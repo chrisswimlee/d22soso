@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Wayne "D22-soso" Chiang — StarCraft Brood War World Champion</title>
+  <meta name="description" content="Wayne D22-soso Chiang — first official StarCraft: Brood War Season 1 World Champion (Random), Cube Draft pioneer, patented casino game inventor, WSOP Talent Manager." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body data-theme="starcraft">
+  <canvas id="fog-canvas" aria-hidden="true"></canvas>
+  <canvas id="minimap-canvas" width="160" height="120" aria-label="Career minimap navigation"></canvas>
+
+  <header class="site-header">
+    <a class="brand" href="#hero">
+      <span class="brand-mark" aria-hidden="true">D22</span>
+      <span class="brand-text">D22-soso</span>
+    </a>
+    <nav class="command-nav" aria-label="Primary">
+      <a href="#hero" data-hotkey="1"><span class="hk">1</span> Briefing</a>
+      <a href="#esports" data-hotkey="2"><span class="hk">2</span> Esports</a>
+      <a href="#poker" data-hotkey="3"><span class="hk">3</span> Poker</a>
+      <a href="#innovation" data-hotkey="4"><span class="hk">4</span> Innovation</a>
+      <a href="#contact" data-hotkey="5"><span class="hk">5</span> Comms</a>
+    </nav>
+  </header>
+
+  <main>
+    <!-- HERO -->
+    <section id="hero" class="section hero" data-node="hero">
+      <div class="hero-fog" aria-hidden="true"></div>
+      <div class="hero-grid">
+        <div class="hero-copy">
+          <p class="eyebrow mono">MISSION BRIEFING // SEASON 1 ARCHIVE</p>
+          <h1 class="brand-hero">Wayne <span class="accent-violet">“D22-soso”</span> Chiang</h1>
+          <p class="role-line mono">StarCraft: Brood War Season 1 World Champion · Random</p>
+          <blockquote class="transmission">
+            Whether navigating the pixelated fog-of-war in early real-time strategy or managing non-linear game theory on the green felt of Las Vegas, the meta never really changes—you just have to be willing to bet on yourself.
+          </blockquote>
+          <div class="cta-row">
+            <a class="btn btn-primary" href="#esports">Enter Esports Legacy</a>
+            <a class="btn btn-gold" href="#innovation">Open Innovation Catalog</a>
+          </div>
+          <p class="hint mono">Press <kbd>R</kbd> to roll Random · Scout the fog with your pointer</p>
+        </div>
+        <div class="hero-stage">
+          <canvas id="race-canvas" width="420" height="320" role="img" aria-label="Random race roll interactive"></canvas>
+          <figure class="hero-portrait">
+            <img
+              src="assets/photos/AAA%20Wayne%20Chiang%20Starcraft%20World%20Champ.JPG"
+              alt="Wayne D22-soso Chiang with StarCraft Brood War world championship trophy"
+              width="640"
+              height="800"
+            />
+            <figcaption class="mono">World Champion · Brood War S1 · 1999</figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <!-- ESPORTS -->
+    <section id="esports" class="section" data-node="esports">
+      <header class="section-head">
+        <p class="eyebrow mono">BUILD ORDER // 1996–PRESENT</p>
+        <h2>Esports Origins</h2>
+        <p class="lede">From Case’s Ladder to Blizzard’s first official Brood War world title—and the cast, community, and formats that followed.</p>
+      </header>
+
+      <div class="tablist-wrap" data-tabs="esports">
+        <div class="tablist" role="tablist" aria-label="Esports theaters">
+          <button role="tab" id="tab-sc" aria-controls="panel-sc" aria-selected="true" data-theme="starcraft">StarCraft</button>
+          <button role="tab" id="tab-cnc" aria-controls="panel-cnc" aria-selected="false" data-theme="cnc">C&amp;C</button>
+          <button role="tab" id="tab-wc" aria-controls="panel-wc" aria-selected="false" data-theme="warcraft">Warcraft</button>
+          <button role="tab" id="tab-mtg" aria-controls="panel-mtg" aria-selected="false" data-theme="mtg">Magic</button>
+          <button role="tab" id="tab-hs" aria-controls="panel-hs" aria-selected="false" data-theme="hearthstone">Hearthstone</button>
+        </div>
+
+        <!-- StarCraft -->
+        <article class="tab-panel theme-panel" id="panel-sc" role="tabpanel" aria-labelledby="tab-sc" data-theme="starcraft">
+          <div class="panel-grid">
+            <div>
+              <h3>StarCraft: Brood War — World Champion</h3>
+              <p class="plaque mono">#1 · Case’s Ladder · StarCraft Teams · 1998</p>
+              <p>April 28, 1999 — Blizzard’s official Battle.net Season 1 Ladder Tournament. Playing <strong>Random</strong>, D22-soso became the first Season 1 Brood War World Champion ($2,500).</p>
+              <blockquote class="transmission">
+                In a legendary ~38-minute semi-final on Lost Temple against Guillaume “Grrrr…” Patry’s Zerg, Chiang rolled Protoss and broke a map 75% controlled by the swarm with a three-pronged assault—Reavers and Archons, Dark Templars and Corsairs, and a devastating center push.
+              </blockquote>
+              <ul class="stat-list mono">
+                <li><span>May 1998</span> First StarCraft tournament — Neutral Ground Mountain View vs Jay “Gadianton” Severson</li>
+                <li><span>Oct 1998</span> First StarCraft play-by-play caster — PGL Season 3</li>
+                <li><span>May 1999</span> PGL Season 4 — 2nd place ($7,000)</li>
+                <li><span>Sep 1999</span> Brood War World Championships — 3rd place</li>
+              </ul>
+              <p>Built GX StarCraft and <em>Pimpest Plays</em>—early esports highlight infrastructure—after Thresh and Calbear handed him the keys.</p>
+            </div>
+            <div class="panel-media">
+              <canvas id="battle-canvas" width="480" height="360" aria-label="Lost Temple battle map animation"></canvas>
+              <img
+                class="panel-img"
+                src="assets/photos/The%20First%20Official%20Blizzard%20StarCraft%20Brood%20War%20World%20Championships%20Won%20by%20D22-soso.jpg"
+                alt="Archive photo of the first official Blizzard Brood War world championship"
+              />
+            </div>
+          </div>
+        </article>
+
+        <!-- C&C -->
+        <article class="tab-panel theme-panel" id="panel-cnc" role="tabpanel" aria-labelledby="tab-cnc" hidden data-theme="cnc">
+          <div class="panel-grid">
+            <div>
+              <h3>Command &amp; Conquer: Tiberian Dawn</h3>
+              <p class="plaque mono">Case’s Ladder · 1v1 &amp; Teams · #1 · 1996</p>
+              <p>As <strong>SoSOWAC</strong>, captaining Team Synergy, Chiang topped the global Case’s Ladder individually and in team play—pre-StarCraft proof that the ladder was the contract.</p>
+              <blockquote class="transmission">
+                Before official world titles were staged, rank was the contract—and the war room was a CRT.
+              </blockquote>
+            </div>
+            <div class="panel-media dossier">
+              <dl class="dossier-meta mono">
+                <div><dt>DATE</dt><dd>1996</dd></div>
+                <div><dt>THEATER</dt><dd>Case’s Ladder</dd></div>
+                <div><dt>OUTCOME</dt><dd>#1 Global</dd></div>
+                <div><dt>CALLSIGN</dt><dd>SoSOWAC</dd></div>
+              </dl>
+            </div>
+          </div>
+        </article>
+
+        <!-- Warcraft -->
+        <article class="tab-panel theme-panel" id="panel-wc" role="tabpanel" aria-labelledby="tab-wc" hidden data-theme="warcraft">
+          <div class="panel-grid">
+            <div>
+              <h3>Warcraft II / III</h3>
+              <p class="plaque mono">Warcraft II Teams #1 · Kali.net · 1997</p>
+              <p>Clan C4L claimed the Case’s / Kali.net team ladder peak. In 2004, the same competitive DNA resurfaced on Warcraft III Battle.net US West—FFA #1 and Arranged Teams #2.</p>
+              <ul class="stat-list mono">
+                <li><span>1997</span> Warcraft II Tides of Darkness — Team Ladder #1</li>
+                <li><span>2004</span> Warcraft III US West FFA #1 / AT #2</li>
+              </ul>
+            </div>
+            <div class="panel-media heraldry">
+              <div class="heraldic-plate">
+                <span class="mono">#1</span>
+                <strong>Warcraft II</strong>
+                <em>Case’s Ladder · Teams · 1997</em>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <!-- MTG -->
+        <article class="tab-panel theme-panel" id="panel-mtg" role="tabpanel" aria-labelledby="tab-mtg" hidden data-theme="mtg">
+          <div class="panel-grid">
+            <div>
+              <h3>Magic: The Gathering — Cube Draft</h3>
+              <p>Chiang engineered curated draft pools that became Cube Draft—now a structural staple of the format. Public credit from Brian Weissman and Tom Martell. Two-time Pro Tour competitor (New York 2001, Boston 2002).</p>
+              <blockquote class="transmission">
+                Kind words from Magic legends Brian Weissman and Tom Martell crediting him for the majority of the Cube Draft idea—lugging the original Super Monster Storage Box affectionately called “The Cube.”
+              </blockquote>
+            </div>
+            <div class="panel-media">
+              <img
+                class="panel-img card-ratio"
+                src="assets/photos/wayne%20chiang%20brian%20weissman.jpg"
+                alt="Wayne Chiang with Brian Weissman"
+              />
+            </div>
+          </div>
+        </article>
+
+        <!-- Hearthstone -->
+        <article class="tab-panel theme-panel" id="panel-hs" role="tabpanel" aria-labelledby="tab-hs" hidden data-theme="hearthstone">
+          <div class="panel-grid">
+            <div>
+              <h3>Hearthstone — High Legend</h3>
+              <p class="plaque mono">Legend · Standard #35 NA · Wild #11 NA</p>
+              <p>Peak Rank #35 Standard NA, #11 Wild NA, and Top 32 in the Wild Open Americas (2018)—the same hand-reading muscle, new battlefield.</p>
+            </div>
+            <div class="panel-media">
+              <img
+                class="panel-img"
+                src="assets/photos/Heartsthone%2035.jpg"
+                alt="Hearthstone Legend rank screenshot peak 35"
+              />
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- POKER -->
+    <section id="poker" class="section section-poker" data-node="poker" data-theme="poker">
+      <header class="section-head">
+        <p class="eyebrow mono">FELT // BROADCAST // TALENT</p>
+        <h2>Poker &amp; Advantage Play</h2>
+        <p class="lede">From math-driven blackjack bans to Live at the Bike and the World Series of Poker media desk.</p>
+      </header>
+      <div class="poker-grid">
+        <div class="lower-third">
+          <span class="lt-label mono">TALENT MANAGER</span>
+          <strong>World Series of Poker — Media Team</strong>
+          <p>Shapes creator ecosystems and oversees the official WSOP Vlogger Program. In 2025, interviewed StarCraft legend SlayerS_BoxeR—a meeting of the man who built the throne and the man who sat on it.</p>
+        </div>
+        <figure class="poker-photo">
+          <img src="assets/photos/Slayers%20Boxer%20D22-soso%20WSOP%202025.jpg" alt="D22-soso with SlayerS BoxeR at WSOP 2025" />
+        </figure>
+        <div class="poker-cards">
+          <article class="felt-card">
+            <h3>Live at the Bike</h3>
+            <p>Co-owner and lead producer. Grew peak concurrent viewers from 2,500 to 8,800 and drove a 40% revenue increase. Hosted the PokerCraft Podcast with industry figures including Hellmuth, Negreanu, and Greenstein.</p>
+            <img class="logo-inline" src="assets/photos/live-at-the-bike-logo.jpg" alt="Live at the Bike logo" />
+          </article>
+          <article class="felt-card">
+            <h3>Advantage Play</h3>
+            <p>Applied Hi-Lo and Hi-Opt 1 card-counting frameworks as a blackjack specialist—resulting in absolute table bans across major Las Vegas and San Diego properties.</p>
+          </article>
+          <article class="felt-card">
+            <h3>Betting on Yourself</h3>
+            <p>Co-author with Fortune 500 strategist Joe Matton. <cite>Betting on Yourself: Winning in Business, Poker, and the Age of AI</cite> (Kendall Hunt, 2026)—outlining the WEB decision framework.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- INNOVATION -->
+    <section id="innovation" class="section" data-node="innovation">
+      <header class="section-head">
+        <p class="eyebrow mono">PATENT ARCHIVE // TABLE GAMES</p>
+        <h2>Casino Game Innovation</h2>
+        <p class="lede">Protected game catalog—play the mechanics, then read the patents.</p>
+      </header>
+
+      <div class="tablist-wrap" data-tabs="innovation">
+        <div class="tablist" role="tablist" aria-label="Innovation catalog">
+          <button role="tab" id="tab-2hh" aria-controls="panel-2hh" aria-selected="true" data-theme="2hh">2 Hand Hold’em™</button>
+          <button role="tab" id="tab-badugi" aria-controls="panel-badugi" aria-selected="false" data-theme="badugi">Badugi Chase™</button>
+        </div>
+
+        <article class="tab-panel theme-panel" id="panel-2hh" role="tabpanel" aria-labelledby="tab-2hh" data-theme="2hh">
+          <div class="panel-grid">
+            <div>
+              <h3>2 Hand Hold’em™</h3>
+              <p class="plaque mono">U.S. Pat. 11,117,045 · 11,731,032 · 12,005,342</p>
+              <p>Player is dealt four hole cards, splits them into two independent two-card hands, and plays both against a single board. Stable <strong class="gold">4.06%</strong> house edge.</p>
+              <p>Deployed live at Great American Casino Tukwila (WA) via Maverick Gaming. Launches planned for Commerce Casino and Hustler Casino (LA).</p>
+              <p class="hint mono">Click or drag to split the hands</p>
+            </div>
+            <div class="panel-media">
+              <canvas id="cards-2hh" width="480" height="320" aria-label="Interactive 2 Hand Hold'em card split demo"></canvas>
+              <img class="logo-inline" src="assets/photos/2hh%20LOGO%20OFFICIAL%20TRADEMARK%20APPLIED.png" alt="2 Hand Hold'em trademark logo" />
+            </div>
+          </div>
+        </article>
+
+        <article class="tab-panel theme-panel" id="panel-badugi" role="tabpanel" aria-labelledby="tab-badugi" hidden data-theme="badugi">
+          <div class="panel-grid">
+            <div>
+              <h3>Badugi Chase™</h3>
+              <p class="plaque mono">U.S. Pat. 11,810,421 · 12,131,608</p>
+              <p>Single-draw lowball variant. Three community cards deal face-up; the player selects exactly one to complete their hand—leaving the remaining two to the dealer. Structured at a <strong class="gold">1.22%</strong> house edge of total volume wagered.</p>
+              <p>Developed with Charles Chang and Joe Shipman, Ph.D.</p>
+              <p class="hint mono">Pick one of the three community cards</p>
+            </div>
+            <div class="panel-media">
+              <canvas id="cards-badugi" width="480" height="320" aria-label="Interactive Badugi Chase triad picker"></canvas>
+              <img class="panel-img" src="assets/photos/Badugi%20Play%204.png" alt="Badugi Chase gameplay diagram" />
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- CONTACT -->
+    <section id="contact" class="section contact" data-node="contact">
+      <header class="section-head">
+        <p class="eyebrow mono">OPEN COMMS CHANNEL</p>
+        <h2>Strategic Collaboration</h2>
+        <p class="lede">For licensing, media, talent, or partnership inquiries—open a channel.</p>
+      </header>
+      <a class="btn btn-primary btn-lg" href="mailto:d22sosowaynechiang@gmail.com">Email Wayne at d22sosowaynechiang@gmail.com</a>
+      <p class="footer-meta mono">© Wayne “D22-soso” Chiang · Portfolio archive · Bet on yourself</p>
+    </section>
+  </main>
+
+  <script src="js/physics.js"></script>
+  <script src="js/game-canvas.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
