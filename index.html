@@ -20,6 +20,7 @@
     <div class="bg-layer" data-bg="mtg"></div>
     <div class="bg-layer" data-bg="hearthstone"></div>
     <div class="bg-layer" data-bg="poker"></div>
+    <div class="bg-layer" data-bg="book"></div>
     <div class="bg-layer" data-bg="2hh"></div>
     <div class="bg-layer" data-bg="badugi"></div>
     <div class="bg-layer" data-bg="contact"></div>
@@ -38,9 +39,10 @@
       <a href="#about" data-hotkey="2"><span class="hk">2</span><span class="nav-label">About</span></a>
       <a href="#esports" data-hotkey="3"><span class="hk">3</span><span class="nav-label">Esports</span></a>
       <a href="#poker" data-hotkey="4"><span class="hk">4</span><span class="nav-label">Poker</span></a>
-      <a href="#innovation" data-hotkey="5"><span class="hk">5</span><span class="nav-label">Innovation</span></a>
-      <a href="#play" data-hotkey="6"><span class="hk">6</span><span class="nav-label">Play 2HH</span></a>
-      <a href="#contact" data-hotkey="7"><span class="hk">7</span><span class="nav-label">Comms</span></a>
+      <a href="#book" data-hotkey="5"><span class="hk">5</span><span class="nav-label">Book</span></a>
+      <a href="#innovation" data-hotkey="6"><span class="hk">6</span><span class="nav-label">Innovation</span></a>
+      <a href="#play" data-hotkey="7"><span class="hk">7</span><span class="nav-label">Play 2HH</span></a>
+      <a href="#contact" data-hotkey="8"><span class="hk">8</span><span class="nav-label">Comms</span></a>
     </nav>
   </header>
 
@@ -244,134 +246,136 @@
       </div>
     </section>
 
-    <!-- ESPORTS -->
-    <section id="esports" class="section" data-node="esports" data-bg="starcraft" data-bg-from-tab="esports">
+    <!-- ESPORTS — each theater is its own scrollable section -->
+    <section id="esports" class="section game-section" data-node="esports" data-bg="starcraft" data-theme="starcraft">
       <header class="section-head" data-reveal>
         <p class="eyebrow-badge mono"><span class="badge-dot" aria-hidden="true"></span>BUILD ORDER // 1996–PRESENT</p>
         <h2>Esports Origins</h2>
-        <p class="lede">From Case’s Ladder to Blizzard’s first official Brood War world title—and the cast, community, and formats that followed.</p>
+        <p class="lede">From Case’s Ladder to Blizzard’s first official Brood War world title—and the cast, community, and formats that followed. Scroll through each theater.</p>
       </header>
 
-      <div class="tablist-wrap" data-tabs="esports" data-reveal>
-        <div class="tablist" role="tablist" aria-label="Esports theaters">
-          <button role="tab" id="tab-sc" aria-controls="panel-sc" aria-selected="true" data-theme="starcraft">StarCraft</button>
-          <button role="tab" id="tab-cnc" aria-controls="panel-cnc" aria-selected="false" data-theme="cnc">C&amp;C</button>
-          <button role="tab" id="tab-wc" aria-controls="panel-wc" aria-selected="false" data-theme="warcraft">Warcraft</button>
-          <button role="tab" id="tab-mtg" aria-controls="panel-mtg" aria-selected="false" data-theme="mtg">Magic</button>
-          <button role="tab" id="tab-hs" aria-controls="panel-hs" aria-selected="false" data-theme="hearthstone">Hearthstone</button>
+      <article class="game-panel theme-panel" data-theme="starcraft" data-reveal>
+        <p class="game-tag mono"><span class="badge-dot" aria-hidden="true"></span>THEATER 01 // STARCRAFT: BROOD WAR</p>
+        <div class="panel-grid">
+          <div>
+            <h3>StarCraft: Brood War — World Champion</h3>
+            <p class="plaque mono">#1 · Case’s Ladder · StarCraft Teams · 1998</p>
+            <p>April 28, 1999 — Blizzard’s official Battle.net Season 1 Ladder Tournament. Playing <strong>Random</strong>, D22-soso became the first Season 1 Brood War World Champion ($2,500).</p>
+            <blockquote class="transmission">
+              In a legendary ~38-minute semi-final on Lost Temple against Guillaume “Grrrr…” Patry’s Zerg, Chiang rolled Protoss and broke a map 75% controlled by the swarm with a three-pronged assault—Reavers and Archons, Dark Templars and Corsairs, and a devastating center push.
+            </blockquote>
+            <ul class="stat-list mono">
+              <li><span>May 1998</span> First StarCraft tournament — Neutral Ground Mountain View vs Jay “Gadianton” Severson</li>
+              <li><span>Oct 1998</span> First StarCraft play-by-play caster — PGL Season 3</li>
+              <li><span>May 1999</span> PGL Season 4 — 2nd place ($7,000)</li>
+              <li><span>Sep 1999</span> Brood War World Championships — 3rd place</li>
+            </ul>
+            <p>Built GX StarCraft and <em>Pimpest Plays</em>—early esports highlight infrastructure—after Thresh and Calbear handed him the keys.</p>
+          </div>
+          <div class="panel-media">
+            <canvas id="battle-canvas" width="480" height="360" aria-label="Lost Temple battle map animation"></canvas>
+            <img
+              class="panel-img"
+              src="assets/photos/The%20First%20Official%20Blizzard%20StarCraft%20Brood%20War%20World%20Championships%20Won%20by%20D22-soso.jpg"
+              alt="Archive photo of the first official Blizzard Brood War world championship"
+            />
+          </div>
         </div>
+      </article>
+    </section>
 
-        <!-- StarCraft -->
-        <article class="tab-panel theme-panel" id="panel-sc" role="tabpanel" aria-labelledby="tab-sc" data-theme="starcraft">
-          <div class="panel-grid">
-            <div>
-              <h3>StarCraft: Brood War — World Champion</h3>
-              <p class="plaque mono">#1 · Case’s Ladder · StarCraft Teams · 1998</p>
-              <p>April 28, 1999 — Blizzard’s official Battle.net Season 1 Ladder Tournament. Playing <strong>Random</strong>, D22-soso became the first Season 1 Brood War World Champion ($2,500).</p>
-              <blockquote class="transmission">
-                In a legendary ~38-minute semi-final on Lost Temple against Guillaume “Grrrr…” Patry’s Zerg, Chiang rolled Protoss and broke a map 75% controlled by the swarm with a three-pronged assault—Reavers and Archons, Dark Templars and Corsairs, and a devastating center push.
-              </blockquote>
-              <ul class="stat-list mono">
-                <li><span>May 1998</span> First StarCraft tournament — Neutral Ground Mountain View vs Jay “Gadianton” Severson</li>
-                <li><span>Oct 1998</span> First StarCraft play-by-play caster — PGL Season 3</li>
-                <li><span>May 1999</span> PGL Season 4 — 2nd place ($7,000)</li>
-                <li><span>Sep 1999</span> Brood War World Championships — 3rd place</li>
-              </ul>
-              <p>Built GX StarCraft and <em>Pimpest Plays</em>—early esports highlight infrastructure—after Thresh and Calbear handed him the keys.</p>
-            </div>
-            <div class="panel-media">
-              <canvas id="battle-canvas" width="480" height="360" aria-label="Lost Temple battle map animation"></canvas>
-              <img
-                class="panel-img"
-                src="assets/photos/The%20First%20Official%20Blizzard%20StarCraft%20Brood%20War%20World%20Championships%20Won%20by%20D22-soso.jpg"
-                alt="Archive photo of the first official Blizzard Brood War world championship"
-              />
+    <!-- C&C -->
+    <section id="game-cnc" class="section game-section" data-node="esports" data-bg="cnc" data-theme="cnc">
+      <article class="game-panel theme-panel" data-theme="cnc" data-reveal>
+        <p class="game-tag mono"><span class="badge-dot" aria-hidden="true"></span>THEATER 02 // COMMAND &amp; CONQUER</p>
+        <div class="panel-grid">
+          <div>
+            <h3>Command &amp; Conquer: Tiberian Dawn</h3>
+            <p class="plaque mono">Case’s Ladder · 1v1 &amp; Teams · #1 · 1996</p>
+            <p>As <strong>SoSOWAC</strong>, captaining Team Synergy, Chiang topped the global Case’s Ladder individually and in team play—pre-StarCraft proof that the ladder was the contract.</p>
+            <blockquote class="transmission">
+              Before official world titles were staged, rank was the contract—and the war room was a CRT.
+            </blockquote>
+          </div>
+          <div class="panel-media dossier">
+            <dl class="dossier-meta mono">
+              <div><dt>DATE</dt><dd>1996</dd></div>
+              <div><dt>THEATER</dt><dd>Case’s Ladder</dd></div>
+              <div><dt>OUTCOME</dt><dd>#1 Global</dd></div>
+              <div><dt>CALLSIGN</dt><dd>SoSOWAC</dd></div>
+            </dl>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <!-- Warcraft -->
+    <section id="game-warcraft" class="section game-section" data-node="esports" data-bg="warcraft" data-theme="warcraft">
+      <article class="game-panel theme-panel" data-theme="warcraft" data-reveal>
+        <p class="game-tag mono"><span class="badge-dot" aria-hidden="true"></span>THEATER 03 // WARCRAFT II / III</p>
+        <div class="panel-grid">
+          <div>
+            <h3>Warcraft II / III</h3>
+            <p class="plaque mono">Warcraft II Teams #1 · Kali.net · 1997</p>
+            <p>Clan C4L claimed the Case’s / Kali.net team ladder peak. In 2004, the same competitive DNA resurfaced on Warcraft III Battle.net US West—FFA #1 and Arranged Teams #2.</p>
+            <ul class="stat-list mono">
+              <li><span>1997</span> Warcraft II Tides of Darkness — Team Ladder #1</li>
+              <li><span>2004</span> Warcraft III US West FFA #1 / AT #2</li>
+            </ul>
+          </div>
+          <div class="panel-media heraldry">
+            <div class="heraldic-plate">
+              <span class="mono">#1</span>
+              <strong>Warcraft II</strong>
+              <em>Case’s Ladder · Teams · 1997</em>
             </div>
           </div>
-        </article>
+        </div>
+      </article>
+    </section>
 
-        <!-- C&C -->
-        <article class="tab-panel theme-panel" id="panel-cnc" role="tabpanel" aria-labelledby="tab-cnc" hidden data-theme="cnc">
-          <div class="panel-grid">
-            <div>
-              <h3>Command &amp; Conquer: Tiberian Dawn</h3>
-              <p class="plaque mono">Case’s Ladder · 1v1 &amp; Teams · #1 · 1996</p>
-              <p>As <strong>SoSOWAC</strong>, captaining Team Synergy, Chiang topped the global Case’s Ladder individually and in team play—pre-StarCraft proof that the ladder was the contract.</p>
-              <blockquote class="transmission">
-                Before official world titles were staged, rank was the contract—and the war room was a CRT.
-              </blockquote>
-            </div>
-            <div class="panel-media dossier">
-              <dl class="dossier-meta mono">
-                <div><dt>DATE</dt><dd>1996</dd></div>
-                <div><dt>THEATER</dt><dd>Case’s Ladder</dd></div>
-                <div><dt>OUTCOME</dt><dd>#1 Global</dd></div>
-                <div><dt>CALLSIGN</dt><dd>SoSOWAC</dd></div>
-              </dl>
-            </div>
+    <!-- MTG -->
+    <section id="game-mtg" class="section game-section" data-node="esports" data-bg="mtg" data-theme="mtg">
+      <article class="game-panel theme-panel" data-theme="mtg" data-reveal>
+        <p class="game-tag mono"><span class="badge-dot" aria-hidden="true"></span>THEATER 04 // MAGIC: THE GATHERING</p>
+        <div class="panel-grid">
+          <div>
+            <h3>Magic: The Gathering — Cube Draft</h3>
+            <p>Chiang engineered curated draft pools that became Cube Draft—now a structural staple of the format. Public credit from Brian Weissman and Tom Martell. Two-time Pro Tour competitor (New York 2001, Boston 2002).</p>
+            <blockquote class="transmission">
+              Kind words from Magic legends Brian Weissman and Tom Martell crediting him for the majority of the Cube Draft idea—lugging the original Super Monster Storage Box affectionately called “The Cube.”
+            </blockquote>
           </div>
-        </article>
+          <div class="panel-media">
+            <img
+              class="panel-img card-ratio"
+              src="assets/photos/wayne%20chiang%20brian%20weissman.jpg"
+              alt="Wayne Chiang with Brian Weissman"
+            />
+          </div>
+        </div>
+      </article>
+    </section>
 
-        <!-- Warcraft -->
-        <article class="tab-panel theme-panel" id="panel-wc" role="tabpanel" aria-labelledby="tab-wc" hidden data-theme="warcraft">
-          <div class="panel-grid">
-            <div>
-              <h3>Warcraft II / III</h3>
-              <p class="plaque mono">Warcraft II Teams #1 · Kali.net · 1997</p>
-              <p>Clan C4L claimed the Case’s / Kali.net team ladder peak. In 2004, the same competitive DNA resurfaced on Warcraft III Battle.net US West—FFA #1 and Arranged Teams #2.</p>
-              <ul class="stat-list mono">
-                <li><span>1997</span> Warcraft II Tides of Darkness — Team Ladder #1</li>
-                <li><span>2004</span> Warcraft III US West FFA #1 / AT #2</li>
-              </ul>
-            </div>
-            <div class="panel-media heraldry">
-              <div class="heraldic-plate">
-                <span class="mono">#1</span>
-                <strong>Warcraft II</strong>
-                <em>Case’s Ladder · Teams · 1997</em>
-              </div>
-            </div>
+    <!-- Hearthstone -->
+    <section id="game-hearthstone" class="section game-section" data-node="esports" data-bg="hearthstone" data-theme="hearthstone">
+      <article class="game-panel theme-panel" data-theme="hearthstone" data-reveal>
+        <p class="game-tag mono"><span class="badge-dot" aria-hidden="true"></span>THEATER 05 // HEARTHSTONE</p>
+        <div class="panel-grid">
+          <div>
+            <h3>Hearthstone — High Legend</h3>
+            <p class="plaque mono">Legend · Standard #35 NA · Wild #11 NA</p>
+            <p>Peak Rank #35 Standard NA, #11 Wild NA, and Top 32 in the Wild Open Americas (2018)—the same hand-reading muscle, new battlefield.</p>
           </div>
-        </article>
-
-        <!-- MTG -->
-        <article class="tab-panel theme-panel" id="panel-mtg" role="tabpanel" aria-labelledby="tab-mtg" hidden data-theme="mtg">
-          <div class="panel-grid">
-            <div>
-              <h3>Magic: The Gathering — Cube Draft</h3>
-              <p>Chiang engineered curated draft pools that became Cube Draft—now a structural staple of the format. Public credit from Brian Weissman and Tom Martell. Two-time Pro Tour competitor (New York 2001, Boston 2002).</p>
-              <blockquote class="transmission">
-                Kind words from Magic legends Brian Weissman and Tom Martell crediting him for the majority of the Cube Draft idea—lugging the original Super Monster Storage Box affectionately called “The Cube.”
-              </blockquote>
-            </div>
-            <div class="panel-media">
-              <img
-                class="panel-img card-ratio"
-                src="assets/photos/wayne%20chiang%20brian%20weissman.jpg"
-                alt="Wayne Chiang with Brian Weissman"
-              />
-            </div>
+          <div class="panel-media">
+            <img
+              class="panel-img"
+              src="assets/photos/Heartsthone%2035.jpg"
+              alt="Hearthstone Legend rank screenshot peak 35"
+            />
           </div>
-        </article>
-
-        <!-- Hearthstone -->
-        <article class="tab-panel theme-panel" id="panel-hs" role="tabpanel" aria-labelledby="tab-hs" hidden data-theme="hearthstone">
-          <div class="panel-grid">
-            <div>
-              <h3>Hearthstone — High Legend</h3>
-              <p class="plaque mono">Legend · Standard #35 NA · Wild #11 NA</p>
-              <p>Peak Rank #35 Standard NA, #11 Wild NA, and Top 32 in the Wild Open Americas (2018)—the same hand-reading muscle, new battlefield.</p>
-            </div>
-            <div class="panel-media">
-              <img
-                class="panel-img"
-                src="assets/photos/Heartsthone%2035.jpg"
-                alt="Hearthstone Legend rank screenshot peak 35"
-              />
-            </div>
-          </div>
-        </article>
-      </div>
+        </div>
+      </article>
     </section>
 
     <!-- POKER -->
@@ -400,10 +404,51 @@
             <h3>Advantage Play</h3>
             <p>Applied Hi-Lo and Hi-Opt 1 card-counting frameworks as a blackjack specialist—resulting in absolute table bans across major Las Vegas and San Diego properties.</p>
           </article>
-          <article class="felt-card reveal-item">
-            <h3>Betting on Yourself</h3>
-            <p>Co-author with Fortune 500 strategist Joe Matton. <cite>Betting on Yourself: Winning in Business, Poker, and the Age of AI</cite> (Kendall Hunt, 2026)—outlining the WEB decision framework.</p>
-          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- BOOK — Betting on Yourself -->
+    <section id="book" class="section section-book" data-node="book" data-bg="book" data-theme="book">
+      <header class="section-head" data-reveal>
+        <p class="eyebrow-badge mono"><span class="badge-dot" aria-hidden="true"></span>PRINT // KENDALL HUNT · 2026</p>
+        <h2>Betting on Yourself</h2>
+        <p class="lede">The playbook behind the career—decision-making from the ladder, the felt, and the age of AI.</p>
+      </header>
+
+      <div class="book-layout" data-reveal>
+        <div class="book-showcase" data-parallax="0.06">
+          <div class="book-3d" aria-hidden="true">
+            <div class="book-cover">
+              <span class="book-cover-kicker mono">WAYNE “D22-SOSO” CHIANG &amp; JOE MATTON</span>
+              <span class="book-cover-title">Betting<br />on<br />Yourself</span>
+              <span class="book-cover-sub mono">Winning in Business, Poker &amp; the Age of AI</span>
+            </div>
+            <div class="book-spine"></div>
+          </div>
+        </div>
+
+        <div class="book-copy">
+          <p class="plaque mono">Kendall Hunt · 2026 · with Joe Matton</p>
+          <p>
+            Co-authored with Fortune 500 strategist Joe Matton,
+            <cite>Betting on Yourself: Winning in Business, Poker, and the Age of AI</cite>
+            distills three decades of high-stakes decision-making into a single, repeatable system.
+          </p>
+          <p>
+            At its core is the <strong class="gold">WEB decision framework</strong>—a method for weighing
+            expected value, edge, and bankroll the same way a world champion reads a board: fast, honest,
+            and unafraid to commit when the odds are right.
+          </p>
+          <ul class="book-points mono">
+            <li><span>W</span> Weigh the expected value before the ego</li>
+            <li><span>E</span> Establish your edge—or fold</li>
+            <li><span>B</span> Bet the bankroll you can survive losing</li>
+          </ul>
+          <div class="cta-row book-ctas">
+            <a class="btn btn-primary btn-arrow" href="#contact">Inquire about the release <span class="arrow" aria-hidden="true">→</span></a>
+            <span class="btn btn-soon" aria-disabled="true">Available 2026</span>
+          </div>
         </div>
       </div>
     </section>
