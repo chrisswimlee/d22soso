@@ -37,6 +37,34 @@
     ),
     starDot: svg(`<circle cx="50" cy="50" r="4" fill="currentColor"/>`),
 
+    /* StarCraft: Protoss pylon energy ring */
+    pylonRing: svg(
+      `<ellipse cx="50" cy="50" rx="40" ry="16" />
+       <ellipse cx="50" cy="50" rx="26" ry="10" />
+       <path d="M50 34 L50 66" />
+       <circle cx="50" cy="50" r="3" fill="currentColor"/>`
+    ),
+    /* StarCraft: Siege Tank silhouette */
+    siegeTank: svg(
+      `<path d="M14 66 H86 L80 78 H20 Z" />
+       <rect x="26" y="50" width="40" height="16" rx="3" />
+       <path d="M62 54 L92 46" />
+       <circle cx="26" cy="72" r="4"/><circle cx="42" cy="72" r="4"/>
+       <circle cx="58" cy="72" r="4"/><circle cx="74" cy="72" r="4"/>`
+    ),
+    /* StarCraft: Battlecruiser silhouette */
+    battlecruiser: svg(
+      `<path d="M10 52 L34 40 L78 40 L92 52 L78 62 L34 62 Z" />
+       <path d="M40 40 L46 28 L66 28 L70 40" />
+       <path d="M34 62 L40 74 L64 74 L70 62" />
+       <path d="M92 52 L82 50 M92 52 L82 54" />`
+    ),
+    /* StarCraft: mineral crystal cluster */
+    mineral: svg(
+      `<path d="M40 84 L30 48 L46 20 L58 44 Z" />
+       <path d="M58 84 L54 44 L68 30 L74 62 Z" />`
+    ),
+
     /* C&C: GDI eagle-ish + Nod scorpion silhouettes simplified */
     gdi: svg(
       `<path d="M50 12 L70 30 L82 26 L74 42 L88 52 L74 58 L82 74 L70 70 L50 88 L30 70 L18 74 L26 58 L12 52 L26 42 L18 26 L30 30 Z" />`
@@ -84,6 +112,17 @@
       `<circle cx="50" cy="50" r="36" />
        <path d="M50 20 L50 80 M28 34 L72 66 M28 66 L72 34" />`
     ),
+    /* Hearthstone: ornate card back frame */
+    cardBack: svg(
+      `<rect x="22" y="10" width="56" height="80" rx="8" />
+       <rect x="32" y="20" width="36" height="60" rx="6" />
+       <circle cx="50" cy="50" r="12" />
+       <path d="M50 38 L50 62 M38 50 L62 50" />`
+    ),
+    /* Hearthstone: tavern ember */
+    ember: svg(
+      `<path d="M50 14 C64 32 74 42 66 60 C62 72 52 72 50 62 C48 72 38 72 34 60 C26 42 36 32 50 14 Z" fill="currentColor" stroke="none"/>`
+    ),
 
     /* Poker: card face (Ace) + chip disc */
     cardFace: svg(
@@ -130,13 +169,15 @@
    */
   const FLEETS = {
     starcraft: [
-      { i: "protoss", x: 12, y: 22, s: 260, z: 0.85, r: -8, c: "#a78bfa", d: 22 },
-      { i: "zerg", x: 82, y: 68, s: 220, z: 0.7, r: 12, c: "#2dd4bf", d: 26 },
-      { i: "terran", x: 78, y: 18, s: 130, z: 0.5, r: 6, c: "#d4af37", d: 18 },
-      { i: "starDot", x: 40, y: 80, s: 60, z: 0.3, r: 0, c: "#fff", d: 12 },
-      { i: "starDot", x: 20, y: 55, s: 40, z: 0.2, r: 0, c: "#fff", d: 14 },
-      { i: "starDot", x: 66, y: 40, s: 30, z: 0.15, r: 0, c: "#fff", d: 10 },
-      { i: "reticle", x: 55, y: 75, s: 180, z: 0.6, r: 0, c: "#8b5cf6", d: 30 },
+      { i: "battlecruiser", x: 14, y: 20, s: 300, z: 0.85, r: -6, c: "#60a5fa", d: 22 },
+      { i: "pylonRing", x: 80, y: 30, s: 200, z: 0.6, r: 4, c: "#38bdf8", d: 24 },
+      { i: "siegeTank", x: 78, y: 72, s: 240, z: 0.7, r: 6, c: "#a78bfa", d: 26 },
+      { i: "mineral", x: 20, y: 74, s: 150, z: 0.5, r: -8, c: "#2dd4bf", d: 18 },
+      { i: "protoss", x: 52, y: 78, s: 160, z: 0.55, r: 0, c: "#8b5cf6", d: 30 },
+      { i: "starDot", x: 40, y: 40, s: 50, z: 0.3, r: 0, c: "#cfe8ff", d: 12 },
+      { i: "starDot", x: 66, y: 55, s: 36, z: 0.2, r: 0, c: "#cfe8ff", d: 14 },
+      { i: "starDot", x: 30, y: 30, s: 28, z: 0.15, r: 0, c: "#fff", d: 10 },
+      { i: "starDot", x: 88, y: 62, s: 22, z: 0.1, r: 0, c: "#fff", d: 9 },
     ],
     about: [
       { i: "protoss", x: 8, y: 15, s: 200, z: 0.6, r: -12, c: "#8b5cf6", d: 24 },
@@ -165,11 +206,14 @@
       { i: "manaPip", x: 50, y: 50, s: 60, z: 0.25, r: 0, c: "#f472b6", d: 16 },
     ],
     hearthstone: [
-      { i: "manaCrystal", x: 15, y: 20, s: 260, z: 0.9, r: -6, c: "#38bdf8", d: 24 },
-      { i: "manaCrystal", x: 80, y: 74, s: 220, z: 0.75, r: 8, c: "#f59e0b", d: 26 },
-      { i: "rune", x: 62, y: 26, s: 170, z: 0.55, r: 0, c: "#fde68a", d: 22 },
-      { i: "manaCrystal", x: 45, y: 82, s: 120, z: 0.4, r: 0, c: "#f59e0b", d: 18 },
-      { i: "rune", x: 26, y: 72, s: 100, z: 0.3, r: 0, c: "#b45309", d: 20 },
+      { i: "manaCrystal", x: 15, y: 20, s: 250, z: 0.9, r: -6, c: "#38bdf8", d: 24 },
+      { i: "cardBack", x: 82, y: 70, s: 240, z: 0.8, r: 8, c: "#f59e0b", d: 26 },
+      { i: "manaCrystal", x: 66, y: 24, s: 150, z: 0.55, r: 0, c: "#22d3ee", d: 22 },
+      { i: "rune", x: 26, y: 72, s: 130, z: 0.4, r: 0, c: "#fde68a", d: 20 },
+      { i: "ember", x: 45, y: 82, s: 70, z: 0.3, r: 0, c: "#f59e0b", d: 8 },
+      { i: "ember", x: 55, y: 38, s: 50, z: 0.22, r: 0, c: "#fbbf24", d: 7 },
+      { i: "ember", x: 34, y: 50, s: 40, z: 0.16, r: 0, c: "#fdba74", d: 6 },
+      { i: "ember", x: 74, y: 52, s: 34, z: 0.12, r: 0, c: "#f59e0b", d: 9 },
     ],
     poker: [
       { i: "cardFace", x: 14, y: 22, s: 260, z: 0.85, r: -12, c: "#e8e6e3", d: 26 },
@@ -201,6 +245,11 @@
     ],
   };
 
+  /* Icons that rotate around the Y-axis (cards) instead of Z */
+  const Y_AXIS = new Set(["card", "cardFace", "cardBack", "twoCards", "triad"]);
+  /* Tiny ambience assets — twinkle only, minimal drift */
+  const SPARK = new Set(["starDot", "ember"]);
+
   /* --------- Build fleets into each layer --------- */
   const layerMap = new Map();
 
@@ -211,39 +260,46 @@
 
     const fleet = document.createElement("div");
     fleet.className = "bg-fleet";
+    const assets = [];
+
     spec.forEach((a, idx) => {
       const el = document.createElement("span");
       el.className = "bg-asset";
       el.dataset.z = a.z;
-      el.dataset.rot = a.r;
       el.style.setProperty("--x", a.x + "%");
       el.style.setProperty("--y", a.y + "%");
       el.style.setProperty("--s", a.s + "px");
       el.style.setProperty("--rot", a.r + "deg");
       el.style.setProperty("--z", a.z);
-      el.style.setProperty("--drift", a.d + "s");
       el.style.setProperty("--tint", a.c);
-      /* Stagger idle animation start */
-      el.style.animationDelay = (idx * -3.5) % 20 + "s";
       el.innerHTML = ICONS[a.i] || "";
       fleet.appendChild(el);
+
+      assets.push({
+        el,
+        z: a.z,
+        depth: 0.4 + a.z,
+        baseRot: a.r,
+        phase: idx * 1.7,
+        dir: idx % 2 === 0 ? 1 : -1,
+        yAxis: Y_AXIS.has(a.i),
+        spark: SPARK.has(a.i),
+        /* per-asset resting transform (updated each frame) */
+      });
     });
 
     layer.appendChild(fleet);
-    layerMap.set(layer, { key, spec, fleet });
+    layerMap.set(layer, { key, assets });
   });
 
-  /* --------- Scroll-driven progress on the active layer --------- */
+  /* --------- Section lookup for the active layer --------- */
   const sections = ["hero", "about", "esports", "poker", "innovation", "play", "contact"]
     .map((id) => document.getElementById(id))
     .filter(Boolean);
 
-  function sectionForActiveLayer() {
-    const key = document.body.dataset.bg;
-    /* Find the section currently mapped to this bg key */
+  function sectionForKey(key) {
     for (const s of sections) {
-      const bg = s.dataset.bg;
-      if (bg === key) return s;
+      if (s.dataset.bg === key) return s;
       if (s.hasAttribute("data-bg-from-tab")) {
         const t = s.querySelector('[role="tab"][aria-selected="true"]');
         if (t?.dataset.theme === key) return s;
@@ -252,40 +308,110 @@
     return null;
   }
 
-  let raf = 0;
-  function tick() {
-    raf = 0;
+  /* --------- Scroll-velocity physics engine --------- */
+  /* travel: signed accumulator advanced by smoothed scroll velocity.
+   * When scrolling stops, vel decays to 0 → travel freezes → assets
+   * settle into a stationary floating pose (stop-on-inertia).      */
+  let lastY = window.scrollY;
+  let vel = 0; // smoothed px/frame
+  let travel = 0; // accumulated scroll (drives drift + spin)
+  let running = false;
+  let idle = 0;
+
+  function frame() {
+    const y = window.scrollY;
+    const raw = y - lastY;
+    lastY = y;
+
+    /* Smooth velocity toward raw input; ~0.3-0.5s decay to rest */
+    vel += (raw - vel) * 0.18;
+    if (Math.abs(vel) < 0.03) vel = 0;
+    travel += vel * 0.03;
+
     const active = document.querySelector("#bg-stage .bg-layer.is-active");
-    if (!active) return;
+    const entry = active ? layerMap.get(active) : null;
 
-    const s = sectionForActiveLayer();
-    if (!s) return;
+    if (entry) {
+      const s = sectionForKey(entry.key);
+      const vh = window.innerHeight || 1;
+      let p = 0;
+      if (s) {
+        const rect = s.getBoundingClientRect();
+        const center = rect.top + rect.height * 0.5;
+        p = (center - vh * 0.5) / (vh * 0.5 + rect.height * 0.5);
+        p = Math.max(-1, Math.min(1, p));
+      }
+      const enter = 1 - Math.min(1, Math.abs(p));
+      /* how strongly assets react right now (0 at rest → 1 fast scroll) */
+      const speed = Math.min(1, Math.abs(vel) / 24);
 
-    const rect = s.getBoundingClientRect();
-    const vh = window.innerHeight || 1;
-    /* Progress: -1 (below), 0 (center), +1 (above) */
-    const center = rect.top + rect.height * 0.5;
-    const p = (center - vh * 0.5) / (vh * 0.5 + rect.height * 0.5);
-    const clamped = Math.max(-1, Math.min(1, p));
-    active.style.setProperty("--p", clamped.toFixed(3));
-    /* Enter progress (0..1) — used for scale-in from far */
-    const enter = 1 - Math.min(1, Math.abs(clamped));
-    active.style.setProperty("--enter", enter.toFixed(3));
+      for (const a of entry.assets) {
+        const d = a.depth;
+        /* Bounded drift (sin/cos of travel) — advances only while scrolling */
+        const drift = a.spark ? 6 : 22;
+        const dx = Math.sin(travel * 0.7 + a.phase) * drift * d;
+        const dy = Math.cos(travel * 0.55 + a.phase * 1.3) * drift * d;
+        /* Section parallax on scroll progress */
+        const py = p * 80 * d;
+        const px = p * 24 * d * a.dir;
+        /* Depth zoom: recede when off-center, forward when centered */
+        const tz = (enter - 1) * 380 * d;
+        const scale = 0.45 + enter * 0.65;
+        /* Rotation follows scroll travel; freezes when scroll stops */
+        const spin = travel * (a.yAxis ? 26 : 12) * a.dir * (0.5 + a.z);
+
+        if (a.yAxis) {
+          a.el.style.transform =
+            `translate3d(${(dx + px).toFixed(2)}px, ${(dy + py).toFixed(2)}px, ${tz.toFixed(1)}px) ` +
+            `rotateY(${spin.toFixed(2)}deg) rotate(${a.baseRot}deg) scale(${scale.toFixed(3)})`;
+        } else {
+          a.el.style.transform =
+            `translate3d(${(dx + px).toFixed(2)}px, ${(dy + py).toFixed(2)}px, ${tz.toFixed(1)}px) ` +
+            `rotate(${(a.baseRot + spin).toFixed(2)}deg) scale(${scale.toFixed(3)})`;
+        }
+
+        /* Sparkle assets brighten slightly with scroll speed */
+        if (a.spark) {
+          a.el.style.setProperty("--spark", (0.55 + speed * 0.45).toFixed(2));
+        }
+      }
+    }
+
+    /* Keep looping while there's motion or a pending settle */
+    if (vel !== 0) {
+      idle = 0;
+      requestAnimationFrame(frame);
+    } else if (idle < 6) {
+      /* A few extra frames so transforms settle smoothly, then park */
+      idle++;
+      requestAnimationFrame(frame);
+    } else {
+      running = false;
+    }
   }
 
-  function schedule() {
-    if (raf) return;
-    raf = requestAnimationFrame(tick);
+  function kick() {
+    lastY = window.scrollY;
+    if (!running) {
+      running = true;
+      idle = 0;
+      requestAnimationFrame(frame);
+    }
   }
 
   if (!reduced) {
-    window.addEventListener("scroll", schedule, { passive: true });
-    window.addEventListener("resize", schedule, { passive: true });
-    /* Re-schedule on bg change (mutation on body[data-bg]) */
-    new MutationObserver(schedule).observe(document.body, {
+    window.addEventListener("scroll", kick, { passive: true });
+    window.addEventListener("resize", kick, { passive: true });
+    /* Re-run when the active theme changes (scroll into section / tab switch) */
+    new MutationObserver(kick).observe(document.body, {
       attributes: true,
       attributeFilter: ["data-bg"],
     });
-    schedule();
+    /* Prime once so the initial section is posed correctly */
+    requestAnimationFrame(() => {
+      running = true;
+      idle = 5;
+      frame();
+    });
   }
 })();

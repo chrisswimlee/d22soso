@@ -99,15 +99,15 @@ body {
   pointer-events: none;
 }
 
-/* Individual asset — SVG icon in 3D space */
+/* Individual asset — SVG icon in 3D space (transform driven by JS) */
 .bg-asset {
   --x: 50%;
   --y: 50%;
   --s: 200px;
   --rot: 0deg;
   --z: 0.5;
-  --drift: 20s;
   --tint: #8b5cf6;
+  --spark: 1;
   position: absolute;
   left: var(--x);
   top: var(--y);
@@ -122,19 +122,13 @@ body {
   backface-visibility: hidden;
   /* Depth-mapped opacity when active */
   --op-base: calc(0.28 + var(--z) * 0.42);
-  /* Scroll progress -1..0..1 → shift + rotate */
-  --tx: calc(var(--p) * 60px * (0.4 + var(--z)));
-  --ty: calc(var(--p) * 90px * (0.4 + var(--z)));
-  --tz: calc((var(--enter) - 1) * 320px * (0.4 + var(--z)));
-  --scale: calc(0.55 + var(--enter) * 0.55);
-  --scroll-rot: calc(var(--p) * 22deg);
-  transform:
-    translate3d(var(--tx), var(--ty), var(--tz))
-    rotate(calc(var(--rot) + var(--scroll-rot)))
-    scale(var(--scale));
+  /* Static resting pose (used before JS runs / reduced motion) */
+  transform: translate3d(0, 0, 0) rotate(var(--rot)) scale(calc(0.55 + var(--z) * 0.5));
+  /* Only opacity + a short transform smoothing → JS controls motion,
+     transition eases the final frame into a clean stop */
   transition:
     opacity 0.9s ease,
-    transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+    transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
   filter: drop-shadow(0 0 28px color-mix(in srgb, var(--tint) 80%, transparent));
   mix-blend-mode: screen;
 }
@@ -144,7 +138,6 @@ body {
   height: 100%;
   display: block;
   opacity: 1;
-  animation: bgDrift var(--drift, 22s) ease-in-out infinite alternate;
 }
 
 /* Give large icons a soft fill so they read against the gradient */
@@ -161,29 +154,16 @@ body {
   opacity: var(--op-base);
 }
 
-/* Idle drift/rotate on inner SVG so it composes with the outer scroll transform */
-@keyframes bgDrift {
-  0% {
-    transform: translate3d(0, 0, 0) rotate(0deg);
-  }
-  50% {
-    transform: translate3d(-14px, 10px, 0) rotate(6deg);
-  }
-  100% {
-    transform: translate3d(12px, -8px, 0) rotate(-6deg);
-  }
-}
-
-/* Small-star assets sparkle instead of drift */
-.bg-asset[data-z="0.1"] svg,
-.bg-asset[data-z="0.15"] svg,
-.bg-asset[data-z="0.2"] svg {
-  animation: bgSparkle var(--drift, 12s) ease-in-out infinite alternate;
-}
-
-@keyframes bgSparkle {
-  0%, 100% { opacity: 0.35; transform: scale(0.8); }
-  50% { opacity: 1; transform: scale(1.1); }
+/* Tiny ambience assets (stars / embers): brightness tracks scroll speed */
+.bg-layer.is-active .bg-asset[data-z="0.1"],
+.bg-layer.is-active .bg-asset[data-z="0.12"],
+.bg-layer.is-active .bg-asset[data-z="0.15"],
+.bg-layer.is-active .bg-asset[data-z="0.16"],
+.bg-layer.is-active .bg-asset[data-z="0.2"],
+.bg-layer.is-active .bg-asset[data-z="0.22"],
+.bg-layer.is-active .bg-asset[data-z="0.3"] {
+  opacity: calc(var(--op-base) * var(--spark));
+  transition: opacity 0.35s ease, transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 /* StarCraft / hero — cosmic violet */
@@ -2118,6 +2098,11 @@ kbd {
   .badge-dot,
   .scroll-cue-chevron {
     animation: none !important;
+  }
+
+  /* Freeze icon fleets in their resting pose */
+  .bg-asset {
+    transition: opacity 0.4s ease !important;
   }
 }
 
