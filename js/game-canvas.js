@@ -82,6 +82,11 @@
     }
 
     resize();
+    /* Start with a clear reading window so content is never fully blacked out */
+    if (!holes.length) {
+      scout(w * 0.5, h * 0.35, Math.max(w, h) * 0.55);
+      scout(w * 0.5, h * 0.7, Math.max(w, h) * 0.4);
+    }
     draw();
     window.addEventListener("resize", () => {
       resize();
