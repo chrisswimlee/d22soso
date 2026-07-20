@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body data-theme="starcraft">
+  <div class="scroll-progress" aria-hidden="true"><span class="scroll-progress-bar"></span></div>
   <canvas id="fog-canvas" aria-hidden="true"></canvas>
   <canvas id="minimap-canvas" width="160" height="120" aria-label="Career minimap navigation"></canvas>
 
@@ -33,23 +34,23 @@
     <section id="hero" class="section hero" data-node="hero">
       <div class="hero-fog" aria-hidden="true"></div>
       <div class="hero-grid">
-        <div class="hero-copy">
-          <p class="eyebrow mono">MISSION BRIEFING // SEASON 1 ARCHIVE</p>
-          <h1 class="brand-hero">Wayne <span class="accent-violet">“D22-soso”</span> Chiang</h1>
-          <p class="role-line mono">StarCraft: Brood War Season 1 World Champion · Random</p>
-          <blockquote class="transmission">
+        <div class="hero-copy" data-reveal="stagger">
+          <p class="eyebrow mono reveal-item">MISSION BRIEFING // SEASON 1 ARCHIVE</p>
+          <h1 class="brand-hero reveal-item">Wayne <span class="accent-violet">“D22-soso”</span> Chiang</h1>
+          <p class="role-line mono reveal-item">StarCraft: Brood War Season 1 World Champion · Random</p>
+          <blockquote class="transmission reveal-item">
             Whether navigating the pixelated fog-of-war in early real-time strategy or managing non-linear game theory on the green felt of Las Vegas, the meta never really changes—you just have to be willing to bet on yourself.
           </blockquote>
-          <div class="cta-row">
+          <div class="cta-row reveal-item">
             <a class="btn btn-primary" href="#esports">Enter Esports Legacy</a>
             <a class="btn btn-gold" href="#innovation">Open Innovation Catalog</a>
           </div>
-          <p class="hint mono">
+          <p class="hint mono reveal-item">
             <span class="hint-desktop">Press <kbd>R</kbd> to roll Random · Scout the fog with your pointer</span>
             <span class="hint-touch">Tap the race panel to roll Random · Drag to scout fog</span>
           </p>
         </div>
-        <div class="hero-stage">
+        <div class="hero-stage" data-parallax="0.12">
           <canvas id="race-canvas" width="420" height="320" role="img" aria-label="Random race roll interactive"></canvas>
           <figure class="hero-portrait">
             <img
@@ -66,13 +67,13 @@
 
     <!-- ESPORTS -->
     <section id="esports" class="section" data-node="esports">
-      <header class="section-head">
+      <header class="section-head" data-reveal>
         <p class="eyebrow mono">BUILD ORDER // 1996–PRESENT</p>
         <h2>Esports Origins</h2>
         <p class="lede">From Case’s Ladder to Blizzard’s first official Brood War world title—and the cast, community, and formats that followed.</p>
       </header>
 
-      <div class="tablist-wrap" data-tabs="esports">
+      <div class="tablist-wrap" data-tabs="esports" data-reveal>
         <div class="tablist" role="tablist" aria-label="Esports theaters">
           <button role="tab" id="tab-sc" aria-controls="panel-sc" aria-selected="true" data-theme="starcraft">StarCraft</button>
           <button role="tab" id="tab-cnc" aria-controls="panel-cnc" aria-selected="false" data-theme="cnc">C&amp;C</button>
@@ -196,31 +197,31 @@
 
     <!-- POKER -->
     <section id="poker" class="section section-poker" data-node="poker" data-theme="poker">
-      <header class="section-head">
+      <header class="section-head" data-reveal>
         <p class="eyebrow mono">FELT // BROADCAST // TALENT</p>
         <h2>Poker &amp; Advantage Play</h2>
         <p class="lede">From math-driven blackjack bans to Live at the Bike and the World Series of Poker media desk.</p>
       </header>
       <div class="poker-grid">
-        <div class="lower-third">
+        <div class="lower-third" data-reveal>
           <span class="lt-label mono">TALENT MANAGER</span>
           <strong>World Series of Poker — Media Team</strong>
           <p>Shapes creator ecosystems and oversees the official WSOP Vlogger Program. In 2025, interviewed StarCraft legend SlayerS_BoxeR—a meeting of the man who built the throne and the man who sat on it.</p>
         </div>
-        <figure class="poker-photo">
+        <figure class="poker-photo" data-reveal data-parallax="0.08">
           <img src="assets/photos/Slayers%20Boxer%20D22-soso%20WSOP%202025.jpg" alt="D22-soso with SlayerS BoxeR at WSOP 2025" />
         </figure>
-        <div class="poker-cards">
-          <article class="felt-card">
+        <div class="poker-cards" data-reveal="stagger">
+          <article class="felt-card reveal-item">
             <h3>Live at the Bike</h3>
             <p>Co-owner and lead producer. Grew peak concurrent viewers from 2,500 to 8,800 and drove a 40% revenue increase. Hosted the PokerCraft Podcast with industry figures including Hellmuth, Negreanu, and Greenstein.</p>
             <img class="logo-inline" src="assets/photos/live-at-the-bike-logo.jpg" alt="Live at the Bike logo" />
           </article>
-          <article class="felt-card">
+          <article class="felt-card reveal-item">
             <h3>Advantage Play</h3>
             <p>Applied Hi-Lo and Hi-Opt 1 card-counting frameworks as a blackjack specialist—resulting in absolute table bans across major Las Vegas and San Diego properties.</p>
           </article>
-          <article class="felt-card">
+          <article class="felt-card reveal-item">
             <h3>Betting on Yourself</h3>
             <p>Co-author with Fortune 500 strategist Joe Matton. <cite>Betting on Yourself: Winning in Business, Poker, and the Age of AI</cite> (Kendall Hunt, 2026)—outlining the WEB decision framework.</p>
           </article>
@@ -230,13 +231,13 @@
 
     <!-- INNOVATION -->
     <section id="innovation" class="section" data-node="innovation">
-      <header class="section-head">
+      <header class="section-head" data-reveal>
         <p class="eyebrow mono">PATENT ARCHIVE // TABLE GAMES</p>
         <h2>Casino Game Innovation</h2>
         <p class="lede">Protected game catalog—play the mechanics, then read the patents.</p>
       </header>
 
-      <div class="tablist-wrap" data-tabs="innovation">
+      <div class="tablist-wrap" data-tabs="innovation" data-reveal>
         <div class="tablist" role="tablist" aria-label="Innovation catalog">
           <button role="tab" id="tab-2hh" aria-controls="panel-2hh" aria-selected="true" data-theme="2hh">2 Hand Hold’em™</button>
           <button role="tab" id="tab-badugi" aria-controls="panel-badugi" aria-selected="false" data-theme="badugi">Badugi Chase™</button>
@@ -278,12 +279,12 @@
 
     <!-- CONTACT -->
     <section id="contact" class="section contact" data-node="contact">
-      <header class="section-head">
+      <header class="section-head" data-reveal>
         <p class="eyebrow mono">OPEN COMMS CHANNEL</p>
         <h2>Strategic Collaboration</h2>
         <p class="lede">For licensing, media, talent, or partnership inquiries—open a channel.</p>
       </header>
-      <a class="btn btn-primary btn-lg" href="mailto:d22sosowaynechiang@gmail.com">Email Wayne<br class="break-sm" /> <span class="mono">d22sosowaynechiang@gmail.com</span></a>
+      <a class="btn btn-primary btn-lg" data-reveal href="mailto:d22sosowaynechiang@gmail.com">Email Wayne<br class="break-sm" /> <span class="mono">d22sosowaynechiang@gmail.com</span></a>
       <p class="footer-meta mono">© Wayne “D22-soso” Chiang · Portfolio archive · Bet on yourself</p>
     </section>
   </main>

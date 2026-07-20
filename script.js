@@ -120,4 +120,72 @@
     { threshold: 0.25 }
   );
   sections.forEach((s) => navObs.observe(s));
+
+  /* ---------- Scroll effects ---------- */
+  const reduced = P && P.reduced;
+  const progressBar = document.querySelector(".scroll-progress-bar");
+  const header = document.querySelector(".site-header");
+  const parallaxNodes = [...document.querySelectorAll("[data-parallax]")];
+
+  function scrollProgress() {
+    const max = document.documentElement.scrollHeight - window.innerHeight;
+    const pct = max > 0 ? (window.scrollY / max) * 100 : 0;
+    if (progressBar) progressBar.style.width = pct + "%";
+    if (header) header.classList.toggle("is-scrolled", window.scrollY > 12);
+  }
+
+  function updateParallax() {
+    if (reduced) return;
+    const vh = window.innerHeight;
+    parallaxNodes.forEach((el) => {
+      const speed = parseFloat(el.dataset.parallax || "0.1") || 0.1;
+      const rect = el.getBoundingClientRect();
+      const center = rect.top + rect.height / 2;
+      const offset = (center - vh / 2) * speed * -0.35;
+      el.style.transform = "translate3d(0," + offset.toFixed(2) + "px,0)";
+    });
+  }
+
+  if (!reduced) {
+    const revealObs = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("is-inview");
+            revealObs.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.15, rootMargin: "0px 0px -8% 0px" }
+    );
+    document.querySelectorAll("[data-reveal]").forEach((el) => revealObs.observe(el));
+  } else {
+    document.querySelectorAll("[data-reveal]").forEach((el) => el.classList.add("is-inview"));
+  }
+
+  let ticking = false;
+  function onScrollFrame() {
+    scrollProgress();
+    updateParallax();
+    ticking = false;
+  }
+
+  window.addEventListener(
+    "scroll",
+    () => {
+      if (!ticking) {
+        ticking = true;
+        requestAnimationFrame(onScrollFrame);
+      }
+    },
+    { passive: true }
+  );
+  window.addEventListener("resize", onScrollFrame, { passive: true });
+  onScrollFrame();
+
+  /* Hero enters immediately */
+  const heroReveal = document.querySelector("#hero [data-reveal]");
+  if (heroReveal) {
+    requestAnimationFrame(() => heroReveal.classList.add("is-inview"));
+  }
 })();
