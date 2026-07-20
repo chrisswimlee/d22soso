@@ -124,10 +124,32 @@
   sections.forEach((s) => navObs.observe(s));
 
   /* ---------- Scroll effects ---------- */
-  const reduced = P && P.reduced;
+  const reduced = !!(P && P.reduced);
   const progressBar = document.querySelector(".scroll-progress-bar");
   const header = document.querySelector(".site-header");
   const parallaxNodes = [...document.querySelectorAll("[data-parallax]")];
+  const revealNodes = [...document.querySelectorAll("[data-reveal]")];
+
+  function revealEl(el) {
+    if (el) el.classList.add("is-inview");
+  }
+
+  function revealAll() {
+    revealNodes.forEach(revealEl);
+  }
+
+  function isInViewport(el) {
+    const r = el.getBoundingClientRect();
+    const vh = window.innerHeight || document.documentElement.clientHeight;
+    const vw = window.innerWidth || document.documentElement.clientWidth;
+    return r.bottom > 0 && r.right > 0 && r.top < vh && r.left < vw;
+  }
+
+  function revealVisible() {
+    revealNodes.forEach((el) => {
+      if (isInViewport(el)) revealEl(el);
+    });
+  }
 
   function scrollProgress() {
     const max = document.documentElement.scrollHeight - window.innerHeight;
@@ -140,6 +162,7 @@
     if (reduced) return;
     const vh = window.innerHeight;
     parallaxNodes.forEach((el) => {
+      if (!el.classList.contains("is-inview") && el.hasAttribute("data-reveal")) return;
       const speed = parseFloat(el.dataset.parallax || "0.1") || 0.1;
       const rect = el.getBoundingClientRect();
       const center = rect.top + rect.height / 2;
@@ -148,21 +171,30 @@
     });
   }
 
-  if (!reduced) {
+  if (reduced) {
+    revealAll();
+  } else {
+    document.documentElement.classList.add("reveal-on");
+    revealVisible();
+
     const revealObs = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            entry.target.classList.add("is-inview");
+            revealEl(entry.target);
             revealObs.unobserve(entry.target);
           }
         });
       },
-      { threshold: 0.15, rootMargin: "0px 0px -8% 0px" }
+      { threshold: 0.01, rootMargin: "40px 0px 40px 0px" }
     );
-    document.querySelectorAll("[data-reveal]").forEach((el) => revealObs.observe(el));
-  } else {
-    document.querySelectorAll("[data-reveal]").forEach((el) => el.classList.add("is-inview"));
+    revealNodes.forEach((el) => {
+      if (!el.classList.contains("is-inview")) revealObs.observe(el);
+    });
+
+    /* Safety nets: never leave the page blank */
+    setTimeout(revealVisible, 100);
+    setTimeout(revealAll, 2500);
   }
 
   let ticking = false;
@@ -179,17 +211,24 @@
         ticking = true;
         requestAnimationFrame(onScrollFrame);
       }
+      revealVisible();
     },
     { passive: true }
   );
   window.addEventListener("resize", onScrollFrame, { passive: true });
   onScrollFrame();
 
-  /* Hero enters immediately */
-  const heroReveal = document.querySelector("#hero [data-reveal]");
-  if (heroReveal) {
-    requestAnimationFrame(() => heroReveal.classList.add("is-inview"));
+  /* Hash targets (e.g. #play) should reveal immediately */
+  function revealHashTarget() {
+    const id = (location.hash || "").replace(/^#/, "");
+    if (!id) return;
+    const section = document.getElementById(id);
+    if (!section) return;
+    section.querySelectorAll("[data-reveal]").forEach(revealEl);
+    if (section.hasAttribute("data-reveal")) revealEl(section);
   }
+  revealHashTarget();
+  window.addEventListener("hashchange", revealHashTarget);
 
   /* In-page 2HH game embed */
   const playWrap = document.getElementById("play-2hh-wrap");
