@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Wayne "D22-soso" Chiang — StarCraft Brood War World Champion</title>
   <meta name="description" content="Wayne D22-soso Chiang — first official StarCraft: Brood War Season 1 World Champion (Random), Cube Draft pioneer, patented casino game inventor, WSOP Talent Manager." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -20,11 +20,11 @@
       <span class="brand-text">D22-soso</span>
     </a>
     <nav class="command-nav" aria-label="Primary">
-      <a href="#hero" data-hotkey="1"><span class="hk">1</span> Briefing</a>
-      <a href="#esports" data-hotkey="2"><span class="hk">2</span> Esports</a>
-      <a href="#poker" data-hotkey="3"><span class="hk">3</span> Poker</a>
-      <a href="#innovation" data-hotkey="4"><span class="hk">4</span> Innovation</a>
-      <a href="#contact" data-hotkey="5"><span class="hk">5</span> Comms</a>
+      <a href="#hero" data-hotkey="1"><span class="hk">1</span><span class="nav-label">Briefing</span></a>
+      <a href="#esports" data-hotkey="2"><span class="hk">2</span><span class="nav-label">Esports</span></a>
+      <a href="#poker" data-hotkey="3"><span class="hk">3</span><span class="nav-label">Poker</span></a>
+      <a href="#innovation" data-hotkey="4"><span class="hk">4</span><span class="nav-label">Innovation</span></a>
+      <a href="#contact" data-hotkey="5"><span class="hk">5</span><span class="nav-label">Comms</span></a>
     </nav>
   </header>
 
@@ -44,7 +44,10 @@
             <a class="btn btn-primary" href="#esports">Enter Esports Legacy</a>
             <a class="btn btn-gold" href="#innovation">Open Innovation Catalog</a>
           </div>
-          <p class="hint mono">Press <kbd>R</kbd> to roll Random · Scout the fog with your pointer</p>
+          <p class="hint mono">
+            <span class="hint-desktop">Press <kbd>R</kbd> to roll Random · Scout the fog with your pointer</span>
+            <span class="hint-touch">Tap the race panel to roll Random · Drag to scout fog</span>
+          </p>
         </div>
         <div class="hero-stage">
           <canvas id="race-canvas" width="420" height="320" role="img" aria-label="Random race roll interactive"></canvas>
@@ -280,7 +283,7 @@
         <h2>Strategic Collaboration</h2>
         <p class="lede">For licensing, media, talent, or partnership inquiries—open a channel.</p>
       </header>
-      <a class="btn btn-primary btn-lg" href="mailto:d22sosowaynechiang@gmail.com">Email Wayne at d22sosowaynechiang@gmail.com</a>
+      <a class="btn btn-primary btn-lg" href="mailto:d22sosowaynechiang@gmail.com">Email Wayne<br class="break-sm" /> <span class="mono">d22sosowaynechiang@gmail.com</span></a>
       <p class="footer-meta mono">© Wayne “D22-soso” Chiang · Portfolio archive · Bet on yourself</p>
     </section>
   </main>

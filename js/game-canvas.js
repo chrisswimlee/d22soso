@@ -5,7 +5,13 @@
 
   /* ---------- FOG OF WAR ---------- */
   function initFog(canvas) {
-    if (!canvas || P.reduced) {
+    const coarse =
+      typeof matchMedia !== "undefined" &&
+      matchMedia("(pointer: coarse)").matches;
+    const shortLandscape =
+      typeof matchMedia !== "undefined" &&
+      matchMedia("(max-height: 480px) and (orientation: landscape)").matches;
+    if (!canvas || P.reduced || shortLandscape) {
       if (canvas) canvas.style.display = "none";
       return;
     }
@@ -17,16 +23,26 @@
       saved.forEach((h0) => holes.push(h0));
     } catch (_) {}
 
+    function viewportSize() {
+      const vv = window.visualViewport;
+      return {
+        w: Math.round((vv && vv.width) || window.innerWidth),
+        h: Math.round((vv && vv.height) || window.innerHeight),
+      };
+    }
+
     function resize() {
-      w = window.innerWidth;
-      h = window.innerHeight;
+      const s = viewportSize();
+      w = s.w;
+      h = s.h;
       const r = P.resizeCanvas(canvas, w, h);
       ctx = r.ctx;
     }
 
     function scout(x, y, r) {
+      if (!w || !h) return;
       holes.push({ x: x / w, y: y / h, r: (r || 90) / Math.min(w, h) });
-      if (holes.length > 80) holes.shift();
+      if (holes.length > (coarse ? 40 : 80)) holes.shift();
       try {
         sessionStorage.setItem(key, JSON.stringify(holes.slice(-40)));
       } catch (_) {}
@@ -35,7 +51,7 @@
     function draw() {
       if (!ctx) return;
       ctx.clearRect(0, 0, w, h);
-      ctx.fillStyle = "rgba(6, 6, 10, 0.72)";
+      ctx.fillStyle = coarse ? "rgba(6, 6, 10, 0.45)" : "rgba(6, 6, 10, 0.72)";
       ctx.fillRect(0, 0, w, h);
       ctx.globalCompositeOperation = "destination-out";
       holes.forEach((hole) => {
@@ -53,21 +69,32 @@
       ctx.globalCompositeOperation = "source-over";
     }
 
+    let lastScout = 0;
+    function onPointer(e) {
+      const now = performance.now();
+      const throttle = coarse ? 48 : 16;
+      if (now - lastScout < throttle) return;
+      lastScout = now;
+      if (!coarse && Math.random() > 0.55) return;
+      const radius = coarse ? 100 + Math.random() * 40 : 70 + Math.random() * 40;
+      scout(e.clientX, e.clientY, radius);
+      draw();
+    }
+
     resize();
     draw();
     window.addEventListener("resize", () => {
       resize();
       draw();
     });
-    window.addEventListener(
-      "pointermove",
-      (e) => {
-        if (Math.random() > 0.55) return;
-        scout(e.clientX, e.clientY, 70 + Math.random() * 40);
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener("resize", () => {
+        resize();
         draw();
-      },
-      { passive: true }
-    );
+      });
+    }
+    window.addEventListener("pointermove", onPointer, { passive: true });
+    window.addEventListener("pointerdown", onPointer, { passive: true });
 
     return { scout, draw };
   }
@@ -77,38 +104,56 @@
     if (!canvas) return;
     const rects = nodes.map((id) => document.getElementById(id)).filter(Boolean);
     let active = 0;
+    let layout = [];
+
+    function cssSize() {
+      const r = canvas.getBoundingClientRect();
+      return {
+        w: Math.max(88, Math.round(r.width) || 160),
+        h: Math.max(66, Math.round(r.height) || 120),
+      };
+    }
 
     function paint() {
-      const { ctx, w, h } = P.resizeCanvas(canvas, 160, 120);
+      const size = cssSize();
+      const { ctx, w, h } = P.resizeCanvas(canvas, size.w, size.h);
       ctx.clearRect(0, 0, w, h);
       ctx.fillStyle = "#0a0a0e";
       ctx.fillRect(0, 0, w, h);
-      // terrain hint
       ctx.strokeStyle = "rgba(139,92,246,0.25)";
-      ctx.strokeRect(6, 6, w - 12, h - 12);
-      const n = rects.length;
+      ctx.strokeRect(4, 4, w - 8, h - 8);
+
+      const cols = w < 120 ? 5 : 3;
+      const cellW = (w - 16) / cols;
+      const cellH = (h - 20) / Math.ceil(rects.length / cols);
+      layout = [];
       rects.forEach((el, i) => {
-        const x = 18 + (i % 3) * 45;
-        const y = 22 + Math.floor(i / 3) * 40;
+        const col = i % cols;
+        const row = Math.floor(i / cols);
+        const x = 10 + col * cellW + cellW * 0.3;
+        const y = 14 + row * cellH + cellH * 0.35;
+        layout.push({ x, y, r: w < 120 ? 5 : 7 });
         const on = i === active;
         ctx.fillStyle = on ? "#8b5cf6" : "#2a2a32";
         ctx.beginPath();
-        ctx.arc(x, y, on ? 7 : 5, 0, Math.PI * 2);
+        ctx.arc(x, y, on ? layout[i].r : layout[i].r - 1.5, 0, Math.PI * 2);
         ctx.fill();
         if (on) {
           ctx.strokeStyle = "rgba(212,175,55,0.8)";
           ctx.beginPath();
-          ctx.arc(x, y, 12, 0, Math.PI * 2);
+          ctx.arc(x, y, layout[i].r + 4, 0, Math.PI * 2);
           ctx.stroke();
         }
-        ctx.fillStyle = "#9a9690";
-        ctx.font = "8px JetBrains Mono, monospace";
-        ctx.fillText(el.id.slice(0, 4), x + 10, y + 3);
+        if (w >= 120) {
+          ctx.fillStyle = "#9a9690";
+          ctx.font = "8px JetBrains Mono, monospace";
+          ctx.fillText(el.id.slice(0, 4), x + 8, y + 3);
+        }
       });
-      // camera rect
-      const scroll = window.scrollY / (document.body.scrollHeight - window.innerHeight || 1);
+      const scrollMax = document.documentElement.scrollHeight - window.innerHeight || 1;
+      const scroll = window.scrollY / scrollMax;
       ctx.strokeStyle = "#d4af37";
-      ctx.strokeRect(10, 8 + scroll * (h - 36), w - 20, 20);
+      ctx.strokeRect(8, 6 + scroll * (h - 28), w - 16, 16);
     }
 
     function sync() {
@@ -116,7 +161,7 @@
       let best = 0;
       let bestDist = Infinity;
       rects.forEach((el, i) => {
-        const top = el.offsetTop;
+        const top = el.getBoundingClientRect().top + window.scrollY;
         const d = Math.abs(top - mid);
         if (d < bestDist) {
           bestDist = d;
@@ -127,21 +172,26 @@
       paint();
     }
 
-    canvas.addEventListener("click", (e) => {
+    function jumpAt(clientX, clientY) {
       const r = canvas.getBoundingClientRect();
-      const x = ((e.clientX - r.left) / r.width) * 160;
-      const y = ((e.clientY - r.top) / r.height) * 120;
+      const x = ((clientX - r.left) / r.width) * cssSize().w;
+      const y = ((clientY - r.top) / r.height) * cssSize().h;
       let hit = -1;
-      rects.forEach((_, i) => {
-        const bx = 18 + (i % 3) * 45;
-        const by = 22 + Math.floor(i / 3) * 40;
-        if (Math.hypot(x - bx, y - by) < 16) hit = i;
+      layout.forEach((node, i) => {
+        if (Math.hypot(x - node.x, y - node.y) < Math.max(14, node.r + 10)) hit = i;
       });
-      if (hit >= 0) rects[hit].scrollIntoView({ behavior: P.reduced ? "auto" : "smooth" });
-    });
+      if (hit >= 0) {
+        rects[hit].scrollIntoView({ behavior: P.reduced ? "auto" : "smooth" });
+      }
+    }
+
+    canvas.addEventListener("click", (e) => jumpAt(e.clientX, e.clientY));
 
     window.addEventListener("scroll", sync, { passive: true });
-    window.addEventListener("resize", paint);
+    window.addEventListener("resize", () => {
+      paint();
+      sync();
+    });
     paint();
     sync();
   }
@@ -348,20 +398,26 @@
     let dragging = false;
 
     function layout() {
-      const { w, h } = P.resizeCanvas(canvas, canvas.clientWidth || 480, 300);
+      const cssW = canvas.clientWidth || 480;
+      const cssH = Math.max(220, Math.round(cssW * 0.62));
+      const { w, h } = P.resizeCanvas(canvas, cssW, cssH);
+      const gap = Math.min(70, w * 0.15);
       const baseY = h * 0.62;
       hole.forEach((c, i) => {
         if (!split) {
-          c.x.setTarget(w * 0.2 + i * 70);
+          const start = (w - gap * 3) / 2;
+          c.x.setTarget(start + i * gap);
           c.y.setTarget(baseY);
         } else {
           const hand = i < 2 ? 0 : 1;
-          c.x.setTarget(w * (hand === 0 ? 0.22 : 0.62) + (i % 2) * 55);
+          const handGap = Math.min(55, w * 0.12);
+          c.x.setTarget(w * (hand === 0 ? 0.22 : 0.62) + (i % 2) * handGap);
           c.y.setTarget(baseY);
         }
       });
       board.forEach((c, i) => {
-        c.x.setTarget(w * 0.28 + i * 70);
+        const start = (w - gap * 2) / 2;
+        c.x.setTarget(start + i * gap);
         c.y.setTarget(h * 0.28);
       });
       return { w, h };
