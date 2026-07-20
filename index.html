@@ -281,24 +281,42 @@
     <!-- PLAY 2HH -->
     <section id="play" class="section section-play" data-node="play" data-theme="2hh">
       <header class="section-head" data-reveal>
-        <p class="eyebrow mono">TABLE OPEN // DESKTOP</p>
+        <p class="eyebrow mono">TABLE OPEN // PLAY IN-SITE</p>
         <h2>Play 2 Hand Hold’em™</h2>
-        <p class="lede">Deal four, split two, one board—run the patented game in your browser.</p>
+        <p class="lede">Deal four, split two, one board—play the patented game right here.</p>
       </header>
 
-      <div class="play-panel" data-reveal>
-        <img
-          class="play-logo"
-          src="assets/photos/2hh%20LOGO%20OFFICIAL%20TRADEMARK%20APPLIED.png"
-          alt="2 Hand Hold'em trademark logo"
-        />
+      <div class="play-panel play-panel-wide" data-reveal>
+        <div class="play-frame-wrap" id="play-2hh-wrap">
+          <iframe
+            id="play-2hh-frame"
+            title="Play 2 Hand Hold’em"
+            data-src="https://play2hh.herokuapp.com/"
+            loading="lazy"
+            allow="fullscreen"
+            referrerpolicy="no-referrer-when-downgrade"
+          ></iframe>
+          <div class="play-frame-overlay" id="play-2hh-overlay">
+            <img
+              class="play-logo"
+              src="assets/photos/2hh%20LOGO%20OFFICIAL%20TRADEMARK%20APPLIED.png"
+              alt="2 Hand Hold'em trademark logo"
+            />
+            <button type="button" class="btn btn-primary btn-lg" id="play-2hh-start">
+              Launch 2 Hand Hold’em
+            </button>
+            <p class="hint mono">Loads the live table inside this page</p>
+          </div>
+        </div>
+
         <div class="cta-row play-ctas">
           <a
-            class="btn btn-primary btn-lg"
-            href="http://play2hh.herokuapp.com/"
+            class="btn btn-gold"
+            href="https://play2hh.herokuapp.com/"
             target="_blank"
             rel="noopener noreferrer"
-          >Play 2 Hand Hold’em on desktop</a>
+          >Open full-table desktop version</a>
+          <button type="button" class="btn btn-primary" id="play-2hh-fs">Enter fullscreen table</button>
           <span class="btn btn-soon" aria-disabled="true">2HH iOS app — coming soon</span>
         </div>
         <p class="play-credit mono">Credits</p>

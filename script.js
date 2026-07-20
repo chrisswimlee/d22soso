@@ -190,4 +190,47 @@
   if (heroReveal) {
     requestAnimationFrame(() => heroReveal.classList.add("is-inview"));
   }
+
+  /* In-page 2HH game embed */
+  const playWrap = document.getElementById("play-2hh-wrap");
+  const playFrame = document.getElementById("play-2hh-frame");
+  const playStart = document.getElementById("play-2hh-start");
+  const playFs = document.getElementById("play-2hh-fs");
+
+  function launch2HH() {
+    if (!playFrame || !playWrap) return;
+    if (!playFrame.getAttribute("src")) {
+      playFrame.src = playFrame.getAttribute("data-src") || "https://play2hh.herokuapp.com/";
+    }
+    playWrap.classList.add("is-live");
+  }
+
+  playStart?.addEventListener("click", launch2HH);
+  playFs?.addEventListener("click", () => {
+    launch2HH();
+    const target = playWrap;
+    if (!target) return;
+    const req =
+      target.requestFullscreen ||
+      target.webkitRequestFullscreen ||
+      target.msRequestFullscreen;
+    if (req) req.call(target);
+  });
+
+  /* Prefetch iframe when Play section nears viewport */
+  const playSection = document.getElementById("play");
+  if (playSection && playFrame && "IntersectionObserver" in window) {
+    const playObs = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            /* warm DNS only; wait for Launch click to preserve bandwidth */
+            playObs.disconnect();
+          }
+        });
+      },
+      { rootMargin: "200px 0px" }
+    );
+    playObs.observe(playSection);
+  }
 })();

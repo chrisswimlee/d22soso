@@ -805,9 +805,78 @@ kbd {
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
 }
 
+.play-panel-wide {
+  max-width: min(1100px, 100%);
+  padding: 1.25rem;
+}
+
+.play-frame-wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  min-height: 360px;
+  max-height: min(78vh, 720px);
+  margin: 0 auto 1.25rem;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+  background: #071018;
+  box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.45);
+}
+
+.play-frame-wrap.is-live {
+  max-height: none;
+  height: min(78vh, 780px);
+  aspect-ratio: auto;
+}
+
+.play-frame-wrap iframe {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: #0a0a0a;
+}
+
+.play-frame-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: grid;
+  place-content: center;
+  gap: 1rem;
+  padding: 1.5rem;
+  background:
+    radial-gradient(ellipse at 50% 40%, rgba(56, 189, 248, 0.12), transparent 55%),
+    rgba(7, 12, 18, 0.92);
+  transition: opacity 0.35s ease, visibility 0.35s ease;
+}
+
+.play-frame-wrap.is-live .play-frame-overlay {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.play-frame-overlay .play-logo {
+  margin-bottom: 0.25rem;
+}
+
 .play-logo {
   max-width: 220px;
   margin: 0 auto 1.5rem;
+}
+
+@media (max-width: 768px) {
+  .play-frame-wrap {
+    min-height: 280px;
+    aspect-ratio: 4 / 5;
+    max-height: 70vh;
+  }
+
+  .play-frame-wrap.is-live {
+    height: 70vh;
+  }
 }
 
 .play-ctas {
