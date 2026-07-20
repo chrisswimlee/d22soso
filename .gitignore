@@ -4,5 +4,6 @@ confidential-notes.md
 *.log
 .vscode/
 .idea/
+node_modules/
 SAMURAI69*
 SAMURAI69*

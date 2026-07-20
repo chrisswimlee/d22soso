@@ -1,8 +1,13 @@
-/* Orchestration: tabs, hotkeys, theme, canvas boot, bg crossfade */
-(function () {
-  const C = window.D22Canvas;
-  const P = window.D22Physics;
+/* Orchestration: tabs, hotkeys, theme, WebGL boot, bg crossfade */
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { initBgScene } from "./js/webgl-scene.js";
+import { D22Canvas as C } from "./js/webgl-interactives.js";
 
+const reduced =
+  typeof matchMedia !== "undefined" &&
+  matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+(function () {
   /* ---------- Dynamic background crossfade ---------- */
   const bgLayers = [...document.querySelectorAll("#bg-stage .bg-layer")];
   let activeBg = document.body.dataset.bg || "starcraft";
@@ -128,7 +133,7 @@
     if (link) {
       e.preventDefault();
       document.querySelector(link.getAttribute("href"))?.scrollIntoView({
-        behavior: P && P.reduced ? "auto" : "smooth",
+        behavior: reduced ? "auto" : "smooth",
       });
       link.classList.add("pulse");
       setTimeout(() => link.classList.remove("pulse"), 300);
@@ -224,14 +229,13 @@
     applySectionScene(sceneSections[0]);
   }
 
-  /* Boot canvas systems */
-  if (C) {
-    C.initFog(document.getElementById("fog-canvas"));
-    raceApi = C.initRaceRoll(document.getElementById("race-canvas"));
-    C.initBattleMap(document.getElementById("battle-canvas"));
-    C.init2HH(document.getElementById("cards-2hh"));
-    C.initBadugi(document.getElementById("cards-badugi"));
-  }
+  /* Boot WebGL systems (Three.js + GSAP) */
+  initBgScene(document.getElementById("webgl-bg"));
+  raceApi = C.initRaceRoll(document.getElementById("race-canvas"));
+  C.initBattleMap(document.getElementById("battle-canvas"));
+  C.init2HH(document.getElementById("cards-2hh"));
+  C.initBadugi(document.getElementById("cards-badugi"));
+  requestAnimationFrame(() => ScrollTrigger.refresh());
 
   /* Active nav underline (game-* subsections map to the Esports link) */
   const sections = sceneSections;
@@ -251,7 +255,6 @@
   sections.forEach((s) => navObs.observe(s));
 
   /* ---------- Scroll effects ---------- */
-  const reduced = !!(P && P.reduced);
   const progressBar = document.querySelector(".scroll-progress-bar");
   const header = document.querySelector(".site-header");
   const parallaxNodes = [...document.querySelectorAll("[data-parallax]")];
@@ -427,6 +430,17 @@
   const playFrame = document.getElementById("play-2hh-frame");
   const playStart = document.getElementById("play-2hh-start");
   const playFs = document.getElementById("play-2hh-fs");
+  const playCenter = document.getElementById("play-2hh-center");
+  const playSectionEl = document.getElementById("play");
+
+  function centerPlayTable() {
+    if (!playWrap) return;
+    playWrap.scrollIntoView({
+      behavior: reduced ? "auto" : "smooth",
+      block: "center",
+      inline: "nearest",
+    });
+  }
 
   function launch2HH() {
     if (!playFrame || !playWrap) return;
@@ -434,9 +448,16 @@
       playFrame.src = playFrame.getAttribute("data-src") || "https://play2hh.herokuapp.com/";
     }
     playWrap.classList.add("is-live");
+    playSectionEl?.classList.add("is-playing");
+    document.body.classList.add("play-2hh-live");
+    /* After layout expands, park the table in the vertical center of the viewport */
+    requestAnimationFrame(() => {
+      requestAnimationFrame(centerPlayTable);
+    });
   }
 
   playStart?.addEventListener("click", launch2HH);
+  playCenter?.addEventListener("click", centerPlayTable);
   playFs?.addEventListener("click", () => {
     launch2HH();
     const target = playWrap;

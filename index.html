@@ -10,6 +10,15 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://esm.sh/three@0.170.0",
+      "gsap": "https://esm.sh/gsap@3.12.5",
+      "gsap/ScrollTrigger": "https://esm.sh/gsap@3.12.5/ScrollTrigger"
+    }
+  }
+  </script>
 </head>
 <body data-theme="starcraft" data-bg="starcraft">
   <!-- Fixed theme backgrounds — opacity-crossfaded by scroll / tab theme -->
@@ -25,9 +34,9 @@
     <div class="bg-layer" data-bg="2hh"></div>
     <div class="bg-layer" data-bg="badugi"></div>
     <div class="bg-layer" data-bg="contact"></div>
+    <canvas id="webgl-bg" aria-hidden="true"></canvas>
   </div>
   <div class="scroll-progress" aria-hidden="true"><span class="scroll-progress-bar"></span></div>
-  <canvas id="fog-canvas" aria-hidden="true"></canvas>
   <div id="section-indicator" class="section-indicator" aria-live="polite">
     <span class="si-dot" aria-hidden="true"></span>
     <span class="si-text mono"><span class="si-kicker">NOW VIEWING</span><span class="si-label">Briefing</span></span>
@@ -563,6 +572,9 @@
         </div>
 
         <div class="cta-row play-ctas">
+          <button type="button" class="btn btn-primary play-center-btn" id="play-2hh-center">
+            Center table
+          </button>
           <a
             class="btn btn-gold"
             href="https://play2hh.herokuapp.com/"
@@ -598,9 +610,6 @@
     </section>
   </main>
 
-  <script src="js/physics.js"></script>
-  <script src="js/game-canvas.js"></script>
-  <script src="js/bg-scene.js"></script>
-  <script src="script.js"></script>
+  <script type="module" src="script.js"></script>
 </body>
 </html>

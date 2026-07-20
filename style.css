@@ -56,8 +56,17 @@ body {
   pointer-events: none;
   overflow: hidden;
   background: #0a0a0a;
-  perspective: 1200px;
-  perspective-origin: 50% 50%;
+}
+
+/* Shared Three.js WebGL layer (fleets + fog scout) */
+#webgl-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  pointer-events: none;
+  display: block;
 }
 
 /* Vignette overlay for text readability over icon fleets */
@@ -73,95 +82,16 @@ body {
 }
 
 .bg-layer {
-  --p: 0;
-  --enter: 1;
   position: absolute;
   inset: 0;
   opacity: 0;
   transition: opacity 0.9s ease;
   will-change: opacity;
-  transform: translateZ(0);
-  backface-visibility: hidden;
-  transform-style: preserve-3d;
+  z-index: 1;
 }
 
 .bg-layer.is-active {
   opacity: 1;
-}
-
-/* Fleet — icon container inside a 3D layer */
-.bg-fleet {
-  position: absolute;
-  inset: 0;
-  transform-style: preserve-3d;
-  pointer-events: none;
-}
-
-/* Individual asset — SVG icon in 3D space (transform driven by JS) */
-.bg-asset {
-  --x: 50%;
-  --y: 50%;
-  --s: 200px;
-  --rot: 0deg;
-  --z: 0.5;
-  --tint: #8b5cf6;
-  --spark: 1;
-  position: absolute;
-  left: var(--x);
-  top: var(--y);
-  width: var(--s);
-  height: var(--s);
-  margin-left: calc(var(--s) * -0.5);
-  margin-top: calc(var(--s) * -0.5);
-  color: var(--tint);
-  opacity: 0;
-  transform-style: preserve-3d;
-  will-change: transform, opacity;
-  backface-visibility: hidden;
-  /* Depth-mapped opacity when active */
-  --op-base: calc(0.28 + var(--z) * 0.42);
-  /* Static resting pose (used before JS runs / reduced motion) */
-  transform: translate3d(0, 0, 0) rotate(var(--rot)) scale(calc(0.55 + var(--z) * 0.5));
-  /* Only opacity + a short transform smoothing → JS controls motion,
-     transition eases the final frame into a clean stop */
-  transition:
-    opacity 0.9s ease,
-    transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
-  filter: drop-shadow(0 0 28px color-mix(in srgb, var(--tint) 80%, transparent));
-  mix-blend-mode: screen;
-}
-
-.bg-asset svg {
-  width: 100%;
-  height: 100%;
-  display: block;
-  opacity: 1;
-}
-
-/* Give large icons a soft fill so they read against the gradient */
-.bg-asset[data-z="0.85"] svg,
-.bg-asset[data-z="0.9"] svg,
-.bg-asset[data-z="0.8"] svg,
-.bg-asset[data-z="0.75"] svg,
-.bg-asset[data-z="0.7"] svg {
-  fill: color-mix(in srgb, currentColor 12%, transparent);
-}
-
-/* Only render fleet when the layer is active */
-.bg-layer.is-active .bg-asset {
-  opacity: var(--op-base);
-}
-
-/* Tiny ambience assets (stars / embers): brightness tracks scroll speed */
-.bg-layer.is-active .bg-asset[data-z="0.1"],
-.bg-layer.is-active .bg-asset[data-z="0.12"],
-.bg-layer.is-active .bg-asset[data-z="0.15"],
-.bg-layer.is-active .bg-asset[data-z="0.16"],
-.bg-layer.is-active .bg-asset[data-z="0.2"],
-.bg-layer.is-active .bg-asset[data-z="0.22"],
-.bg-layer.is-active .bg-asset[data-z="0.3"] {
-  opacity: calc(var(--op-base) * var(--spark));
-  transition: opacity 0.35s ease, transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 /* StarCraft / hero — cosmic violet */
@@ -378,33 +308,6 @@ body[data-theme="book"] { --theme-accent: #d4af37; --theme-accent-2: #a78bfa; }
 body[data-theme="2hh"] { --theme-accent: #38bdf8; --theme-accent-2: #fb7185; }
 body[data-theme="badugi"] { --theme-accent: #94a3b8; --theme-accent-2: #e0f2fe; }
 
-/* Fog + minimap canvases — fade fog on non-SC themes so color wash reads clearly */
-#fog-canvas {
-  position: fixed;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: 2;
-  opacity: 0.22;
-  mix-blend-mode: multiply;
-  transition: opacity 0.9s ease;
-}
-
-body[data-bg="poker"] #fog-canvas,
-body[data-bg="2hh"] #fog-canvas,
-body[data-bg="badugi"] #fog-canvas,
-body[data-bg="hearthstone"] #fog-canvas,
-body[data-bg="cnc"] #fog-canvas,
-body[data-bg="warcraft"] #fog-canvas,
-body[data-bg="mtg"] #fog-canvas {
-  opacity: 0.06;
-}
-
-body[data-bg="about"] #fog-canvas,
-body[data-bg="contact"] #fog-canvas {
-  opacity: 0.12;
-}
 
 /* Current-section indicator (replaces the minimap radar) */
 .section-indicator {
@@ -1937,6 +1840,7 @@ kbd {
 .section-play {
   max-width: none;
   background: transparent;
+  scroll-margin-top: calc(var(--header-h) + 0.75rem);
 }
 
 .section-play .section-head {
@@ -1944,6 +1848,7 @@ kbd {
   margin-left: auto;
   margin-right: auto;
   text-align: center;
+  transition: opacity 0.35s ease, max-height 0.4s ease, margin 0.35s ease;
 }
 
 .play-panel {
@@ -1978,12 +1883,40 @@ kbd {
   box-shadow:
     inset 0 0 40px rgba(0, 0, 0, 0.45),
     0 0 30px rgba(56, 189, 248, 0.08);
+  scroll-margin-top: calc(var(--header-h) + 0.5rem);
+  scroll-margin-bottom: 1.5rem;
 }
 
 .play-frame-wrap.is-live {
   max-height: none;
-  height: min(78vh, 780px);
+  width: min(100%, 1200px);
+  height: min(86vh, 860px);
   aspect-ratio: auto;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Live table: tighten chrome so the app can sit centered in view */
+.section-play.is-playing .section-head {
+  opacity: 0.55;
+  margin-bottom: 1rem;
+}
+
+.section-play.is-playing .play-panel-wide {
+  max-width: min(1240px, 100%);
+  padding: 0.75rem;
+}
+
+.play-center-btn {
+  display: none;
+}
+
+.section-play.is-playing .play-center-btn {
+  display: inline-flex;
+}
+
+body.play-2hh-live #section-indicator {
+  opacity: 0.35;
 }
 
 .play-frame-wrap iframe {
@@ -1992,6 +1925,8 @@ kbd {
   height: 100%;
   border: 0;
   background: #0a0a0a;
+  /* Prefer centering internal app chrome when the host allows */
+  margin: 0 auto;
 }
 
 .play-frame-overlay {
@@ -2031,7 +1966,8 @@ kbd {
   }
 
   .play-frame-wrap.is-live {
-    height: 70vh;
+    width: 100%;
+    height: min(82vh, 720px);
   }
 }
 
@@ -2185,10 +2121,6 @@ kbd {
     --header-h: 56px;
   }
 
-  #fog-canvas {
-    opacity: 0.18;
-  }
-
   .brand-text {
     font-size: 0.92rem;
   }
@@ -2312,10 +2244,6 @@ kbd {
   .hero-portrait img {
     max-height: 55vh;
   }
-
-  #fog-canvas {
-    display: none;
-  }
 }
 
 /* Touch / coarse pointer: prefer tap feedback over hover lift */
@@ -2353,7 +2281,7 @@ kbd {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
   }
-  #fog-canvas { display: none; }
+  #webgl-bg { display: none; }
 
   html.reveal-on [data-reveal],
   html.reveal-on [data-reveal="stagger"] .reveal-item {
@@ -2376,16 +2304,11 @@ kbd {
   .scroll-cue-chevron {
     animation: none !important;
   }
-
-  /* Freeze icon fleets in their resting pose */
-  .bg-asset {
-    transition: opacity 0.4s ease !important;
-  }
 }
 
 /* Print: strip HUD chrome */
 @media print {
-  #fog-canvas,
+  #webgl-bg,
   #section-indicator,
   #bg-stage,
   .site-header {

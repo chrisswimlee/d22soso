@@ -1,7 +1,7 @@
 # D22-soso Portfolio — Design Language (Cursor Constitution)
 
 ## North star
-A **documentary command archive** that feels like a video game: fog, minimap, Random race roll, card physics. Not a neon resume. One strategist, many theaters.
+A **documentary command archive** that feels like a video game: WebGL fog, Random race roll, 3D battle map, card physics. Not a neon resume. One strategist, many theaters.
 
 ## Shell
 - BG `#0a0a0a`, surfaces `#0f0f0f` / `#121212`
@@ -11,15 +11,15 @@ A **documentary command archive** that feels like a video game: fog, minimap, Ra
 - Blockquotes = advisor transmissions; no raw URLs
 
 ## Signature systems (required)
-1. Random race canvas reveal → tri-race shell  
-2. Fog-of-war scout + session persistence  
-3. Live minimap jump  
-4. Lost Temple battle-report canvas  
+1. Random race WebGL reveal → tri-race shell (GSAP spin/settle)  
+2. WebGL fog-of-war scout + session persistence  
+3. Themed Three.js background fleets (ScrollTrigger parallax)  
+4. Lost Temple battle-report WebGL map  
 5. Tab themes: starcraft | cnc | warcraft | mtg | hearthstone | poker | 2hh | badugi  
-6. 2HH card-split physics  
-7. Badugi triad pick physics  
+6. 2HH 3D card-split (GSAP)  
+7. Badugi 3D triad pick (GSAP)  
 8. Rank plaques (engraved, max 3 proof objects / panel)  
-9. `prefers-reduced-motion` static fallbacks  
+9. `prefers-reduced-motion` static fallbacks (hide WebGL motion)  
 
 ## Tab dialects
 | Theme | Material |
