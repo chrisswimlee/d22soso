@@ -29,9 +29,10 @@ Then visit [http://localhost:8080](http://localhost:8080).
 
 - Pointer scouts fog of war
 - Corner minimap — click blips to jump sections
-- Hotkeys `1`–`5` — command nav
+- Hotkeys `1`–`6` — command nav (includes Play 2HH)
 - `R` or click race canvas — Random race roll
 - Innovation canvases — click to split (2HH) or pick (Badugi)
+- [Play 2 Hand Hold’em on desktop](http://play2hh.herokuapp.com/)
 
 ## Privacy
 

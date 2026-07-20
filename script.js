@@ -47,7 +47,7 @@
 
   document.querySelectorAll("[data-tabs]").forEach(setupTabs);
 
-  /* Hotkeys 1-5 nav, R roll */
+  /* Hotkeys 1-6 nav, R roll */
   const navLinks = [...document.querySelectorAll(".command-nav a[data-hotkey]")];
   let raceApi = null;
 
@@ -70,6 +70,7 @@
   /* Section theme when scrolling poker/contact */
   const themeSections = [
     { id: "poker", theme: "poker" },
+    { id: "play", theme: "2hh" },
     { id: "contact", theme: "starcraft" },
   ];
   const themeObs = new IntersectionObserver(
@@ -95,6 +96,7 @@
       "esports",
       "poker",
       "innovation",
+      "play",
       "contact",
     ]);
     raceApi = C.initRaceRoll(document.getElementById("race-canvas"));
@@ -104,7 +106,7 @@
   }
 
   /* Active nav underline */
-  const sections = ["hero", "esports", "poker", "innovation", "contact"]
+  const sections = ["hero", "esports", "poker", "innovation", "play", "contact"]
     .map((id) => document.getElementById(id))
     .filter(Boolean);
   const navObs = new IntersectionObserver(
