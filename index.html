@@ -10,7 +10,20 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
 </head>
-<body data-theme="starcraft">
+<body data-theme="starcraft" data-bg="starcraft">
+  <!-- Fixed theme backgrounds — opacity-crossfaded by scroll / tab theme -->
+  <div id="bg-stage" aria-hidden="true">
+    <div class="bg-layer is-active" data-bg="starcraft"></div>
+    <div class="bg-layer" data-bg="about"></div>
+    <div class="bg-layer" data-bg="cnc"></div>
+    <div class="bg-layer" data-bg="warcraft"></div>
+    <div class="bg-layer" data-bg="mtg"></div>
+    <div class="bg-layer" data-bg="hearthstone"></div>
+    <div class="bg-layer" data-bg="poker"></div>
+    <div class="bg-layer" data-bg="2hh"></div>
+    <div class="bg-layer" data-bg="badugi"></div>
+    <div class="bg-layer" data-bg="contact"></div>
+  </div>
   <div class="scroll-progress" aria-hidden="true"><span class="scroll-progress-bar"></span></div>
   <canvas id="fog-canvas" aria-hidden="true"></canvas>
   <canvas id="minimap-canvas" width="160" height="120" aria-label="Career minimap navigation"></canvas>
@@ -22,37 +35,46 @@
     </a>
     <nav class="command-nav" aria-label="Primary">
       <a href="#hero" data-hotkey="1"><span class="hk">1</span><span class="nav-label">Briefing</span></a>
-      <a href="#esports" data-hotkey="2"><span class="hk">2</span><span class="nav-label">Esports</span></a>
-      <a href="#poker" data-hotkey="3"><span class="hk">3</span><span class="nav-label">Poker</span></a>
-      <a href="#innovation" data-hotkey="4"><span class="hk">4</span><span class="nav-label">Innovation</span></a>
-      <a href="#play" data-hotkey="5"><span class="hk">5</span><span class="nav-label">Play 2HH</span></a>
-      <a href="#contact" data-hotkey="6"><span class="hk">6</span><span class="nav-label">Comms</span></a>
+      <a href="#about" data-hotkey="2"><span class="hk">2</span><span class="nav-label">About</span></a>
+      <a href="#esports" data-hotkey="3"><span class="hk">3</span><span class="nav-label">Esports</span></a>
+      <a href="#poker" data-hotkey="4"><span class="hk">4</span><span class="nav-label">Poker</span></a>
+      <a href="#innovation" data-hotkey="5"><span class="hk">5</span><span class="nav-label">Innovation</span></a>
+      <a href="#play" data-hotkey="6"><span class="hk">6</span><span class="nav-label">Play 2HH</span></a>
+      <a href="#contact" data-hotkey="7"><span class="hk">7</span><span class="nav-label">Comms</span></a>
     </nav>
   </header>
 
   <main>
     <!-- HERO -->
-    <section id="hero" class="section hero" data-node="hero">
+    <section id="hero" class="section hero" data-node="hero" data-bg="starcraft">
       <div class="hero-fog" aria-hidden="true"></div>
       <div class="hero-grid">
         <div class="hero-copy" data-reveal="stagger">
-          <p class="eyebrow mono reveal-item">MISSION BRIEFING // SEASON 1 ARCHIVE</p>
-          <h1 class="brand-hero reveal-item">Wayne <span class="accent-violet">“D22-soso”</span> Chiang</h1>
-          <p class="role-line mono reveal-item">StarCraft: Brood War Season 1 World Champion · Random</p>
+          <p class="eyebrow-badge mono reveal-item"><span class="badge-dot" aria-hidden="true"></span>MISSION BRIEFING // SEASON 1 ARCHIVE</p>
+          <h1 class="brand-hero reveal-item">Wayne <span class="accent-gradient">“D22-soso”</span> Chiang</h1>
+          <p class="hero-sub reveal-item">
+            First official <strong>StarCraft: Brood War World Champion</strong> — now inventing patented
+            casino games and managing talent for the <strong>World Series of Poker</strong>.
+          </p>
           <blockquote class="transmission reveal-item">
-            Whether navigating the pixelated fog-of-war in early real-time strategy or managing non-linear game theory on the green felt of Las Vegas, the meta never really changes—you just have to be willing to bet on yourself.
+            The meta never really changes—you just have to be willing to bet on yourself.
           </blockquote>
           <div class="cta-row reveal-item">
-            <a class="btn btn-primary" href="#esports">Enter Esports Legacy</a>
-            <a class="btn btn-gold" href="#innovation">Open Innovation Catalog</a>
+            <a class="btn btn-primary btn-arrow" href="#play">Play 2 Hand Hold’em™ <span class="arrow" aria-hidden="true">→</span></a>
+            <a class="btn btn-gold" href="#about">Read the Story</a>
           </div>
+          <ul class="hero-stats mono reveal-item">
+            <li><strong>1999</strong><span>BW World Champion</span></li>
+            <li><strong>5</strong><span>U.S. Patents</span></li>
+            <li><strong>#1</strong><span>Case’s Ladder ’96–’98</span></li>
+            <li><strong>WSOP</strong><span>Talent Manager</span></li>
+          </ul>
           <p class="hint mono reveal-item">
             <span class="hint-desktop">Press <kbd>R</kbd> to roll Random · Scout the fog with your pointer</span>
             <span class="hint-touch">Tap the race panel to roll Random · Drag to scout fog</span>
           </p>
         </div>
         <div class="hero-stage" data-parallax="0.12">
-          <canvas id="race-canvas" width="420" height="320" role="img" aria-label="Random race roll interactive"></canvas>
           <figure class="hero-portrait">
             <img
               src="assets/photos/AAA%20Wayne%20Chiang%20Starcraft%20World%20Champ.JPG"
@@ -60,16 +82,172 @@
               width="640"
               height="800"
             />
+            <span class="portrait-badge mono" aria-hidden="true">★ WORLD CHAMPION</span>
             <figcaption class="mono">World Champion · Brood War S1 · 1999</figcaption>
           </figure>
+          <div class="race-console">
+            <p class="race-console-label mono"><span class="badge-dot" aria-hidden="true"></span>INTERACTIVE // RANDOM RACE ROLL</p>
+            <canvas id="race-canvas" width="420" height="320" role="img" aria-label="Random race roll interactive"></canvas>
+          </div>
         </div>
+      </div>
+      <a class="scroll-cue mono" href="#about" aria-label="Scroll to About">
+        <span class="scroll-cue-text">SCROLL</span>
+        <span class="scroll-cue-chevron" aria-hidden="true">▾</span>
+      </a>
+    </section>
+
+    <!-- ABOUT -->
+    <section id="about" class="section section-about" data-node="about" data-bg="about">
+      <header class="section-head" data-reveal>
+        <p class="eyebrow-badge mono"><span class="badge-dot" aria-hidden="true"></span>PERSONNEL FILE // ABOUT</p>
+        <h2>StarCraft Brood War’s First World Champion: Leader by Example</h2>
+        <p class="lede">The full origin story—from Case’s Ladder to the Brood War throne, and the long game that followed.</p>
+      </header>
+
+      <div class="about-layout" data-reveal>
+        <article class="about-prose">
+          <p class="about-tldr">
+            The first official <strong>StarCraft: Brood War World Champion</strong> (1999, Random).
+            #1 Case’s Ladder in <em>Command &amp; Conquer</em> (1996) and <em>Warcraft II</em> (1997).
+            First StarCraft caster. Cube Draft co-originator. Now the WSOP Talent Manager and inventor of five patented casino games.
+          </p>
+          <blockquote class="transmission">
+            The ultimate macro-manager traded his hotkeys for higher stakes—proving that whether you’re building a
+            digital empire or a real-world legacy, the meta never really changes. You just have to be willing to bet on yourself.
+          </blockquote>
+
+          <details class="about-more">
+            <summary>
+              <span class="about-more-label">Read the full story</span>
+              <span class="about-more-icon" aria-hidden="true">
+                <span class="about-more-chevron">▾</span>
+              </span>
+            </summary>
+            <div class="about-more-content">
+              <h3>Dawn of Esports</h3>
+              <p>
+                Before the sold-out stadiums in Seoul, before multi-million dollar Twitch exclusivity contracts,
+                and long before you could Google “Zerg Rush,” the digital frontier was a wild, uncharted landscape.
+                In 1996, Wayne Chiang as “SoSOWAC” dominated 1v1 and teams on Case’s Ladder, ranking #1 at
+                <em>Command &amp; Conquer: Tiberian Dawn</em>. In 1997, he did the same for
+                <em>Warcraft II: Tides of Darkness</em>.
+              </p>
+              <p>
+                <strong>March 31, 1998</strong> changed everything. StarCraft was released—and esports would never be the same.
+                Once again, Chiang hit #1 on Case’s Ladder in 1v1 and teams. Then he won the first StarCraft tournament
+                against friend and eventual Chess.com co-founder Jay “Gadianton” Severson for $250, held at the legendary
+                Magic: The Gathering hotspot Neutral Ground Mountain View—close to Google and Apple headquarters.
+                Two $10 grudge-match victories over Severson followed. With nothing more to prove, Chiang was ready to move on.
+              </p>
+              <p>
+                Then, in September 1998, Severson let Chiang know the Professional Gamers’ League Season 3 was running
+                the first international StarCraft tournament. Chiang missed sign-ups by one day. For a lesser player,
+                that could have been a career-ending setback. Instead, he stated: “I want it all.” He set out to become
+                the top media personality and content creator for StarCraft—taking to the microphone as StarCraft’s
+                first-ever caster, and watching his rival and friend Gadianton take first place.
+              </p>
+              <p>
+                That early eye for talent and narrative caught the attention of esports heavyweights
+                5× FPS World Champion and Esports Hall of Famer Dennis “Thresh” Fong and Bob “Calbear” Colayco,
+                who handed Chiang the keys to GX StarCraft on Gamers.com. D11-Thresh inducted “SoSOWAC” to “D22-soso”
+                and “Gadianton” to “D23-Gadianton.”
+              </p>
+              <p>
+                D22-soso became the central nervous system of the community. He wasn’t just beating the best players
+                in the world—he was translating their brilliance for the masses. He wrote battle reports of high-ranked
+                ladder games, most notably battling rival Guillaume Patry. He set up <em>Pimpest Plays</em>: the original
+                SportsCenter Top 10 for esports, creating the foundation for every highlight reel you see on YouTube today.
+              </p>
+              <p>
+                While most early pros relied on blistering early-game APM, when Chiang and Patry clashed they dragged
+                each other into the depths of the late game—utilizing rarely-seen units like Ultralisks, Battlecruisers,
+                and Carriers.
+              </p>
+
+              <h3>The Ultimate Flex: World Champion</h3>
+              <p>
+                At the 1999 Brood War Season 1 Ladder Tournament—Blizzard’s first official World Championship—
+                D22-soso did the unthinkable. In a game defined by extreme, singular racial specialization, he played
+                <strong>Random</strong>. It was the equivalent of winning a scoring title while shooting ambidextrously.
+              </p>
+              <p>
+                In a legendary ~38-minute semi-final against Patry’s Zerg on Lost Temple, Chiang rolled Protoss.
+                Facing a map that was 75% controlled by the swarm, he orchestrated a masterclass three-pronged attack:
+                Reavers and Archons on the right, Dark Templars and Corsairs on the left, and a devastating push down
+                the middle. He broke Patry, advanced to the finals, and defeated Crexis to become the first
+                StarCraft: Brood War World Champion—taking home $2,500.
+              </p>
+
+              <h3>The Walk-Off and The Long Game</h3>
+              <p>
+                Like a champion vacating the throne at the absolute peak of his powers, D22-soso eventually walked away.
+                With the esports scene shifting entirely to South Korea and the dot-com bubble looming, Patry—four years
+                his junior—was rapidly evolving. Choosing family, academics, and a grander vision for his future,
+                Chiang stepped away from the keyboard to pursue a Computer Science degree at UC San Diego.
+              </p>
+              <p>
+                He didn’t stick around to watch his mechanics fade. He handed the torch to a new generation, eventually
+                interviewing legends like SlayerS_BoxeR at the 2025 World Series of Poker—a meeting of the man who built
+                the throne and the man who sat on it.
+              </p>
+              <p>
+                Ultimately, StarCraft was never just a video game for Wayne Chiang. It was Chapter One. The ability to
+                read opponents, calculate odds, evaluate raw talent, and design winning strategies didn’t retire in 1999.
+                It evolved. The battlefield simply shifted from the pixelated maps of Brood War to the green felt of
+                Las Vegas and the boardrooms of modern business.
+              </p>
+
+              <h3>Today</h3>
+              <p>
+                Wayne “D22-soso” Chiang operates on a different battlefield. He is the Talent Manager for the
+                World Series of Poker (WSOP), an inventor of patented casino games like 2 Hand Hold’em™ and Badugi Chase™,
+                and co-author of the self-investment guide <cite>Betting on Yourself</cite>. But long before he was shaping
+                the modern poker landscape, he was pouring the concrete foundation for modern competitive gaming and
+                content creation.
+              </p>
+            </div>
+          </details>
+        </article>
+
+        <aside class="about-aside" data-reveal>
+          <figure class="about-portrait">
+            <img
+              src="assets/photos/AAA%20Wayne%20Chiang%20Starcraft%20World%20Champ%20and%20PGL%202nd.JPG"
+              alt="Wayne D22-soso Chiang with StarCraft trophies"
+              width="640"
+              height="800"
+            />
+            <figcaption class="mono">Champion archive · Brood War era</figcaption>
+          </figure>
+
+          <div class="about-timeline">
+            <p class="about-aside-label mono"><span class="badge-dot" aria-hidden="true"></span>COMPETITOR RECORD</p>
+            <ol class="career-timeline mono">
+              <li><time>1998</time><span>StarCraft Team Case’s Ladder #1</span></li>
+              <li><time>1998</time><span>Neutral Ground Mountain View — 1st StarCraft tournament winner</span></li>
+              <li><time>Oct 1998</time><span>First StarCraft tournament commentator — PGL Season 3</span></li>
+              <li><time>Feb 1999</time><span>B.net vs Kali #2 seed vs Guillaume Patry</span></li>
+              <li><time>Apr 1999</time><span>Brood War Battle.net Season 1 World Champion</span></li>
+              <li><time>May 1999</time><span>PGL Season 4 StarCraft World Championship — 2nd place</span></li>
+              <li><time>Jun 1999</time><span>USA vs Canada — MVP</span></li>
+              <li><time>Jul 1999</time><span>Sports Seoul Brood War #5 · World Champions Invitational #3</span></li>
+              <li><time>Sep 1999</time><span>Brood War Battle.net World Championships — 3rd place</span></li>
+            </ol>
+          </div>
+
+          <div class="cta-row about-ctas">
+            <a class="btn btn-primary btn-arrow" href="#esports">Open Esports Archive <span class="arrow" aria-hidden="true">→</span></a>
+            <a class="btn btn-gold" href="#poker">See the Felt Era</a>
+          </div>
+        </aside>
       </div>
     </section>
 
     <!-- ESPORTS -->
-    <section id="esports" class="section" data-node="esports">
+    <section id="esports" class="section" data-node="esports" data-bg="starcraft" data-bg-from-tab="esports">
       <header class="section-head" data-reveal>
-        <p class="eyebrow mono">BUILD ORDER // 1996–PRESENT</p>
+        <p class="eyebrow-badge mono"><span class="badge-dot" aria-hidden="true"></span>BUILD ORDER // 1996–PRESENT</p>
         <h2>Esports Origins</h2>
         <p class="lede">From Case’s Ladder to Blizzard’s first official Brood War world title—and the cast, community, and formats that followed.</p>
       </header>
@@ -197,9 +375,9 @@
     </section>
 
     <!-- POKER -->
-    <section id="poker" class="section section-poker" data-node="poker" data-theme="poker">
+    <section id="poker" class="section section-poker" data-node="poker" data-theme="poker" data-bg="poker">
       <header class="section-head" data-reveal>
-        <p class="eyebrow mono">FELT // BROADCAST // TALENT</p>
+        <p class="eyebrow-badge mono"><span class="badge-dot" aria-hidden="true"></span>FELT // BROADCAST // TALENT</p>
         <h2>Poker &amp; Advantage Play</h2>
         <p class="lede">From math-driven blackjack bans to Live at the Bike and the World Series of Poker media desk.</p>
       </header>
@@ -231,9 +409,9 @@
     </section>
 
     <!-- INNOVATION -->
-    <section id="innovation" class="section" data-node="innovation">
+    <section id="innovation" class="section" data-node="innovation" data-bg="2hh" data-bg-from-tab="innovation">
       <header class="section-head" data-reveal>
-        <p class="eyebrow mono">PATENT ARCHIVE // TABLE GAMES</p>
+        <p class="eyebrow-badge mono"><span class="badge-dot" aria-hidden="true"></span>PATENT ARCHIVE // TABLE GAMES</p>
         <h2>Casino Game Innovation</h2>
         <p class="lede">Protected game catalog—play the mechanics, then read the patents.</p>
       </header>
@@ -279,9 +457,9 @@
     </section>
 
     <!-- PLAY 2HH -->
-    <section id="play" class="section section-play" data-node="play" data-theme="2hh">
+    <section id="play" class="section section-play" data-node="play" data-theme="2hh" data-bg="2hh">
       <header class="section-head" data-reveal>
-        <p class="eyebrow mono">TABLE OPEN // PLAY IN-SITE</p>
+        <p class="eyebrow-badge mono"><span class="badge-dot" aria-hidden="true"></span>TABLE OPEN // PLAY IN-SITE</p>
         <h2>Play 2 Hand Hold’em™</h2>
         <p class="lede">Deal four, split two, one board—play the patented game right here.</p>
       </header>
@@ -302,8 +480,8 @@
               src="assets/photos/2hh%20LOGO%20OFFICIAL%20TRADEMARK%20APPLIED.png"
               alt="2 Hand Hold'em trademark logo"
             />
-            <button type="button" class="btn btn-primary btn-lg" id="play-2hh-start">
-              Launch 2 Hand Hold’em
+            <button type="button" class="btn btn-primary btn-lg btn-arrow" id="play-2hh-start">
+              Launch 2 Hand Hold’em <span class="arrow" aria-hidden="true">→</span>
             </button>
             <p class="hint mono">Loads the live table inside this page</p>
           </div>
@@ -331,13 +509,13 @@
     </section>
 
     <!-- CONTACT -->
-    <section id="contact" class="section contact" data-node="contact">
+    <section id="contact" class="section contact" data-node="contact" data-bg="contact">
       <header class="section-head" data-reveal>
-        <p class="eyebrow mono">OPEN COMMS CHANNEL</p>
+        <p class="eyebrow-badge mono"><span class="badge-dot" aria-hidden="true"></span>OPEN COMMS CHANNEL</p>
         <h2>Strategic Collaboration</h2>
         <p class="lede">For licensing, media, talent, or partnership inquiries—open a channel.</p>
       </header>
-      <a class="btn btn-primary btn-lg" data-reveal href="mailto:d22sosowaynechiang@gmail.com">Email Wayne<br class="break-sm" /> <span class="mono">d22sosowaynechiang@gmail.com</span></a>
+      <a class="btn btn-primary btn-lg btn-arrow" data-reveal href="mailto:d22sosowaynechiang@gmail.com">Email Wayne <span class="arrow" aria-hidden="true">→</span><br class="break-sm" /> <span class="mono contact-email">d22sosowaynechiang@gmail.com</span></a>
       <p class="footer-meta mono">
         <a href="https://www.instagram.com/p/Cr2A8JJrgVa/?img_index=1" target="_blank" rel="noopener noreferrer">2 Hand Holdem created by StarCraft: Brood War World Champion Wayne “D22-soso” Chiang</a>
         · Portfolio archive · Bet on yourself
@@ -347,6 +525,7 @@
 
   <script src="js/physics.js"></script>
   <script src="js/game-canvas.js"></script>
+  <script src="js/bg-scene.js"></script>
   <script src="script.js"></script>
 </body>
 </html>

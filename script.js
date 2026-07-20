@@ -1,7 +1,49 @@
-/* Orchestration: tabs, hotkeys, theme, canvas boot */
+/* Orchestration: tabs, hotkeys, theme, canvas boot, bg crossfade */
 (function () {
   const C = window.D22Canvas;
   const P = window.D22Physics;
+
+  /* ---------- Dynamic background crossfade ---------- */
+  const bgLayers = [...document.querySelectorAll("#bg-stage .bg-layer")];
+  let activeBg = document.body.dataset.bg || "starcraft";
+  let activeSectionId = "hero";
+
+  function accentThemeForBg(bg) {
+    if (bg === "about" || bg === "contact") return "starcraft";
+    return bg;
+  }
+
+  function setSceneBg(bgKey, themeKey) {
+    const bg = bgKey || "starcraft";
+    const theme = themeKey || accentThemeForBg(bg);
+    if (bg !== activeBg) {
+      activeBg = bg;
+      document.body.dataset.bg = bg;
+      bgLayers.forEach((layer) => {
+        layer.classList.toggle("is-active", layer.dataset.bg === bg);
+      });
+    }
+    if (document.body.dataset.theme !== theme) {
+      document.body.dataset.theme = theme;
+    }
+  }
+
+  function resolveSectionBg(section) {
+    if (!section) return "starcraft";
+    if (section.hasAttribute("data-bg-from-tab")) {
+      const tabRoot = section.querySelector("[data-tabs]");
+      const selected = tabRoot?.querySelector('[role="tab"][aria-selected="true"]');
+      if (selected?.dataset.theme) return selected.dataset.theme;
+    }
+    return section.dataset.bg || "starcraft";
+  }
+
+  function applySectionScene(section) {
+    if (!section) return;
+    activeSectionId = section.id;
+    const bg = resolveSectionBg(section);
+    setSceneBg(bg, accentThemeForBg(bg));
+  }
 
   /* Tabs */
   function setupTabs(root) {
@@ -9,6 +51,7 @@
     if (!tablist) return;
     const tabs = [...tablist.querySelectorAll('[role="tab"]')];
     const panels = tabs.map((t) => document.getElementById(t.getAttribute("aria-controls"))).filter(Boolean);
+    const hostSection = root.closest("section[data-node]");
 
     function activate(tab, focus) {
       tabs.forEach((t) => {
@@ -21,7 +64,15 @@
         p.hidden = !on;
       });
       const theme = tab.dataset.theme;
-      if (theme) document.body.dataset.theme = theme;
+      if (theme && hostSection) {
+        hostSection.dataset.bg = theme;
+        /* Crossfade immediately when this section owns the viewport */
+        if (hostSection.id === activeSectionId) {
+          setSceneBg(theme, theme);
+        }
+      } else if (theme) {
+        document.body.dataset.theme = theme;
+      }
       if (focus) tab.focus();
     }
 
@@ -47,7 +98,7 @@
 
   document.querySelectorAll("[data-tabs]").forEach(setupTabs);
 
-  /* Hotkeys 1-6 nav, R roll */
+  /* Hotkeys 1-7 nav, R roll */
   const navLinks = [...document.querySelectorAll(".command-nav a[data-hotkey]")];
   let raceApi = null;
 
@@ -67,32 +118,71 @@
     }
   });
 
-  /* Section theme when scrolling poker/contact */
-  const themeSections = [
-    { id: "poker", theme: "poker" },
-    { id: "play", theme: "2hh" },
-    { id: "contact", theme: "starcraft" },
-  ];
-  const themeObs = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
+  /* Center-of-viewport section → background theme */
+  const sceneSections = ["hero", "about", "esports", "poker", "innovation", "play", "contact"]
+    .map((id) => document.getElementById(id))
+    .filter(Boolean);
+
+  if ("IntersectionObserver" in window && sceneSections.length) {
+    const visible = new Map();
+
+    function pickCenteredSection() {
+      const mid = window.innerHeight * 0.5;
+      let best = null;
+      let bestDist = Infinity;
+      visible.forEach((entry, el) => {
         if (!entry.isIntersecting) return;
-        const match = themeSections.find((s) => s.id === entry.target.id);
-        if (match) document.body.dataset.theme = match.theme;
+        const rect = el.getBoundingClientRect();
+        const center = rect.top + rect.height * 0.5;
+        const dist = Math.abs(center - mid);
+        if (dist < bestDist) {
+          bestDist = dist;
+          best = el;
+        }
       });
-    },
-    { threshold: 0.35 }
-  );
-  themeSections.forEach((s) => {
-    const el = document.getElementById(s.id);
-    if (el) themeObs.observe(el);
-  });
+      if (best) applySectionScene(best);
+    }
+
+    const sceneObs = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => visible.set(entry.target, entry));
+        pickCenteredSection();
+      },
+      {
+        /* Middle band of the viewport — which section owns the center */
+        root: null,
+        rootMargin: "-35% 0px -35% 0px",
+        threshold: [0, 0.1, 0.25, 0.5, 0.75],
+      }
+    );
+    sceneSections.forEach((el) => sceneObs.observe(el));
+
+    /* Fallback pick on load / hash jump */
+    requestAnimationFrame(() => {
+      const hashId = (location.hash || "").replace(/^#/, "");
+      const hashEl = hashId ? document.getElementById(hashId) : null;
+      applySectionScene(hashEl && sceneSections.includes(hashEl) ? hashEl : sceneSections[0]);
+    });
+
+    window.addEventListener(
+      "hashchange",
+      () => {
+        const id = (location.hash || "").replace(/^#/, "");
+        const el = id ? document.getElementById(id) : null;
+        if (el && sceneSections.includes(el)) applySectionScene(el);
+      },
+      { passive: true }
+    );
+  } else {
+    applySectionScene(sceneSections[0]);
+  }
 
   /* Boot canvas systems */
   if (C) {
     C.initFog(document.getElementById("fog-canvas"));
     C.initMinimap(document.getElementById("minimap-canvas"), [
       "hero",
+      "about",
       "esports",
       "poker",
       "innovation",
@@ -106,9 +196,7 @@
   }
 
   /* Active nav underline */
-  const sections = ["hero", "esports", "poker", "innovation", "play", "contact"]
-    .map((id) => document.getElementById(id))
-    .filter(Boolean);
+  const sections = sceneSections;
   const navObs = new IntersectionObserver(
     (entries) => {
       entries.forEach((entry) => {
