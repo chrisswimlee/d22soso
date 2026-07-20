@@ -38,11 +38,31 @@
     return section.dataset.bg || "starcraft";
   }
 
+  /* Human-readable label for the current-section indicator */
+  const SECTION_LABELS = {
+    hero: "Briefing",
+    about: "About",
+    esports: "StarCraft",
+    "game-cnc": "Command & Conquer",
+    "game-warcraft": "Warcraft",
+    "game-mtg": "Magic: The Gathering",
+    "game-hearthstone": "Hearthstone",
+    poker: "Poker",
+    book: "Betting on Yourself",
+    innovation: "Casino Innovation",
+    play: "Play 2 Hand Hold'em",
+    contact: "Comms",
+  };
+  const indicatorLabel = document.querySelector("#section-indicator .si-label");
+
   function applySectionScene(section) {
     if (!section) return;
     activeSectionId = section.id;
     const bg = resolveSectionBg(section);
     setSceneBg(bg, accentThemeForBg(bg));
+    if (indicatorLabel) {
+      indicatorLabel.textContent = SECTION_LABELS[section.id] || section.id;
+    }
   }
 
   /* Tabs */
@@ -136,45 +156,56 @@
     .map((id) => document.getElementById(id))
     .filter(Boolean);
 
-  if ("IntersectionObserver" in window && sceneSections.length) {
-    const visible = new Map();
+  if (sceneSections.length) {
+    /* Continuous nearest-center detection — reliable for tall sections
+     * (IntersectionObserver thresholds fire too sparsely on big targets). */
+    let sceneCurrent = null;
+    let sceneTicking = false;
 
     function pickCenteredSection() {
-      const mid = window.innerHeight * 0.5;
+      const vh = window.innerHeight || 1;
+      const mid = vh * 0.5;
       let best = null;
       let bestDist = Infinity;
-      visible.forEach((entry, el) => {
-        if (!entry.isIntersecting) return;
+      for (const el of sceneSections) {
         const rect = el.getBoundingClientRect();
+        /* Skip sections entirely off-screen */
+        if (rect.bottom < 0 || rect.top > vh) continue;
         const center = rect.top + rect.height * 0.5;
         const dist = Math.abs(center - mid);
         if (dist < bestDist) {
           bestDist = dist;
           best = el;
         }
-      });
-      if (best) applySectionScene(best);
+      }
+      if (best && best !== sceneCurrent) {
+        sceneCurrent = best;
+        applySectionScene(best);
+      }
     }
 
-    const sceneObs = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => visible.set(entry.target, entry));
+    function sceneOnScroll() {
+      if (sceneTicking) return;
+      sceneTicking = true;
+      requestAnimationFrame(() => {
         pickCenteredSection();
-      },
-      {
-        /* Middle band of the viewport — which section owns the center */
-        root: null,
-        rootMargin: "-35% 0px -35% 0px",
-        threshold: [0, 0.1, 0.25, 0.5, 0.75],
-      }
-    );
-    sceneSections.forEach((el) => sceneObs.observe(el));
+        sceneTicking = false;
+      });
+    }
 
-    /* Fallback pick on load / hash jump */
+    window.addEventListener("scroll", sceneOnScroll, { passive: true });
+    window.addEventListener("resize", sceneOnScroll, { passive: true });
+
+    /* Initial pick (honor a hash target if present) */
     requestAnimationFrame(() => {
       const hashId = (location.hash || "").replace(/^#/, "");
       const hashEl = hashId ? document.getElementById(hashId) : null;
-      applySectionScene(hashEl && sceneSections.includes(hashEl) ? hashEl : sceneSections[0]);
+      if (hashEl && sceneSections.includes(hashEl)) {
+        sceneCurrent = hashEl;
+        applySectionScene(hashEl);
+      } else {
+        pickCenteredSection();
+      }
     });
 
     window.addEventListener(
@@ -182,7 +213,10 @@
       () => {
         const id = (location.hash || "").replace(/^#/, "");
         const el = id ? document.getElementById(id) : null;
-        if (el && sceneSections.includes(el)) applySectionScene(el);
+        if (el && sceneSections.includes(el)) {
+          sceneCurrent = el;
+          applySectionScene(el);
+        }
       },
       { passive: true }
     );
@@ -193,16 +227,6 @@
   /* Boot canvas systems */
   if (C) {
     C.initFog(document.getElementById("fog-canvas"));
-    C.initMinimap(document.getElementById("minimap-canvas"), [
-      "hero",
-      "about",
-      "esports",
-      "poker",
-      "book",
-      "innovation",
-      "play",
-      "contact",
-    ]);
     raceApi = C.initRaceRoll(document.getElementById("race-canvas"));
     C.initBattleMap(document.getElementById("battle-canvas"));
     C.init2HH(document.getElementById("cards-2hh"));
@@ -332,6 +356,71 @@
   }
   revealHashTarget();
   window.addEventListener("hashchange", revealHashTarget);
+
+  /* Poker gallery — hover/focus a block to swap the featured photo */
+  (function () {
+    const gallery = document.querySelector("[data-poker-gallery]");
+    const img = document.getElementById("poker-photo-img");
+    if (!gallery || !img) return;
+    const caption = gallery.querySelector(".poker-photo-caption");
+    const triggers = [...gallery.querySelectorAll("[data-swap-img]")];
+    const defSrc = img.dataset.default || img.getAttribute("src");
+    const defAlt = img.dataset.defaultAlt || img.getAttribute("alt");
+    const defCap = caption ? caption.textContent : "";
+    let applied = img.getAttribute("src"); // what's currently shown
+    let want = { src: defSrc, alt: defAlt, cap: defCap };
+    let fadeTimer = null;
+    let leaveTimer = null;
+
+    /* Preload swap targets to avoid flicker on first hover */
+    triggers.forEach((t) => {
+      const src = t.getAttribute("data-swap-img");
+      if (src) {
+        const pre = new Image();
+        pre.src = src;
+      }
+    });
+
+    /* Single-timer "latest wins" crossfade — immune to rapid hover races */
+    function doSwap(src, alt, cap) {
+      want = { src, alt, cap };
+      if (src === applied) {
+        clearTimeout(fadeTimer);
+        fadeTimer = null;
+        img.classList.remove("is-swapping");
+        return;
+      }
+      img.classList.add("is-swapping");
+      clearTimeout(fadeTimer);
+      fadeTimer = setTimeout(() => {
+        applied = want.src;
+        img.src = want.src;
+        if (want.alt) img.alt = want.alt;
+        if (caption && want.cap) caption.textContent = want.cap;
+        requestAnimationFrame(() => img.classList.remove("is-swapping"));
+      }, 180);
+    }
+
+    triggers.forEach((t) => {
+      const src = t.getAttribute("data-swap-img");
+      const alt = t.getAttribute("data-swap-alt") || "";
+      const cap = t.getAttribute("data-swap-caption") || "";
+      /* Enter cancels any pending revert (absorbs hover-lift flicker) */
+      const on = () => {
+        clearTimeout(leaveTimer);
+        doSwap(src, alt, cap);
+      };
+      /* Leave is debounced so a transient re-enter won't reset the image */
+      const off = () => {
+        clearTimeout(leaveTimer);
+        leaveTimer = setTimeout(() => doSwap(defSrc, defAlt, defCap), 110);
+      };
+      t.addEventListener("mouseenter", on);
+      t.addEventListener("mouseleave", off);
+      t.addEventListener("focusin", on);
+      t.addEventListener("focusout", off);
+    });
+  })();
 
   /* In-page 2HH game embed */
   const playWrap = document.getElementById("play-2hh-wrap");

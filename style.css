@@ -19,8 +19,6 @@
   --header-h: 64px;
   --pad-x: clamp(1rem, 3vw, 1.75rem);
   --section-y: clamp(3rem, 8vw, 5.5rem);
-  --minimap-size: 160px;
-  --minimap-h: 120px;
   --safe-bottom: env(safe-area-inset-bottom, 0px);
   --safe-top: env(safe-area-inset-top, 0px);
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -45,7 +43,7 @@ body {
   color: var(--text);
   line-height: 1.6;
   overflow-x: clip;
-  padding-bottom: calc(1.5rem + var(--minimap-h) + var(--safe-bottom));
+  padding-bottom: calc(2rem + var(--safe-bottom));
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
 }
@@ -408,19 +406,51 @@ body[data-bg="contact"] #fog-canvas {
   opacity: 0.12;
 }
 
-#minimap-canvas {
+/* Current-section indicator (replaces the minimap radar) */
+.section-indicator {
   position: fixed;
-  right: max(12px, env(safe-area-inset-right, 0px));
-  bottom: max(12px, var(--safe-bottom));
+  right: max(14px, env(safe-area-inset-right, 0px));
+  bottom: max(14px, var(--safe-bottom));
   z-index: 60;
-  width: var(--minimap-size);
-  height: var(--minimap-h);
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  background: rgba(10, 10, 10, 0.9);
-  box-shadow: 0 0 0 1px rgba(139, 92, 246, 0.25), 0 8px 32px rgba(0, 0, 0, 0.5);
-  cursor: pointer;
-  touch-action: manipulation;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.55rem 0.9rem;
+  border: 1px solid color-mix(in srgb, var(--theme-accent) 40%, var(--border));
+  border-radius: 999px;
+  background: rgba(10, 10, 12, 0.82);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.5);
+  pointer-events: none;
+  transition: border-color 0.4s ease, box-shadow 0.4s ease;
+}
+
+.section-indicator .si-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--theme-accent);
+  box-shadow: 0 0 10px var(--theme-accent);
+  animation: dotPulse 2.2s ease-in-out infinite;
+}
+
+.section-indicator .si-text {
+  display: grid;
+  line-height: 1.1;
+}
+
+.section-indicator .si-kicker {
+  font-size: 0.52rem;
+  letter-spacing: 0.14em;
+  color: var(--muted);
+}
+
+.section-indicator .si-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--theme-accent);
+  transition: color 0.4s ease;
 }
 
 /* Header */
@@ -1628,6 +1658,20 @@ kbd {
   justify-self: center;
 }
 
+/* Non-photo assets (documents, wide promo graphics, diagrams):
+   show the whole image, centered, without cover-cropping the subject */
+.panel-img--contain {
+  object-fit: contain;
+  object-position: center;
+  width: 100%;
+  height: auto;
+  max-height: 300px;
+  padding: 0.75rem;
+  background:
+    radial-gradient(ellipse 80% 70% at 50% 50%, rgba(255, 255, 255, 0.03), transparent 70%),
+    #08080c;
+}
+
 #battle-canvas,
 #cards-2hh,
 #cards-badugi {
@@ -1794,6 +1838,7 @@ kbd {
 }
 
 .poker-photo {
+  position: relative;
   margin: 0;
   border: 1px solid rgba(74, 222, 128, 0.25);
   border-radius: 6px;
@@ -1814,12 +1859,45 @@ kbd {
   height: 100%;
   object-fit: cover;
   min-height: 280px;
-  transition: transform 0.55s ease, filter 0.55s ease;
+  transition: transform 0.55s ease, filter 0.55s ease, opacity 0.22s ease;
 }
 
 .poker-photo:hover img {
   transform: scale(1.03);
   filter: contrast(1.04) saturate(1.05);
+}
+
+/* Gallery crossfade state */
+.poker-photo img.is-swapping {
+  opacity: 0;
+}
+
+.poker-photo-caption {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 0.6rem 0.85rem;
+  font-size: 0.68rem;
+  color: var(--gold);
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.9));
+  pointer-events: none;
+}
+
+/* Interactive poker blocks get an affordance */
+.poker-grid [data-swap-img] {
+  cursor: pointer;
+}
+
+/* Center-anchored hover (no translate) so the pointer never slips off,
+   keeping the image-swap hover stable */
+.poker-cards .felt-card[data-swap-img]:hover {
+  transform: scale(1.015);
+}
+
+.poker-grid [data-swap-img]:focus-visible {
+  outline: 2px solid var(--theme-accent);
+  outline-offset: 3px;
 }
 
 .poker-cards {
@@ -2105,8 +2183,6 @@ kbd {
 @media (max-width: 768px) {
   :root {
     --header-h: 56px;
-    --minimap-size: 108px;
-    --minimap-h: 82px;
   }
 
   #fog-canvas {
@@ -2178,10 +2254,6 @@ kbd {
 
 /* Phone */
 @media (max-width: 480px) {
-  :root {
-    --minimap-size: 96px;
-    --minimap-h: 72px;
-  }
 
   .site-header {
     flex-wrap: wrap;
@@ -2227,10 +2299,6 @@ kbd {
   .panel-img {
     max-height: 220px;
   }
-
-  #minimap-canvas {
-    opacity: 0.92;
-  }
 }
 
 /* Landscape phones: keep content usable */
@@ -2247,11 +2315,6 @@ kbd {
 
   #fog-canvas {
     display: none;
-  }
-
-  :root {
-    --minimap-size: 88px;
-    --minimap-h: 66px;
   }
 }
 
@@ -2323,7 +2386,7 @@ kbd {
 /* Print: strip HUD chrome */
 @media print {
   #fog-canvas,
-  #minimap-canvas,
+  #section-indicator,
   #bg-stage,
   .site-header {
     display: none !important;

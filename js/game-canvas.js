@@ -405,7 +405,7 @@
     function layout() {
       const cssW = canvas.clientWidth || 480;
       const cssH = Math.max(220, Math.round(cssW * 0.62));
-      const { w, h } = P.resizeCanvas(canvas, cssW, cssH);
+      const { ctx, w, h } = P.resizeCanvas(canvas, cssW, cssH);
       const gap = Math.min(70, w * 0.15);
       const baseY = h * 0.62;
       hole.forEach((c, i) => {
@@ -425,7 +425,7 @@
         c.x.setTarget(start + i * gap);
         c.y.setTarget(h * 0.28);
       });
-      return { w, h };
+      return { ctx, w, h };
     }
 
     hole.forEach((c, i) => {
