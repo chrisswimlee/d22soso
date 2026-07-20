@@ -155,6 +155,22 @@
        <rect x="62" y="30" width="28" height="42" rx="3" transform="rotate(10 76 51)" />`
     ),
 
+    /* Book: open book, quill, circuit node (AI) */
+    book: svg(
+      `<path d="M50 24 C38 16 22 16 12 20 V76 C22 72 38 72 50 80 C62 72 78 72 88 76 V20 C78 16 62 16 50 24 Z" />
+       <path d="M50 24 V80" />
+       <path d="M22 34 H40 M22 46 H40 M60 34 H78 M60 46 H78" />`
+    ),
+    quill: svg(
+      `<path d="M20 82 C40 78 72 60 82 22 C60 26 34 42 24 70 Z" />
+       <path d="M24 70 L44 50 M20 82 L34 68" />`
+    ),
+    chipAi: svg(
+      `<rect x="30" y="30" width="40" height="40" rx="4" />
+       <circle cx="50" cy="50" r="8" />
+       <path d="M50 18 V30 M50 70 V82 M18 50 H30 M70 50 H82 M34 18 V30 M66 18 V30 M34 70 V82 M66 70 V82" />`
+    ),
+
     /* Contact: signal envelope */
     signal: svg(
       `<rect x="12" y="24" width="76" height="52" rx="4" />
@@ -236,6 +252,14 @@
       { i: "chip", x: 60, y: 24, s: 120, z: 0.4, r: 0, c: "#e0f2fe", d: 20 },
       { i: "manaPip", x: 30, y: 76, s: 90, z: 0.3, r: 0, c: "#94a3b8", d: 18 },
     ],
+    book: [
+      { i: "book", x: 18, y: 24, s: 300, z: 0.85, r: -6, c: "#d4af37", d: 24 },
+      { i: "quill", x: 80, y: 70, s: 240, z: 0.7, r: 8, c: "#a78bfa", d: 26 },
+      { i: "chipAi", x: 64, y: 26, s: 150, z: 0.5, r: 0, c: "#fcd34d", d: 20 },
+      { i: "book", x: 30, y: 76, s: 130, z: 0.4, r: 6, c: "#c48b3b", d: 22 },
+      { i: "starDot", x: 50, y: 46, s: 30, z: 0.2, r: 0, c: "#fde68a", d: 12 },
+      { i: "starDot", x: 72, y: 52, s: 22, z: 0.14, r: 0, c: "#fff", d: 10 },
+    ],
     contact: [
       { i: "signal", x: 20, y: 26, s: 260, z: 0.8, r: -6, c: "#8b5cf6", d: 26 },
       { i: "signal", x: 80, y: 72, s: 220, z: 0.65, r: 6, c: "#d4af37", d: 28 },
@@ -293,19 +317,39 @@
   });
 
   /* --------- Section lookup for the active layer --------- */
-  const sections = ["hero", "about", "esports", "poker", "innovation", "play", "contact"]
+  const sections = [
+    "hero",
+    "about",
+    "esports",
+    "game-cnc",
+    "game-warcraft",
+    "game-mtg",
+    "game-hearthstone",
+    "poker",
+    "book",
+    "innovation",
+    "play",
+    "contact",
+  ]
     .map((id) => document.getElementById(id))
     .filter(Boolean);
 
-  function sectionForKey(key) {
+  /* Section whose center is nearest the viewport middle (drives parallax) */
+  function nearestSection() {
+    const vh = window.innerHeight || 1;
+    const mid = vh * 0.5;
+    let best = null;
+    let bestDist = Infinity;
     for (const s of sections) {
-      if (s.dataset.bg === key) return s;
-      if (s.hasAttribute("data-bg-from-tab")) {
-        const t = s.querySelector('[role="tab"][aria-selected="true"]');
-        if (t?.dataset.theme === key) return s;
+      const rect = s.getBoundingClientRect();
+      if (rect.bottom < 0 || rect.top > vh) continue;
+      const dist = Math.abs(rect.top + rect.height * 0.5 - mid);
+      if (dist < bestDist) {
+        bestDist = dist;
+        best = s;
       }
     }
-    return null;
+    return best;
   }
 
   /* --------- Scroll-velocity physics engine --------- */
@@ -332,7 +376,7 @@
     const entry = active ? layerMap.get(active) : null;
 
     if (entry) {
-      const s = sectionForKey(entry.key);
+      const s = nearestSection();
       const vh = window.innerHeight || 1;
       let p = 0;
       if (s) {

@@ -119,7 +119,20 @@
   });
 
   /* Center-of-viewport section → background theme */
-  const sceneSections = ["hero", "about", "esports", "poker", "innovation", "play", "contact"]
+  const sceneSections = [
+    "hero",
+    "about",
+    "esports",
+    "game-cnc",
+    "game-warcraft",
+    "game-mtg",
+    "game-hearthstone",
+    "poker",
+    "book",
+    "innovation",
+    "play",
+    "contact",
+  ]
     .map((id) => document.getElementById(id))
     .filter(Boolean);
 
@@ -185,6 +198,7 @@
       "about",
       "esports",
       "poker",
+      "book",
       "innovation",
       "play",
       "contact",
@@ -195,15 +209,16 @@
     C.initBadugi(document.getElementById("cards-badugi"));
   }
 
-  /* Active nav underline */
+  /* Active nav underline (game-* subsections map to the Esports link) */
   const sections = sceneSections;
   const navObs = new IntersectionObserver(
     (entries) => {
       entries.forEach((entry) => {
         if (!entry.isIntersecting) return;
+        const navId = entry.target.id.startsWith("game-") ? "esports" : entry.target.id;
         navLinks.forEach((a) => {
           a.style.borderColor =
-            a.getAttribute("href") === "#" + entry.target.id ? "var(--theme-accent)" : "transparent";
+            a.getAttribute("href") === "#" + navId ? "var(--theme-accent)" : "transparent";
         });
       });
     },

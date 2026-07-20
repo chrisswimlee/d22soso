@@ -234,6 +234,15 @@ body {
     linear-gradient(180deg, #04140c 0%, #0f2618 40%, #081610 100%);
 }
 
+/* Betting on Yourself — editorial ink & gold */
+.bg-layer[data-bg="book"] {
+  background:
+    radial-gradient(ellipse 75% 55% at 25% 20%, rgba(212, 175, 55, 0.3), transparent 55%),
+    radial-gradient(ellipse 55% 45% at 85% 70%, rgba(167, 139, 250, 0.22), transparent 50%),
+    radial-gradient(ellipse 45% 40% at 55% 100%, rgba(120, 90, 40, 0.28), transparent 50%),
+    linear-gradient(165deg, #140f06 0%, #1a1410 50%, #0c0a08 100%);
+}
+
 /* 2 Hand Hold'em — cool dual-hand blue/rose */
 .bg-layer[data-bg="2hh"] {
   background:
@@ -367,6 +376,7 @@ body[data-theme="warcraft"] { --theme-accent: #60a5fa; --theme-accent-2: #fbbf24
 body[data-theme="mtg"] { --theme-accent: #a78bfa; --theme-accent-2: #fcd34d; }
 body[data-theme="hearthstone"] { --theme-accent: var(--ember); --theme-accent-2: #fde68a; }
 body[data-theme="poker"] { --theme-accent: #4ade80; --theme-accent-2: var(--gold); }
+body[data-theme="book"] { --theme-accent: #d4af37; --theme-accent-2: #a78bfa; }
 body[data-theme="2hh"] { --theme-accent: #38bdf8; --theme-accent-2: #fb7185; }
 body[data-theme="badugi"] { --theme-accent: #94a3b8; --theme-accent-2: #e0f2fe; }
 
@@ -1252,6 +1262,205 @@ kbd {
   flex: 1 1 auto;
 }
 
+/* Book — Betting on Yourself */
+.section-book {
+  max-width: none;
+  background: transparent;
+}
+
+.section-book .section-head {
+  max-width: 44rem;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+}
+
+.section-book .section-head h2::after {
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.section-book .lede {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.book-layout {
+  max-width: 1000px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 0.85fr 1.15fr;
+  gap: clamp(2rem, 5vw, 4rem);
+  align-items: center;
+}
+
+/* 3D book cover (pure CSS) */
+.book-showcase {
+  display: grid;
+  place-items: center;
+  perspective: 1400px;
+}
+
+.book-3d {
+  position: relative;
+  width: min(260px, 70vw);
+  aspect-ratio: 5 / 7;
+  transform-style: preserve-3d;
+  transform: rotateY(-24deg) rotateX(6deg);
+  transition: transform 0.6s var(--ease-spring);
+}
+
+.book-showcase:hover .book-3d {
+  transform: rotateY(-12deg) rotateX(3deg) translateY(-6px);
+}
+
+.book-cover {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.9rem;
+  padding: 1.6rem 1.4rem;
+  border-radius: 3px 8px 8px 3px;
+  background:
+    radial-gradient(ellipse 120% 80% at 20% 10%, rgba(212, 175, 55, 0.25), transparent 60%),
+    linear-gradient(145deg, #1a1206 0%, #241a0c 45%, #12100a 100%);
+  border: 1px solid rgba(212, 175, 55, 0.5);
+  box-shadow:
+    0 30px 60px rgba(0, 0, 0, 0.6),
+    inset 0 0 40px rgba(212, 175, 55, 0.08),
+    inset 3px 0 0 rgba(255, 255, 255, 0.06);
+  transform: translateZ(18px);
+}
+
+.book-cover-kicker {
+  font-size: 0.5rem;
+  letter-spacing: 0.12em;
+  color: var(--gold);
+  opacity: 0.85;
+}
+
+.book-cover-title {
+  font-size: clamp(1.6rem, 4.5vw, 2.2rem);
+  font-weight: 700;
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+  color: #f4e9c8;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.5);
+}
+
+.book-cover-sub {
+  font-size: 0.56rem;
+  letter-spacing: 0.06em;
+  color: #c9b47a;
+  text-transform: uppercase;
+}
+
+.book-spine {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 36px;
+  transform: rotateY(90deg) translateZ(-18px) translateX(-18px);
+  transform-origin: left center;
+  background: linear-gradient(90deg, #0c0a06, #1a1206);
+  border-radius: 3px 0 0 3px;
+}
+
+.book-copy .plaque {
+  margin-bottom: 1.1rem;
+}
+
+.book-copy p {
+  color: color-mix(in srgb, var(--text) 90%, var(--muted));
+  line-height: 1.7;
+  margin: 0 0 1.1rem;
+}
+
+.book-copy cite {
+  font-style: italic;
+  color: var(--gold);
+}
+
+.book-points {
+  list-style: none;
+  margin: 1.25rem 0 1.5rem;
+  padding: 0;
+  display: grid;
+  gap: 0.65rem;
+}
+
+.book-points li {
+  display: grid;
+  grid-template-columns: 2rem 1fr;
+  align-items: center;
+  gap: 0.85rem;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+.book-points span {
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--gold);
+  border: 1px solid var(--gold-dim);
+  background: linear-gradient(180deg, rgba(212, 175, 55, 0.16), rgba(212, 175, 55, 0.02));
+}
+
+.book-ctas {
+  margin-bottom: 0;
+}
+
+/* Game theaters — each esports game is its own scrollable section */
+.game-section {
+  scroll-margin-top: calc(var(--header-h) + 1rem);
+}
+
+.game-section + .game-section {
+  padding-top: clamp(1.5rem, 4vw, 3rem);
+}
+
+.game-panel {
+  position: relative;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: clamp(1.5rem, 3vw, 2.5rem);
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.35),
+    0 0 0 1px rgba(255, 255, 255, 0.02);
+  transition: border-color 0.3s, box-shadow 0.3s, transform 0.3s var(--ease-spring);
+}
+
+.game-panel:hover {
+  border-color: color-mix(in srgb, var(--theme-accent) 35%, var(--border));
+  box-shadow:
+    0 24px 70px rgba(0, 0, 0, 0.42),
+    0 0 44px color-mix(in srgb, var(--theme-accent) 14%, transparent);
+}
+
+.game-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0 0 1.5rem;
+  padding: 0.4rem 0.8rem;
+  font-size: 0.66rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--theme-accent);
+  border: 1px solid color-mix(in srgb, var(--theme-accent) 40%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--theme-accent) 8%, transparent);
+}
+
 /* Tabs */
 .tablist-wrap {
   background: var(--surface);
@@ -1851,8 +2060,13 @@ kbd {
   .hero-grid,
   .panel-grid,
   .poker-grid,
-  .about-layout {
+  .about-layout,
+  .book-layout {
     grid-template-columns: 1fr;
+  }
+
+  .book-showcase {
+    order: -1;
   }
 
   .about-aside {
