@@ -1,5 +1,4 @@
 /* Orchestration: tabs, hotkeys, theme, WebGL boot, bg crossfade */
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { initBgScene } from "./js/webgl-scene.js";
 import { D22Canvas as C } from "./js/webgl-interactives.js";
 
@@ -334,20 +333,21 @@ const reduced =
       applySectionScene(sceneTarget);
     }
 
-    /* scrollIntoView + CSS scroll-margin-top — more reliable than manual scrollTo */
+    /* Scroll the document element directly — scrollIntoView can target a
+       non-moving body scrollport when overflow-x/y compute to auto. */
+    const scroller = document.scrollingElement || document.documentElement;
+    const top = Math.max(
+      0,
+      scroller.scrollTop + target.getBoundingClientRect().top - measureHeaderHeight() - 12
+    );
     try {
-      target.scrollIntoView({
+      scroller.scrollTo({
+        top,
+        left: 0,
         behavior: reduced ? "auto" : "smooth",
-        block: "start",
-        inline: "nearest",
       });
     } catch (_) {
-      const top =
-        window.scrollY +
-        target.getBoundingClientRect().top -
-        measureHeaderHeight() -
-        12;
-      window.scrollTo(0, Math.max(0, top));
+      scroller.scrollTop = top;
     }
 
     const hashId = sceneTarget?.id || target.id || rawId;
@@ -517,7 +517,6 @@ const reduced =
   C.initBattleMap(document.getElementById("battle-canvas"));
   C.init2HH(document.getElementById("cards-2hh"));
   C.initBadugi(document.getElementById("cards-badugi"));
-  requestAnimationFrame(() => ScrollTrigger.refresh());
 
   /* Active nav underline — deferred to pickCenteredSection during programmatic jumps */
   const sections = sceneSections;

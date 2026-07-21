@@ -1,9 +1,6 @@
 /* Shared WebGL background: themed 3D fleets + fog-of-war scout (Three.js + GSAP) */
 import * as THREE from "three";
 import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-
-gsap.registerPlugin(ScrollTrigger);
 
 const reduced =
   typeof matchMedia !== "undefined" &&
@@ -505,10 +502,16 @@ export function initBgScene(canvas) {
     window.addEventListener("pointerdown", onPointer, { passive: true });
   }
 
-  /* Scroll / pointer parallax via GSAP */
+  /* Scroll / pointer parallax — plain scroll listener (ScrollTrigger.refresh
+     was resetting window.scrollTo(0,0) on every data-bg theme change). */
   const parallax = { x: 0, y: 0, scroll: 0 };
   let pointerX = 0;
   let pointerY = 0;
+
+  function syncScrollParallax() {
+    const max = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+    parallax.scroll = window.scrollY / max;
+  }
 
   if (!reduced) {
     window.addEventListener(
@@ -519,16 +522,8 @@ export function initBgScene(canvas) {
       },
       { passive: true }
     );
-
-    ScrollTrigger.create({
-      trigger: document.body,
-      start: "top top",
-      end: "bottom bottom",
-      scrub: 0.6,
-      onUpdate: (self) => {
-        parallax.scroll = self.progress;
-      },
-    });
+    window.addEventListener("scroll", syncScrollParallax, { passive: true });
+    syncScrollParallax();
   }
 
   /* Theme opacity for fog by bg */
@@ -555,7 +550,6 @@ export function initBgScene(canvas) {
   new MutationObserver(() => {
     setTheme(document.body.dataset.bg || "starcraft");
     syncFogOpacity();
-    ScrollTrigger.refresh();
   }).observe(document.body, { attributes: true, attributeFilter: ["data-bg"] });
 
   let running = true;
@@ -622,7 +616,7 @@ export function initBgScene(canvas) {
   window.addEventListener("resize", () => {
     resize();
     syncShortLandscape();
-    ScrollTrigger.refresh();
+    syncScrollParallax();
   });
   if (window.visualViewport) {
     window.visualViewport.addEventListener("resize", resize);

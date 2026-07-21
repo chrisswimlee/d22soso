@@ -37,6 +37,9 @@
 html {
   scroll-behavior: smooth;
   scroll-padding-top: calc(var(--header-h) + 12px);
+  /* clip (not hidden) — overflow-x:hidden forces overflow-y to auto and
+     creates a body scrollport that swallows scrollIntoView without moving the page */
+  overflow-x: clip;
   overflow-y: scroll;
 }
 
@@ -46,8 +49,7 @@ body {
   background: var(--bg);
   color: var(--text);
   line-height: 1.6;
-  overflow-x: hidden; /* clip can block window scrolling in some WebKit builds */
-  overflow-y: visible;
+  overflow: visible;
   padding-top: var(--header-h);
   padding-bottom: calc(2rem + var(--safe-bottom));
   -webkit-text-size-adjust: 100%;
