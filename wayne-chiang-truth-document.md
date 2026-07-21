@@ -90,7 +90,7 @@ Single source of truth for the public portfolio. Confidence tiers:
 | Global Poker Bankroll Challenge 1st (+$11,464), streamed | FIRST-PARTY |
 | Co-author *Betting on Yourself* (2026, Kendall Hunt) with Joe Matton; WEB framework | PUBLIC-VERIFIED |
 
-**Contact (site):** d22sosowaynechiang@gmail.com
+**Contact (site):** playbadugi@gmail.com
 
 ---
 

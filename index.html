@@ -3,6 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#0a0a0a" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <title>Wayne "D22-soso" Chiang — StarCraft Brood War World Champion</title>
   <meta name="description" content="Wayne D22-soso Chiang — first official StarCraft: Brood War Season 1 World Champion (Random), Cube Draft pioneer, patented casino game inventor, WSOP Talent Manager." />
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%230a0a0a'/%3E%3Crect x='5' y='5' width='54' height='54' rx='9' fill='none' stroke='%238b5cf6' stroke-width='3'/%3E%3Ctext x='32' y='42' font-family='monospace' font-size='22' font-weight='700' fill='%238b5cf6' text-anchor='middle'%3ED22%3C/text%3E%3C/svg%3E" />
@@ -20,15 +23,27 @@
   }
   </script>
 </head>
-<body data-theme="starcraft" data-bg="starcraft">
+<body data-theme="starcraft" data-bg="hero">
+  <a class="skip-link" href="#main">Skip to content</a>
   <!-- Fixed theme backgrounds — opacity-crossfaded by scroll / tab theme -->
   <div id="bg-stage" aria-hidden="true">
-    <div class="bg-layer is-active" data-bg="starcraft"></div>
+    <div class="bg-layer is-active" data-bg="hero"></div>
+    <div class="bg-layer" data-bg="starcraft"></div>
+    <div class="bg-layer" data-bg="starcraft-v2"></div>
+    <div class="bg-layer" data-bg="starcraft-v3"></div>
     <div class="bg-layer" data-bg="about"></div>
     <div class="bg-layer" data-bg="cnc"></div>
+    <div class="bg-layer" data-bg="cnc-v2"></div>
+    <div class="bg-layer" data-bg="cnc-v3"></div>
     <div class="bg-layer" data-bg="warcraft"></div>
+    <div class="bg-layer" data-bg="warcraft-v2"></div>
+    <div class="bg-layer" data-bg="warcraft-v3"></div>
     <div class="bg-layer" data-bg="mtg"></div>
+    <div class="bg-layer" data-bg="mtg-v2"></div>
+    <div class="bg-layer" data-bg="mtg-v3"></div>
     <div class="bg-layer" data-bg="hearthstone"></div>
+    <div class="bg-layer" data-bg="hearthstone-v2"></div>
+    <div class="bg-layer" data-bg="hearthstone-v3"></div>
     <div class="bg-layer" data-bg="poker"></div>
     <div class="bg-layer" data-bg="book"></div>
     <div class="bg-layer" data-bg="2hh"></div>
@@ -47,21 +62,31 @@
       <span class="brand-mark" aria-hidden="true">D22</span>
       <span class="brand-text">D22-soso</span>
     </a>
-    <nav class="command-nav" aria-label="Primary">
-      <a href="#hero" data-hotkey="1"><span class="hk">1</span><span class="nav-label">Briefing</span></a>
-      <a href="#about" data-hotkey="2"><span class="hk">2</span><span class="nav-label">About</span></a>
-      <a href="#esports" data-hotkey="3"><span class="hk">3</span><span class="nav-label">Esports</span></a>
-      <a href="#poker" data-hotkey="4"><span class="hk">4</span><span class="nav-label">Poker</span></a>
-      <a href="#book" data-hotkey="5"><span class="hk">5</span><span class="nav-label">Book</span></a>
-      <a href="#innovation" data-hotkey="6"><span class="hk">6</span><span class="nav-label">Innovation</span></a>
-      <a href="#play" data-hotkey="7"><span class="hk">7</span><span class="nav-label">Play 2HH</span></a>
-      <a href="#contact" data-hotkey="8"><span class="hk">8</span><span class="nav-label">Comms</span></a>
-    </nav>
+    <div class="header-tools">
+      <nav class="command-nav" aria-label="Primary">
+        <a href="#hero" data-hotkey="1" title="Briefing"><span class="hk">1</span><span class="nav-label">Briefing</span></a>
+        <a href="#about" data-hotkey="2" title="About"><span class="hk">2</span><span class="nav-label">About</span></a>
+        <a href="#esports" data-hotkey="3" title="Esports"><span class="hk">3</span><span class="nav-label">Esports</span></a>
+        <a href="#poker" data-hotkey="4" title="Poker"><span class="hk">4</span><span class="nav-label">Poker</span></a>
+        <a href="#book" data-hotkey="5" title="Book"><span class="hk">5</span><span class="nav-label">Book</span></a>
+        <a href="#innovation" data-hotkey="6" title="Innovation"><span class="hk">6</span><span class="nav-label">Innovate</span></a>
+        <a href="#play" data-hotkey="7" title="Play 2 Hand Hold’em"><span class="hk">7</span><span class="nav-label">Play</span></a>
+        <a href="#contact" data-hotkey="8" title="Comms"><span class="hk">8</span><span class="nav-label">Comms</span></a>
+      </nav>
+      <a
+        class="nav-ig"
+        href="https://www.instagram.com/D22_soso/"
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Instagram @D22_soso"
+        title="Instagram @D22_soso"
+      ><span class="nav-label">IG</span><span class="nav-ig-handle mono">@D22_soso</span></a>
+    </div>
   </header>
 
-  <main>
+  <main id="main" tabindex="-1">
     <!-- HERO -->
-    <section id="hero" class="section hero" data-node="hero" data-bg="starcraft">
+    <section id="hero" class="section hero" data-node="hero" data-bg="hero">
       <div class="hero-fog" aria-hidden="true"></div>
       <div class="hero-grid">
         <div class="hero-copy" data-reveal="stagger">
@@ -69,7 +94,7 @@
           <h1 class="brand-hero reveal-item">Wayne <span class="accent-gradient">“D22-soso”</span> Chiang</h1>
           <p class="hero-sub reveal-item">
             First official <strong>StarCraft: Brood War World Champion</strong> — now inventing patented
-            casino games and managing talent for the <strong>World Series of Poker</strong>.
+            casino games, coaching poker, and managing talent for the <strong>World Series of Poker</strong>.
           </p>
           <blockquote class="transmission reveal-item">
             The meta never really changes—you just have to be willing to bet on yourself.
@@ -77,6 +102,12 @@
           <div class="cta-row reveal-item">
             <a class="btn btn-primary btn-arrow" href="#play">Play 2 Hand Hold’em™ <span class="arrow" aria-hidden="true">→</span></a>
             <a class="btn btn-gold" href="#about">Read the Story</a>
+            <a
+              class="btn btn-ig"
+              href="https://www.instagram.com/D22_soso/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >Instagram <span class="mono">@D22_soso</span></a>
           </div>
           <ul class="hero-stats mono reveal-item">
             <li><strong>1999</strong><span>BW World Champion</span></li>
@@ -85,24 +116,40 @@
             <li><strong>WSOP</strong><span>Talent Manager</span></li>
           </ul>
           <p class="hint mono reveal-item">
-            <span class="hint-desktop">Press <kbd>R</kbd> to roll Random · Scout the fog with your pointer</span>
-            <span class="hint-touch">Tap the race panel to roll Random · Drag to scout fog</span>
+            <span class="hint-desktop">Press <kbd>R</kbd> to roll Random · Click the portrait for more archive photos · Follow <a class="ig-inline" href="https://www.instagram.com/D22_soso/" target="_blank" rel="noopener noreferrer">@D22_soso</a></span>
+            <span class="hint-touch">Tap the race panel to roll · Tap the portrait for more photos · Follow <a class="ig-inline" href="https://www.instagram.com/D22_soso/" target="_blank" rel="noopener noreferrer">@D22_soso</a></span>
           </p>
         </div>
         <div class="hero-stage" data-parallax="0.12">
-          <figure class="hero-portrait">
+          <figure
+            class="hero-portrait is-gallery"
+            id="hero-gallery"
+            tabindex="0"
+            role="button"
+            aria-label="Cycle D22-soso archive photos. Activate for the next photo."
+            title="Next archive photo"
+          >
             <img
+              id="hero-gallery-img"
               src="assets/photos/AAA%20Wayne%20Chiang%20Starcraft%20World%20Champ.JPG"
               alt="Wayne D22-soso Chiang with StarCraft Brood War world championship trophy"
               width="640"
               height="800"
+              fetchpriority="high"
+              decoding="async"
+              draggable="false"
             />
-            <span class="portrait-badge mono" aria-hidden="true">★ WORLD CHAMPION</span>
-            <figcaption class="mono">World Champion · Brood War S1 · 1999</figcaption>
+            <span class="portrait-badge mono" id="hero-gallery-badge" aria-hidden="true">★ WORLD CHAMPION</span>
+            <span class="hero-gallery-cue mono" aria-hidden="true">
+              <span class="cue-click">CLICK · NEXT PHOTO</span>
+              <span class="cue-tap">TAP · NEXT PHOTO</span>
+            </span>
+            <figcaption class="mono" id="hero-gallery-cap">World Champion · Brood War S1 · 1999</figcaption>
+            <span class="hero-gallery-count mono" id="hero-gallery-count" aria-live="polite">1 / 7</span>
           </figure>
           <div class="race-console">
             <p class="race-console-label mono"><span class="badge-dot" aria-hidden="true"></span>INTERACTIVE // RANDOM RACE ROLL</p>
-            <canvas id="race-canvas" width="420" height="320" role="img" aria-label="Random race roll interactive"></canvas>
+            <canvas id="race-canvas" width="420" height="280" role="img" aria-label="Random race roll interactive"></canvas>
           </div>
         </div>
       </div>
@@ -114,14 +161,14 @@
 
     <!-- ABOUT -->
     <section id="about" class="section section-about" data-node="about" data-bg="about">
-      <header class="section-head" data-reveal>
+      <header class="section-head" data-reveal="twist">
         <p class="eyebrow-badge mono"><span class="badge-dot" aria-hidden="true"></span>PERSONNEL FILE // ABOUT</p>
         <h2>StarCraft Brood War’s First World Champion: Leader by Example</h2>
         <p class="lede">The full origin story—from Case’s Ladder to the Brood War throne, and the long game that followed.</p>
       </header>
 
-      <div class="about-layout" data-reveal>
-        <article class="about-prose">
+      <div class="about-layout">
+        <article class="about-prose" data-reveal="fade">
           <p class="about-tldr">
             The first official <strong>StarCraft: Brood War World Champion</strong> (1999, Random).
             #1 Case’s Ladder in <em>Command &amp; Conquer</em> (1996) and <em>Warcraft II</em> (1997).
@@ -225,13 +272,15 @@
           </details>
         </article>
 
-        <aside class="about-aside" data-reveal>
+        <aside class="about-aside" data-reveal="jump">
           <figure class="about-portrait">
             <img
               src="assets/photos/AAA%20Wayne%20Chiang%20Starcraft%20World%20Champ%20and%20PGL%202nd.JPG"
               alt="Wayne D22-soso Chiang with StarCraft trophies"
               width="640"
               height="800"
+              loading="lazy"
+              decoding="async"
             />
             <figcaption class="mono">Champion archive · Brood War era</figcaption>
           </figure>
@@ -260,15 +309,20 @@
     </section>
 
     <!-- ESPORTS — each theater is its own scrollable section -->
-    <section id="esports" class="section game-section" data-node="esports" data-bg="starcraft" data-theme="starcraft">
-      <header class="section-head" data-reveal>
+    <section id="esports" class="section game-section" data-node="esports-sc" data-bg="starcraft" data-theme="starcraft" data-base-theme="starcraft" data-variant="0">
+      <header class="section-head" data-reveal="fade">
         <p class="eyebrow-badge mono"><span class="badge-dot" aria-hidden="true"></span>BUILD ORDER // 1996–PRESENT</p>
         <h2>Esports Origins</h2>
-        <p class="lede">From Case’s Ladder to Blizzard’s first official Brood War world title—and the cast, community, and formats that followed. Scroll through each theater.</p>
+        <p class="lede">From Case’s Ladder to Blizzard’s first official Brood War world title—and the cast, community, and formats that followed. Scroll through each theater. Click a panel to cycle its theme.</p>
       </header>
 
-      <article class="game-panel theme-panel" data-theme="starcraft" data-reveal>
+      <article class="game-panel theme-panel" data-theme="starcraft" data-reveal="twist" tabindex="0" aria-label="StarCraft theme — click to cycle variants">
         <p class="game-tag mono"><span class="badge-dot" aria-hidden="true"></span>THEATER 01 // STARCRAFT: BROOD WAR</p>
+        <div class="theme-pips" aria-hidden="true">
+          <span class="theme-pip is-active" data-pip="0" title="Cosmic Violet"></span>
+          <span class="theme-pip" data-pip="1" title="Protoss Teal"></span>
+          <span class="theme-pip" data-pip="2" title="Amber Dusk"></span>
+        </div>
         <div class="panel-grid">
           <div>
             <h3>StarCraft: Brood War — World Champion</h3>
@@ -286,11 +340,13 @@
             <p>Built GX StarCraft and <em>Pimpest Plays</em>—early esports highlight infrastructure—after Thresh and Calbear handed him the keys.</p>
           </div>
           <div class="panel-media">
-            <canvas id="battle-canvas" width="480" height="360" aria-label="Lost Temple battle map animation"></canvas>
+            <canvas id="battle-canvas" width="480" height="300" aria-label="Lost Temple battle map animation"></canvas>
             <img
-              class="panel-img panel-img--contain"
+              class="panel-img panel-img--contain panel-img--tall"
               src="assets/photos/The%20First%20Official%20Blizzard%20StarCraft%20Brood%20War%20World%20Championships%20Won%20by%20D22-soso.jpg"
               alt="Archive photo of the first official Blizzard Brood War world championship"
+              loading="lazy"
+              decoding="async"
             />
           </div>
         </div>
@@ -298,9 +354,14 @@
     </section>
 
     <!-- C&C -->
-    <section id="game-cnc" class="section game-section" data-node="esports" data-bg="cnc" data-theme="cnc">
-      <article class="game-panel theme-panel" data-theme="cnc" data-reveal>
+    <section id="game-cnc" class="section game-section" data-node="esports-cnc" data-bg="cnc" data-theme="cnc" data-base-theme="cnc" data-variant="0">
+      <article class="game-panel theme-panel" data-theme="cnc" data-reveal="jump" tabindex="0" aria-label="Command and Conquer theme — click to cycle variants">
         <p class="game-tag mono"><span class="badge-dot" aria-hidden="true"></span>THEATER 02 // COMMAND &amp; CONQUER</p>
+        <div class="theme-pips" aria-hidden="true">
+          <span class="theme-pip is-active" data-pip="0" title="Phosphor CRT"></span>
+          <span class="theme-pip" data-pip="1" title="Nod Crimson"></span>
+          <span class="theme-pip" data-pip="2" title="GDI Brass"></span>
+        </div>
         <div class="panel-grid">
           <div>
             <h3>Command &amp; Conquer: Tiberian Dawn</h3>
@@ -323,9 +384,14 @@
     </section>
 
     <!-- Warcraft -->
-    <section id="game-warcraft" class="section game-section" data-node="esports" data-bg="warcraft" data-theme="warcraft">
-      <article class="game-panel theme-panel" data-theme="warcraft" data-reveal>
+    <section id="game-warcraft" class="section game-section" data-node="esports-warcraft" data-bg="warcraft" data-theme="warcraft" data-base-theme="warcraft" data-variant="0">
+      <article class="game-panel theme-panel" data-theme="warcraft" data-reveal="twist" tabindex="0" aria-label="Warcraft theme — click to cycle variants">
         <p class="game-tag mono"><span class="badge-dot" aria-hidden="true"></span>THEATER 03 // WARCRAFT II / III</p>
+        <div class="theme-pips" aria-hidden="true">
+          <span class="theme-pip is-active" data-pip="0" title="Parchment Night"></span>
+          <span class="theme-pip" data-pip="1" title="Alliance Banner"></span>
+          <span class="theme-pip" data-pip="2" title="Horde Ember"></span>
+        </div>
         <div class="panel-grid">
           <div>
             <h3>Warcraft II / III</h3>
@@ -348,9 +414,14 @@
     </section>
 
     <!-- MTG -->
-    <section id="game-mtg" class="section game-section" data-node="esports" data-bg="mtg" data-theme="mtg">
-      <article class="game-panel theme-panel" data-theme="mtg" data-reveal>
+    <section id="game-mtg" class="section game-section" data-node="esports-mtg" data-bg="mtg" data-theme="mtg" data-base-theme="mtg" data-variant="0">
+      <article class="game-panel theme-panel" data-theme="mtg" data-reveal="fade" tabindex="0" aria-label="Magic the Gathering theme — click to cycle variants">
         <p class="game-tag mono"><span class="badge-dot" aria-hidden="true"></span>THEATER 04 // MAGIC: THE GATHERING</p>
+        <div class="theme-pips" aria-hidden="true">
+          <span class="theme-pip is-active" data-pip="0" title="Lacquer Magenta"></span>
+          <span class="theme-pip" data-pip="1" title="Swamp Ink"></span>
+          <span class="theme-pip" data-pip="2" title="Plains Gold"></span>
+        </div>
         <div class="panel-grid">
           <div>
             <h3>Magic: The Gathering — Cube Draft</h3>
@@ -364,6 +435,8 @@
               class="panel-img panel-img--contain"
               src="assets/photos/wayne%20chiang%20brian%20weissman.jpg"
               alt="Wayne Chiang with Brian Weissman"
+              loading="lazy"
+              decoding="async"
             />
           </div>
         </div>
@@ -371,9 +444,14 @@
     </section>
 
     <!-- Hearthstone -->
-    <section id="game-hearthstone" class="section game-section" data-node="esports" data-bg="hearthstone" data-theme="hearthstone">
-      <article class="game-panel theme-panel" data-theme="hearthstone" data-reveal>
+    <section id="game-hearthstone" class="section game-section" data-node="esports-hearthstone" data-bg="hearthstone" data-theme="hearthstone" data-base-theme="hearthstone" data-variant="0">
+      <article class="game-panel theme-panel" data-theme="hearthstone" data-reveal="jump" tabindex="0" aria-label="Hearthstone theme — click to cycle variants">
         <p class="game-tag mono"><span class="badge-dot" aria-hidden="true"></span>THEATER 05 // HEARTHSTONE</p>
+        <div class="theme-pips" aria-hidden="true">
+          <span class="theme-pip is-active" data-pip="0" title="Tavern Ember"></span>
+          <span class="theme-pip" data-pip="1" title="Frost Legend"></span>
+          <span class="theme-pip" data-pip="2" title="Midnight Inn"></span>
+        </div>
         <div class="panel-grid">
           <div>
             <h3>Hearthstone — High Legend</h3>
@@ -382,9 +460,11 @@
           </div>
           <div class="panel-media">
             <img
-              class="panel-img"
+              class="panel-img panel-img--screenshot"
               src="assets/photos/Heartsthone%2035.jpg"
               alt="Hearthstone Legend rank screenshot peak 35"
+              loading="lazy"
+              decoding="async"
             />
           </div>
         </div>
@@ -393,55 +473,64 @@
 
     <!-- POKER -->
     <section id="poker" class="section section-poker" data-node="poker" data-theme="poker" data-bg="poker">
-      <header class="section-head" data-reveal>
+      <header class="section-head" data-reveal="fade">
         <p class="eyebrow-badge mono"><span class="badge-dot" aria-hidden="true"></span>FELT // BROADCAST // TALENT</p>
         <h2>Poker &amp; Advantage Play</h2>
-        <p class="lede">From math-driven blackjack bans to Live at the Bike and the World Series of Poker media desk.</p>
+        <p class="lede">From math-driven blackjack bans and poker coaching to Live at the Bike and the World Series of Poker media desk.</p>
       </header>
       <div class="poker-grid" data-poker-gallery>
         <div
           class="lower-third"
-          data-reveal
+          data-reveal="twist"
           tabindex="0"
           data-swap-img="assets/photos/Slayers%20Boxer%20D22-soso%20WSOP%202025.jpg"
           data-swap-alt="D22-soso with SlayerS BoxeR at WSOP 2025"
           data-swap-caption="WSOP 2025 · with SlayerS_BoxeR"
+          data-swap-pos="50% 32%"
         >
           <span class="lt-label mono">TALENT MANAGER</span>
           <strong>World Series of Poker — Media Team</strong>
           <p>Shapes creator ecosystems and oversees the official WSOP Vlogger Program. In 2025, interviewed StarCraft legend SlayerS_BoxeR—a meeting of the man who built the throne and the man who sat on it.</p>
         </div>
-        <figure class="poker-photo" data-reveal data-parallax="0.08">
+        <figure class="poker-photo" data-reveal="fade" data-parallax="0.08">
           <img
             id="poker-photo-img"
             src="assets/photos/Slayers%20Boxer%20D22-soso%20WSOP%202025.jpg"
             data-default="assets/photos/Slayers%20Boxer%20D22-soso%20WSOP%202025.jpg"
             data-default-alt="D22-soso with SlayerS BoxeR at WSOP 2025"
+            data-default-pos="50% 32%"
             alt="D22-soso with SlayerS BoxeR at WSOP 2025"
+            style="object-position: 50% 32%"
+            loading="lazy"
+            decoding="async"
           />
           <figcaption class="poker-photo-caption mono">WSOP 2025 · with SlayerS_BoxeR</figcaption>
         </figure>
-        <div class="poker-cards" data-reveal="stagger">
+        <div class="poker-cards">
           <article
-            class="felt-card reveal-item"
+            class="felt-card"
+            data-reveal="jump"
             tabindex="0"
             data-swap-img="assets/photos/D22-soso%20Elky.JPG"
             data-swap-alt="D22-soso with poker pro ElkY"
             data-swap-caption="Live at the Bike · broadcast era"
+            data-swap-pos="50% 28%"
           >
             <h3>Live at the Bike</h3>
             <p>Co-owner and lead producer. Grew peak concurrent viewers from 2,500 to 8,800 and drove a 40% revenue increase. Hosted the PokerCraft Podcast with industry figures including Hellmuth, Negreanu, and Greenstein.</p>
-            <img class="logo-inline" src="assets/photos/live-at-the-bike-logo.jpg" alt="Live at the Bike logo" />
+            <img class="logo-inline" src="assets/photos/live-at-the-bike-logo.jpg" alt="Live at the Bike logo" loading="lazy" decoding="async" />
           </article>
           <article
-            class="felt-card reveal-item"
+            class="felt-card"
+            data-reveal="twist"
             tabindex="0"
             data-swap-img="assets/photos/how-to-play-blackjack-lead.jpg"
-            data-swap-alt="Blackjack table — advantage play"
-            data-swap-caption="Advantage play · card counting"
+            data-swap-alt="Blackjack table — advantage play and poker coaching"
+            data-swap-caption="Advantage play · poker coaching"
+            data-swap-pos="48% 58%"
           >
-            <h3>Advantage Play</h3>
-            <p>Applied Hi-Lo and Hi-Opt 1 card-counting frameworks as a blackjack specialist—resulting in absolute table bans across major Las Vegas and San Diego properties.</p>
+            <h3>Advantage Play &amp; Poker Coaching</h3>
+            <p>Applied Hi-Lo and Hi-Opt 1 card-counting frameworks as a blackjack specialist—resulting in absolute table bans across major Las Vegas and San Diego properties. Also coaches poker players on decision-making, edge, and bankroll—the same macro skills that win on the ladder and at the felt.</p>
           </article>
         </div>
       </div>
@@ -449,13 +538,13 @@
 
     <!-- BOOK — Betting on Yourself -->
     <section id="book" class="section section-book" data-node="book" data-bg="book" data-theme="book">
-      <header class="section-head" data-reveal>
+      <header class="section-head" data-reveal="twist">
         <p class="eyebrow-badge mono"><span class="badge-dot" aria-hidden="true"></span>PRINT // KENDALL HUNT · 2026</p>
         <h2>Betting on Yourself</h2>
         <p class="lede">The playbook behind the career—decision-making from the ladder, the felt, and the age of AI.</p>
       </header>
 
-      <div class="book-layout" data-reveal>
+      <div class="book-layout" data-reveal="fade">
         <div class="book-showcase" data-parallax="0.06">
           <div class="book-3d" aria-hidden="true">
             <div class="book-cover">
@@ -494,13 +583,13 @@
 
     <!-- INNOVATION -->
     <section id="innovation" class="section" data-node="innovation" data-bg="2hh" data-bg-from-tab="innovation">
-      <header class="section-head" data-reveal>
+      <header class="section-head" data-reveal="jump">
         <p class="eyebrow-badge mono"><span class="badge-dot" aria-hidden="true"></span>PATENT ARCHIVE // TABLE GAMES</p>
         <h2>Casino Game Innovation</h2>
         <p class="lede">Protected game catalog—play the mechanics, then read the patents.</p>
       </header>
 
-      <div class="tablist-wrap" data-tabs="innovation" data-reveal>
+      <div class="tablist-wrap" data-tabs="innovation" data-reveal="fade">
         <div class="tablist" role="tablist" aria-label="Innovation catalog">
           <button role="tab" id="tab-2hh" aria-controls="panel-2hh" aria-selected="true" data-theme="2hh">2 Hand Hold’em™</button>
           <button role="tab" id="tab-badugi" aria-controls="panel-badugi" aria-selected="false" data-theme="badugi">Badugi Chase™</button>
@@ -516,8 +605,8 @@
               <p class="hint mono">Click or drag to split the hands · <a href="#play">Jump to Play 2 Hand Hold’em</a></p>
             </div>
             <div class="panel-media">
-              <canvas id="cards-2hh" width="480" height="320" aria-label="Interactive 2 Hand Hold'em card split demo"></canvas>
-              <img class="logo-inline" src="assets/photos/2hh%20LOGO%20OFFICIAL%20TRADEMARK%20APPLIED.png" alt="2 Hand Hold'em trademark logo" />
+              <canvas id="cards-2hh" width="480" height="300" aria-label="Interactive 2 Hand Hold'em card split demo"></canvas>
+              <img class="logo-inline" src="assets/photos/2hh%20LOGO%20OFFICIAL%20TRADEMARK%20APPLIED.png" alt="2 Hand Hold'em trademark logo" loading="lazy" decoding="async" />
             </div>
           </div>
         </article>
@@ -532,8 +621,8 @@
               <p class="hint mono">Pick one of the three community cards</p>
             </div>
             <div class="panel-media">
-              <canvas id="cards-badugi" width="480" height="320" aria-label="Interactive Badugi Chase triad picker"></canvas>
-              <img class="panel-img panel-img--contain" src="assets/photos/Badugi%20Play%204.png" alt="Badugi Chase gameplay diagram" />
+              <canvas id="cards-badugi" width="480" height="300" aria-label="Interactive Badugi Chase triad picker"></canvas>
+              <img class="panel-img panel-img--contain" src="assets/photos/Badugi%20Play%204.png" alt="Badugi Chase gameplay diagram" loading="lazy" decoding="async" />
             </div>
           </div>
         </article>
@@ -542,13 +631,13 @@
 
     <!-- PLAY 2HH -->
     <section id="play" class="section section-play" data-node="play" data-theme="2hh" data-bg="2hh">
-      <header class="section-head" data-reveal>
+      <header class="section-head" data-reveal="fade">
         <p class="eyebrow-badge mono"><span class="badge-dot" aria-hidden="true"></span>TABLE OPEN // PLAY IN-SITE</p>
         <h2>Play 2 Hand Hold’em™</h2>
         <p class="lede">Deal four, split two, one board—play the patented game right here.</p>
       </header>
 
-      <div class="play-panel play-panel-wide" data-reveal>
+      <div class="play-panel play-panel-wide" data-reveal="jump">
         <div class="play-frame-wrap" id="play-2hh-wrap">
           <iframe
             id="play-2hh-frame"
@@ -556,13 +645,20 @@
             data-src="https://play2hh.herokuapp.com/"
             loading="lazy"
             allow="fullscreen"
+            allowfullscreen
+            scrolling="no"
             referrerpolicy="no-referrer-when-downgrade"
           ></iframe>
+          <button type="button" class="play-immersive-exit btn btn-primary" id="play-2hh-exit-immersive" hidden>
+            Exit table
+          </button>
           <div class="play-frame-overlay" id="play-2hh-overlay">
             <img
               class="play-logo"
               src="assets/photos/2hh%20LOGO%20OFFICIAL%20TRADEMARK%20APPLIED.png"
               alt="2 Hand Hold'em trademark logo"
+              loading="lazy"
+              decoding="async"
             />
             <button type="button" class="btn btn-primary btn-lg btn-arrow" id="play-2hh-start">
               Launch 2 Hand Hold’em <span class="arrow" aria-hidden="true">→</span>
@@ -597,13 +693,39 @@
 
     <!-- CONTACT -->
     <section id="contact" class="section contact" data-node="contact" data-bg="contact">
-      <header class="section-head" data-reveal>
+      <header class="section-head" data-reveal="twist">
         <p class="eyebrow-badge mono"><span class="badge-dot" aria-hidden="true"></span>OPEN COMMS CHANNEL</p>
         <h2>Strategic Collaboration</h2>
-        <p class="lede">For licensing, media, talent, or partnership inquiries—open a channel.</p>
+        <p class="lede">For licensing, media, talent, or partnership inquiries—open a channel. Follow the archive on Instagram.</p>
       </header>
-      <a class="btn btn-primary btn-lg btn-arrow" data-reveal href="mailto:d22sosowaynechiang@gmail.com">Email Wayne <span class="arrow" aria-hidden="true">→</span><br class="break-sm" /> <span class="mono contact-email">d22sosowaynechiang@gmail.com</span></a>
+      <div class="contact-actions" data-reveal="jump">
+        <a
+          class="btn btn-ig btn-lg btn-arrow"
+          href="https://www.instagram.com/D22_soso/"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Follow on Instagram <span class="arrow" aria-hidden="true">→</span>
+          <span class="mono contact-ig">@D22_soso</span>
+        </a>
+        <a class="btn btn-primary btn-lg btn-arrow" href="mailto:playbadugi@gmail.com">
+          Email Wayne <span class="arrow" aria-hidden="true">→</span>
+          <br class="break-sm" />
+          <span class="mono contact-email">playbadugi@gmail.com</span>
+        </a>
+        <a
+          class="btn btn-gold btn-lg btn-arrow"
+          id="feedback-email"
+          href="mailto:playbadugi@gmail.com?subject=website%20bug"
+        >
+          Submit feedback <span class="arrow" aria-hidden="true">→</span>
+          <br class="break-sm" />
+          <span class="mono contact-email">website bug report</span>
+        </a>
+      </div>
       <p class="footer-meta mono">
+        <a class="ig-inline" href="https://www.instagram.com/D22_soso/" target="_blank" rel="noopener noreferrer">Instagram @D22_soso</a>
+        ·
         <a href="https://www.instagram.com/p/Cr2A8JJrgVa/?img_index=1" target="_blank" rel="noopener noreferrer">2 Hand Holdem created by StarCraft: Brood War World Champion Wayne “D22-soso” Chiang</a>
         · Portfolio archive · Bet on yourself
       </p>
