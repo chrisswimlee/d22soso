@@ -83,6 +83,7 @@ function initRaceRoll(canvas) {
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 40);
   camera.position.set(0, 0.2, 5.2);
+  camera.lookAt(0, 0.05, 0);
 
   const ambient = new THREE.AmbientLight(0xffffff, 0.9);
   scene.add(ambient);
@@ -95,9 +96,15 @@ function initRaceRoll(canvas) {
     );
     const frame = new THREE.Mesh(
       new THREE.BoxGeometry(1.22, 0.96, 0.28),
-      new THREE.MeshBasicMaterial({ color: race.accent, transparent: true, opacity: 0.35 })
+      new THREE.MeshBasicMaterial({
+        color: race.accent,
+        transparent: true,
+        opacity: 0.35,
+        depthWrite: false,
+      })
     );
-    frame.position.z = -0.05;
+    /* Fully behind body to avoid intersecting volumes / z-fight */
+    frame.position.z = -0.22;
     group.add(frame, body);
     group.position.set((i - 1) * 1.55, 0.15, 0);
     group.userData.race = race;
@@ -119,7 +126,7 @@ function initRaceRoll(canvas) {
     depthWrite: false,
   });
   const label = new THREE.Mesh(new THREE.PlaneGeometry(4.2, 0.45), labelMat);
-  label.position.set(0, -1.35, 0.2);
+  label.position.set(0, -1.15, 0.2);
   scene.add(label);
 
   function setLabel(text) {
@@ -178,11 +185,11 @@ function initRaceRoll(canvas) {
       m.position.set(0, 0.2, 0.5);
       particles.add(m);
       const a = (Math.PI * 2 * i) / 28;
-      const dist = 1.2 + Math.random() * 1.4;
+      const dist = 0.9 + Math.random() * 0.9;
       gsap.to(m.position, {
         x: Math.cos(a) * dist,
-        y: Math.sin(a) * dist * 0.6,
-        z: 0.5 + Math.random(),
+        y: Math.sin(a) * dist * 0.55,
+        z: 0.5 + Math.random() * 0.4,
         duration: 0.7 + Math.random() * 0.35,
         ease: "power2.out",
       });
@@ -255,129 +262,219 @@ function initBattleMap(canvas) {
   if (!canvas) return;
 
   const renderer = makeRenderer(canvas);
-  renderer.setClearColor(0x101418, 1);
+  renderer.setClearColor(0x0a1018, 1);
   const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 40);
-  camera.position.set(0, 5.2, 5.8);
+  const camera = new THREE.PerspectiveCamera(36, 1, 0.1, 40);
+  camera.position.set(0, 5.6, 6.1);
   camera.lookAt(0, 0, 0);
 
+  /* Terrain plate with subtle grid */
   const board = new THREE.Mesh(
-    new THREE.PlaneGeometry(6.2, 4.4),
-    new THREE.MeshBasicMaterial({ color: 0x152028 })
+    new THREE.PlaneGeometry(6.4, 4.6),
+    new THREE.MeshBasicMaterial({ color: 0x142028 })
   );
   board.rotation.x = -Math.PI / 2;
   scene.add(board);
 
+  const gridMat = new THREE.LineBasicMaterial({
+    color: 0x2dd4bf,
+    transparent: true,
+    opacity: 0.12,
+    depthWrite: false,
+  });
+  for (let i = -3; i <= 3; i++) {
+    const gx = new THREE.BufferGeometry().setFromPoints([
+      new THREE.Vector3(i * 0.9, 0.02, -2.1),
+      new THREE.Vector3(i * 0.9, 0.02, 2.1),
+    ]);
+    const gz = new THREE.BufferGeometry().setFromPoints([
+      new THREE.Vector3(-2.7, 0.02, i * 0.6),
+      new THREE.Vector3(2.7, 0.02, i * 0.6),
+    ]);
+    scene.add(new THREE.Line(gx, gridMat), new THREE.Line(gz, gridMat));
+  }
+
   const fogPlane = new THREE.Mesh(
-    new THREE.PlaneGeometry(6.2, 1.6),
-    new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.45 })
+    new THREE.PlaneGeometry(6.4, 1.7),
+    new THREE.MeshBasicMaterial({
+      color: 0x000000,
+      transparent: true,
+      opacity: 0.5,
+      depthWrite: false,
+    })
   );
   fogPlane.rotation.x = -Math.PI / 2;
-  fogPlane.position.set(0, 0.02, -1.2);
+  fogPlane.position.set(0, 0.05, -1.25);
   scene.add(fogPlane);
 
+  /* Zerg-controlled haze on most of the map */
+  const swarmHaze = new THREE.Mesh(
+    new THREE.PlaneGeometry(5.2, 2.8),
+    new THREE.MeshBasicMaterial({
+      color: 0x4c1d95,
+      transparent: true,
+      opacity: 0.18,
+      depthWrite: false,
+    })
+  );
+  swarmHaze.rotation.x = -Math.PI / 2;
+  swarmHaze.position.set(0, 0.08, -0.2);
+  scene.add(swarmHaze);
+
   const bases = [
-    [-1.9, -1.2],
-    [1.9, -1.2],
-    [-1.9, 1.2],
-    [1.9, 1.2],
+    { x: -1.9, z: -1.2, color: 0x22c55e },
+    { x: 1.9, z: -1.2, color: 0x22c55e },
+    { x: -1.9, z: 1.2, color: 0xfbbf24 },
+    { x: 1.9, z: 1.2, color: 0x8b5cf6 },
   ];
-  bases.forEach(([x, z]) => {
+  bases.forEach((b) => {
     const pad = new THREE.Mesh(
-      new THREE.BoxGeometry(1.2, 0.06, 1.0),
-      new THREE.MeshBasicMaterial({ color: 0x8b5cf6, transparent: true, opacity: 0.35 })
+      new THREE.BoxGeometry(1.15, 0.07, 0.95),
+      new THREE.MeshBasicMaterial({ color: b.color, transparent: true, opacity: 0.4 })
     );
-    pad.position.set(x, 0.04, z);
+    /* Lift pads so bottoms clear haze stack (half-height 0.035 → bottom ≈ 0.045) */
+    pad.position.set(b.x, 0.08, b.z);
     scene.add(pad);
+    const ring = new THREE.Mesh(
+      new THREE.RingGeometry(0.55, 0.62, 24),
+      new THREE.MeshBasicMaterial({
+        color: b.color,
+        transparent: true,
+        opacity: 0.55,
+        side: THREE.DoubleSide,
+        depthWrite: false,
+      })
+    );
+    ring.rotation.x = -Math.PI / 2;
+    ring.position.set(b.x, 0.14, b.z);
+    scene.add(ring);
   });
 
   const center = new THREE.Mesh(
-    new THREE.BoxGeometry(1.3, 0.05, 1.1),
-    new THREE.MeshBasicMaterial({ color: 0x2dd4bf, transparent: true, opacity: 0.25 })
+    new THREE.BoxGeometry(1.35, 0.06, 1.15),
+    new THREE.MeshBasicMaterial({ color: 0x2dd4bf, transparent: true, opacity: 0.28 })
   );
-  center.position.set(0, 0.04, 0);
+  center.position.set(0, 0.08, 0);
   scene.add(center);
 
   const paths = [
-    { from: [2.0, 1.4], to: [0.55, 0.15], color: 0xfbbf24 },
-    { from: [-2.0, 1.4], to: [-0.4, 0.15], color: 0x2dd4bf },
-    { from: [0, 1.85], to: [0, 0.35], color: 0x8b5cf6 },
+    { from: [2.0, 1.4], to: [0.55, 0.15], color: 0xfbbf24, name: "REAVER / ARCHON" },
+    { from: [-2.0, 1.4], to: [-0.4, 0.15], color: 0x2dd4bf, name: "DT / CORSAIR" },
+    { from: [0, 1.85], to: [0, 0.35], color: 0x8b5cf6, name: "CENTER PUSH" },
   ];
 
+  const trails = [];
   const prongs = paths.map((p) => {
     const lineGeo = new THREE.BufferGeometry().setFromPoints([
-      new THREE.Vector3(p.from[0], 0.12, p.from[1]),
-      new THREE.Vector3(p.from[0], 0.12, p.from[1]),
+      new THREE.Vector3(p.from[0], 0.14, p.from[1]),
+      new THREE.Vector3(p.from[0], 0.14, p.from[1]),
     ]);
     const line = new THREE.Line(
       lineGeo,
-      new THREE.LineBasicMaterial({ color: p.color, transparent: true, opacity: 0.9 })
+      new THREE.LineBasicMaterial({ color: p.color, transparent: true, opacity: 0.95 })
     );
     const tip = new THREE.Mesh(
-      new THREE.SphereGeometry(0.12, 12, 12),
+      new THREE.SphereGeometry(0.14, 14, 14),
       new THREE.MeshBasicMaterial({ color: p.color })
     );
-    tip.position.set(p.from[0], 0.14, p.from[1]);
-    scene.add(line, tip);
-    return { line, tip, from: p.from, to: p.to, progress: { t: 0 } };
+    tip.position.set(p.from[0], 0.16, p.from[1]);
+    const glow = new THREE.Mesh(
+      new THREE.SphereGeometry(0.28, 12, 12),
+      new THREE.MeshBasicMaterial({ color: p.color, transparent: true, opacity: 0.22 })
+    );
+    glow.position.copy(tip.position);
+    scene.add(line, tip, glow);
+    return { line, tip, glow, from: p.from, to: p.to, progress: { t: 0 }, color: p.color };
   });
 
   const captionCanvas = document.createElement("canvas");
-  captionCanvas.width = 640;
-  captionCanvas.height = 48;
+  captionCanvas.width = 720;
+  captionCanvas.height = 56;
   const cctx = captionCanvas.getContext("2d");
-  cctx.fillStyle = "#d4af37";
-  cctx.font = "600 18px JetBrains Mono, monospace";
-  cctx.fillText("LOST TEMPLE // SEMI-FINAL // ~38:00 // vs GRRRR…", 12, 30);
+  function paintCaption(phase) {
+    cctx.clearRect(0, 0, 720, 56);
+    cctx.fillStyle = "rgba(8, 12, 18, 0.55)";
+    cctx.fillRect(0, 0, 720, 56);
+    cctx.fillStyle = "#d4af37";
+    cctx.font = "600 17px JetBrains Mono, monospace";
+    cctx.fillText("LOST TEMPLE // SEMI-FINAL // ~38:00 // vs GRRRR…", 14, 24);
+    cctx.fillStyle = "#a78bfa";
+    cctx.font = "500 13px JetBrains Mono, monospace";
+    cctx.fillText(phase, 14, 44);
+  }
+  paintCaption("THREE-PRONG ASSAULT — STANDBY");
   const capTex = new THREE.CanvasTexture(captionCanvas);
   const cap = new THREE.Mesh(
-    new THREE.PlaneGeometry(5.4, 0.35),
+    new THREE.PlaneGeometry(5.6, 0.42),
     new THREE.MeshBasicMaterial({ map: capTex, transparent: true })
   );
-  cap.position.set(0, 0.2, 2.35);
-  cap.rotation.x = -0.4;
+  cap.position.set(0, 0.28, 2.4);
+  cap.rotation.x = -0.42;
   scene.add(cap);
 
   const isVisible = observeVisibility(canvas);
   let tl = null;
+  let clock = 0;
+
+  function spawnTrail(x, z, color) {
+    const m = new THREE.Mesh(
+      new THREE.SphereGeometry(0.05, 8, 8),
+      new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.7 })
+    );
+    m.position.set(x, 0.12, z);
+    m.userData.life = 1;
+    scene.add(m);
+    trails.push(m);
+  }
 
   function playAssault() {
     if (tl) tl.kill();
     prongs.forEach((p) => {
       p.progress.t = 0;
     });
+    paintCaption("THREE-PRONG ASSAULT — ENGAGE");
+    capTex.needsUpdate = true;
     tl = gsap.timeline({
       repeat: reduced ? 0 : -1,
-      repeatDelay: 1.2,
+      repeatDelay: 1.1,
     });
     prongs.forEach((p, i) => {
       tl.to(
         p.progress,
         {
           t: 1,
-          duration: reduced ? 0.01 : 2.4,
+          duration: reduced ? 0.01 : 2.35,
           ease: "power2.inOut",
           onUpdate: () => {
             const x = p.from[0] + (p.to[0] - p.from[0]) * p.progress.t;
             const z = p.from[1] + (p.to[1] - p.from[1]) * p.progress.t;
-            p.tip.position.set(x, 0.14, z);
+            p.tip.position.set(x, 0.16, z);
+            p.glow.position.set(x, 0.16, z);
             const positions = p.line.geometry.attributes.position;
-            positions.setXYZ(1, x, 0.12, z);
+            positions.setXYZ(1, x, 0.14, z);
             positions.needsUpdate = true;
+            if (!reduced && Math.random() > 0.72) spawnTrail(x, z, p.color);
           },
         },
-        i * 0.15
+        i * 0.18
       );
     });
     if (!reduced) {
-      tl.to({}, { duration: 1.2 });
       tl.add(() => {
+        paintCaption("MAP BROKEN — ADVANCE TO FINALS");
+        capTex.needsUpdate = true;
+      });
+      tl.to({}, { duration: 1.15 });
+      tl.add(() => {
+        paintCaption("THREE-PRONG ASSAULT — STANDBY");
+        capTex.needsUpdate = true;
         prongs.forEach((p) => {
           p.progress.t = 0;
           const positions = p.line.geometry.attributes.position;
-          positions.setXYZ(1, p.from[0], 0.12, p.from[1]);
+          positions.setXYZ(1, p.from[0], 0.14, p.from[1]);
           positions.needsUpdate = true;
-          p.tip.position.set(p.from[0], 0.14, p.from[1]);
+          p.tip.position.set(p.from[0], 0.16, p.from[1]);
+          p.glow.position.copy(p.tip.position);
         });
       });
     }
@@ -386,8 +483,27 @@ function initBattleMap(canvas) {
 
   function loop() {
     fitRenderer(renderer, camera, canvas, 480, 300);
+    clock += 0.016;
     if (isVisible()) {
       if (tl && tl.paused()) tl.resume();
+      /* Soft camera orbit for presence */
+      if (!reduced) {
+        camera.position.x = Math.sin(clock * 0.18) * 0.35;
+        camera.lookAt(0, 0, 0);
+      }
+      for (let i = trails.length - 1; i >= 0; i--) {
+        const t = trails[i];
+        t.userData.life -= 0.035;
+        t.material.opacity = Math.max(0, t.userData.life * 0.7);
+        t.scale.setScalar(0.6 + t.userData.life * 0.8);
+        if (t.userData.life <= 0) {
+          scene.remove(t);
+          t.geometry.dispose();
+          t.material.dispose();
+          trails.splice(i, 1);
+        }
+      }
+      fogPlane.material.opacity = 0.42 + Math.sin(clock * 0.7) * 0.06;
       renderer.render(scene, camera);
     } else if (tl && !tl.paused()) {
       tl.pause();
@@ -449,8 +565,8 @@ function init2HH(canvas) {
   ];
   handBoxes[0].rotation.x = -Math.PI / 2;
   handBoxes[1].rotation.x = -Math.PI / 2;
-  handBoxes[0].position.set(-1.35, 0.02, 1.1);
-  handBoxes[1].position.set(1.35, 0.02, 1.1);
+  handBoxes[0].position.set(-1.35, 0.04, 1.1);
+  handBoxes[1].position.set(1.35, 0.04, 1.1);
   scene.add(...handBoxes);
 
   const labelCanvas = document.createElement("canvas");
@@ -491,13 +607,14 @@ function init2HH(canvas) {
         x = (hand === 0 ? -1.7 : 1.0) + (i % 2) * 0.75;
         z = 1.15;
       }
-      gsap.to(m.position, { x, y: 0.08, z, duration, ease, overwrite: "auto" });
+      /* y≈0.52 keeps upright card bottoms above the felt */
+      gsap.to(m.position, { x, y: 0.52, z, duration, ease, overwrite: "auto" });
       gsap.to(m.rotation, { x: -0.15, y: 0, z: 0, duration, ease, overwrite: "auto" });
     });
     board.forEach((m, i) => {
       gsap.to(m.position, {
         x: -0.9 + i * 0.9,
-        y: 0.08,
+        y: 0.52,
         z: -0.6,
         duration,
         ease,
@@ -514,8 +631,8 @@ function init2HH(canvas) {
     });
   }
 
-  hole.forEach((m, i) => m.position.set(-1.2 + i * 0.3, 1.5, 2));
-  board.forEach((m, i) => m.position.set(-0.5 + i * 0.3, 1.5, -1));
+  hole.forEach((m, i) => m.position.set(-1.2 + i * 0.3, 0.9, 2));
+  board.forEach((m, i) => m.position.set(-0.5 + i * 0.3, 0.9, -0.6));
   layout(true);
 
   function redeal() {
@@ -530,11 +647,11 @@ function init2HH(canvas) {
     hole = [pick(), pick(), pick(), pick()].map((c) => makeCardMesh(c.rank, c.suit));
     board = [pick(), pick(), pick()].map((c) => makeCardMesh(c.rank, c.suit));
     hole.forEach((m, i) => {
-      m.position.set(-1.2 + i * 0.3, 1.5, 2);
+      m.position.set(-1.2 + i * 0.3, 0.9, 2);
       scene.add(m);
     });
     board.forEach((m, i) => {
-      m.position.set(-0.5 + i * 0.3, 1.5, -1);
+      m.position.set(-0.5 + i * 0.3, 0.9, -0.6);
       scene.add(m);
     });
   }
@@ -623,7 +740,7 @@ function initBadugi(canvas) {
     community.forEach((m, i) => {
       let x;
       let z;
-      let y = 0.08;
+      let y = 0.52;
       let opacity = 1;
       if (m.userData.chosen) {
         x = 0;
@@ -655,11 +772,12 @@ function initBadugi(canvas) {
     });
   }
 
-  community.forEach((m, i) => m.position.set(-1 + i * 0.5, 1.4, 1.5));
+  community.forEach((m, i) => m.position.set(-1.2 + i * 0.9, 0.9, 1.5));
   layout(true);
 
   const raycaster = new THREE.Raycaster();
   const pointer = new THREE.Vector2();
+  const pickProj = new THREE.Vector3();
 
   canvas.addEventListener("click", (e) => {
     if (picked) {
@@ -668,7 +786,7 @@ function initBadugi(canvas) {
         m.geometry.dispose();
       });
       community = makeCommunity();
-      community.forEach((m, i) => m.position.set(-1 + i * 0.5, 1.4, 1.5));
+      community.forEach((m, i) => m.position.set(-1.2 + i * 0.9, 0.9, 1.5));
       picked = false;
       setLabel("PICK 1 OF 3 COMMUNITY CARDS");
       layout(true);
@@ -678,20 +796,23 @@ function initBadugi(canvas) {
     pointer.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
     pointer.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
     raycaster.setFromCamera(pointer, camera);
-    const hits = raycaster.intersectObjects(community, false);
+    const pickable = community.filter((m) => !m.userData.rejected);
+    const hits = raycaster.intersectObjects(pickable, false);
     let idx = -1;
     if (hits.length) {
       idx = community.indexOf(hits[0].object);
     } else {
-      /* fallback: nearest by x in NDC-ish screen space */
+      /* fallback: nearest projected card center in screen space */
       const x = (e.clientX - rect.left) / rect.width;
-      let best = 0;
+      let best = -1;
       let bestD = Infinity;
-      community.forEach((m, i) => {
-        const d = Math.abs((i + 0.5) / 3 - x);
+      pickable.forEach((m) => {
+        pickProj.copy(m.position).project(camera);
+        const sx = (pickProj.x + 1) / 2;
+        const d = Math.abs(sx - x);
         if (d < bestD) {
           bestD = d;
-          best = i;
+          best = community.indexOf(m);
         }
       });
       idx = best;

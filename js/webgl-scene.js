@@ -12,9 +12,10 @@ const reduced =
 const coarse =
   typeof matchMedia !== "undefined" && matchMedia("(pointer: coarse)").matches;
 
-const shortLandscape =
-  typeof matchMedia !== "undefined" &&
-  matchMedia("(max-height: 480px) and (orientation: landscape)").matches;
+const shortLandscapeMq =
+  typeof matchMedia !== "undefined"
+    ? matchMedia("(max-height: 480px) and (orientation: landscape)")
+    : null;
 
 /* Fleet specs — ported from CSS 3D bg-scene (lightweight geometries) */
 const FLEETS = {
@@ -28,6 +29,24 @@ const FLEETS = {
     { kind: "spark", x: 1.4, y: -0.2, z: -4.2, s: 0.1, c: 0xffffff, spin: 0 },
     { kind: "spark", x: -2.0, y: 0.8, z: -5, s: 0.08, c: 0xffffff, spin: 0 },
   ],
+  "starcraft-v2": [
+    { kind: "crystal", x: -2.6, y: 1.5, z: -2, s: 1.05, c: 0x2dd4bf, spin: 0.16 },
+    { kind: "ring", x: 2.8, y: 0.8, z: -2.5, s: 1.0, c: 0xa8e6ff, spin: 0.22 },
+    { kind: "crystal", x: 2.2, y: -1.5, z: -2, s: 0.7, c: 0x14b8a6, spin: 0.14 },
+    { kind: "tetra", x: -2.0, y: -1.4, z: -3, s: 0.55, c: 0x67e8f9, spin: 0.18 },
+    { kind: "ring", x: 0.2, y: 1.6, z: -3.5, s: 0.45, c: 0x2dd4bf, spin: 0.28 },
+    { kind: "spark", x: -0.8, y: 0.2, z: -4, s: 0.12, c: 0xa8e6ff, spin: 0 },
+    { kind: "spark", x: 1.6, y: -0.6, z: -4.2, s: 0.1, c: 0xffffff, spin: 0 },
+  ],
+  "starcraft-v3": [
+    { kind: "tank", x: -2.8, y: 1.2, z: -2, s: 1.05, c: 0xea580c, spin: 0.1 },
+    { kind: "cruiser", x: 2.6, y: -1.0, z: -2, s: 1.0, c: 0xb45309, spin: 0.12 },
+    { kind: "tetra", x: 1.8, y: 1.5, z: -2.8, s: 0.65, c: 0xc2410c, spin: 0.16 },
+    { kind: "ring", x: -2.2, y: -1.5, z: -3, s: 0.5, c: 0xfb923c, spin: 0.2 },
+    { kind: "spark", x: 0.0, y: 0.4, z: -4, s: 0.14, c: 0xfdba74, spin: 0 },
+    { kind: "spark", x: -1.4, y: -0.8, z: -4.2, s: 0.1, c: 0xea580c, spin: 0 },
+    { kind: "spark", x: 2.0, y: 0.6, z: -4.5, s: 0.08, c: 0xffffff, spin: 0 },
+  ],
   about: [
     { kind: "tetra", x: -3.4, y: 1.8, z: -2.5, s: 0.75, c: 0x8b5cf6, spin: 0.14 },
     { kind: "crystal", x: 3.2, y: -1.4, z: -2, s: 0.7, c: 0xd4af37, spin: 0.16 },
@@ -40,26 +59,84 @@ const FLEETS = {
     { kind: "ring", x: 1.2, y: 1.2, z: -3, s: 0.55, c: 0x39ff14, spin: 0.22 },
     { kind: "ring", x: -1.6, y: -1.2, z: -3.5, s: 0.4, c: 0xc4a35a, spin: 0.18 },
   ],
+  "cnc-v2": [
+    { kind: "blob", x: -2.6, y: 1.3, z: -2, s: 1.0, c: 0xb42318, spin: 0.12 },
+    { kind: "star", x: 2.6, y: -1.2, z: -2, s: 0.8, c: 0x7a868c, spin: 0.16 },
+    { kind: "ring", x: 1.4, y: 1.4, z: -3, s: 0.5, c: 0xb42318, spin: 0.2 },
+    { kind: "ring", x: -1.8, y: -1.5, z: -3.2, s: 0.38, c: 0x94a3b8, spin: 0.18 },
+    { kind: "spark", x: 0.2, y: 0.2, z: -4, s: 0.1, c: 0xfca5a5, spin: 0 },
+  ],
+  "cnc-v3": [
+    { kind: "star", x: -2.4, y: 1.2, z: -2, s: 0.95, c: 0xc4a035, spin: 0.1 },
+    { kind: "tank", x: 2.6, y: -1.0, z: -2, s: 0.9, c: 0x6d7f8c, spin: 0.12 },
+    { kind: "ring", x: 0.0, y: 1.5, z: -2.8, s: 0.6, c: 0xc4a035, spin: 0.18 },
+    { kind: "ring", x: -2.0, y: -1.4, z: -3.2, s: 0.42, c: 0x94a3b8, spin: 0.16 },
+    { kind: "spark", x: 1.6, y: 0.4, z: -4, s: 0.1, c: 0xfde68a, spin: 0 },
+  ],
   warcraft: [
     { kind: "cross", x: 2.6, y: 1.4, z: -2, s: 0.95, c: 0xfbbf24, spin: 0.1 },
     { kind: "shield", x: -2.8, y: -1.2, z: -2, s: 0.9, c: 0x60a5fa, spin: 0.08 },
     { kind: "banner", x: 0.4, y: -1.6, z: -2.5, s: 0.65, c: 0xfbbf24, spin: 0.06 },
     { kind: "shield", x: 1.6, y: 1.6, z: -3.5, s: 0.4, c: 0xc48b3b, spin: 0.12 },
   ],
+  "warcraft-v2": [
+    { kind: "shield", x: -2.6, y: 1.3, z: -2, s: 1.05, c: 0x3b82f6, spin: 0.08 },
+    { kind: "banner", x: 2.6, y: -1.1, z: -2, s: 0.85, c: 0xd4af37, spin: 0.1 },
+    { kind: "cross", x: 0.2, y: 1.5, z: -2.8, s: 0.7, c: 0x60a5fa, spin: 0.12 },
+    { kind: "shield", x: -1.8, y: -1.5, z: -3.2, s: 0.45, c: 0x1d4ed8, spin: 0.1 },
+    { kind: "spark", x: 1.4, y: 0.3, z: -4, s: 0.1, c: 0xfde68a, spin: 0 },
+  ],
+  "warcraft-v3": [
+    { kind: "banner", x: -2.4, y: 1.2, z: -2, s: 1.0, c: 0xb91c1c, spin: 0.1 },
+    { kind: "cross", x: 2.6, y: -1.0, z: -2, s: 0.9, c: 0x84cc16, spin: 0.12 },
+    { kind: "shield", x: 1.2, y: 1.5, z: -2.8, s: 0.55, c: 0xdc2626, spin: 0.14 },
+    { kind: "spark", x: -1.6, y: -1.2, z: -3.5, s: 0.14, c: 0xa3e635, spin: 0 },
+    { kind: "spark", x: 0.4, y: 0.2, z: -4, s: 0.12, c: 0xb91c1c, spin: 0 },
+    { kind: "spark", x: 2.0, y: -1.6, z: -4.2, s: 0.1, c: 0xfef08a, spin: 0 },
+  ],
   mtg: [
-    { kind: "card", x: -2.8, y: 1.2, z: -2, s: 0.9, c: 0xa78bfa, spin: 0.2 },
-    { kind: "card", x: 2.8, y: -1.2, z: -2, s: 0.85, c: 0xfcd34d, spin: 0.18 },
-    { kind: "pip", x: 1.8, y: 1.4, z: -3, s: 0.4, c: 0xa78bfa, spin: 0.25 },
-    { kind: "pip", x: -1.8, y: -1.4, z: -3, s: 0.35, c: 0xfcd34d, spin: 0.22 },
+    { kind: "card", x: -2.8, y: 1.2, z: -2, s: 0.9, c: 0xe879f9, spin: 0.2 },
+    { kind: "card", x: 2.8, y: -1.2, z: -2, s: 0.85, c: 0xfbbf24, spin: 0.18 },
+    { kind: "pip", x: 1.8, y: 1.4, z: -3, s: 0.4, c: 0xe879f9, spin: 0.25 },
+    { kind: "pip", x: -1.8, y: -1.4, z: -3, s: 0.35, c: 0xfbbf24, spin: 0.22 },
     { kind: "pip", x: 0, y: 0, z: -4, s: 0.22, c: 0xf472b6, spin: 0.3 },
   ],
+  "mtg-v2": [
+    { kind: "card", x: -2.6, y: 1.1, z: -2, s: 0.95, c: 0x86efac, spin: 0.16 },
+    { kind: "card", x: 2.6, y: -1.1, z: -2, s: 0.9, c: 0xa8a29e, spin: 0.14 },
+    { kind: "pip", x: 0.0, y: 1.5, z: -3, s: 0.38, c: 0x4ade80, spin: 0.22 },
+    { kind: "pip", x: -1.6, y: -1.4, z: -3.2, s: 0.3, c: 0xa8a29e, spin: 0.2 },
+    { kind: "blob", x: 1.8, y: 0.2, z: -3.5, s: 0.4, c: 0x14532d, spin: 0.1 },
+  ],
+  "mtg-v3": [
+    { kind: "card", x: -2.6, y: 1.2, z: -2, s: 0.95, c: 0xf5f0e1, spin: 0.16 },
+    { kind: "card", x: 2.6, y: -1.1, z: -2, s: 0.9, c: 0xeab308, spin: 0.18 },
+    { kind: "pip", x: 0.2, y: 1.5, z: -3, s: 0.42, c: 0xfde68a, spin: 0.24 },
+    { kind: "pip", x: -1.8, y: -1.3, z: -3.2, s: 0.32, c: 0xeab308, spin: 0.2 },
+    { kind: "ring", x: 1.6, y: 0.4, z: -3.5, s: 0.4, c: 0xf5f0e1, spin: 0.14 },
+  ],
   hearthstone: [
-    { kind: "crystal", x: -2.8, y: 1.4, z: -2, s: 0.95, c: 0x38bdf8, spin: 0.14 },
-    { kind: "card", x: 2.8, y: -1.2, z: -2, s: 0.9, c: 0xf59e0b, spin: 0.16 },
-    { kind: "crystal", x: 1.6, y: 1.4, z: -3, s: 0.5, c: 0x22d3ee, spin: 0.2 },
+    { kind: "crystal", x: -2.8, y: 1.4, z: -2, s: 0.95, c: 0xf59e0b, spin: 0.14 },
+    { kind: "card", x: 2.8, y: -1.2, z: -2, s: 0.9, c: 0xfde68a, spin: 0.16 },
+    { kind: "crystal", x: 1.6, y: 1.4, z: -3, s: 0.5, c: 0xc2410c, spin: 0.2 },
     { kind: "ring", x: -2.0, y: -1.4, z: -3, s: 0.45, c: 0xfde68a, spin: 0.12 },
     { kind: "spark", x: 0.2, y: -1.8, z: -3.5, s: 0.15, c: 0xf59e0b, spin: 0 },
     { kind: "spark", x: 1.0, y: 0.6, z: -4, s: 0.12, c: 0xfbbf24, spin: 0 },
+  ],
+  "hearthstone-v2": [
+    { kind: "crystal", x: -2.6, y: 1.3, z: -2, s: 1.0, c: 0x67e8f9, spin: 0.16 },
+    { kind: "card", x: 2.6, y: -1.1, z: -2, s: 0.9, c: 0xf0f9ff, spin: 0.14 },
+    { kind: "ring", x: 0.0, y: 1.5, z: -2.8, s: 0.55, c: 0xa5f3fc, spin: 0.22 },
+    { kind: "crystal", x: -1.8, y: -1.4, z: -3.2, s: 0.5, c: 0x164e63, spin: 0.12 },
+    { kind: "spark", x: 1.6, y: 0.4, z: -4, s: 0.12, c: 0xffffff, spin: 0 },
+    { kind: "spark", x: -0.6, y: 0.2, z: -4.2, s: 0.1, c: 0x67e8f9, spin: 0 },
+  ],
+  "hearthstone-v3": [
+    { kind: "card", x: -2.6, y: 1.2, z: -2, s: 0.95, c: 0x94a3b8, spin: 0.12 },
+    { kind: "banner", x: 2.6, y: -1.1, z: -2, s: 0.8, c: 0xcbd5e1, spin: 0.1 },
+    { kind: "crystal", x: 0.2, y: 1.5, z: -2.8, s: 0.55, c: 0x64748b, spin: 0.16 },
+    { kind: "ring", x: -1.8, y: -1.4, z: -3.2, s: 0.42, c: 0xcbd5e1, spin: 0.14 },
+    { kind: "spark", x: 1.4, y: 0.3, z: -4, s: 0.1, c: 0xe2e8f0, spin: 0 },
   ],
   poker: [
     { kind: "card", x: -2.8, y: 1.2, z: -2, s: 0.95, c: 0xe8e6e3, spin: 0.18 },
@@ -218,7 +295,7 @@ function createFogShader() {
 }
 
 export function initBgScene(canvas) {
-  if (!canvas || shortLandscape) {
+  if (!canvas || reduced) {
     if (canvas) canvas.style.display = "none";
     return null;
   }
@@ -302,9 +379,17 @@ export function initBgScene(canvas) {
     fogMesh.visible = false;
   }
 
-  let activeKey = document.body.dataset.bg || "starcraft";
+  function resolveFleetKey(key) {
+    const raw = key || "starcraft";
+    if (raw === "hero") return themeGroups.has("starcraft") ? "starcraft" : "starcraft";
+    if (themeGroups.has(raw)) return raw;
+    const base = raw.replace(/-v[23]$/, "");
+    return themeGroups.has(base) ? base : "starcraft";
+  }
+
+  let activeKey = resolveFleetKey(document.body.dataset.bg);
   function setTheme(key) {
-    const next = themeGroups.has(key) ? key : "starcraft";
+    const next = resolveFleetKey(key);
     if (next === activeKey && themeGroups.get(next)?.visible) return;
     const prev = themeGroups.get(activeKey);
     const cur = themeGroups.get(next);
@@ -366,9 +451,12 @@ export function initBgScene(canvas) {
     w = Math.round((vv && vv.width) || window.innerWidth);
     h = Math.round((vv && vv.height) || window.innerHeight);
     renderer.setSize(w, h, false);
-    camera.aspect = w / Math.max(1, h);
+    const aspect = w / Math.max(1, h);
+    camera.aspect = aspect;
     camera.updateProjectionMatrix();
-    fog.material.uniforms.uAspect.value = w / Math.max(1, h);
+    fog.material.uniforms.uAspect.value = aspect;
+    /* Compress fleet X on portrait so side icons stay inside the narrower hFOV */
+    root.scale.x = aspect < 1.2 ? Math.max(0.45, aspect / 1.2) : 1;
   }
   resize();
 
@@ -445,13 +533,14 @@ export function initBgScene(canvas) {
 
   /* Theme opacity for fog by bg */
   function syncFogOpacity() {
-    const bg = document.body.dataset.bg || "starcraft";
+    const bg = resolveFleetKey(document.body.dataset.bg);
+    const base = bg.replace(/-v[23]$/, "");
     let op = coarse ? 0.28 : 0.42;
-    if (["poker", "2hh", "badugi", "hearthstone", "cnc", "warcraft", "mtg"].includes(bg)) {
+    if (["poker", "2hh", "badugi", "hearthstone", "cnc", "warcraft", "mtg"].includes(base)) {
       op = 0.1;
-    } else if (bg === "about" || bg === "contact") {
+    } else if (base === "about" || base === "contact") {
       op = 0.2;
-    } else if (bg === "starcraft") {
+    } else if (base === "starcraft" || base === "hero") {
       op = coarse ? 0.3 : 0.48;
     }
     gsap.to(fog.material.uniforms.uOpacity, {
@@ -503,8 +592,24 @@ export function initBgScene(canvas) {
     raf = requestAnimationFrame(frame);
   }
 
+  function syncShortLandscape() {
+    const short = shortLandscapeMq?.matches;
+    if (short) {
+      canvas.style.display = "none";
+      running = false;
+      cancelAnimationFrame(raf);
+      return;
+    }
+    canvas.style.display = "block";
+    if (!running && !document.hidden) {
+      running = true;
+      clock.start();
+      raf = requestAnimationFrame(frame);
+    }
+  }
+
   document.addEventListener("visibilitychange", () => {
-    if (document.hidden) {
+    if (document.hidden || shortLandscapeMq?.matches) {
       running = false;
       cancelAnimationFrame(raf);
     } else {
@@ -516,13 +621,22 @@ export function initBgScene(canvas) {
 
   window.addEventListener("resize", () => {
     resize();
+    syncShortLandscape();
     ScrollTrigger.refresh();
   });
   if (window.visualViewport) {
     window.visualViewport.addEventListener("resize", resize);
   }
+  if (shortLandscapeMq) {
+    if (typeof shortLandscapeMq.addEventListener === "function") {
+      shortLandscapeMq.addEventListener("change", syncShortLandscape);
+    } else if (typeof shortLandscapeMq.addListener === "function") {
+      shortLandscapeMq.addListener(syncShortLandscape);
+    }
+  }
 
-  raf = requestAnimationFrame(frame);
+  syncShortLandscape();
+  if (running) raf = requestAnimationFrame(frame);
 
   return {
     setTheme,
