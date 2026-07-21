@@ -20,7 +20,7 @@ function SubmitButton() {
     <button
       type="submit"
       disabled={pending}
-      className="inline-flex items-center justify-center gap-2 rounded-full bg-amber-500 px-6 py-3 text-sm font-semibold text-slate-950 transition-colors hover:bg-amber-400 disabled:cursor-not-allowed disabled:opacity-60"
+      className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-gold px-6 py-3 text-sm font-semibold text-slate-950 transition-colors hover:bg-gold-soft disabled:cursor-not-allowed disabled:opacity-60"
     >
       {pending ? (
         <>
@@ -43,7 +43,7 @@ function FieldError({ messages }: { messages?: string[] }) {
 }
 
 const inputClass =
-  "w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-slate-100 placeholder:text-slate-500 focus:border-amber-400/50 focus:outline-none focus:ring-1 focus:ring-amber-400/40";
+  "w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-slate-100 placeholder:text-slate-500 focus:border-gold/50 focus:outline-none focus:ring-1 focus:ring-gold/40";
 const labelClass = "mb-1.5 block text-sm font-medium text-slate-300";
 
 export default function ContactForm() {

@@ -1,164 +1,82 @@
 "use client";
 
-import { motion, AnimatePresence } from "framer-motion";
-import { Dices, Gamepad2, ArrowUpRight } from "lucide-react";
-import { useState } from "react";
-
-type PanelId = "esports" | "casino";
-
-type Panel = {
-  id: PanelId;
-  eyebrow: string;
-  title: string;
-  description: string;
-  cta: string;
-  Icon: typeof Gamepad2;
-  gradient: string;
-  glow: string;
-  accentText: string;
-};
-
-const panels: Panel[] = [
-  {
-    id: "esports",
-    eyebrow: "A decade at the top",
-    title: "Esports Legacy",
-    description:
-      "Championship rosters, sold-out arenas, and a fanbase built on relentless competition.",
-    cta: "Explore the legacy",
-    Icon: Gamepad2,
-    gradient: "from-cyan-500/30 via-indigo-600/20 to-slate-950",
-    glow: "bg-cyan-400/20",
-    accentText: "text-cyan-300",
-  },
-  {
-    id: "casino",
-    eyebrow: "The next frontier",
-    title: "Casino Innovations",
-    description:
-      "Reimagining play with provably fair tables, live dealers, and immersive digital floors.",
-    cta: "Discover what's new",
-    Icon: Dices,
-    gradient: "from-amber-500/30 via-rose-600/20 to-slate-950",
-    glow: "bg-amber-400/20",
-    accentText: "text-amber-300",
-  },
-];
+import { motion, useReducedMotion } from "framer-motion";
+import { ArrowDown, Spade } from "lucide-react";
 
 export default function Hero() {
-  const [active, setActive] = useState<PanelId | null>(null);
+  const reduceMotion = useReducedMotion();
+  const fade = (delay: number) =>
+    reduceMotion
+      ? { initial: false as const, animate: { opacity: 1 }, transition: { duration: 0 } }
+      : {
+          initial: { opacity: 0, y: 16 },
+          animate: { opacity: 1, y: 0 },
+          transition: { duration: 0.55, delay, ease: "easeOut" as const },
+        };
 
   return (
-    <section className="relative mx-auto w-full max-w-6xl px-4 py-12 sm:px-6 sm:py-20">
-      <div className="mb-8 flex flex-col items-start gap-3 sm:mb-12">
-        <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-slate-300">
-          Two worlds. One brand.
-        </span>
-        <h1 className="max-w-2xl text-3xl font-semibold leading-tight tracking-tight text-slate-50 sm:text-5xl">
-          Choose your side of the story.
-        </h1>
-        <p className="max-w-xl text-base leading-relaxed text-slate-400 sm:text-lg">
-          Tap a panel to dive into where we&apos;ve been — and where we&apos;re headed next.
-        </p>
+    <section
+      id="top"
+      className="relative flex min-h-[100svh] w-full items-end overflow-hidden sm:items-center"
+    >
+      <div className="absolute inset-0" aria-hidden>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/champ-trophy.webp"
+          alt=""
+          className="h-full w-full object-cover object-[center_18%] opacity-70 sm:opacity-[0.78]"
+        />
+        {/* Bottom vignette only — keep the trophy readable */}
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/45 to-slate-950/15" />
+        <div className="absolute inset-0 bg-gradient-to-r from-slate-950/70 via-transparent to-transparent" />
       </div>
 
-      {/* Split screen: stacks vertically on mobile, side-by-side on desktop */}
-      <div className="flex min-h-[34rem] flex-col gap-3 sm:min-h-[28rem] sm:flex-row">
-        {panels.map((panel) => {
-          const isActive = active === panel.id;
-          const isDimmed = active !== null && !isActive;
+      <div className="relative mx-auto w-full max-w-6xl px-4 pb-16 pt-28 sm:px-6 sm:pb-24 sm:pt-20">
+        <motion.p
+          {...fade(0)}
+          className="font-[family-name:var(--font-display)] text-5xl tracking-tight text-gold sm:text-7xl md:text-8xl"
+        >
+          D22-soso
+        </motion.p>
 
-          return (
-            <motion.button
-              key={panel.id}
-              type="button"
-              onClick={() => setActive(isActive ? null : panel.id)}
-              onHoverStart={() => setActive(panel.id)}
-              onHoverEnd={() => setActive(null)}
-              animate={{ flexGrow: isActive ? 2.4 : isDimmed ? 0.7 : 1 }}
-              transition={{ type: "spring", stiffness: 220, damping: 28 }}
-              className="group relative flex-1 overflow-hidden rounded-3xl border border-white/10 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
-              style={{ flexBasis: 0 }}
-            >
-              {/* Gradient wash */}
-              <div
-                className={`absolute inset-0 bg-gradient-to-br ${panel.gradient} transition-opacity duration-500 ${
-                  isDimmed ? "opacity-40" : "opacity-100"
-                }`}
-              />
-              {/* Soft glow blob */}
-              <motion.div
-                aria-hidden
-                animate={{ scale: isActive ? 1.15 : 1, opacity: isActive ? 0.9 : 0.6 }}
-                transition={{ duration: 0.6 }}
-                className={`pointer-events-none absolute -right-16 -top-16 h-56 w-56 rounded-full blur-3xl ${panel.glow}`}
-              />
+        <motion.p
+          {...fade(0.1)}
+          className="mt-2 text-sm font-medium tracking-[0.22em] text-slate-300 uppercase sm:text-base"
+        >
+          Wayne Chiang
+        </motion.p>
 
-              <div className="relative flex h-full flex-col justify-between p-6 sm:p-8">
-                <div className="flex items-center justify-between">
-                  <span
-                    className={`inline-flex items-center justify-center rounded-2xl bg-white/10 p-3 backdrop-blur-sm ${panel.accentText}`}
-                  >
-                    <panel.Icon className="h-6 w-6" />
-                  </span>
-                  <motion.span
-                    animate={{ rotate: isActive ? 45 : 0, opacity: isActive ? 1 : 0.5 }}
-                    className="text-slate-200"
-                  >
-                    <ArrowUpRight className="h-5 w-5" />
-                  </motion.span>
-                </div>
+        <motion.h1
+          {...fade(0.2)}
+          className="mt-8 max-w-3xl text-2xl leading-snug font-semibold tracking-tight text-slate-50 sm:text-4xl sm:leading-tight"
+        >
+          Pioneer of Esports. High-Stakes Poker Player. Casino Game Inventor.
+        </motion.h1>
 
-                <div className="mt-8">
-                  <p className={`text-xs font-medium uppercase tracking-widest ${panel.accentText}`}>
-                    {panel.eyebrow}
-                  </p>
-                  <h2 className="mt-2 text-2xl font-semibold text-slate-50 sm:text-3xl">
-                    {panel.title}
-                  </h2>
+        <motion.p
+          {...fade(0.32)}
+          className="mt-4 max-w-xl text-base leading-relaxed text-slate-200 sm:text-lg"
+        >
+          From the first official StarCraft: Brood War World Championship in 1999 to patented
+          casino floors — one strategist across every theater.
+        </motion.p>
 
-                  <AnimatePresence initial={false}>
-                    {isActive && (
-                      <motion.div
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: "auto" }}
-                        exit={{ opacity: 0, height: 0 }}
-                        transition={{ duration: 0.35, ease: "easeOut" }}
-                        className="overflow-hidden"
-                      >
-                        <p className="mt-3 max-w-md text-sm leading-relaxed text-slate-300 sm:text-base">
-                          {panel.description}
-                        </p>
-                        <span className="mt-5 inline-flex items-center gap-1.5 text-sm font-medium text-slate-100">
-                          {panel.cta}
-                          <ArrowUpRight className="h-4 w-4" />
-                        </span>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-              </div>
-            </motion.button>
-          );
-        })}
-      </div>
-
-      {/* Mobile-friendly explicit toggle */}
-      <div className="mt-6 flex items-center justify-center gap-2 sm:hidden">
-        {panels.map((panel) => (
-          <button
-            key={panel.id}
-            type="button"
-            onClick={() => setActive(active === panel.id ? null : panel.id)}
-            className={`flex-1 rounded-full border px-4 py-2.5 text-sm font-medium transition-colors ${
-              active === panel.id
-                ? "border-white/30 bg-white/15 text-slate-50"
-                : "border-white/10 bg-white/5 text-slate-400"
-            }`}
+        <motion.div {...fade(0.44)} className="mt-8 flex flex-wrap items-center gap-3">
+          <a
+            href="#twohh"
+            className="inline-flex min-h-12 items-center gap-2 rounded-xl border border-gold/50 bg-gold/20 px-5 py-3 text-sm font-semibold text-gold-soft transition hover:bg-gold/30 focus-visible:ring-2 focus-visible:ring-gold/60 focus-visible:outline-none"
           >
-            {panel.title}
-          </button>
-        ))}
+            <Spade className="h-4 w-4" />
+            Play 2 Hand Hold&apos;em
+          </a>
+          <a
+            href="#timeline"
+            className="inline-flex min-h-12 items-center gap-2 rounded-xl border border-white/20 bg-black/30 px-5 py-3 text-sm font-semibold text-slate-100 backdrop-blur-sm transition hover:border-gold/40 hover:text-gold-soft focus-visible:ring-2 focus-visible:ring-gold/50 focus-visible:outline-none"
+          >
+            Career Story
+            <ArrowDown className="h-4 w-4" />
+          </a>
+        </motion.div>
       </div>
     </section>
   );

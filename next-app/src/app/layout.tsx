@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Instrument_Serif } from "next/font/google";
+import SiteNav from "@/components/SiteNav";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -12,15 +13,21 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const instrumentSerif = Instrument_Serif({
+  variable: "--font-display",
+  subsets: ["latin"],
+  weight: "400",
+});
+
 const SITE_URL = "https://d22soso.com";
 const SITE_NAME = "Wayne \u201CD22-soso\u201D Chiang";
 const DESCRIPTION =
-  "Wayne \u201CD22-soso\u201D Chiang \u2014 first official StarCraft: Brood War World Champion (1999), inventor of patented casino games 2 Hand Hold\u2019em and Badugi Chase, and WSOP Talent Manager.";
+  "Wayne \u201CD22-soso\u201D Chiang \u2014 first official StarCraft: Brood War World Champion (1999), high-stakes poker player, and inventor of patented casino game 2 Hand Hold\u2019em.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "Wayne \u201CD22-soso\u201D Chiang \u2014 Esports Legacy & Casino Innovations",
+    default: "Wayne \u201CD22-soso\u201D Chiang \u2014 Pioneer of Esports & Casino Inventor",
     template: "%s | Wayne \u201CD22-soso\u201D Chiang",
   },
   description: DESCRIPTION,
@@ -49,7 +56,7 @@ export const metadata: Metadata = {
     type: "website",
     url: SITE_URL,
     siteName: SITE_NAME,
-    title: "Wayne \u201CD22-soso\u201D Chiang \u2014 Esports Legacy & Casino Innovations",
+    title: "Wayne \u201CD22-soso\u201D Chiang \u2014 Pioneer of Esports & Casino Inventor",
     description: DESCRIPTION,
     locale: "en_US",
   },
@@ -57,7 +64,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     site: "@D22_soso",
     creator: "@D22_soso",
-    title: "Wayne \u201CD22-soso\u201D Chiang \u2014 Esports Legacy & Casino Innovations",
+    title: "Wayne \u201CD22-soso\u201D Chiang \u2014 Pioneer of Esports & Casino Inventor",
     description: DESCRIPTION,
   },
   robots: {
@@ -80,7 +87,11 @@ const personSchema = {
   alternateName: ["D22-soso", "SoSOWAC"],
   url: SITE_URL,
   description: DESCRIPTION,
-  jobTitle: ["Casino Game Inventor", "Talent Manager, World Series of Poker", "Professional Poker Player"],
+  jobTitle: [
+    "Casino Game Inventor",
+    "Talent Manager, World Series of Poker",
+    "Professional Poker Player",
+  ],
   gender: "Male",
   nationality: "American",
   alumniOf: {
@@ -104,7 +115,7 @@ const personSchema = {
     {
       "@type": "CreativeWork",
       name: "2 Hand Hold'em",
-      description: "Patented casino card game (US Patents 11,117,045 and 11,731,032).",
+      description: "Patented casino card game (US Patents 11,117,045, 11,731,032, and 12,005,342).",
     },
     {
       "@type": "CreativeWork",
@@ -115,6 +126,8 @@ const personSchema = {
   sameAs: [
     "https://x.com/D22_soso",
     "https://twitter.com/D22_soso",
+    "https://www.instagram.com/D22_soso/",
+    "https://www.youtube.com/@WayneChiangPoker",
     "https://liquipedia.net/starcraft/Soso",
   ],
 };
@@ -125,26 +138,21 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
-      <body className="min-h-full flex flex-col text-slate-200">
+    <html
+      lang="en"
+      className={`${geistSans.variable} ${geistMono.variable} ${instrumentSerif.variable} h-full antialiased`}
+    >
+      <body className="flex min-h-full flex-col text-slate-200">
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(personSchema) }}
         />
-        <header className="sticky top-0 z-50 border-b border-white/5 bg-slate-950/40 backdrop-blur-md">
-          <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-4 sm:px-6">
-            <span className="text-sm font-semibold tracking-tight text-slate-100">D22-soso</span>
-            <nav className="flex items-center gap-4 text-sm text-slate-400 sm:gap-6">
-              <a className="transition-colors hover:text-slate-100" href="#esports">Esports</a>
-              <a className="transition-colors hover:text-slate-100" href="#casino">Casino</a>
-              <a className="transition-colors hover:text-slate-100" href="#contact">Licensing</a>
-            </nav>
-          </div>
-        </header>
+        <SiteNav />
         <main className="flex flex-1 flex-col">{children}</main>
-        <footer className="border-t border-white/5 py-6">
-          <div className="mx-auto w-full max-w-6xl px-4 text-sm text-slate-500 sm:px-6">
-            &copy; {new Date().getFullYear()} Wayne Chiang. Esports Legacy &amp; Casino Innovations.
+        <footer className="border-t border-gold/10 py-6">
+          <div className="mx-auto flex w-full max-w-6xl flex-col gap-2 px-4 text-sm text-slate-500 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+            <span>&copy; {new Date().getFullYear()} Wayne Chiang. All rights reserved.</span>
+            <span className="text-slate-600">Esports · Poker · Casino Innovation</span>
           </div>
         </footer>
       </body>
