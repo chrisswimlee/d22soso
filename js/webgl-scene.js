@@ -412,7 +412,7 @@ export function initBgScene(canvas) {
             gsap.fromTo(
               obj.material,
               { opacity: 0 },
-              { opacity: target, duration: 0.85, ease: "power2.out", overwrite: "auto" }
+              { opacity: target, duration: 1.45, ease: "power1.inOut", overwrite: "auto" }
             );
           }
         });
@@ -427,8 +427,8 @@ export function initBgScene(canvas) {
         }
         gsap.to(mats, {
           opacity: 0,
-          duration: 0.7,
-          ease: "power2.in",
+          duration: 1.25,
+          ease: "power1.inOut",
           overwrite: "auto",
           onComplete: () => {
             if (activeKey !== k) g.visible = false;
@@ -502,15 +502,18 @@ export function initBgScene(canvas) {
     window.addEventListener("pointerdown", onPointer, { passive: true });
   }
 
-  /* Scroll / pointer parallax — plain scroll listener (ScrollTrigger.refresh
-     was resetting window.scrollTo(0,0) on every data-bg theme change). */
-  const parallax = { x: 0, y: 0, scroll: 0 };
+  /* Scroll / pointer parallax — lerped so fleets ease instead of snapping */
+  const parallax = { scroll: 0, scrollTarget: 0 };
   let pointerX = 0;
   let pointerY = 0;
+  let smoothPX = 0;
+  let smoothPY = 0;
+  const PARALLAX_LERP = coarse ? 0.045 : 0.035;
+  const POINTER_LERP = coarse ? 0.055 : 0.04;
 
   function syncScrollParallax() {
     const max = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
-    parallax.scroll = window.scrollY / max;
+    parallax.scrollTarget = window.scrollY / max;
   }
 
   if (!reduced) {
@@ -540,8 +543,8 @@ export function initBgScene(canvas) {
     }
     gsap.to(fog.material.uniforms.uOpacity, {
       value: reduced ? 0 : op,
-      duration: 0.8,
-      ease: "power2.out",
+      duration: 1.4,
+      ease: "power1.inOut",
       overwrite: "auto",
     });
   }
@@ -561,26 +564,29 @@ export function initBgScene(canvas) {
     const t = clock.getElapsedTime();
     const group = themeGroups.get(activeKey);
     if (group && !reduced) {
+      parallax.scroll += (parallax.scrollTarget - parallax.scroll) * PARALLAX_LERP;
+      smoothPX += (pointerX - smoothPX) * POINTER_LERP;
+      smoothPY += (pointerY - smoothPY) * POINTER_LERP;
       const enter = 1;
-      const scrollPull = (parallax.scroll - 0.5) * 1.2;
+      const scrollPull = (parallax.scroll - 0.5) * 0.7;
       group.userData.assets.forEach((mesh) => {
         const u = mesh.userData;
         const depth = 0.4 + Math.abs(u.base.z) * 0.08;
-        const dx = Math.sin(t * 0.35 + u.phase) * 0.12 * depth + pointerX * 0.15 * depth;
+        const dx = Math.sin(t * 0.22 + u.phase) * 0.1 * depth + smoothPX * 0.1 * depth;
         const dy =
-          Math.cos(t * 0.28 + u.phase * 1.3) * 0.1 * depth -
-          pointerY * 0.12 * depth -
-          scrollPull * 0.35 * depth;
+          Math.cos(t * 0.18 + u.phase * 1.3) * 0.08 * depth -
+          smoothPY * 0.08 * depth -
+          scrollPull * 0.28 * depth;
         mesh.position.x = u.base.x + dx;
         mesh.position.y = u.base.y + dy;
         mesh.position.z = u.base.z + (enter - 1) * 0.5;
         if (u.spin) {
-          if (u.kind === "card") mesh.rotation.y = t * u.spin * u.dir;
-          else mesh.rotation.z = t * u.spin * u.dir;
+          if (u.kind === "card") mesh.rotation.y = t * u.spin * 0.65 * u.dir;
+          else mesh.rotation.z = t * u.spin * 0.65 * u.dir;
         }
       });
-      root.rotation.y = pointerX * 0.04;
-      root.rotation.x = -pointerY * 0.03;
+      root.rotation.y = smoothPX * 0.028;
+      root.rotation.x = -smoothPY * 0.02;
     }
     renderer.render(scene, camera);
     raf = requestAnimationFrame(frame);

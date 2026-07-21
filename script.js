@@ -39,6 +39,17 @@ const reduced =
     return bg;
   }
 
+  const themeColorMeta = document.querySelector('meta[name="theme-color"]');
+
+  function syncThemeColor() {
+    if (!themeColorMeta) return;
+    const accent = getComputedStyle(document.body).getPropertyValue("--theme-accent").trim();
+    if (accent) themeColorMeta.setAttribute("content", accent);
+  }
+
+  /* Match mobile browser chrome to the body theme already set in HTML */
+  syncThemeColor();
+
   function setSceneBg(bgKey, themeKey) {
     const bg = bgKey || "starcraft";
     const theme = themeKey || accentThemeForBg(bg);
@@ -52,6 +63,7 @@ const reduced =
     if (document.body.dataset.theme !== theme) {
       document.body.dataset.theme = theme;
     }
+    syncThemeColor();
   }
 
   function variantKeyForSection(section) {
@@ -137,6 +149,7 @@ const reduced =
     "game-cnc": "Command & Conquer",
     "game-warcraft": "Warcraft",
     "game-mtg": "Magic: The Gathering",
+    "game-cube": "Cube Draft",
     "game-hearthstone": "Hearthstone",
     poker: "Poker",
     book: "Betting on Yourself",
@@ -200,6 +213,7 @@ const reduced =
         }
       } else if (theme) {
         document.body.dataset.theme = theme;
+        syncThemeColor();
       }
       if (focus) tab.focus();
     }
@@ -439,6 +453,7 @@ const reduced =
     "game-cnc",
     "game-warcraft",
     "game-mtg",
+    "game-cube",
     "game-hearthstone",
     "poker",
     "book",
@@ -1109,51 +1124,67 @@ const reduced =
     const count = document.getElementById("hero-gallery-count");
     if (!root || !img) return;
 
+    const avifSource = document.getElementById("hero-gallery-avif");
+    const webpSource = document.getElementById("hero-gallery-webp");
+    const OPT = "assets/img/";
+    const GALLERY_SIZES = "(max-width: 1023px) 88vw, 40vw";
+    const buildSet = (slug, widths, ext) =>
+      widths.map((w) => OPT + slug + "-" + w + "." + ext + " " + w + "w").join(", ");
+    const fallbackSrc = (slide) =>
+      OPT + slide.slug + "-" + slide.widths[slide.widths.length - 1] + ".jpg";
+
     const gallery = [
       {
-        src: "assets/photos/AAA%20Wayne%20Chiang%20Starcraft%20World%20Champ.JPG",
+        slug: "champ-trophy",
+        widths: [640, 1080],
         alt: "Wayne D22-soso Chiang with StarCraft Brood War world championship trophy",
         caption: "World Champion · Brood War S1 · 1999",
         badge: "★ WORLD CHAMPION",
         pos: "48% 36%",
       },
       {
-        src: "assets/photos/AAA%20Wayne%20Chiang%20Starcraft%20World%20Champ%20and%20PGL%202nd.JPG",
+        slug: "champ-pgl",
+        widths: [640, 1080],
         alt: "Wayne D22-soso Chiang with StarCraft World Champion and PGL trophies",
         caption: "Champion archive · Brood War + PGL era",
         badge: "★ TROPHY ROOM",
         pos: "50% 40%",
       },
       {
-        src: "assets/photos/AAA%20Starcraft%20World%20Champ%20Close%20Up.JPG",
+        slug: "champ-closeup",
+        widths: [640, 1080],
         alt: "Close-up of Wayne D22-soso Chiang as StarCraft World Champion",
         caption: "Close-up · World Champion portrait",
         badge: "★ CLOSE-UP",
         pos: "50% 28%",
       },
       {
-        src: "assets/photos/Slayers%20Boxer%20D22-soso%20WSOP%202025.jpg",
+        slug: "wsop-boxer",
+        widths: [720, 1200],
         alt: "D22-soso with SlayerS BoxeR at WSOP 2025",
         caption: "WSOP 2025 · with SlayerS_BoxeR",
         badge: "★ WSOP 2025",
         pos: "50% 32%",
       },
       {
-        src: "assets/photos/D22-soso%20Elky.JPG",
+        slug: "elky",
+        widths: [640, 1080],
         alt: "D22-soso with poker pro ElkY",
         caption: "Live at the Bike · with ElkY",
         badge: "★ FELT ERA",
         pos: "50% 28%",
       },
       {
-        src: "assets/photos/Garimto%20D22-soso%202024.jpg",
+        slug: "garimto",
+        widths: [640, 1080],
         alt: "Garimto and D22-soso in 2024",
         caption: "2024 · with Garimto",
         badge: "★ 2024",
         pos: "50% 30%",
       },
       {
-        src: "assets/photos/Tastosis%20D22-soso%202024.jpg",
+        slug: "tastosis",
+        widths: [640, 1080],
         alt: "Tastosis and D22-soso in 2024",
         caption: "2024 · with Tastosis",
         badge: "★ CAST CREW",
@@ -1167,11 +1198,13 @@ const reduced =
 
     function preload(i) {
       const slide = gallery[i % gallery.length];
-      if (!slide || cache.has(slide.src)) return;
+      if (!slide || cache.has(slide.slug)) return;
       const pre = new Image();
       pre.decoding = "async";
-      pre.src = slide.src;
-      cache.set(slide.src, pre);
+      pre.sizes = GALLERY_SIZES;
+      pre.srcset = buildSet(slide.slug, slide.widths, "webp");
+      pre.src = fallbackSrc(slide);
+      cache.set(slide.slug, pre);
     }
 
     function paint(i) {
@@ -1179,7 +1212,9 @@ const reduced =
       if (!slide) return;
       index = i;
       img.style.objectPosition = slide.pos || "50% 35%";
-      img.src = slide.src;
+      if (avifSource) avifSource.srcset = buildSet(slide.slug, slide.widths, "avif");
+      if (webpSource) webpSource.srcset = buildSet(slide.slug, slide.widths, "webp");
+      img.src = fallbackSrc(slide);
       img.alt = slide.alt;
       if (cap) cap.textContent = slide.caption;
       if (badge) badge.textContent = slide.badge;
@@ -1238,7 +1273,7 @@ const reduced =
       img.classList.add("is-flip-out");
 
       const afterOut = () => {
-        const pre = cache.get(slide.src);
+        const pre = cache.get(slide.slug);
         if (pre && pre.complete) {
           showTarget();
           return;
@@ -1252,8 +1287,11 @@ const reduced =
         warm.onload = ready;
         warm.onerror = ready;
         if (!pre) {
-          warm.src = slide.src;
-          cache.set(slide.src, warm);
+          warm.decoding = "async";
+          warm.sizes = GALLERY_SIZES;
+          warm.srcset = buildSet(slide.slug, slide.widths, "webp");
+          warm.src = fallbackSrc(slide);
+          cache.set(slide.slug, warm);
         } else if (warm.complete) {
           ready();
         }

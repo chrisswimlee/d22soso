@@ -27,33 +27,193 @@ function fitRenderer(renderer, camera, canvas, fallbackW, fallbackH) {
   return { w: cssW, h: cssH };
 }
 
-function cardTexture(rank, suit) {
+function cardFaceTexture(rank, suit) {
   const c = document.createElement("canvas");
-  c.width = 128;
-  c.height = 180;
+  c.width = 256;
+  c.height = 360;
   const ctx = c.getContext("2d");
-  ctx.fillStyle = "#f8f5ef";
-  ctx.fillRect(0, 0, 128, 180);
-  ctx.strokeStyle = "#222";
-  ctx.lineWidth = 4;
-  ctx.strokeRect(3, 3, 122, 174);
   const red = suit === "♥" || suit === "♦";
-  ctx.fillStyle = red ? "#b91c1c" : "#111";
-  ctx.font = "bold 42px Inter, system-ui, sans-serif";
+  const ink = red ? "#b91c1c" : "#141414";
+
+  const grad = ctx.createLinearGradient(0, 0, 0, 360);
+  grad.addColorStop(0, "#fffcf6");
+  grad.addColorStop(1, "#efe8dc");
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, 256, 360);
+
+  ctx.strokeStyle = "#c4b8a4";
+  ctx.lineWidth = 6;
+  ctx.strokeRect(10, 10, 236, 340);
+  ctx.strokeStyle = "#2a2a2e";
+  ctx.lineWidth = 2;
+  ctx.strokeRect(18, 18, 220, 324);
+
+  ctx.fillStyle = ink;
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
-  ctx.fillText(rank + suit, 64, 90);
+  ctx.font = "700 54px Inter, system-ui, sans-serif";
+  ctx.fillText(rank, 48, 52);
+  ctx.font = "48px Inter, system-ui, sans-serif";
+  ctx.fillText(suit, 48, 104);
+  ctx.font = "120px Inter, system-ui, sans-serif";
+  ctx.globalAlpha = 0.92;
+  ctx.fillText(suit, 128, 190);
+  ctx.globalAlpha = 1;
+  ctx.save();
+  ctx.translate(208, 308);
+  ctx.rotate(Math.PI);
+  ctx.font = "700 54px Inter, system-ui, sans-serif";
+  ctx.fillText(rank, 0, 0);
+  ctx.font = "48px Inter, system-ui, sans-serif";
+  ctx.fillText(suit, 0, 52);
+  ctx.restore();
+
+  const tex = new THREE.CanvasTexture(c);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.anisotropy = 4;
+  return tex;
+}
+
+function cardBackTexture(tint) {
+  const c = document.createElement("canvas");
+  c.width = 256;
+  c.height = 360;
+  const ctx = c.getContext("2d");
+  const base = tint || "#1e3a5f";
+  ctx.fillStyle = base;
+  ctx.fillRect(0, 0, 256, 360);
+  ctx.strokeStyle = "rgba(212,175,55,0.55)";
+  ctx.lineWidth = 8;
+  ctx.strokeRect(14, 14, 228, 332);
+  ctx.strokeStyle = "rgba(255,255,255,0.12)";
+  ctx.lineWidth = 2;
+  for (let i = 0; i < 8; i++) {
+    ctx.beginPath();
+    ctx.moveTo(28 + i * 28, 28);
+    ctx.lineTo(28 + i * 28, 332);
+    ctx.stroke();
+  }
+  ctx.fillStyle = "rgba(212,175,55,0.85)";
+  ctx.font = "700 36px JetBrains Mono, monospace";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText("D22", 128, 180);
   const tex = new THREE.CanvasTexture(c);
   tex.colorSpace = THREE.SRGBColorSpace;
   return tex;
 }
 
-function makeCardMesh(rank, suit) {
-  const geo = new THREE.BoxGeometry(0.7, 1.0, 0.04);
-  const face = new THREE.MeshBasicMaterial({ map: cardTexture(rank, suit) });
-  const back = new THREE.MeshBasicMaterial({ color: 0x1e293b });
-  const edge = new THREE.MeshBasicMaterial({ color: 0xd4d0c8 });
+function makeCardMesh(rank, suit, opts) {
+  const geo = new THREE.BoxGeometry(0.72, 1.02, 0.045);
+  const face = new THREE.MeshBasicMaterial({ map: cardFaceTexture(rank, suit) });
+  const back = new THREE.MeshBasicMaterial({
+    map: cardBackTexture(opts?.backTint),
+  });
+  const edge = new THREE.MeshBasicMaterial({ color: 0xd8d2c6 });
   const mesh = new THREE.Mesh(geo, [edge, edge, edge, edge, face, back]);
+  mesh.userData.rank = rank;
+  mesh.userData.suit = suit;
+  mesh.userData.dispose = () => {
+    geo.dispose();
+    [face, back, edge].forEach((m) => {
+      m.map?.dispose();
+      m.dispose();
+    });
+  };
+  return mesh;
+}
+
+function makeFeltTable(radius, feltColor, railColor) {
+  const group = new THREE.Group();
+  const felt = new THREE.Mesh(
+    new THREE.CircleGeometry(radius, 64),
+    new THREE.MeshBasicMaterial({ color: feltColor })
+  );
+  felt.rotation.x = -Math.PI / 2;
+  group.add(felt);
+
+  const rail = new THREE.Mesh(
+    new THREE.RingGeometry(radius * 0.92, radius * 1.06, 64),
+    new THREE.MeshBasicMaterial({
+      color: railColor,
+      transparent: true,
+      opacity: 0.88,
+      side: THREE.DoubleSide,
+      depthWrite: false,
+    })
+  );
+  rail.rotation.x = -Math.PI / 2;
+  rail.position.y = 0.01;
+  group.add(rail);
+
+  const inner = new THREE.Mesh(
+    new THREE.RingGeometry(radius * 0.55, radius * 0.58, 64),
+    new THREE.MeshBasicMaterial({
+      color: 0xd4af37,
+      transparent: true,
+      opacity: 0.14,
+      side: THREE.DoubleSide,
+      depthWrite: false,
+    })
+  );
+  inner.rotation.x = -Math.PI / 2;
+  inner.position.y = 0.012;
+  group.add(inner);
+  return group;
+}
+
+function makeHudLabel(width, height, color) {
+  const canvas = document.createElement("canvas");
+  canvas.width = 640;
+  canvas.height = 96;
+  const ctx = canvas.getContext("2d");
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  const mesh = new THREE.Mesh(
+    new THREE.PlaneGeometry(width, height),
+    new THREE.MeshBasicMaterial({ map: tex, transparent: true, depthWrite: false })
+  );
+  mesh.userData.paint = (text) => {
+    ctx.clearRect(0, 0, 640, 96);
+    ctx.fillStyle = "rgba(8, 10, 14, 0.55)";
+    ctx.fillRect(0, 12, 640, 72);
+    ctx.strokeStyle = color;
+    ctx.globalAlpha = 0.45;
+    ctx.strokeRect(4, 16, 632, 64);
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = color;
+    ctx.font = "600 28px JetBrains Mono, monospace";
+    ctx.textAlign = "left";
+    ctx.textBaseline = "middle";
+    ctx.fillText(text, 28, 48);
+    tex.needsUpdate = true;
+  };
+  return mesh;
+}
+
+function makeZoneLabel(text, color) {
+  const canvas = document.createElement("canvas");
+  canvas.width = 256;
+  canvas.height = 64;
+  const ctx = canvas.getContext("2d");
+  ctx.fillStyle = color;
+  ctx.font = "700 28px JetBrains Mono, monospace";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.globalAlpha = 0.9;
+  ctx.fillText(text, 128, 32);
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  const mesh = new THREE.Mesh(
+    new THREE.PlaneGeometry(1.4, 0.32),
+    new THREE.MeshBasicMaterial({
+      map: tex,
+      transparent: true,
+      opacity: 0,
+      depthWrite: false,
+    })
+  );
+  mesh.rotation.x = -Math.PI / 2;
   return mesh;
 }
 
@@ -518,161 +678,220 @@ function init2HH(canvas) {
   if (!canvas) return;
 
   const suits = ["♠", "♥", "♦", "♣"];
-  const ranks = ["A", "K", "Q", "J", "T", "9"];
+  const ranks = ["A", "K", "Q", "J", "T", "9", "8"];
   const pick = () => ({
     rank: ranks[(Math.random() * ranks.length) | 0],
     suit: suits[(Math.random() * suits.length) | 0],
   });
 
   const renderer = makeRenderer(canvas);
-  renderer.setClearColor(0x0a1a12, 1);
+  renderer.setClearColor(0x07140e, 1);
   const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(36, 1, 0.1, 40);
-  camera.position.set(0, 3.8, 5.2);
-  camera.lookAt(0, 0.2, 0);
+  const camera = new THREE.PerspectiveCamera(34, 1, 0.1, 40);
+  camera.position.set(0, 4.1, 5.4);
+  camera.lookAt(0, 0.15, 0.1);
 
-  const table = new THREE.Mesh(
-    new THREE.CircleGeometry(3.2, 48),
-    new THREE.MeshBasicMaterial({ color: 0x0d2818 })
+  scene.add(makeFeltTable(3.25, 0x0d2818, 0x3f2a14));
+
+  /* Soft felt wash */
+  const wash = new THREE.Mesh(
+    new THREE.CircleGeometry(2.4, 48),
+    new THREE.MeshBasicMaterial({
+      color: 0x1a5c3a,
+      transparent: true,
+      opacity: 0.18,
+      depthWrite: false,
+    })
   );
-  table.rotation.x = -Math.PI / 2;
-  scene.add(table);
-
-  let hole = [pick(), pick(), pick(), pick()].map((c) => makeCardMesh(c.rank, c.suit));
-  let board = [pick(), pick(), pick()].map((c) => makeCardMesh(c.rank, c.suit));
-  hole.forEach((m) => scene.add(m));
-  board.forEach((m) => scene.add(m));
+  wash.rotation.x = -Math.PI / 2;
+  wash.position.y = 0.008;
+  scene.add(wash);
 
   const handBoxes = [
     new THREE.Mesh(
-      new THREE.PlaneGeometry(2.2, 1.6),
+      new THREE.PlaneGeometry(2.35, 1.55),
       new THREE.MeshBasicMaterial({
         color: 0x38bdf8,
         transparent: true,
         opacity: 0,
         side: THREE.DoubleSide,
+        depthWrite: false,
       })
     ),
     new THREE.Mesh(
-      new THREE.PlaneGeometry(2.2, 1.6),
+      new THREE.PlaneGeometry(2.35, 1.55),
       new THREE.MeshBasicMaterial({
         color: 0xfb7185,
         transparent: true,
         opacity: 0,
         side: THREE.DoubleSide,
+        depthWrite: false,
       })
     ),
   ];
   handBoxes[0].rotation.x = -Math.PI / 2;
   handBoxes[1].rotation.x = -Math.PI / 2;
-  handBoxes[0].position.set(-1.35, 0.04, 1.1);
-  handBoxes[1].position.set(1.35, 0.04, 1.1);
+  handBoxes[0].position.set(-1.45, 0.03, 1.15);
+  handBoxes[1].position.set(1.45, 0.03, 1.15);
   scene.add(...handBoxes);
 
-  const labelCanvas = document.createElement("canvas");
-  labelCanvas.width = 512;
-  labelCanvas.height = 48;
-  const lctx = labelCanvas.getContext("2d");
-  const ltex = new THREE.CanvasTexture(labelCanvas);
-  const label = new THREE.Mesh(
-    new THREE.PlaneGeometry(4.2, 0.35),
-    new THREE.MeshBasicMaterial({ map: ltex, transparent: true })
-  );
-  label.position.set(0, 0.05, -2.2);
-  label.rotation.x = -Math.PI / 2;
+  const zoneA = makeZoneLabel("HAND A", "#7dd3fc");
+  const zoneB = makeZoneLabel("HAND B", "#fda4af");
+  zoneA.position.set(-1.45, 0.04, 0.35);
+  zoneB.position.set(1.45, 0.04, 0.35);
+  scene.add(zoneA, zoneB);
+
+  const boardTag = makeZoneLabel("BOARD", "#d4af37");
+  boardTag.position.set(0, 0.04, -1.35);
+  boardTag.material.opacity = 0.55;
+  scene.add(boardTag);
+
+  /* Pot chips */
+  [0x8b5cf6, 0xd4af37, 0x2dd4bf].forEach((color, i) => {
+    const chip = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.14, 0.14, 0.04, 24),
+      new THREE.MeshBasicMaterial({ color })
+    );
+    chip.position.set(-0.22 + i * 0.22, 0.04 + i * 0.02, 0.15);
+    scene.add(chip);
+  });
+
+  const label = makeHudLabel(4.4, 0.42, "#d4af37");
+  label.position.set(0, 0.9, -2.35);
+  label.lookAt(camera.position);
   scene.add(label);
+  label.userData.paint("DEALT — CLICK TO SPLIT INTO TWO HANDS");
 
-  function setLabel(text) {
-    lctx.clearRect(0, 0, 512, 48);
-    lctx.fillStyle = "rgba(212,175,55,0.9)";
-    lctx.font = "600 18px JetBrains Mono, monospace";
-    lctx.fillText(text, 16, 30);
-    ltex.needsUpdate = true;
-  }
-  setLabel("DEALT — CLICK TO SPLIT");
-
+  let hole = [];
+  let board = [];
   let split = false;
+  let busy = false;
+
+  function disposeCards(list) {
+    list.forEach((m) => {
+      scene.remove(m);
+      m.userData.dispose?.();
+    });
+  }
+
+  function dealFresh() {
+    disposeCards(hole);
+    disposeCards(board);
+    hole = [pick(), pick(), pick(), pick()].map((c) =>
+      makeCardMesh(c.rank, c.suit, { backTint: "#12304f" })
+    );
+    board = [pick(), pick(), pick()].map((c) =>
+      makeCardMesh(c.rank, c.suit, { backTint: "#12304f" })
+    );
+    hole.forEach((m, i) => {
+      m.position.set(-0.9 + i * 0.22, 1.1, 2.4);
+      m.rotation.set(-0.4, 0, 0);
+      m.scale.setScalar(0.85);
+      scene.add(m);
+    });
+    board.forEach((m, i) => {
+      m.position.set(-0.4 + i * 0.2, 1.2, -1.6);
+      m.rotation.set(-0.5, 0, 0);
+      m.scale.setScalar(0.85);
+      scene.add(m);
+    });
+  }
 
   function layout(animate) {
-    const duration = reduced || !animate ? 0.01 : 0.55;
+    const duration = reduced || !animate ? 0.01 : 0.65;
     const ease = "power3.out";
     hole.forEach((m, i) => {
       let x;
       let z;
+      let rotY = 0;
       if (!split) {
-        x = -1.35 + i * 0.9;
-        z = 1.15;
+        x = -1.2 + i * 0.8;
+        z = 1.2;
       } else {
         const hand = i < 2 ? 0 : 1;
-        x = (hand === 0 ? -1.7 : 1.0) + (i % 2) * 0.75;
-        z = 1.15;
+        x = (hand === 0 ? -1.85 : 0.95) + (i % 2) * 0.78;
+        z = 1.2;
+        rotY = hand === 0 ? -0.08 : 0.08;
       }
-      /* y≈0.52 keeps upright card bottoms above the felt */
-      gsap.to(m.position, { x, y: 0.52, z, duration, ease, overwrite: "auto" });
-      gsap.to(m.rotation, { x: -0.15, y: 0, z: 0, duration, ease, overwrite: "auto" });
-    });
-    board.forEach((m, i) => {
       gsap.to(m.position, {
-        x: -0.9 + i * 0.9,
+        x,
         y: 0.52,
-        z: -0.6,
+        z,
+        duration,
+        delay: reduced ? 0 : i * 0.04,
+        ease,
+        overwrite: "auto",
+      });
+      gsap.to(m.rotation, {
+        x: -0.18,
+        y: rotY,
+        z: 0,
         duration,
         ease,
         overwrite: "auto",
       });
-      gsap.to(m.rotation, { x: -0.15, y: 0, z: 0, duration, ease, overwrite: "auto" });
+      gsap.to(m.scale, { x: 1, y: 1, z: 1, duration, ease, overwrite: "auto" });
     });
-    handBoxes.forEach((b, i) => {
-      gsap.to(b.material, {
-        opacity: split ? 0.18 : 0,
+    board.forEach((m, i) => {
+      gsap.to(m.position, {
+        x: -0.85 + i * 0.85,
+        y: 0.52,
+        z: -0.55,
         duration,
+        delay: reduced ? 0 : 0.12 + i * 0.05,
+        ease,
+        overwrite: "auto",
+      });
+      gsap.to(m.rotation, { x: -0.18, y: 0, z: 0, duration, ease, overwrite: "auto" });
+      gsap.to(m.scale, { x: 1, y: 1, z: 1, duration, ease, overwrite: "auto" });
+    });
+    handBoxes.forEach((b) => {
+      gsap.to(b.material, {
+        opacity: split ? 0.2 : 0,
+        duration: duration * 0.8,
         overwrite: "auto",
       });
     });
+    gsap.to(zoneA.material, { opacity: split ? 0.85 : 0, duration, overwrite: "auto" });
+    gsap.to(zoneB.material, { opacity: split ? 0.85 : 0, duration, overwrite: "auto" });
   }
 
-  hole.forEach((m, i) => m.position.set(-1.2 + i * 0.3, 0.9, 2));
-  board.forEach((m, i) => m.position.set(-0.5 + i * 0.3, 0.9, -0.6));
+  dealFresh();
   layout(true);
 
-  function redeal() {
-    hole.forEach((m) => {
-      scene.remove(m);
-      m.geometry.dispose();
-    });
-    board.forEach((m) => {
-      scene.remove(m);
-      m.geometry.dispose();
-    });
-    hole = [pick(), pick(), pick(), pick()].map((c) => makeCardMesh(c.rank, c.suit));
-    board = [pick(), pick(), pick()].map((c) => makeCardMesh(c.rank, c.suit));
-    hole.forEach((m, i) => {
-      m.position.set(-1.2 + i * 0.3, 0.9, 2);
-      scene.add(m);
-    });
-    board.forEach((m, i) => {
-      m.position.set(-0.5 + i * 0.3, 0.9, -0.6);
-      scene.add(m);
-    });
-  }
-
   canvas.addEventListener("click", () => {
+    if (busy) return;
     if (split) {
+      busy = true;
       split = false;
-      redeal();
-      setLabel("DEALT — CLICK TO SPLIT");
-    } else {
-      split = true;
-      setLabel("TWO HANDS // ONE BOARD");
+      dealFresh();
+      label.userData.paint("DEALT — CLICK TO SPLIT INTO TWO HANDS");
+      layout(true);
+      window.setTimeout(() => {
+        busy = false;
+      }, reduced ? 40 : 700);
+      return;
     }
+    split = true;
+    label.userData.paint("TWO HANDS // ONE BOARD — CLICK TO REDEAL");
     layout(true);
   });
   canvas.style.cursor = "pointer";
 
   const isVisible = observeVisibility(canvas);
+  let clock = 0;
   function loop() {
     fitRenderer(renderer, camera, canvas, 480, 300);
-    if (isVisible()) renderer.render(scene, camera);
+    clock += 0.016;
+    if (isVisible()) {
+      if (!reduced) {
+        camera.position.x = Math.sin(clock * 0.22) * 0.12;
+        camera.position.y = 4.1 + Math.sin(clock * 0.18) * 0.04;
+        camera.lookAt(0, 0.15, 0.1);
+        label.lookAt(camera.position);
+      }
+      renderer.render(scene, camera);
+    }
     requestAnimationFrame(loop);
   }
   loop();
@@ -683,155 +902,281 @@ function initBadugi(canvas) {
   if (!canvas) return;
 
   const suits = ["♠", "♥", "♦", "♣"];
-  const ranks = ["A", "2", "3", "4", "5"];
+  const ranks = ["A", "2", "3", "4", "5", "6", "7", "8"];
+  const pick = () => ({
+    rank: ranks[(Math.random() * ranks.length) | 0],
+    suit: suits[(Math.random() * suits.length) | 0],
+  });
 
   const renderer = makeRenderer(canvas);
-  renderer.setClearColor(0x0a1018, 1);
+  renderer.setClearColor(0x070b12, 1);
   const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(36, 1, 0.1, 40);
-  camera.position.set(0, 3.6, 5);
-  camera.lookAt(0, 0.2, 0);
+  const camera = new THREE.PerspectiveCamera(34, 1, 0.1, 40);
+  camera.position.set(0, 3.9, 5.2);
+  camera.lookAt(0, 0.2, 0.15);
 
-  const table = new THREE.Mesh(
-    new THREE.CircleGeometry(3.0, 48),
-    new THREE.MeshBasicMaterial({ color: 0x0f172a })
+  scene.add(makeFeltTable(3.1, 0x0f172a, 0x334155));
+
+  const iceWash = new THREE.Mesh(
+    new THREE.CircleGeometry(2.2, 48),
+    new THREE.MeshBasicMaterial({
+      color: 0x38bdf8,
+      transparent: true,
+      opacity: 0.07,
+      depthWrite: false,
+    })
   );
-  table.rotation.x = -Math.PI / 2;
-  scene.add(table);
+  iceWash.rotation.x = -Math.PI / 2;
+  iceWash.position.y = 0.008;
+  scene.add(iceWash);
 
-  function makeCommunity() {
-    return [0, 1, 2].map((i) => {
-      const mesh = makeCardMesh(ranks[i % ranks.length], suits[i % 4]);
-      mesh.userData.idx = i;
-      mesh.userData.chosen = false;
-      mesh.userData.rejected = false;
-      scene.add(mesh);
-      return mesh;
+  /* Triad geometry under community */
+  const triad = new THREE.Mesh(
+    new THREE.RingGeometry(1.55, 1.68, 3),
+    new THREE.MeshBasicMaterial({
+      color: 0x94a3b8,
+      transparent: true,
+      opacity: 0.35,
+      side: THREE.DoubleSide,
+      depthWrite: false,
+    })
+  );
+  triad.rotation.x = -Math.PI / 2;
+  triad.rotation.z = Math.PI / 6;
+  triad.position.set(0, 0.02, 0.15);
+  scene.add(triad);
+
+  const pickRing = new THREE.Mesh(
+    new THREE.RingGeometry(0.48, 0.56, 32),
+    new THREE.MeshBasicMaterial({
+      color: 0xe0f2fe,
+      transparent: true,
+      opacity: 0,
+      side: THREE.DoubleSide,
+      depthWrite: false,
+    })
+  );
+  pickRing.rotation.x = -Math.PI / 2;
+  pickRing.position.y = 0.03;
+  scene.add(pickRing);
+
+  const holeTag = makeZoneLabel("YOUR HAND", "#94a3b8");
+  holeTag.position.set(0, 0.04, 1.85);
+  holeTag.material.opacity = 0.7;
+  scene.add(holeTag);
+
+  const communityTag = makeZoneLabel("PICK 1", "#e0f2fe");
+  communityTag.position.set(0, 0.04, -0.85);
+  communityTag.material.opacity = 0.75;
+  scene.add(communityTag);
+
+  const label = makeHudLabel(4.4, 0.42, "#94a3b8");
+  label.position.set(0, 0.85, -2.2);
+  label.lookAt(camera.position);
+  scene.add(label);
+  label.userData.paint("PICK 1 OF 3 COMMUNITY CARDS");
+
+  let hole = [];
+  let community = [];
+  let picked = false;
+  let hoverIdx = -1;
+
+  function disposeCards(list) {
+    list.forEach((m) => {
+      scene.remove(m);
+      m.userData.dispose?.();
     });
   }
 
-  let community = makeCommunity();
-  let picked = false;
-
-  const labelCanvas = document.createElement("canvas");
-  labelCanvas.width = 512;
-  labelCanvas.height = 48;
-  const lctx = labelCanvas.getContext("2d");
-  const ltex = new THREE.CanvasTexture(labelCanvas);
-  const label = new THREE.Mesh(
-    new THREE.PlaneGeometry(4.2, 0.35),
-    new THREE.MeshBasicMaterial({ map: ltex, transparent: true })
-  );
-  label.position.set(0, 0.05, -2.0);
-  label.rotation.x = -Math.PI / 2;
-  scene.add(label);
-
-  function setLabel(text) {
-    lctx.clearRect(0, 0, 512, 48);
-    lctx.fillStyle = "#94a3b8";
-    lctx.font = "600 18px JetBrains Mono, monospace";
-    lctx.fillText(text, 16, 30);
-    ltex.needsUpdate = true;
+  function makeDeal() {
+    disposeCards(hole);
+    disposeCards(community);
+    hole = [pick(), pick(), pick(), pick()].map((c) =>
+      makeCardMesh(c.rank, c.suit, { backTint: "#1e293b" })
+    );
+    community = [pick(), pick(), pick()].map((c, i) => {
+      const mesh = makeCardMesh(c.rank, c.suit, { backTint: "#1e293b" });
+      mesh.userData.idx = i;
+      mesh.userData.chosen = false;
+      mesh.userData.rejected = false;
+      return mesh;
+    });
+    hole.forEach((m, i) => {
+      m.position.set(-1.15 + i * 0.28, 1.0, 2.5);
+      m.rotation.set(-0.45, 0, 0);
+      scene.add(m);
+    });
+    community.forEach((m, i) => {
+      m.position.set(-1.0 + i * 0.7, 1.1, 1.4);
+      m.rotation.set(-0.4, 0, 0);
+      scene.add(m);
+    });
   }
-  setLabel("PICK 1 OF 3 COMMUNITY CARDS");
 
   function layout(animate) {
-    const duration = reduced || !animate ? 0.01 : 0.5;
+    const duration = reduced || !animate ? 0.01 : 0.55;
+    const ease = "power3.out";
+
+    hole.forEach((m, i) => {
+      gsap.to(m.position, {
+        x: -1.2 + i * 0.8,
+        y: 0.5,
+        z: 1.55,
+        duration,
+        delay: reduced ? 0 : i * 0.03,
+        ease,
+        overwrite: "auto",
+      });
+      gsap.to(m.rotation, { x: -0.22, y: 0, z: 0, duration, ease, overwrite: "auto" });
+    });
+
     community.forEach((m, i) => {
       let x;
       let z;
-      let y = 0.52;
+      let y = 0.55;
       let opacity = 1;
+      let scale = 1;
       if (m.userData.chosen) {
         x = 0;
-        z = 1.3;
+        z = 0.55;
+        y = 0.72;
+        scale = 1.12;
       } else if (m.userData.rejected) {
-        x = -1.4 + i * 1.4;
-        z = 2.8;
-        y = -0.5;
+        x = -1.5 + i * 1.5;
+        z = 2.6;
+        y = -0.4;
         opacity = 0;
+        scale = 0.7;
       } else {
-        x = -1.4 + i * 1.4;
-        z = 0.2;
+        x = -1.45 + i * 1.45;
+        z = 0.05;
+        if (hoverIdx === i && !picked) y = 0.72;
       }
-      gsap.to(m.position, { x, y, z, duration, ease: "power3.out", overwrite: "auto" });
+      gsap.to(m.position, { x, y, z, duration, ease, overwrite: "auto" });
       gsap.to(m.rotation, {
-        x: -0.2,
-        y: m.userData.chosen ? 0.15 : 0,
+        x: -0.22,
+        y: m.userData.chosen ? 0.12 : 0,
         z: 0,
         duration,
-        ease: "power3.out",
+        ease,
         overwrite: "auto",
       });
-      m.traverse?.(() => {});
+      gsap.to(m.scale, { x: scale, y: scale, z: scale, duration, ease, overwrite: "auto" });
       const mats = Array.isArray(m.material) ? m.material : [m.material];
       mats.forEach((mat) => {
         mat.transparent = true;
         gsap.to(mat, { opacity, duration, overwrite: "auto" });
       });
     });
+
+    if (community.some((m) => m.userData.chosen)) {
+      gsap.to(pickRing.position, {
+        x: 0,
+        z: 0.55,
+        duration,
+        ease,
+        overwrite: "auto",
+      });
+      gsap.to(pickRing.material, { opacity: 0.75, duration, overwrite: "auto" });
+    } else {
+      gsap.to(pickRing.material, { opacity: 0, duration: 0.25, overwrite: "auto" });
+    }
   }
 
-  community.forEach((m, i) => m.position.set(-1.2 + i * 0.9, 0.9, 1.5));
+  makeDeal();
   layout(true);
 
   const raycaster = new THREE.Raycaster();
   const pointer = new THREE.Vector2();
   const pickProj = new THREE.Vector3();
 
-  canvas.addEventListener("click", (e) => {
-    if (picked) {
-      community.forEach((m) => {
-        scene.remove(m);
-        m.geometry.dispose();
-      });
-      community = makeCommunity();
-      community.forEach((m, i) => m.position.set(-1.2 + i * 0.9, 0.9, 1.5));
-      picked = false;
-      setLabel("PICK 1 OF 3 COMMUNITY CARDS");
-      layout(true);
-      return;
-    }
+  function pointerNdc(e) {
     const rect = canvas.getBoundingClientRect();
     pointer.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
     pointer.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+    return rect;
+  }
+
+  function resolveIndex(e) {
+    pointerNdc(e);
     raycaster.setFromCamera(pointer, camera);
     const pickable = community.filter((m) => !m.userData.rejected);
     const hits = raycaster.intersectObjects(pickable, false);
-    let idx = -1;
-    if (hits.length) {
-      idx = community.indexOf(hits[0].object);
-    } else {
-      /* fallback: nearest projected card center in screen space */
-      const x = (e.clientX - rect.left) / rect.width;
-      let best = -1;
-      let bestD = Infinity;
-      pickable.forEach((m) => {
-        pickProj.copy(m.position).project(camera);
-        const sx = (pickProj.x + 1) / 2;
-        const d = Math.abs(sx - x);
-        if (d < bestD) {
-          bestD = d;
-          best = community.indexOf(m);
-        }
+    if (hits.length) return community.indexOf(hits[0].object);
+    const rect = canvas.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width;
+    let best = -1;
+    let bestD = Infinity;
+    pickable.forEach((m) => {
+      pickProj.copy(m.position).project(camera);
+      const sx = (pickProj.x + 1) / 2;
+      const d = Math.abs(sx - x);
+      if (d < bestD) {
+        bestD = d;
+        best = community.indexOf(m);
+      }
+    });
+    return bestD < 0.22 ? best : -1;
+  }
+
+  canvas.addEventListener("pointermove", (e) => {
+    if (picked || reduced) return;
+    const idx = resolveIndex(e);
+    if (idx === hoverIdx) return;
+    hoverIdx = idx;
+    canvas.style.cursor = idx >= 0 ? "pointer" : "default";
+    community.forEach((m, i) => {
+      if (m.userData.rejected || m.userData.chosen) return;
+      gsap.to(m.position, {
+        y: i === hoverIdx ? 0.72 : 0.55,
+        duration: 0.22,
+        ease: "power2.out",
+        overwrite: "auto",
       });
-      idx = best;
+    });
+  });
+
+  canvas.addEventListener("click", (e) => {
+    if (picked) {
+      picked = false;
+      hoverIdx = -1;
+      makeDeal();
+      label.userData.paint("PICK 1 OF 3 COMMUNITY CARDS");
+      communityTag.material.opacity = 0.75;
+      layout(true);
+      return;
     }
+    const idx = resolveIndex(e);
     if (idx < 0) return;
     community.forEach((m, i) => {
       m.userData.chosen = i === idx;
       m.userData.rejected = i !== idx;
     });
     picked = true;
-    setLabel("HAND COMPLETE — CLICK TO RESET");
+    hoverIdx = -1;
+    label.userData.paint("HAND COMPLETE — CLICK TO RESET");
+    communityTag.material.opacity = 0.35;
     layout(true);
   });
   canvas.style.cursor = "pointer";
 
   const isVisible = observeVisibility(canvas);
+  let clock = 0;
   function loop() {
     fitRenderer(renderer, camera, canvas, 480, 300);
-    if (isVisible()) renderer.render(scene, camera);
+    clock += 0.016;
+    if (isVisible()) {
+      if (!reduced) {
+        camera.position.x = Math.sin(clock * 0.2) * 0.1;
+        camera.lookAt(0, 0.2, 0.15);
+        label.lookAt(camera.position);
+        triad.rotation.z = Math.PI / 6 + clock * 0.08;
+        if (picked) {
+          pickRing.rotation.z = clock * 0.6;
+        }
+      }
+      renderer.render(scene, camera);
+    }
     requestAnimationFrame(loop);
   }
   loop();

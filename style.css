@@ -41,6 +41,8 @@ html {
      creates a body scrollport that swallows scrollIntoView without moving the page */
   overflow-x: clip;
   overflow-y: scroll;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
 }
 
 body {
@@ -54,6 +56,34 @@ body {
   padding-bottom: calc(2rem + var(--safe-bottom));
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
+}
+
+/* Themed text selection — tracks active theater accent */
+::selection {
+  background: color-mix(in srgb, var(--theme-accent) 45%, transparent);
+  color: var(--text);
+}
+
+/* Page scrollbar — thin dark bar that picks up theme accent */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--theme-accent) 35%, var(--border));
+  border-radius: 6px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, var(--theme-accent) 55%, var(--border));
+  background-clip: padding-box;
 }
 
 /* Keyboard skip — visible on focus only */
@@ -117,7 +147,7 @@ body {
   position: absolute;
   inset: 0;
   opacity: 0;
-  transition: opacity 0.9s ease;
+  transition: opacity 1.85s cubic-bezier(0.33, 0.05, 0.2, 1);
   will-change: opacity;
   z-index: 1;
 }
@@ -152,7 +182,10 @@ body {
     radial-gradient(ellipse 90% 70% at 50% 40%, transparent 0%, rgba(11, 6, 24, 0.5) 55%, rgba(10, 10, 14, 0.9) 100%),
     linear-gradient(180deg, rgba(11, 6, 24, 0.5) 0%, rgba(16, 12, 28, 0.3) 40%, rgba(10, 10, 14, 0.86) 100%),
     radial-gradient(ellipse 90% 60% at 50% -5%, rgba(139, 92, 246, 0.35), transparent 58%),
-    url("assets/themes/starcraft.jpg") center 40% / cover no-repeat,
+    image-set(
+      url("assets/img/bg-starcraft.avif") type("image/avif"),
+      url("assets/img/bg-starcraft.webp") type("image/webp"),
+      url("assets/img/bg-starcraft.jpg") type("image/jpeg")) center 40% / cover no-repeat,
     linear-gradient(180deg, #0b0618 0%, #100c1c 45%, #0a0a0e 100%);
 }
 
@@ -167,7 +200,10 @@ body {
       rgba(168, 230, 255, 0.035) 11px 12px
     ),
     radial-gradient(ellipse 85% 55% at 48% -8%, rgba(45, 212, 191, 0.28), transparent 56%),
-    url("assets/themes/starcraft-v2.jpg") center 35% / cover no-repeat,
+    image-set(
+      url("assets/img/bg-starcraft-v2.avif") type("image/avif"),
+      url("assets/img/bg-starcraft-v2.webp") type("image/webp"),
+      url("assets/img/bg-starcraft-v2.jpg") type("image/jpeg")) center 35% / cover no-repeat,
     linear-gradient(180deg, #040c10 0%, #071416 42%, #0a0a0a 100%);
 }
 
@@ -177,7 +213,10 @@ body {
     radial-gradient(ellipse 90% 70% at 50% 40%, transparent 0%, rgba(20, 8, 2, 0.55) 55%, rgba(10, 8, 6, 0.92) 100%),
     linear-gradient(180deg, rgba(20, 8, 2, 0.5) 0%, rgba(24, 12, 6, 0.35) 40%, rgba(10, 8, 6, 0.88) 100%),
     radial-gradient(ellipse 88% 58% at 50% -6%, rgba(234, 88, 12, 0.3), transparent 58%),
-    url("assets/themes/starcraft-v3.jpg") center 40% / cover no-repeat,
+    image-set(
+      url("assets/img/bg-starcraft-v3.avif") type("image/avif"),
+      url("assets/img/bg-starcraft-v3.webp") type("image/webp"),
+      url("assets/img/bg-starcraft-v3.jpg") type("image/jpeg")) center 40% / cover no-repeat,
     linear-gradient(180deg, #140802 0%, #1a0e08 45%, #0a0806 100%);
 }
 
@@ -197,7 +236,10 @@ body {
     linear-gradient(180deg, rgba(2, 5, 2, 0.55) 0%, rgba(10, 18, 8, 0.35) 45%, rgba(2, 5, 2, 0.9) 100%),
     repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.18) 0 1px, transparent 1px 3px),
     radial-gradient(ellipse 70% 50% at 25% 25%, rgba(57, 255, 20, 0.2), transparent 55%),
-    url("assets/themes/cnc.jpg") center 40% / cover no-repeat,
+    image-set(
+      url("assets/img/bg-cnc.avif") type("image/avif"),
+      url("assets/img/bg-cnc.webp") type("image/webp"),
+      url("assets/img/bg-cnc.jpg") type("image/jpeg")) center 40% / cover no-repeat,
     linear-gradient(180deg, #020502 0%, #0a1208 100%);
 }
 
@@ -208,7 +250,10 @@ body {
     linear-gradient(180deg, rgba(6, 2, 3, 0.55) 0%, rgba(16, 8, 8, 0.4) 45%, rgba(10, 12, 14, 0.92) 100%),
     repeating-linear-gradient(0deg, transparent 0 2px, rgba(180, 35, 24, 0.04) 2px 4px),
     radial-gradient(ellipse 65% 55% at 18% 20%, rgba(180, 35, 24, 0.28), transparent 58%),
-    url("assets/themes/cnc-v2.jpg") center 40% / cover no-repeat,
+    image-set(
+      url("assets/img/bg-cnc-v2.avif") type("image/avif"),
+      url("assets/img/bg-cnc-v2.webp") type("image/webp"),
+      url("assets/img/bg-cnc-v2.jpg") type("image/jpeg")) center 40% / cover no-repeat,
     linear-gradient(180deg, #060203 0%, #100808 48%, #0a0c0e 100%);
 }
 
@@ -220,7 +265,10 @@ body {
     repeating-linear-gradient(90deg, transparent 0 47px, rgba(109, 127, 140, 0.05) 47px 48px),
     repeating-linear-gradient(0deg, transparent 0 47px, rgba(196, 160, 53, 0.04) 47px 48px),
     radial-gradient(ellipse 60% 45% at 72% 18%, rgba(196, 160, 53, 0.18), transparent 55%),
-    url("assets/themes/cnc-v3.jpg") center 40% / cover no-repeat,
+    image-set(
+      url("assets/img/bg-cnc-v3.avif") type("image/avif"),
+      url("assets/img/bg-cnc-v3.webp") type("image/webp"),
+      url("assets/img/bg-cnc-v3.jpg") type("image/jpeg")) center 40% / cover no-repeat,
     linear-gradient(180deg, #05070a 0%, #0c1014 50%, #0a0c0e 100%);
 }
 
@@ -231,7 +279,10 @@ body {
     linear-gradient(180deg, rgba(18, 14, 10, 0.55) 0%, rgba(26, 20, 16, 0.35) 45%, rgba(12, 10, 8, 0.9) 100%),
     radial-gradient(ellipse 70% 55% at 50% 5%, rgba(96, 165, 250, 0.22), transparent 55%),
     radial-gradient(ellipse 50% 45% at 12% 80%, rgba(251, 191, 36, 0.14), transparent 50%),
-    url("assets/themes/warcraft.jpg") center 35% / cover no-repeat,
+    image-set(
+      url("assets/img/bg-warcraft.avif") type("image/avif"),
+      url("assets/img/bg-warcraft.webp") type("image/webp"),
+      url("assets/img/bg-warcraft.jpg") type("image/jpeg")) center 35% / cover no-repeat,
     linear-gradient(180deg, #120e0a 0%, #1a1410 55%, #0c0a08 100%);
 }
 
@@ -243,7 +294,10 @@ body {
     repeating-linear-gradient(0deg, transparent 0 36px, rgba(59, 130, 246, 0.04) 36px 37px),
     radial-gradient(ellipse 72% 52% at 48% 0%, rgba(59, 130, 246, 0.24), transparent 56%),
     radial-gradient(ellipse 40% 35% at 85% 80%, rgba(212, 175, 55, 0.14), transparent 50%),
-    url("assets/themes/warcraft-v2.jpg") center 30% / cover no-repeat,
+    image-set(
+      url("assets/img/bg-warcraft-v2.avif") type("image/avif"),
+      url("assets/img/bg-warcraft-v2.webp") type("image/webp"),
+      url("assets/img/bg-warcraft-v2.jpg") type("image/jpeg")) center 30% / cover no-repeat,
     linear-gradient(180deg, #0a1220 0%, #121a28 52%, #080a0e 100%);
 }
 
@@ -254,7 +308,10 @@ body {
     linear-gradient(180deg, rgba(18, 4, 4, 0.55) 0%, rgba(20, 12, 6, 0.4) 45%, rgba(8, 6, 4, 0.92) 100%),
     radial-gradient(ellipse 68% 50% at 50% 8%, rgba(185, 28, 28, 0.3), transparent 55%),
     radial-gradient(ellipse 45% 40% at 15% 80%, rgba(132, 204, 22, 0.12), transparent 50%),
-    url("assets/themes/warcraft-v3.jpg") center 40% / cover no-repeat,
+    image-set(
+      url("assets/img/bg-warcraft-v3.avif") type("image/avif"),
+      url("assets/img/bg-warcraft-v3.webp") type("image/webp"),
+      url("assets/img/bg-warcraft-v3.jpg") type("image/jpeg")) center 40% / cover no-repeat,
     linear-gradient(180deg, #140404 0%, #1a0c08 55%, #0a0604 100%);
 }
 
@@ -265,7 +322,10 @@ body {
     linear-gradient(180deg, rgba(24, 8, 28, 0.55) 0%, rgba(32, 12, 36, 0.35) 45%, rgba(14, 8, 16, 0.9) 100%),
     linear-gradient(125deg, transparent 40%, rgba(255, 255, 255, 0.05) 48%, transparent 56%),
     radial-gradient(ellipse 60% 50% at 75% 20%, rgba(232, 121, 249, 0.28), transparent 55%),
-    url("assets/themes/mtg.jpg") center 40% / cover no-repeat,
+    image-set(
+      url("assets/img/bg-mtg.avif") type("image/avif"),
+      url("assets/img/bg-mtg.webp") type("image/webp"),
+      url("assets/img/bg-mtg.jpg") type("image/jpeg")) center 40% / cover no-repeat,
     linear-gradient(145deg, #18081c 0%, #221028 50%, #0e0810 100%);
 }
 
@@ -275,7 +335,10 @@ body {
     radial-gradient(ellipse 90% 70% at 50% 40%, transparent 0%, rgba(5, 7, 6, 0.62) 55%, rgba(3, 4, 3, 0.95) 100%),
     linear-gradient(180deg, rgba(5, 7, 6, 0.6) 0%, rgba(10, 14, 12, 0.4) 45%, rgba(3, 4, 3, 0.94) 100%),
     radial-gradient(ellipse 55% 45% at 20% 25%, rgba(134, 239, 172, 0.12), transparent 55%),
-    url("assets/themes/mtg-v2.jpg") center 40% / cover no-repeat,
+    image-set(
+      url("assets/img/bg-mtg-v2.avif") type("image/avif"),
+      url("assets/img/bg-mtg-v2.webp") type("image/webp"),
+      url("assets/img/bg-mtg-v2.jpg") type("image/jpeg")) center 40% / cover no-repeat,
     linear-gradient(160deg, #050706 0%, #0a0e0c 45%, #030403 100%);
 }
 
@@ -285,7 +348,10 @@ body {
     radial-gradient(ellipse 90% 70% at 50% 40%, transparent 0%, rgba(20, 17, 10, 0.58) 55%, rgba(12, 10, 8, 0.94) 100%),
     linear-gradient(180deg, rgba(20, 17, 10, 0.55) 0%, rgba(28, 24, 16, 0.4) 45%, rgba(12, 10, 8, 0.92) 100%),
     radial-gradient(ellipse 70% 50% at 50% -8%, rgba(245, 240, 225, 0.2), transparent 55%),
-    url("assets/themes/mtg-v3.jpg") center 40% / cover no-repeat,
+    image-set(
+      url("assets/img/bg-mtg-v3.avif") type("image/avif"),
+      url("assets/img/bg-mtg-v3.webp") type("image/webp"),
+      url("assets/img/bg-mtg-v3.jpg") type("image/jpeg")) center 40% / cover no-repeat,
     linear-gradient(155deg, #14110a 0%, #1c1810 50%, #0c0a08 100%);
 }
 
@@ -295,7 +361,10 @@ body {
     radial-gradient(ellipse 90% 70% at 50% 40%, transparent 0%, rgba(26, 12, 4, 0.55) 55%, rgba(16, 10, 8, 0.92) 100%),
     linear-gradient(180deg, rgba(26, 12, 4, 0.55) 0%, rgba(32, 18, 8, 0.35) 45%, rgba(16, 10, 8, 0.9) 100%),
     radial-gradient(ellipse 80% 55% at 50% 0%, rgba(245, 158, 11, 0.28), transparent 55%),
-    url("assets/themes/hearthstone.jpg") center 40% / cover no-repeat,
+    image-set(
+      url("assets/img/bg-hearthstone.avif") type("image/avif"),
+      url("assets/img/bg-hearthstone.webp") type("image/webp"),
+      url("assets/img/bg-hearthstone.jpg") type("image/jpeg")) center 40% / cover no-repeat,
     linear-gradient(180deg, #1a0c04 0%, #201208 50%, #100a08 100%);
 }
 
@@ -306,7 +375,10 @@ body {
     linear-gradient(180deg, rgba(4, 14, 20, 0.55) 0%, rgba(8, 22, 28, 0.4) 45%, rgba(4, 8, 12, 0.92) 100%),
     repeating-linear-gradient(135deg, transparent 0 9px, rgba(240, 249, 255, 0.04) 9px 10px),
     radial-gradient(ellipse 80% 55% at 50% 0%, rgba(103, 232, 249, 0.24), transparent 55%),
-    url("assets/themes/hearthstone-v2.jpg") center 40% / cover no-repeat,
+    image-set(
+      url("assets/img/bg-hearthstone-v2.avif") type("image/avif"),
+      url("assets/img/bg-hearthstone-v2.webp") type("image/webp"),
+      url("assets/img/bg-hearthstone-v2.jpg") type("image/jpeg")) center 40% / cover no-repeat,
     linear-gradient(180deg, #040e14 0%, #08161c 50%, #04080c 100%);
 }
 
@@ -316,7 +388,10 @@ body {
     radial-gradient(ellipse 90% 70% at 50% 40%, transparent 0%, rgba(8, 10, 14, 0.62) 55%, rgba(4, 5, 8, 0.95) 100%),
     linear-gradient(180deg, rgba(8, 10, 14, 0.6) 0%, rgba(15, 18, 24, 0.4) 45%, rgba(4, 5, 8, 0.94) 100%),
     radial-gradient(ellipse 35% 25% at 78% 12%, rgba(203, 213, 225, 0.1), transparent 60%),
-    url("assets/themes/hearthstone-v3.jpg") center 40% / cover no-repeat,
+    image-set(
+      url("assets/img/bg-hearthstone-v3.avif") type("image/avif"),
+      url("assets/img/bg-hearthstone-v3.webp") type("image/webp"),
+      url("assets/img/bg-hearthstone-v3.jpg") type("image/jpeg")) center 40% / cover no-repeat,
     linear-gradient(180deg, #080a0e 0%, #0f1218 50%, #040508 100%);
 }
 
@@ -845,6 +920,8 @@ body[data-bg^="hearthstone"] #webgl-bg {
   overscroll-behavior-x: contain;
   scroll-padding-inline: 0.75rem;
   padding-inline: 0.1rem 0.35rem;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 1.25rem, #000 calc(100% - 1.25rem), transparent 100%);
+  mask-image: linear-gradient(90deg, transparent 0, #000 1.25rem, #000 calc(100% - 1.25rem), transparent 100%);
 }
 
 /* End spacer so item 8 / Comms can fully clear the scroll edge */
@@ -909,6 +986,40 @@ body[data-bg^="hearthstone"] #webgl-bg {
 .nav-ig-handle {
   font-size: 0.68rem;
   letter-spacing: 0.03em;
+}
+
+.nav-social {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  flex-shrink: 0;
+}
+
+.nav-social-link {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.45rem 0.55rem;
+  min-height: 40px;
+  min-width: 40px;
+  font-size: 0.76rem;
+  color: var(--muted);
+  border: 1px solid color-mix(in srgb, var(--theme-accent) 35%, transparent);
+  border-radius: 3px;
+  background: color-mix(in srgb, var(--theme-accent) 8%, transparent);
+  text-decoration: none;
+  white-space: nowrap;
+  touch-action: manipulation;
+  transition: border-color 0.2s, color 0.2s, background 0.2s;
+}
+
+.nav-social-link:hover,
+.nav-social-link:focus-visible {
+  color: var(--text);
+  border-color: var(--theme-accent);
+  background: color-mix(in srgb, var(--theme-accent) 18%, transparent);
 }
 
 @media (max-width: 1100px) {
@@ -980,6 +1091,12 @@ body[data-bg^="hearthstone"] #webgl-bg {
   height: 2px;
   background: linear-gradient(90deg, var(--theme-accent), var(--theme-accent-2));
   border-radius: 1px;
+  transition: width 0.7s var(--ease-spring) 0.15s;
+}
+
+/* Grow underline when section-head reveals (data-reveal lives on .section-head) */
+html.reveal-on .section-head:not(.is-inview) h2::after {
+  width: 0;
 }
 
 .section-play .section-head h2::after,
@@ -1083,9 +1200,13 @@ h3 {
   margin: 0 auto;
   width: 100%;
   display: grid;
-  grid-template-columns: 1.1fr 0.9fr;
-  gap: clamp(2rem, 4vw, 3.5rem);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 0.95fr);
+  gap: clamp(2rem, 5vw, 3.75rem);
   align-items: center;
+}
+
+.hero-copy {
+  min-width: 0;
 }
 
 /* Eyebrow badge chip with live-status dot */
@@ -1119,11 +1240,31 @@ h3 {
 }
 
 .brand-hero {
-  font-size: clamp(2.4rem, 6.5vw, 4.25rem);
-  line-height: 1.05;
-  letter-spacing: -0.03em;
-  margin: 0 0 1rem;
-  overflow-wrap: anywhere;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.2rem;
+  margin: 0 0 1.15rem;
+}
+
+/* Callsign stays one unit — never wrap mid “D22-soso” */
+.brand-callsign {
+  display: block;
+  font-size: clamp(2.75rem, 7.2vw, 4.6rem);
+  line-height: 0.95;
+  letter-spacing: -0.035em;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.brand-legal {
+  display: block;
+  font-size: clamp(1.15rem, 2.4vw, 1.55rem);
+  line-height: 1.2;
+  letter-spacing: 0.04em;
+  font-weight: 500;
+  color: color-mix(in srgb, var(--text) 78%, var(--muted));
+  text-transform: none;
 }
 
 .accent-gradient {
@@ -1133,12 +1274,71 @@ h3 {
   color: transparent;
 }
 
+/* Championship title — the grand beat of the hero */
+.hero-crown {
+  position: relative;
+  display: grid;
+  justify-items: start;
+  gap: 0.15rem;
+  margin: 0 0 1.35rem;
+  padding: 1rem 0 1.15rem;
+  max-width: 34rem;
+  border-top: 1px solid color-mix(in srgb, var(--gold) 45%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--gold) 35%, transparent);
+  background:
+    linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--gold) 12%, transparent),
+      transparent 70%
+    );
+}
+
+.hero-crown-mark {
+  position: absolute;
+  top: 0.85rem;
+  right: 0.15rem;
+  font-size: 1.1rem;
+  color: var(--gold);
+  opacity: 0.85;
+  text-shadow: 0 0 18px rgba(212, 175, 55, 0.55);
+}
+
+.hero-crown-year {
+  font-family: var(--mono);
+  font-size: clamp(2.6rem, 6.5vw, 3.75rem);
+  font-weight: 700;
+  line-height: 0.95;
+  letter-spacing: 0.04em;
+  background: linear-gradient(180deg, #f5e6a8 0%, var(--gold) 42%, #8a7020 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 0 24px rgba(212, 175, 55, 0.28));
+}
+
+.hero-crown-title {
+  font-size: clamp(1.15rem, 2.6vw, 1.55rem);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--text) 92%, var(--gold));
+}
+
+.hero-crown-sub {
+  margin-top: 0.2rem;
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--gold) 70%, var(--muted));
+}
+
 .hero-sub {
   font-size: clamp(1.05rem, 1.6vw, 1.2rem);
   line-height: 1.65;
   color: var(--muted);
-  max-width: 34rem;
-  margin: 0 0 1.5rem;
+  max-width: 32rem;
+  margin: 0 0 1.25rem;
 }
 
 .hero-sub strong {
@@ -1147,8 +1347,8 @@ h3 {
 }
 
 .transmission {
-  margin: 0 0 1.75rem;
-  padding: 1rem 1.15rem 1rem 1.25rem;
+  margin: 0 0 1.35rem;
+  padding: 0.85rem 1.1rem 0.85rem 1.15rem;
   border-left: 3px solid var(--theme-accent);
   border-radius: 0 4px 4px 0;
   background: linear-gradient(
@@ -1157,9 +1357,10 @@ h3 {
     transparent 85%
   );
   color: var(--text);
-  font-size: 1.05rem;
+  font-size: 1.02rem;
   font-style: italic;
-  line-height: 1.65;
+  line-height: 1.6;
+  max-width: 32rem;
 }
 
 /* Hero credibility stat strip */
@@ -1167,9 +1368,9 @@ h3 {
   list-style: none;
   display: flex;
   flex-wrap: wrap;
-  gap: 0.6rem;
+  gap: 0.55rem;
   padding: 0;
-  margin: 0 0 1.25rem;
+  margin: 0 0 1rem;
 }
 
 .hero-stats li {
@@ -2059,6 +2260,21 @@ kbd {
   padding-top: clamp(1.5rem, 4vw, 3rem);
 }
 
+/* Nested theater beat (e.g. Cube Draft under Magic) */
+.game-subsection {
+  padding-top: clamp(0.75rem, 2vw, 1.5rem);
+  padding-bottom: clamp(2rem, 5vw, 3.5rem);
+}
+
+.game-subsection .game-panel {
+  border-style: dashed;
+  border-color: color-mix(in srgb, var(--theme-accent) 35%, var(--border));
+}
+
+.game-subsection .game-tag {
+  letter-spacing: 0.06em;
+}
+
 .game-panel {
   position: relative;
   background:
@@ -2356,6 +2572,8 @@ kbd {
   background: linear-gradient(180deg, #161618, var(--surface-2));
   scrollbar-width: thin;
   -webkit-overflow-scrolling: touch;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 1.25rem, #000 calc(100% - 1.25rem), transparent 100%);
+  mask-image: linear-gradient(90deg, transparent 0, #000 1.25rem, #000 calc(100% - 1.25rem), transparent 100%);
 }
 
 .tablist [role="tab"] {
@@ -2416,6 +2634,116 @@ kbd {
   line-height: 1.7;
 }
 
+.interview-cite {
+  display: grid;
+  grid-template-columns: minmax(140px, 200px) minmax(0, 1fr);
+  gap: 1rem 1.15rem;
+  align-items: start;
+  margin: 1.35rem 0 0.25rem;
+  padding: 0 0 0 0.9rem;
+  border-left: 2px solid color-mix(in srgb, var(--theme-accent) 55%, transparent);
+}
+
+.interview-cite-thumb {
+  position: relative;
+  display: block;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: #0a0a0a;
+  outline: 1px solid color-mix(in srgb, var(--theme-accent) 28%, transparent);
+  transition: outline-color 0.2s ease, transform 0.25s var(--ease-spring);
+}
+
+.interview-cite-thumb img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: saturate(0.92) contrast(1.05);
+  transition: transform 0.35s ease, filter 0.25s ease;
+}
+
+.interview-cite-play {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(180deg, transparent 40%, rgba(0, 0, 0, 0.45));
+  pointer-events: none;
+}
+
+.interview-cite-play::before {
+  content: "";
+  width: 0;
+  height: 0;
+  margin-left: 0.15rem;
+  border-style: solid;
+  border-width: 0.55rem 0 0.55rem 0.9rem;
+  border-color: transparent transparent transparent
+    color-mix(in srgb, #fff 92%, var(--theme-accent));
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.55));
+}
+
+.interview-cite-thumb:hover,
+.interview-cite-thumb:focus-visible {
+  outline-color: color-mix(in srgb, var(--theme-accent) 70%, transparent);
+  transform: translateY(-1px);
+}
+
+.interview-cite-thumb:hover img,
+.interview-cite-thumb:focus-visible img {
+  transform: scale(1.03);
+  filter: saturate(1.05) contrast(1.08);
+}
+
+.interview-cite-body {
+  min-width: 0;
+}
+
+.interview-cite-kicker {
+  margin: 0 0 0.45rem;
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--theme-accent) 75%, var(--muted));
+}
+
+.interview-cite-summary {
+  margin: 0 0 0.7rem;
+  font-size: 0.95rem;
+  line-height: 1.65;
+  color: color-mix(in srgb, var(--text) 82%, var(--muted));
+  max-width: 40rem;
+}
+
+.interview-cite-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--theme-accent);
+  border-bottom: 1px solid color-mix(in srgb, var(--theme-accent) 40%, transparent);
+}
+
+.interview-cite-link:hover,
+.interview-cite-link:focus-visible {
+  color: var(--theme-accent-2, var(--gold));
+  border-bottom-color: var(--theme-accent-2, var(--gold));
+}
+
+@media (max-width: 560px) {
+  .interview-cite {
+    grid-template-columns: 1fr;
+  }
+
+  .interview-cite-thumb {
+    max-width: 280px;
+  }
+}
+
 .plaque {
   display: inline-block;
   margin: 0 0 1rem;
@@ -2465,6 +2793,25 @@ kbd {
 
 .stat-list span {
   color: var(--theme-accent);
+}
+
+.archive-links {
+  margin-top: 1rem;
+  font-size: 0.72rem;
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+.archive-links a {
+  color: var(--theme-accent);
+  border-bottom: 1px solid color-mix(in srgb, var(--theme-accent) 35%, transparent);
+  text-decoration: none;
+}
+
+.archive-links a:hover,
+.archive-links a:focus-visible {
+  color: var(--text);
+  border-bottom-color: var(--theme-accent);
 }
 
 .panel-media {
@@ -2550,6 +2897,15 @@ kbd {
   box-shadow:
     inset 0 0 40px rgba(0, 0, 0, 0.35),
     0 0 24px color-mix(in srgb, var(--theme-accent) 8%, transparent);
+}
+
+#cards-2hh,
+#cards-badugi {
+  min-height: 220px;
+  box-shadow:
+    inset 0 0 48px rgba(0, 0, 0, 0.42),
+    0 12px 36px rgba(0, 0, 0, 0.28),
+    0 0 28px color-mix(in srgb, var(--theme-accent) 14%, transparent);
 }
 
 #battle-canvas:hover,
@@ -2802,6 +3158,68 @@ kbd {
 .poker-grid [data-swap-img]:focus-visible {
   outline: 2px solid var(--theme-accent);
   outline-offset: 3px;
+}
+
+.press-strip {
+  margin: 2.5rem auto 0;
+  max-width: 1100px;
+  padding: 1.25rem 1.35rem;
+  border: 1px solid color-mix(in srgb, var(--theme-accent) 28%, var(--border));
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--theme-accent) 6%, rgba(0, 0, 0, 0.35));
+}
+
+.press-strip-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0 0 0.85rem;
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+}
+
+.press-strip-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.55rem;
+}
+
+.press-strip-list a {
+  display: grid;
+  gap: 0.15rem;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  text-decoration: none;
+  color: inherit;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.press-strip-list a:hover,
+.press-strip-list a:focus-visible {
+  border-color: color-mix(in srgb, var(--theme-accent) 40%, transparent);
+  background: color-mix(in srgb, var(--theme-accent) 10%, transparent);
+}
+
+.press-outlet {
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  color: var(--gold);
+}
+
+.press-title {
+  font-size: 0.9rem;
+  line-height: 1.35;
+  color: var(--text);
+}
+
+@media (min-width: 900px) {
+  .press-strip-list {
+    grid-template-columns: 1fr 1fr;
+  }
 }
 
 .poker-cards {
@@ -3264,11 +3682,15 @@ body.play-2hh-immersive .play-ctas {
     align-items: flex-start;
   }
 
-  /* Copy stays first so the H1 + CTAs land above the fold */
+  /* Copy stays first so the brand + CTAs land above the fold */
   .hero-stage {
     max-width: 480px;
     margin-inline: auto;
     width: 100%;
+  }
+
+  .brand-callsign {
+    font-size: clamp(2.4rem, 11vw, 3.5rem);
   }
 
   .hero-portrait,
@@ -3422,7 +3844,7 @@ body.play-2hh-immersive .play-ctas {
     flex: 1 1 100%;
   }
 
-  .nav-ig {
+  .nav-social {
     order: 2;
     margin-left: auto;
   }
@@ -3479,6 +3901,7 @@ body.play-2hh-immersive .play-ctas {
 @media (hover: none), (pointer: coarse) {
   .command-nav a:hover,
   .nav-ig:hover,
+  .nav-social-link:hover,
   .btn:hover,
   .hero-stats li:hover,
   .felt-card:hover,
@@ -3491,6 +3914,7 @@ body.play-2hh-immersive .play-ctas {
 
   .command-nav a:active,
   .nav-ig:active,
+  .nav-social-link:active,
   .btn:active,
   .tablist [role="tab"]:active {
     transform: scale(0.98);
