@@ -535,6 +535,71 @@ const reduced =
   C.init2HH(document.getElementById("cards-2hh"));
   C.initBadugi(document.getElementById("cards-badugi"));
 
+  /* Hero panels — hover/focus previews matching feature backgrounds */
+  (function initHeroPanelBgPreview() {
+    const root = document.querySelector(".hero-panels");
+    const stage = document.getElementById("bg-stage");
+    if (!root) return;
+
+    const SCENE_BY_PANEL = {
+      champion: { bg: "starcraft", theme: "starcraft" },
+      inventor: { bg: "2hh", theme: "2hh" },
+      media: { bg: "poker", theme: "poker" },
+    };
+
+    let previewActive = false;
+
+    function setPreviewing(on) {
+      previewActive = on;
+      stage?.classList.toggle("is-hero-preview", on);
+    }
+
+    function previewPanel(panel) {
+      if (activeSectionId !== "hero" || !panel) return;
+      const scene = SCENE_BY_PANEL[panel.dataset.panel];
+      if (!scene) return;
+      setPreviewing(true);
+      setSceneBg(scene.bg, scene.theme);
+    }
+
+    function clearPreview() {
+      if (!previewActive) return;
+      setPreviewing(false);
+      if (activeSectionId !== "hero") return;
+      setSceneBg("hero", "starcraft");
+    }
+
+    root.addEventListener("pointerover", (e) => {
+      const panel = e.target.closest(".hero-panel");
+      if (!panel || !root.contains(panel)) return;
+      /* Ignore bubbled moves within the same panel */
+      const from = e.relatedTarget;
+      if (from && panel.contains(from)) return;
+      previewPanel(panel);
+    });
+
+    root.addEventListener("pointerout", (e) => {
+      const to = e.relatedTarget;
+      if (to && root.contains(to)) {
+        const nextPanel = to.closest?.(".hero-panel");
+        if (nextPanel && root.contains(nextPanel)) {
+          previewPanel(nextPanel);
+          return;
+        }
+      }
+      clearPreview();
+    });
+
+    root.querySelectorAll(".hero-panel").forEach((panel) => {
+      panel.addEventListener("focus", () => previewPanel(panel));
+      panel.addEventListener("blur", (e) => {
+        const next = e.relatedTarget;
+        if (next && root.contains(next)) return;
+        clearPreview();
+      });
+    });
+  })();
+
   /* Active nav underline — deferred to pickCenteredSection during programmatic jumps */
   const sections = sceneSections;
   const navObs = new IntersectionObserver(
