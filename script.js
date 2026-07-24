@@ -143,7 +143,7 @@ const reduced =
 
   /* Human-readable label for the current-section indicator */
   const SECTION_LABELS = {
-    hero: "Briefing",
+    hero: "D22-soso",
     about: "About",
     esports: "StarCraft",
     "game-cnc": "Command & Conquer",
@@ -155,6 +155,7 @@ const reduced =
     book: "Betting on Yourself",
     innovation: "Casino Innovation",
     play: "Play 2 Hand Hold'em",
+    locate: "Find 2HH Tables",
     contact: "Comms",
   };
   const indicatorLabel = document.querySelector("#section-indicator .si-label");
@@ -240,7 +241,7 @@ const reduced =
 
   document.querySelectorAll("[data-tabs]").forEach(setupTabs);
 
-  /* Hotkeys 1-8 nav, R roll — clicks use the same scroll path */
+  /* Hotkeys 1-5 nav, R roll — clicks use the same scroll path */
   const navLinks = [...document.querySelectorAll(".command-nav a[data-hotkey]")];
   const brandLink = document.querySelector(".brand[href]");
   const commandNav = document.querySelector(".command-nav");
@@ -413,7 +414,7 @@ const reduced =
   });
   brandLink?.addEventListener("click", onNavActivate);
 
-  /* Start the menu at hotkey 1 — flex overflow can leave Briefing scrolled out of view */
+  /* Start the menu at hotkey 1 — flex overflow can leave first chip scrolled out of view */
   if (commandNav) {
     commandNav.scrollLeft = 0;
     requestAnimationFrame(() => {
@@ -459,6 +460,7 @@ const reduced =
     "book",
     "innovation",
     "play",
+    "locate",
     "contact",
   ]
     .map((id) => document.getElementById(id))
@@ -948,8 +950,9 @@ const reduced =
     });
   })();
 
-  /* In-page 2HH game embed */
+  /* In-page 2HH game embed — native table is fixed 1000×665 with ~120px host chrome above it */
   const playWrap = document.getElementById("play-2hh-wrap");
+  const playScaler = document.getElementById("play-2hh-scaler");
   const playFrame = document.getElementById("play-2hh-frame");
   const playStart = document.getElementById("play-2hh-start");
   const playFs = document.getElementById("play-2hh-fs");
@@ -957,6 +960,10 @@ const reduced =
   const playExitImmersive = document.getElementById("play-2hh-exit-immersive");
   const playSectionEl = document.getElementById("play");
   const playCtas = playSectionEl?.querySelector(".play-ctas");
+  const PLAY_NATIVE_W = 1000;
+  const PLAY_NATIVE_H = 665;
+  const PLAY_CROP_TOP = 128;
+  let playSyncRaf = 0;
 
   function canFullscreen(el) {
     return !!(
@@ -966,62 +973,133 @@ const reduced =
     );
   }
 
+  function playNeedsImmersive() {
+    if (typeof matchMedia === "undefined") return false;
+    return (
+      matchMedia("(max-width: 900px)").matches ||
+      matchMedia("(max-height: 700px)").matches ||
+      matchMedia("(orientation: portrait) and (max-width: 1024px)").matches
+    );
+  }
+
+  function playViewMetrics() {
+    const vv = window.visualViewport;
+    return {
+      viewW: Math.max(1, vv?.width || window.innerWidth || 1),
+      viewH: Math.max(1, vv?.height || window.innerHeight || 1),
+      viewTop: vv?.offsetTop || 0,
+      viewLeft: vv?.offsetLeft || 0,
+    };
+  }
+
+  function applyPlayScale(availW, availH) {
+    if (!playWrap) return 1;
+    const pad = playWrap.classList.contains("is-immersive") ? 16 : 0;
+    const scale = Math.max(
+      0.2,
+      Math.min((availW - pad) / PLAY_NATIVE_W, (availH - pad) / PLAY_NATIVE_H)
+    );
+    playWrap.style.setProperty("--play-native-w", String(PLAY_NATIVE_W));
+    playWrap.style.setProperty("--play-native-h", String(PLAY_NATIVE_H));
+    playWrap.style.setProperty("--play-crop-top", PLAY_CROP_TOP + "px");
+    playWrap.style.setProperty("--play-scale", String(scale));
+    if (playScaler) {
+      playScaler.style.width = PLAY_NATIVE_W + "px";
+      playScaler.style.height = PLAY_NATIVE_H + "px";
+    }
+    return scale;
+  }
+
   function syncPlayChrome() {
     if (!playWrap || !playSectionEl) return;
-    if (playWrap.classList.contains("is-immersive")) {
-      playWrap.style.setProperty("--play-chrome", "0px");
-      playWrap.style.removeProperty("height");
-      playWrap.style.removeProperty("max-height");
+
+    const { viewW, viewH } = playViewMetrics();
+    const immersive = playWrap.classList.contains("is-immersive");
+    const live = playWrap.classList.contains("is-live");
+
+    if (immersive) {
+      applyPlayScale(viewW, viewH);
+      playWrap.style.width = "100%";
+      playWrap.style.height = "100%";
+      playWrap.style.maxWidth = "none";
+      playWrap.style.maxHeight = "none";
+      playWrap.style.aspectRatio = "auto";
       return;
     }
 
     const headerH = measureHeaderHeight();
     const safeBottom =
       parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--safe-bottom")) || 0;
-    const vv = window.visualViewport;
-    const viewH = vv?.height || window.innerHeight;
-    const viewTop = vv?.offsetTop || 0;
-
-    const ctasVisible = playCtas && getComputedStyle(playCtas).display !== "none";
+    const ctasVisible =
+      live && playCtas && getComputedStyle(playCtas).display !== "none" &&
+      getComputedStyle(playCtas).visibility !== "hidden";
     const rawCtasH = ctasVisible ? playCtas.getBoundingClientRect().height : 0;
-    /* Cap stacked CTA height so the table never collapses on phones */
     const mobile = typeof matchMedia !== "undefined" && matchMedia("(max-width: 768px)").matches;
     const ctasH = Math.min(rawCtasH, mobile ? 52 : 96);
+    const panelPad = live ? 8 : 24;
+    const availH = Math.max(220, viewH - headerH - ctasH - safeBottom - panelPad - 12);
+    const panel = playSectionEl.querySelector(".play-panel-wide");
+    const panelW = panel ? panel.getBoundingClientRect().width : viewW;
+    const availW = Math.max(220, Math.min(panelW || viewW, viewW) - (live ? 8 : 24));
 
-    const wrapStyles = getComputedStyle(playWrap);
-    const wrapMarginBottom = parseFloat(wrapStyles.marginBottom) || 0;
-    const wrapBorder =
-      (parseFloat(wrapStyles.borderTopWidth) || 0) + (parseFloat(wrapStyles.borderBottomWidth) || 0);
+    const scale = applyPlayScale(availW, availH);
+    const fittedW = Math.floor(PLAY_NATIVE_W * scale);
+    const fittedH = Math.floor(PLAY_NATIVE_H * scale);
 
-    const below = ctasH + wrapMarginBottom + safeBottom + 8;
-    const fallbackChrome = Math.ceil(headerH + below + 16);
-    playWrap.style.setProperty("--play-chrome", fallbackChrome + "px");
-
-    if (!playWrap.classList.contains("is-live") || viewH <= 0) {
+    if (!live) {
+      playWrap.style.removeProperty("width");
       playWrap.style.removeProperty("height");
+      playWrap.style.removeProperty("max-width");
       playWrap.style.removeProperty("max-height");
+      playWrap.style.aspectRatio = PLAY_NATIVE_W + " / " + PLAY_NATIVE_H;
       return;
     }
 
-    const rect = playWrap.getBoundingClientRect();
-    /* Don't reslice height while the frame is mostly off-screen */
-    if (rect.bottom < 100 || rect.top > viewH - 48) return;
+    playWrap.style.width = fittedW + "px";
+    playWrap.style.height = fittedH + "px";
+    playWrap.style.maxWidth = "100%";
+    playWrap.style.maxHeight = fittedH + "px";
+    playWrap.style.aspectRatio = "auto";
+  }
 
-    const topInView = rect.top - viewTop;
-    const useTop =
-      topInView > 0 && topInView < viewH ? topInView : Math.min(headerH + 8, viewH * 0.2);
-    const fitted = Math.max(280, Math.floor(viewH - useTop - below - wrapBorder));
-    playWrap.style.height = fitted + "px";
-    playWrap.style.maxHeight = fitted + "px";
+  function schedulePlaySync() {
+    if (playSyncRaf) cancelAnimationFrame(playSyncRaf);
+    playSyncRaf = requestAnimationFrame(() => {
+      playSyncRaf = 0;
+      syncPlayChrome();
+    });
   }
 
   function centerPlayTable() {
-    if (!playWrap) return;
-    playWrap.scrollIntoView({
-      behavior: reduced ? "auto" : "smooth",
-      block: "start",
-      inline: "nearest",
-    });
+    if (!playWrap || !playSectionEl) return;
+    syncPlayChrome();
+
+    const { viewH, viewTop } = playViewMetrics();
+    const headerH = measureHeaderHeight();
+    const ctasVisible =
+      playCtas &&
+      getComputedStyle(playCtas).display !== "none" &&
+      getComputedStyle(playCtas).visibility !== "hidden";
+    const ctasH = ctasVisible ? Math.min(playCtas.getBoundingClientRect().height, 96) : 0;
+    const bandTop = headerH + 6;
+    const bandH = Math.max(180, viewH - bandTop - ctasH - 10);
+    const wrapH = playWrap.getBoundingClientRect().height || PLAY_NATIVE_H;
+    const desiredTopInView = bandTop + Math.max(0, (bandH - wrapH) / 2);
+
+    const scroller = document.scrollingElement || document.documentElement;
+    const wrapDocTop = scroller.scrollTop + playWrap.getBoundingClientRect().top - viewTop;
+    const nextTop = Math.max(0, Math.round(wrapDocTop - desiredTopInView));
+
+    try {
+      scroller.scrollTo({
+        top: nextTop,
+        left: 0,
+        behavior: reduced ? "auto" : "smooth",
+      });
+    } catch (_) {
+      scroller.scrollTop = nextTop;
+    }
+
     window.setTimeout(syncPlayChrome, reduced ? 40 : 320);
   }
 
@@ -1030,8 +1108,10 @@ const reduced =
     playWrap.classList.toggle("is-immersive", on);
     document.body.classList.toggle("play-2hh-immersive", on);
     if (playExitImmersive) {
-      playExitImmersive.hidden = !on;
-      if (on) {
+      const fsEl = document.fullscreenElement || document.webkitFullscreenElement;
+      const inNativeFs = !!(fsEl && (fsEl === playWrap || playWrap.contains(fsEl)));
+      playExitImmersive.hidden = !on || inNativeFs;
+      if (on && !inNativeFs) {
         try {
           playExitImmersive.focus({ preventScroll: true });
         } catch (_) {
@@ -1040,8 +1120,6 @@ const reduced =
       }
     }
     if (on) {
-      playWrap.style.removeProperty("height");
-      playWrap.style.removeProperty("max-height");
       try {
         playFrame?.blur();
       } catch (_) {
@@ -1060,22 +1138,37 @@ const reduced =
     playWrap.classList.add("is-live");
     playSectionEl?.classList.add("is-playing");
     document.body.classList.add("play-2hh-live");
+
+    /* Phones / short viewports: lock the table to the full screen immediately */
+    if (playNeedsImmersive()) {
+      setImmersive(true);
+    }
+
     syncPlayChrome();
     requestAnimationFrame(() => {
-      playSectionEl?.scrollIntoView({
-        behavior: reduced ? "auto" : "smooth",
-        block: "start",
-        inline: "nearest",
-      });
-      /* Remeasure after layout + scroll settle so the table isn't short */
+      if (!playWrap.classList.contains("is-immersive")) {
+        centerPlayTable();
+      }
       requestAnimationFrame(syncPlayChrome);
       window.setTimeout(syncPlayChrome, reduced ? 40 : 320);
     });
   }
 
   playStart?.addEventListener("click", launch2HH);
-  playCenter?.addEventListener("click", centerPlayTable);
-  playExitImmersive?.addEventListener("click", () => setImmersive(false));
+  playCenter?.addEventListener("click", () => {
+    if (playNeedsImmersive()) {
+      setImmersive(true);
+      return;
+    }
+    centerPlayTable();
+  });
+  playExitImmersive?.addEventListener("click", () => {
+    setImmersive(false);
+    requestAnimationFrame(() => {
+      syncPlayChrome();
+      centerPlayTable();
+    });
+  });
 
   if (playFs && playWrap && !canFullscreen(playWrap)) {
     playFs.textContent = "Expand table";
@@ -1090,244 +1183,83 @@ const reduced =
       target.webkitRequestFullscreen ||
       target.msRequestFullscreen;
     if (req && canFullscreen(target)) {
-      Promise.resolve(req.call(target)).catch(() => setImmersive(true));
+      Promise.resolve(req.call(target))
+        .then(() => {
+          setImmersive(true);
+          if (playExitImmersive) playExitImmersive.hidden = true;
+          syncPlayChrome();
+        })
+        .catch(() => setImmersive(true));
       return;
     }
     /* iOS Safari / unsupported: CSS immersive fallback */
     setImmersive(true);
   });
 
-  window.addEventListener("resize", syncPlayChrome, { passive: true });
+  window.addEventListener("resize", schedulePlaySync, { passive: true });
+  window.addEventListener("orientationchange", () => {
+    window.setTimeout(schedulePlaySync, 120);
+    window.setTimeout(() => {
+      if (!playWrap?.classList.contains("is-live")) {
+        schedulePlaySync();
+        return;
+      }
+      if (playNeedsImmersive()) setImmersive(true);
+      else if (!playWrap.classList.contains("is-immersive")) centerPlayTable();
+      else schedulePlaySync();
+    }, 280);
+  });
   if (window.visualViewport) {
-    window.visualViewport.addEventListener("resize", syncPlayChrome, { passive: true });
+    window.visualViewport.addEventListener("resize", schedulePlaySync, { passive: true });
+    window.visualViewport.addEventListener(
+      "scroll",
+      () => {
+        if (playWrap?.classList.contains("is-live")) schedulePlaySync();
+      },
+      { passive: true }
+    );
   }
+
   function onFullscreenChange() {
     const fsEl = document.fullscreenElement || document.webkitFullscreenElement;
-    if (!fsEl) setImmersive(false);
+    if (fsEl && (fsEl === playWrap || playWrap?.contains(fsEl))) {
+      setImmersive(true);
+      if (playExitImmersive) playExitImmersive.hidden = true;
+      syncPlayChrome();
+      return;
+    }
+    if (!fsEl && playWrap?.classList.contains("is-live")) {
+      if (playNeedsImmersive()) setImmersive(true);
+      else setImmersive(false);
+      schedulePlaySync();
+    }
   }
   document.addEventListener("fullscreenchange", onFullscreenChange);
   document.addEventListener("webkitfullscreenchange", onFullscreenChange);
 
   document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && playWrap?.classList.contains("is-immersive")) {
-      setImmersive(false);
+    if (e.key !== "Escape" || !playWrap?.classList.contains("is-immersive")) return;
+    const fsEl = document.fullscreenElement || document.webkitFullscreenElement;
+    if (fsEl && (fsEl === playWrap || playWrap.contains(fsEl))) {
+      const exit = document.exitFullscreen || document.webkitExitFullscreen;
+      if (exit) Promise.resolve(exit.call(document)).catch(() => setImmersive(false));
+      else setImmersive(false);
+      return;
     }
+    setImmersive(false);
+    if (playWrap.classList.contains("is-live")) requestAnimationFrame(centerPlayTable);
   });
+
+  /* Leave table lock when navigating to another section */
+  document.querySelectorAll('.site-nav a[href^="#"], a[href^="#"]').forEach((a) => {
+    a.addEventListener("click", () => {
+      const href = a.getAttribute("href") || "";
+      if (href === "#play" || href === "#main") return;
+      if (playWrap?.classList.contains("is-immersive")) setImmersive(false);
+    });
+  });
+
   syncPlayChrome();
-
-  /* Hero portrait — click / keyboard to cycle D22 archive gallery */
-  (function () {
-    const root = document.getElementById("hero-gallery");
-    const img = document.getElementById("hero-gallery-img");
-    const cap = document.getElementById("hero-gallery-cap");
-    const badge = document.getElementById("hero-gallery-badge");
-    const count = document.getElementById("hero-gallery-count");
-    if (!root || !img) return;
-
-    const avifSource = document.getElementById("hero-gallery-avif");
-    const webpSource = document.getElementById("hero-gallery-webp");
-    const OPT = "assets/img/";
-    const GALLERY_SIZES = "(max-width: 1023px) 88vw, 40vw";
-    const buildSet = (slug, widths, ext) =>
-      widths.map((w) => OPT + slug + "-" + w + "." + ext + " " + w + "w").join(", ");
-    const fallbackSrc = (slide) =>
-      OPT + slide.slug + "-" + slide.widths[slide.widths.length - 1] + ".jpg";
-
-    const gallery = [
-      {
-        slug: "champ-trophy",
-        widths: [640, 1080],
-        alt: "Wayne D22-soso Chiang with StarCraft Brood War world championship trophy",
-        caption: "World Champion · Brood War S1 · 1999",
-        badge: "★ WORLD CHAMPION",
-        pos: "48% 36%",
-      },
-      {
-        slug: "champ-pgl",
-        widths: [640, 1080],
-        alt: "Wayne D22-soso Chiang with StarCraft World Champion and PGL trophies",
-        caption: "Champion archive · Brood War + PGL era",
-        badge: "★ TROPHY ROOM",
-        pos: "50% 40%",
-      },
-      {
-        slug: "champ-closeup",
-        widths: [640, 1080],
-        alt: "Close-up of Wayne D22-soso Chiang as StarCraft World Champion",
-        caption: "Close-up · World Champion portrait",
-        badge: "★ CLOSE-UP",
-        pos: "50% 28%",
-      },
-      {
-        slug: "wsop-boxer",
-        widths: [720, 1200],
-        alt: "D22-soso with SlayerS BoxeR at WSOP 2025",
-        caption: "WSOP 2025 · with SlayerS_BoxeR",
-        badge: "★ WSOP 2025",
-        pos: "50% 32%",
-      },
-      {
-        slug: "elky",
-        widths: [640, 1080],
-        alt: "D22-soso with poker pro ElkY",
-        caption: "Live at the Bike · with ElkY",
-        badge: "★ FELT ERA",
-        pos: "50% 28%",
-      },
-      {
-        slug: "garimto",
-        widths: [640, 1080],
-        alt: "Garimto and D22-soso in 2024",
-        caption: "2024 · with Garimto",
-        badge: "★ 2024",
-        pos: "50% 30%",
-      },
-      {
-        slug: "tastosis",
-        widths: [640, 1080],
-        alt: "Tastosis and D22-soso in 2024",
-        caption: "2024 · with Tastosis",
-        badge: "★ CAST CREW",
-        pos: "50% 30%",
-      },
-    ];
-
-    let index = 0;
-    let busy = false;
-    const cache = new Map();
-
-    function preload(i) {
-      const slide = gallery[i % gallery.length];
-      if (!slide || cache.has(slide.slug)) return;
-      const pre = new Image();
-      pre.decoding = "async";
-      pre.sizes = GALLERY_SIZES;
-      pre.srcset = buildSet(slide.slug, slide.widths, "webp");
-      pre.src = fallbackSrc(slide);
-      cache.set(slide.slug, pre);
-    }
-
-    function paint(i) {
-      const slide = gallery[i];
-      if (!slide) return;
-      index = i;
-      img.style.objectPosition = slide.pos || "50% 35%";
-      if (avifSource) avifSource.srcset = buildSet(slide.slug, slide.widths, "avif");
-      if (webpSource) webpSource.srcset = buildSet(slide.slug, slide.widths, "webp");
-      img.src = fallbackSrc(slide);
-      img.alt = slide.alt;
-      if (cap) cap.textContent = slide.caption;
-      if (badge) badge.textContent = slide.badge;
-      if (count) count.textContent = i + 1 + " / " + gallery.length;
-      const nextHint =
-        typeof matchMedia !== "undefined" &&
-        (matchMedia("(pointer: coarse)").matches || matchMedia("(hover: none)").matches)
-          ? "Tap for next."
-          : "Click for next.";
-      root.setAttribute(
-        "aria-label",
-        "Archive photo " + (i + 1) + " of " + gallery.length + ": " + slide.caption + ". " + nextHint
-      );
-      root.title = nextHint.replace(/\.$/, "") + " archive photo";
-      /* Warm only the next slide (avoid loading all 7 on first paint) */
-      preload((i + 1) % gallery.length);
-    }
-
-    const flipReduced =
-      typeof matchMedia !== "undefined" &&
-      matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const FLIP_OUT_MS = flipReduced ? 0 : 280;
-    const FLIP_IN_MS = flipReduced ? 0 : 400;
-
-    function goTo(nextIndex) {
-      if (busy || gallery.length < 2) return;
-      const target = ((nextIndex % gallery.length) + gallery.length) % gallery.length;
-      if (target === index) return;
-      busy = true;
-      const slide = gallery[target];
-      let settled = false;
-
-      const finishIn = () => {
-        img.classList.remove("is-flip-in");
-        root.classList.remove("is-flipping");
-        busy = false;
-      };
-
-      const showTarget = () => {
-        if (settled) return;
-        settled = true;
-        paint(target);
-        img.classList.remove("is-flip-out");
-        if (flipReduced) {
-          finishIn();
-          return;
-        }
-        void img.offsetWidth;
-        img.classList.add("is-flip-in");
-        setTimeout(finishIn, FLIP_IN_MS);
-      };
-
-      /* Start the out-flip immediately so rapid clicks feel responsive */
-      root.classList.add("is-flipping");
-      img.classList.remove("is-flip-in");
-      img.classList.add("is-flip-out");
-
-      const afterOut = () => {
-        const pre = cache.get(slide.slug);
-        if (pre && pre.complete) {
-          showTarget();
-          return;
-        }
-        const warm = pre || new Image();
-        const failSafe = window.setTimeout(showTarget, 1200);
-        const ready = () => {
-          window.clearTimeout(failSafe);
-          showTarget();
-        };
-        warm.onload = ready;
-        warm.onerror = ready;
-        if (!pre) {
-          warm.decoding = "async";
-          warm.sizes = GALLERY_SIZES;
-          warm.srcset = buildSet(slide.slug, slide.widths, "webp");
-          warm.src = fallbackSrc(slide);
-          cache.set(slide.slug, warm);
-        } else if (warm.complete) {
-          ready();
-        }
-      };
-
-      setTimeout(afterOut, FLIP_OUT_MS);
-    }
-
-    function next() {
-      goTo(index + 1);
-    }
-
-    function prev() {
-      goTo(index - 1);
-    }
-
-    paint(0);
-    preload(1 % gallery.length);
-
-    root.addEventListener("click", (e) => {
-      e.preventDefault();
-      next();
-    });
-    root.addEventListener("keydown", (e) => {
-      if (e.key === "Enter" || e.key === " ") {
-        e.preventDefault();
-        next();
-      } else if (e.key === "ArrowRight") {
-        e.preventDefault();
-        next();
-      } else if (e.key === "ArrowLeft") {
-        e.preventDefault();
-        prev();
-      }
-    });
-  })();
 
   /* Contact — feedback mailto with “website bug” + today’s date */
   (function () {
