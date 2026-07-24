@@ -112,9 +112,7 @@ const reduced =
         });
         panel.classList.add("is-theme-active");
         claimSceneSection(section);
-        if (indicatorLabel) {
-          indicatorLabel.textContent = SECTION_LABELS[section.id] || section.id;
-        }
+        setIndicatorLabel(section.id);
         setSceneBg(key, key);
       }
 
@@ -162,14 +160,37 @@ const reduced =
 
   setupGamePanelThemes();
 
+  let indicatorFadeTimer = 0;
+
+  function setIndicatorLabel(sectionId) {
+    if (!indicatorLabel) return;
+    const next = SECTION_LABELS[sectionId] || sectionId;
+    if (indicatorLabel.textContent === next) return;
+
+    const reducedMotion =
+      typeof matchMedia !== "undefined" &&
+      matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    if (reducedMotion) {
+      indicatorLabel.textContent = next;
+      return;
+    }
+
+    indicatorLabel.classList.add("is-swapping");
+    if (indicatorFadeTimer) clearTimeout(indicatorFadeTimer);
+    indicatorFadeTimer = window.setTimeout(() => {
+      indicatorLabel.textContent = next;
+      indicatorLabel.classList.remove("is-swapping");
+      indicatorFadeTimer = 0;
+    }, 120);
+  }
+
   function applySectionScene(section) {
     if (!section) return;
     activeSectionId = section.id;
     const bg = resolveSectionBg(section);
     setSceneBg(bg, accentThemeForBg(bg));
-    if (indicatorLabel) {
-      indicatorLabel.textContent = SECTION_LABELS[section.id] || section.id;
-    }
+    setIndicatorLabel(section.id);
     const panel = section.querySelector(".game-panel");
     if (panel && section.dataset.baseTheme) {
       const keys = GAME_VARIANT_KEYS[section.dataset.baseTheme];
@@ -245,8 +266,19 @@ const reduced =
   const navLinks = [...document.querySelectorAll(".command-nav a[data-hotkey]")];
   const brandLink = document.querySelector(".brand[href]");
   const commandNav = document.querySelector(".command-nav");
+  const esportsCluster = document.querySelector("[data-esports-expand]");
+  const esportsRootSlot = esportsCluster?.querySelector(".nav-esports-root-slot") || null;
+  const esportsRoot = esportsCluster?.querySelector(".nav-esports-root") || null;
+  const esportsGames = esportsCluster?.querySelector(".nav-esports-games") || null;
+  const esportsGamesTrack =
+    esportsCluster?.querySelector(".nav-esports-games-track") || null;
+  const gamesLinks = esportsGames ? [...esportsGames.querySelectorAll("a[href^='#']")] : [];
   const siteHeader = document.querySelector(".site-header");
   let raceApi = null;
+  let esportsExpandRaf = 0;
+  let esportsExpanded = false;
+  let cachedEsportsRootW = 96;
+  let cachedEsportsGamesW = 280;
 
   function measureHeaderHeight() {
     if (!siteHeader) return 64;
@@ -270,12 +302,144 @@ const reduced =
     commandNav.scrollBy({ left: delta, behavior: "auto" });
   }
 
-  function markActiveNav(sectionId) {
-    const navId = sectionId.startsWith("game-") ? "esports" : sectionId;
-    navLinks.forEach((a) => {
-      a.style.borderColor =
-        a.getAttribute("href") === "#" + navId ? "var(--theme-accent)" : "transparent";
+  function resolvePrimaryNavId(sectionId) {
+    if (!sectionId || sectionId === "hero") return null;
+    if (sectionId === "esports" || sectionId.startsWith("game-")) return "esports";
+    if (sectionId === "play" || sectionId === "locate") return "innovation";
+    if (sectionId === "contact") return "about";
+    return sectionId;
+  }
+
+  function isGamesSection(sectionId) {
+    return sectionId === "esports" || (!!sectionId && sectionId.startsWith("game-"));
+  }
+
+  function refreshEsportsWidthCache(opts) {
+    const measureRoot = !opts || opts.root !== false;
+    const measureGames = !opts || opts.games !== false;
+    if (measureRoot && esportsRoot) {
+      cachedEsportsRootW = Math.max(2, Math.ceil(esportsRoot.scrollWidth) + 2);
+    }
+    if (measureGames && esportsGamesTrack) {
+      cachedEsportsGamesW = Math.max(2, Math.ceil(esportsGamesTrack.scrollWidth) + 2);
+    }
+    return { rootW: cachedEsportsRootW, gamesW: cachedEsportsGamesW };
+  }
+
+  function applyEsportsWidths(inGames, animate) {
+    if (!esportsRootSlot || !esportsGames) return;
+    const rootW = cachedEsportsRootW;
+    const gamesW = cachedEsportsGamesW;
+
+    if (!animate || reduced) {
+      esportsRootSlot.style.maxWidth = inGames ? "0px" : rootW + "px";
+      esportsGames.style.maxWidth = inGames ? gamesW + "px" : "0px";
+      return;
+    }
+
+    if (esportsExpandRaf) cancelAnimationFrame(esportsExpandRaf);
+
+    if (inGames) {
+      /* Start from open root / closed games, then ease to the reverse */
+      esportsRootSlot.style.maxWidth = rootW + "px";
+      esportsGames.style.maxWidth = "0px";
+      esportsExpandRaf = requestAnimationFrame(() => {
+        esportsExpandRaf = requestAnimationFrame(() => {
+          esportsExpandRaf = 0;
+          esportsRootSlot.style.maxWidth = "0px";
+          esportsGames.style.maxWidth = gamesW + "px";
+        });
+      });
+    } else {
+      /* Pin open games width first so max-width can ease open→0 */
+      esportsGames.style.maxWidth = gamesW + "px";
+      esportsRootSlot.style.maxWidth = "0px";
+      esportsExpandRaf = requestAnimationFrame(() => {
+        esportsExpandRaf = requestAnimationFrame(() => {
+          esportsExpandRaf = 0;
+          esportsGames.style.maxWidth = "0px";
+          esportsRootSlot.style.maxWidth = rootW + "px";
+        });
+      });
+    }
+  }
+
+  function syncEsportsExpand(sectionId) {
+    const inGames = isGamesSection(sectionId);
+    const stateChanged = inGames !== esportsExpanded;
+
+    if (stateChanged) {
+      if (inGames) {
+        /* Still showing ESPORTS — cache its width before clipping it shut */
+        refreshEsportsWidthCache({ root: true, games: true });
+      } else {
+        /* Still showing games — cache track width before clipping; keep root cache */
+        refreshEsportsWidthCache({ root: false, games: true });
+      }
+    }
+
+    if (esportsCluster) {
+      esportsCluster.classList.toggle("is-expanded", inGames);
+    }
+    if (esportsRoot) {
+      esportsRoot.toggleAttribute("inert", inGames);
+      esportsRoot.setAttribute("aria-hidden", inGames ? "true" : "false");
+    }
+    if (esportsGames) {
+      esportsGames.setAttribute("aria-hidden", inGames ? "false" : "true");
+      esportsGames.toggleAttribute("inert", !inGames);
+    }
+
+    if (stateChanged) {
+      esportsExpanded = inGames;
+      applyEsportsWidths(inGames, true);
+    }
+
+    let activeGameLink = null;
+    gamesLinks.forEach((a) => {
+      const id = (a.getAttribute("href") || "").replace(/^#/, "");
+      const on = inGames && sectionId === id;
+      a.classList.toggle("is-active", on);
+      if (on) {
+        a.setAttribute("aria-current", "true");
+        activeGameLink = a;
+      } else {
+        a.removeAttribute("aria-current");
+      }
     });
+    if (activeGameLink) scrollNavChipIntoView(activeGameLink);
+  }
+
+  /* First paint: lock ESPORTS slot to its real width so collapse has a from-value */
+  if (esportsRootSlot && esportsGames) {
+    const { rootW } = refreshEsportsWidthCache();
+    esportsRootSlot.style.maxWidth = rootW + "px";
+    esportsGames.style.maxWidth = "0px";
+  }
+
+  function markActiveNav(sectionId) {
+    const navId = resolvePrimaryNavId(sectionId);
+    const inGames = isGamesSection(sectionId);
+    const onHero = sectionId === "hero" || !sectionId;
+    brandLink?.classList.toggle("is-active", onHero);
+    if (onHero) brandLink?.setAttribute("aria-current", "true");
+    else brandLink?.removeAttribute("aria-current");
+
+    let activePrimary = null;
+    navLinks.forEach((a) => {
+      /* While expanded, ESPORTS root is hidden — games chips carry the highlight */
+      const on = !inGames && !!(navId && a.getAttribute("href") === "#" + navId);
+      a.classList.toggle("is-active", on);
+      a.style.borderColor = "";
+      if (on) {
+        a.setAttribute("aria-current", "page");
+        activePrimary = a;
+      } else {
+        a.removeAttribute("aria-current");
+      }
+    });
+    if (activePrimary) scrollNavChipIntoView(activePrimary);
+    syncEsportsExpand(sectionId);
   }
 
   function endNavLock() {
@@ -413,6 +577,9 @@ const reduced =
     a.addEventListener("click", onNavActivate);
   });
   brandLink?.addEventListener("click", onNavActivate);
+  gamesLinks.forEach((a) => {
+    a.addEventListener("click", onNavActivate);
+  });
 
   /* Start the menu at hotkey 1 — flex overflow can leave first chip scrolled out of view */
   if (commandNav) {
@@ -424,7 +591,9 @@ const reduced =
 
   /* In-page CTA anchors (Play, About, Esports, etc.) */
   document.querySelectorAll('a[href^="#"]').forEach((a) => {
-    if (a.classList.contains("command-nav") || a.closest(".command-nav") || a === brandLink) return;
+    if (a.classList.contains("command-nav") || a.closest(".command-nav") || a === brandLink) {
+      return;
+    }
     a.addEventListener("click", (e) => {
       const href = a.getAttribute("href") || "";
       if (!href.startsWith("#") || href === "#") return;
@@ -446,52 +615,193 @@ const reduced =
     }
   });
 
+  /* Keyboard help (?), back-to-top, copy email */
+  (function initSiteChromeExtras() {
+    const help = document.getElementById("hotkey-help");
+    const helpClose = document.getElementById("hotkey-help-close");
+    const backTop = document.getElementById("back-top");
+    const copyBtn = document.getElementById("copy-email");
+    const EMAIL = "playbadugi@gmail.com";
+
+    function helpIsOpen() {
+      return !!(help && (help.open || help.hasAttribute("open")));
+    }
+
+    function openHelp() {
+      if (!help) return;
+      try {
+        if (typeof help.showModal === "function") help.showModal();
+        else help.setAttribute("open", "");
+      } catch (_) {
+        help.setAttribute("open", "");
+      }
+      helpClose?.focus({ preventScroll: true });
+    }
+
+    function closeHelp() {
+      if (!help) return;
+      try {
+        if (typeof help.close === "function" && help.open) help.close();
+        else help.removeAttribute("open");
+      } catch (_) {
+        help.removeAttribute("open");
+      }
+    }
+
+    function toggleHelp() {
+      if (helpIsOpen()) closeHelp();
+      else openHelp();
+    }
+
+    helpClose?.addEventListener("click", closeHelp);
+    help?.addEventListener("click", (e) => {
+      if (e.target === help) closeHelp();
+    });
+    help?.addEventListener("cancel", (e) => {
+      e.preventDefault();
+      closeHelp();
+    });
+
+    window.addEventListener("keydown", (e) => {
+      if (e.target.matches("input, textarea, [contenteditable]")) return;
+
+      if (e.key === "?" || (e.key === "/" && e.shiftKey)) {
+        e.preventDefault();
+        toggleHelp();
+        return;
+      }
+
+      if (e.key === "Escape" && helpIsOpen()) {
+        e.preventDefault();
+        closeHelp();
+      }
+    });
+
+    if (backTop) {
+      const SHOW_AFTER = 420;
+      let backTicking = false;
+
+      function syncBackTop() {
+        const show = window.scrollY > SHOW_AFTER;
+        backTop.classList.toggle("is-visible", show);
+        backTop.setAttribute("aria-hidden", show ? "false" : "true");
+        backTop.tabIndex = show ? 0 : -1;
+        backTicking = false;
+      }
+
+      window.addEventListener(
+        "scroll",
+        () => {
+          if (backTicking) return;
+          backTicking = true;
+          requestAnimationFrame(syncBackTop);
+        },
+        { passive: true }
+      );
+      syncBackTop();
+
+      backTop.addEventListener("click", () => {
+        goToHash("#hero", brandLink || null);
+      });
+    }
+
+    async function copyEmail() {
+      if (!copyBtn) return;
+      let ok = false;
+      try {
+        if (navigator.clipboard?.writeText) {
+          await navigator.clipboard.writeText(EMAIL);
+          ok = true;
+        }
+      } catch (_) {
+        ok = false;
+      }
+      if (!ok) {
+        const ta = document.createElement("textarea");
+        ta.value = EMAIL;
+        ta.setAttribute("readonly", "");
+        ta.style.position = "fixed";
+        ta.style.left = "-9999px";
+        document.body.appendChild(ta);
+        ta.select();
+        try {
+          ok = document.execCommand("copy");
+        } catch (_) {
+          ok = false;
+        }
+        document.body.removeChild(ta);
+      }
+
+      const label = copyBtn.textContent;
+      copyBtn.textContent = ok ? "Copied" : "Copy failed";
+      copyBtn.classList.toggle("is-copied", ok);
+      copyBtn.setAttribute("aria-live", "polite");
+      window.setTimeout(() => {
+        copyBtn.textContent = label || "Copy email";
+        copyBtn.classList.remove("is-copied");
+      }, 1600);
+    }
+
+    copyBtn?.addEventListener("click", () => {
+      copyEmail();
+    });
+  })();
+
   /* Center-of-viewport section → background theme */
+  /* Document order must match header: Poker → ESPORTS → Book → Inventions → About */
   const sceneSections = [
     "hero",
-    "about",
+    "poker",
     "esports",
     "game-cnc",
     "game-warcraft",
     "game-mtg",
     "game-cube",
     "game-hearthstone",
-    "poker",
     "book",
     "innovation",
     "play",
     "locate",
+    "about",
     "contact",
   ]
     .map((id) => document.getElementById(id))
     .filter(Boolean);
 
   if (sceneSections.length) {
-    /* Continuous nearest-center detection — reliable for tall sections
-     * (IntersectionObserver thresholds fire too sparsely on big targets). */
+    /* Reading-line picker: last section whose top crossed a line under the
+     * header. More stable than nearest-center (less thrash between short theaters). */
     let sceneTicking = false;
+    const SCENE_HYSTERESIS_PX = 56;
 
     function pickCenteredSection() {
       if (navProgrammatic || performance.now() < navScrollLockUntil) return;
       const vh = window.innerHeight || 1;
-      const mid = vh * 0.5;
-      let best = null;
-      let bestDist = Infinity;
+      const headerH = measureHeaderHeight();
+      const probe = headerH + Math.min(Math.max(vh * 0.2, 72), 160);
+
+      let candidate = sceneSections[0];
       for (const el of sceneSections) {
-        const rect = el.getBoundingClientRect();
-        /* Skip sections entirely off-screen */
-        if (rect.bottom < 0 || rect.top > vh) continue;
-        const center = rect.top + rect.height * 0.5;
-        const dist = Math.abs(center - mid);
-        if (dist < bestDist) {
-          bestDist = dist;
-          best = el;
+        if (el.getBoundingClientRect().top <= probe) candidate = el;
+        else break;
+      }
+
+      /* Stick to the current section until the candidate has clearly taken the probe */
+      if (sceneCurrent && candidate !== sceneCurrent) {
+        const curRect = sceneCurrent.getBoundingClientRect();
+        const nextRect = candidate.getBoundingClientRect();
+        const currentStillCovers =
+          curRect.top < probe && curRect.bottom > probe + SCENE_HYSTERESIS_PX;
+        const nextBarelyIn = nextRect.top > probe - SCENE_HYSTERESIS_PX * 0.35;
+        if (currentStillCovers && nextBarelyIn) {
+          candidate = sceneCurrent;
         }
       }
-      if (best && best !== sceneCurrent) {
-        claimSceneSection(best);
-        applySectionScene(best);
-        markActiveNav(best.id);
+
+      if (candidate && candidate !== sceneCurrent) {
+        claimSceneSection(candidate);
+        applySectionScene(candidate);
+        markActiveNav(candidate.id);
       }
     }
 
@@ -514,6 +824,7 @@ const reduced =
       if (hashEl && sceneSections.includes(hashEl)) {
         claimSceneSection(hashEl);
         applySectionScene(hashEl);
+        markActiveNav(hashEl.id);
       } else {
         pickCenteredSection();
       }
@@ -636,19 +947,7 @@ const reduced =
     }
   })();
 
-  /* Active nav underline — deferred to pickCenteredSection during programmatic jumps */
-  const sections = sceneSections;
-  const navObs = new IntersectionObserver(
-    (entries) => {
-      if (navProgrammatic || performance.now() < navScrollLockUntil) return;
-      entries.forEach((entry) => {
-        if (!entry.isIntersecting) return;
-        markActiveNav(entry.target.id);
-      });
-    },
-    { threshold: 0.35 }
-  );
-  sections.forEach((s) => navObs.observe(s));
+  /* Nav + indicator update only from pickCenteredSection / goToHash (no IO fight) */
 
   /* ---------- Scroll effects ---------- */
   const progressBar = document.querySelector(".scroll-progress-bar");
