@@ -95,7 +95,23 @@
     <div class="header-tools">
       <nav class="command-nav" aria-label="Primary">
         <a href="#poker" data-hotkey="1" title="Poker"><span class="hk">1</span><span class="nav-label">Poker</span></a>
-        <a href="#esports" data-hotkey="2" title="Esports"><span class="hk">2</span><span class="nav-label">ESPORTS</span></a>
+        <div class="nav-esports" data-esports-expand>
+          <div class="nav-esports-root-slot">
+            <a href="#esports" class="nav-esports-root" data-hotkey="2" title="Esports">
+              <span class="hk">2</span><span class="nav-label">ESPORTS</span>
+            </a>
+          </div>
+          <div class="nav-esports-games" role="group" aria-label="Esports theaters" aria-hidden="true" inert>
+            <div class="nav-esports-games-track">
+              <a href="#esports" title="StarCraft: Brood War"><span class="nav-label">SC</span></a>
+              <a href="#game-cnc" title="Command &amp; Conquer"><span class="nav-label">C&amp;C</span></a>
+              <a href="#game-warcraft" title="Warcraft II / III"><span class="nav-label">WC</span></a>
+              <a href="#game-mtg" title="Magic: The Gathering"><span class="nav-label">MTG</span></a>
+              <a href="#game-cube" title="Cube Draft"><span class="nav-label">Cube</span></a>
+              <a href="#game-hearthstone" title="Hearthstone"><span class="nav-label">HS</span></a>
+            </div>
+          </div>
+        </div>
         <a href="#book" data-hotkey="3" title="Book"><span class="hk">3</span><span class="nav-label">Book</span></a>
         <a href="#innovation" data-hotkey="4" title="Inventions"><span class="hk">4</span><span class="nav-label">Inventions</span></a>
         <a href="#about" data-hotkey="5" title="About"><span class="hk">5</span><span class="nav-label">About</span></a>
@@ -233,171 +249,132 @@
           </a>
         </div>
       </div>
-      <a class="scroll-cue mono" href="#about" aria-label="Scroll to About">
+      <a class="scroll-cue mono" href="#poker" aria-label="Scroll to Poker">
         <span class="scroll-cue-text">SCROLL</span>
         <span class="scroll-cue-chevron" aria-hidden="true">▾</span>
       </a>
     </section>
 
-    <!-- ABOUT -->
-    <section id="about" class="section section-about" data-node="about" data-bg="about">
-      <header class="section-head" data-reveal="twist">
-        <p class="eyebrow-badge mono"><span class="badge-dot" aria-hidden="true"></span>PERSONNEL FILE // ABOUT</p>
-        <h2>StarCraft Brood War’s First World Champion: Leader by Example</h2>
-        <p class="lede">The full origin story—from Case’s Ladder to the Brood War throne, and the long game that followed.</p>
+    <!-- POKER -->
+    <section id="poker" class="section section-poker" data-node="poker" data-theme="poker" data-bg="poker">
+      <header class="section-head" data-reveal="fade">
+        <p class="eyebrow-badge mono"><span class="badge-dot" aria-hidden="true"></span>FELT // BROADCAST // TALENT</p>
+        <h2>Poker &amp; Advantage Play</h2>
+        <p class="lede">From math-driven blackjack bans and poker coaching to Live at the Bike and the World Series of Poker media desk.</p>
       </header>
-
-      <div class="about-layout">
-        <article class="about-prose" data-reveal="fade">
-          <p class="about-tldr">
-            The first official <strong>StarCraft: Brood War World Champion</strong> (1999, Random).
-            #1 Case’s Ladder in <em>Command &amp; Conquer</em> (1996) and <em>Warcraft II</em> (1997).
-            First StarCraft caster. Cube Draft co-originator. Now the WSOP Talent Manager and inventor of five patented casino games.
+      <div class="poker-grid" data-poker-gallery>
+        <div
+          class="lower-third"
+          data-reveal="twist"
+          tabindex="0"
+          data-swap-img="assets/img/wsop-boxer-1200.jpg"
+          data-swap-alt="D22-soso with SlayerS BoxeR at WSOP 2025"
+          data-swap-caption="WSOP 2025 · with SlayerS_BoxeR"
+          data-swap-pos="50% 32%"
+        >
+          <span class="lt-label mono">TALENT MANAGER</span>
+          <strong>World Series of Poker — Media Team</strong>
+          <p>
+            Full-time WSOP Talent Manager since November 2025 after a trial summer.
+            Oversees the official Vlogger Program—rewarding creators from Negreanu and Masato to StarCraft legend
+            SlayerS_BoxeR, whom Chiang recruited into the roster after interviewing him at the 2025 World Series.
+            Series stops include Prague, Cyprus, and the summer bracelet schedule.
           </p>
-          <blockquote class="transmission">
-            The ultimate macro-manager traded his hotkeys for higher stakes—proving that whether you’re building a
-            digital empire or a real-world legacy, the meta never really changes. You just have to be willing to bet on yourself.
-          </blockquote>
-
-          <details class="about-more">
-            <summary>
-              <span class="about-more-label">Read the full story</span>
-              <span class="about-more-icon" aria-hidden="true">
-                <span class="about-more-chevron">▾</span>
-              </span>
-            </summary>
-            <div class="about-more-content">
-              <h3>Dawn of Esports</h3>
-              <p>
-                Before the sold-out stadiums in Seoul, before multi-million dollar Twitch exclusivity contracts,
-                and long before you could Google “Zerg Rush,” the digital frontier was a wild, uncharted landscape.
-                In 1996, Wayne Chiang as “SoSOWAC” dominated 1v1 and teams on Case’s Ladder, ranking #1 at
-                <em>Command &amp; Conquer: Tiberian Dawn</em>. In 1997, he did the same for
-                <em>Warcraft II: Tides of Darkness</em>.
-              </p>
-              <p>
-                <strong>March 31, 1998</strong> changed everything. StarCraft was released—and esports would never be the same.
-                Once again, Chiang hit #1 on Case’s Ladder in 1v1 and teams. Then he won the first StarCraft tournament
-                against friend and eventual Chess.com co-founder Jay “Gadianton” Severson for $250, held at the legendary
-                Magic: The Gathering hotspot Neutral Ground Mountain View—close to Google and Apple headquarters.
-                Two $10 grudge-match victories over Severson followed. With nothing more to prove, Chiang was ready to move on.
-              </p>
-              <p>
-                Then, in September 1998, Severson let Chiang know the Professional Gamers’ League Season 3 was running
-                the first international StarCraft tournament. Chiang missed sign-ups by one day. For a lesser player,
-                that could have been a career-ending setback. Instead, he stated: “I want it all.” He set out to become
-                the top media personality and content creator for StarCraft—taking to the microphone as StarCraft’s
-                first-ever caster, and watching his rival and friend Gadianton take first place.
-              </p>
-              <p>
-                That early eye for talent and narrative caught the attention of esports heavyweights
-                5× FPS World Champion and Esports Hall of Famer Dennis “Thresh” Fong and Bob “Calbear” Colayco,
-                who handed Chiang the keys to GX StarCraft on Gamers.com. D11-Thresh inducted “SoSOWAC” to “D22-soso”
-                and “Gadianton” to “D23-Gadianton.”
-              </p>
-              <p>
-                D22-soso became the central nervous system of the community. He wasn’t just beating the best players
-                in the world—he was translating their brilliance for the masses. He wrote battle reports of high-ranked
-                ladder games, most notably battling rival Guillaume Patry. He set up <em>Pimpest Plays</em>: the original
-                SportsCenter Top 10 for esports, creating the foundation for every highlight reel you see on YouTube today.
-              </p>
-              <p>
-                While most early pros relied on blistering early-game APM, when Chiang and Patry clashed they dragged
-                each other into the depths of the late game—utilizing rarely-seen units like Ultralisks, Battlecruisers,
-                and Carriers.
-              </p>
-
-              <h3>The Ultimate Flex: World Champion</h3>
-              <p>
-                At the 1999 Brood War Season 1 Ladder Tournament—Blizzard’s first official World Championship—
-                D22-soso did the unthinkable. In a game defined by extreme, singular racial specialization, he played
-                <strong>Random</strong>. It was the equivalent of winning a scoring title while shooting ambidextrously.
-              </p>
-              <p>
-                In a legendary ~38-minute semi-final against Patry’s Zerg on Lost Temple, Chiang rolled Protoss.
-                Facing a map that was 75% controlled by the swarm, he orchestrated a masterclass three-pronged attack:
-                Reavers and Archons on the right, Dark Templars and Corsairs on the left, and a devastating push down
-                the middle. He broke Patry, advanced to the finals, and defeated Chris_Low in a five-game final
-                (Game 5 on Showdown, 35:37) to become the first StarCraft: Brood War World Champion—taking home $2,500.
-              </p>
-
-              <h3>The Walk-Off and The Long Game</h3>
-              <p>
-                Like a champion vacating the throne at the absolute peak of his powers, D22-soso eventually walked away.
-                With the esports scene shifting entirely to South Korea and the dot-com bubble looming, Patry—four years
-                his junior—was rapidly evolving. Choosing family, academics, and a grander vision for his future,
-                Chiang stepped away from the keyboard to pursue a Computer Science degree at UC San Diego.
-              </p>
-              <p>
-                He didn’t stick around to watch his mechanics fade. He handed the torch to a new generation—then, as
-                WSOP Talent Manager, brought StarCraft legend SlayerS_BoxeR into the Vlogger Program he runs,
-                after interviewing him at the 2025 World Series of Poker.
-              </p>
-              <p>
-                Ultimately, StarCraft was never just a video game for Wayne Chiang. It was Chapter One. The ability to
-                read opponents, calculate odds, evaluate raw talent, and design winning strategies didn’t retire in 1999.
-                It evolved. The battlefield simply shifted from the pixelated maps of Brood War to the green felt of
-                Las Vegas and the boardrooms of modern business.
-              </p>
-
-              <h3>Today</h3>
-              <p>
-                Wayne “D22-soso” Chiang operates on a different battlefield. He is the Talent Manager for the
-                World Series of Poker (WSOP), an inventor of patented casino games like 2 Hand Hold’em™ and Badugi Chase™,
-                and co-author of the self-investment guide <cite>Betting on Yourself</cite> (Kendall Hunt, 2025). But long before he was shaping
-                the modern poker landscape, he was pouring the concrete foundation for modern competitive gaming and
-                content creation.
-              </p>
-            </div>
-          </details>
-        </article>
-
-        <aside class="about-aside" data-reveal="jump">
-          <figure class="about-portrait">
+        </div>
+        <figure class="poker-photo" data-reveal="fade" data-parallax="0.08">
+          <img
+            id="poker-photo-img"
+            src="assets/img/wsop-boxer-1200.jpg"
+            width="1200"
+            height="1755"
+            data-default="assets/img/wsop-boxer-1200.jpg"
+            data-default-alt="D22-soso with SlayerS BoxeR at WSOP 2025"
+            data-default-pos="50% 32%"
+            alt="D22-soso with SlayerS BoxeR at WSOP 2025"
+            style="object-position: 50% 32%"
+            loading="lazy"
+            decoding="async"
+          />
+          <figcaption class="poker-photo-caption mono">WSOP 2025 · with SlayerS_BoxeR</figcaption>
+        </figure>
+        <div class="poker-cards">
+          <article
+            class="felt-card"
+            data-reveal="jump"
+            tabindex="0"
+            data-swap-img="assets/img/elky-1080.jpg"
+            data-swap-alt="D22-soso with poker pro ElkY"
+            data-swap-caption="Live at the Bike · broadcast era"
+            data-swap-pos="50% 28%"
+          >
+            <h3>Live at the Bike</h3>
+            <p>Co-owner and lead producer. Grew peak concurrent viewers from 2,500 to 8,800 and drove a 40% revenue increase. Hosted the PokerCraft Podcast with industry figures including Hellmuth, Negreanu, and Greenstein.</p>
             <picture>
-              <source
-                type="image/avif"
-                srcset="assets/img/champ-pgl-640.avif 640w, assets/img/champ-pgl-1080.avif 1080w"
-                sizes="(max-width: 1023px) 90vw, 30vw"
-              />
-              <source
-                type="image/webp"
-                srcset="assets/img/champ-pgl-640.webp 640w, assets/img/champ-pgl-1080.webp 1080w"
-                sizes="(max-width: 1023px) 90vw, 30vw"
-              />
-              <img
-                src="assets/img/champ-pgl-1080.jpg"
-                alt="Wayne D22-soso Chiang with StarCraft trophies"
-                width="1080"
-                height="1620"
-                loading="lazy"
-                decoding="async"
-              />
+              <source type="image/avif" srcset="assets/img/latb-logo-400.avif" />
+              <source type="image/webp" srcset="assets/img/latb-logo-400.webp" />
+              <img class="logo-inline" src="assets/img/latb-logo-400.jpg" alt="Live at the Bike logo" width="400" height="165" loading="lazy" decoding="async" />
             </picture>
-            <figcaption class="mono">Champion archive · Brood War era</figcaption>
-          </figure>
-
-          <div class="about-timeline">
-            <p class="about-aside-label mono"><span class="badge-dot" aria-hidden="true"></span>COMPETITOR RECORD</p>
-            <ol class="career-timeline mono">
-              <li><time>1998</time><span>StarCraft Team Case’s Ladder #1</span></li>
-              <li><time>1998</time><span>Neutral Ground Mountain View — 1st StarCraft tournament winner</span></li>
-              <li><time>Oct 1998</time><span>First StarCraft tournament commentator — PGL Season 3</span></li>
-              <li><time>Feb 1999</time><span>B.net vs Kali #2 seed vs Guillaume Patry</span></li>
-              <li><time>Apr 1999</time><span>Brood War Battle.net Season 1 World Champion</span></li>
-              <li><time>May 1999</time><span>PGL Season 4 StarCraft World Championship — 2nd place</span></li>
-              <li><time>Jun 1999</time><span>USA vs Canada — MVP</span></li>
-              <li><time>Jul 1999</time><span>Sports Seoul Brood War #5 · World Champions Invitational #3</span></li>
-              <li><time>Sep 1999</time><span>Brood War Battle.net World Championships — 3rd place</span></li>
-            </ol>
-          </div>
-
-          <div class="cta-row about-ctas">
-            <a class="btn btn-primary btn-arrow" href="#esports">Open Esports Archive <span class="arrow" aria-hidden="true">→</span></a>
-            <a class="btn btn-gold" href="#poker">See the Felt Era</a>
-          </div>
-        </aside>
+          </article>
+          <article
+            class="felt-card"
+            data-reveal="twist"
+            tabindex="0"
+            data-swap-img="assets/img/blackjack-900.jpg"
+            data-swap-alt="Blackjack table — advantage play and poker coaching"
+            data-swap-caption="Advantage play · poker coaching"
+            data-swap-pos="48% 58%"
+          >
+            <h3>Advantage Play &amp; Poker Coaching</h3>
+            <p>Applied Hi-Lo and Hi-Opt 1 card-counting frameworks as a blackjack specialist—resulting in absolute table bans across major Las Vegas and San Diego properties. Also coaches poker players on decision-making, edge, and bankroll—the same macro skills that win on the ladder and at the felt.</p>
+          </article>
+        </div>
       </div>
+
+      <aside class="press-strip" data-reveal="fade" aria-label="Press and media">
+        <p class="press-strip-label mono"><span class="badge-dot" aria-hidden="true"></span>AS HEARD ON</p>
+        <ul class="press-strip-list">
+          <li>
+            <a
+              href="https://www.poker.org/latest-news/40k-view-bonuses-plus-hotels-wayne-chiang-on-wsops-vlogger-boom-aV7pB6K0laKG"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <span class="press-outlet mono">PokerOrg</span>
+              <span class="press-title">WSOP’s vlogger boom — Q&amp;A with Talent Manager Wayne Chiang</span>
+            </a>
+          </li>
+          <li>
+            <a
+              href="https://jeffgrosspodcast.podbean.com/e/wayne-chiang-starcraft-world-champion-wsop-talent-manager-betting-on-yourself/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <span class="press-outlet mono">The Flow Show</span>
+              <span class="press-title">Jeff Gross — StarCraft World Champion, WSOP Talent Manager &amp; Betting on Yourself</span>
+            </a>
+          </li>
+          <li>
+            <a
+              href="https://creators.spotify.com/pod/profile/table-1-podcast/episodes/He-Made-Millions-Playing-PokerThen-His-Side-Hustle-Did-Even-Better-e3gouut"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <span class="press-outlet mono">Table 1 Podcast</span>
+              <span class="press-title">He Made Millions Playing Poker… Then His Side Hustle Did Even Better</span>
+            </a>
+          </li>
+          <li>
+            <a
+              href="https://chasingpokergreatness.com/wayne-chiang-former-owner-of-live-at-the-bike-starcraft-world-champion/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <span class="press-outlet mono">Chasing Poker Greatness</span>
+              <span class="press-title">Former Owner of Live at the Bike &amp; StarCraft World Champion</span>
+            </a>
+          </li>
+        </ul>
+      </aside>
     </section>
 
     <!-- ESPORTS — each theater is its own scrollable section -->
@@ -714,128 +691,6 @@
       </article>
     </section>
 
-    <!-- POKER -->
-    <section id="poker" class="section section-poker" data-node="poker" data-theme="poker" data-bg="poker">
-      <header class="section-head" data-reveal="fade">
-        <p class="eyebrow-badge mono"><span class="badge-dot" aria-hidden="true"></span>FELT // BROADCAST // TALENT</p>
-        <h2>Poker &amp; Advantage Play</h2>
-        <p class="lede">From math-driven blackjack bans and poker coaching to Live at the Bike and the World Series of Poker media desk.</p>
-      </header>
-      <div class="poker-grid" data-poker-gallery>
-        <div
-          class="lower-third"
-          data-reveal="twist"
-          tabindex="0"
-          data-swap-img="assets/img/wsop-boxer-1200.jpg"
-          data-swap-alt="D22-soso with SlayerS BoxeR at WSOP 2025"
-          data-swap-caption="WSOP 2025 · with SlayerS_BoxeR"
-          data-swap-pos="50% 32%"
-        >
-          <span class="lt-label mono">TALENT MANAGER</span>
-          <strong>World Series of Poker — Media Team</strong>
-          <p>
-            Full-time WSOP Talent Manager since November 2025 after a trial summer.
-            Oversees the official Vlogger Program—rewarding creators from Negreanu and Masato to StarCraft legend
-            SlayerS_BoxeR, whom Chiang recruited into the roster after interviewing him at the 2025 World Series.
-            Series stops include Prague, Cyprus, and the summer bracelet schedule.
-          </p>
-        </div>
-        <figure class="poker-photo" data-reveal="fade" data-parallax="0.08">
-          <img
-            id="poker-photo-img"
-            src="assets/img/wsop-boxer-1200.jpg"
-            width="1200"
-            height="1755"
-            data-default="assets/img/wsop-boxer-1200.jpg"
-            data-default-alt="D22-soso with SlayerS BoxeR at WSOP 2025"
-            data-default-pos="50% 32%"
-            alt="D22-soso with SlayerS BoxeR at WSOP 2025"
-            style="object-position: 50% 32%"
-            loading="lazy"
-            decoding="async"
-          />
-          <figcaption class="poker-photo-caption mono">WSOP 2025 · with SlayerS_BoxeR</figcaption>
-        </figure>
-        <div class="poker-cards">
-          <article
-            class="felt-card"
-            data-reveal="jump"
-            tabindex="0"
-            data-swap-img="assets/img/elky-1080.jpg"
-            data-swap-alt="D22-soso with poker pro ElkY"
-            data-swap-caption="Live at the Bike · broadcast era"
-            data-swap-pos="50% 28%"
-          >
-            <h3>Live at the Bike</h3>
-            <p>Co-owner and lead producer. Grew peak concurrent viewers from 2,500 to 8,800 and drove a 40% revenue increase. Hosted the PokerCraft Podcast with industry figures including Hellmuth, Negreanu, and Greenstein.</p>
-            <picture>
-              <source type="image/avif" srcset="assets/img/latb-logo-400.avif" />
-              <source type="image/webp" srcset="assets/img/latb-logo-400.webp" />
-              <img class="logo-inline" src="assets/img/latb-logo-400.jpg" alt="Live at the Bike logo" width="400" height="165" loading="lazy" decoding="async" />
-            </picture>
-          </article>
-          <article
-            class="felt-card"
-            data-reveal="twist"
-            tabindex="0"
-            data-swap-img="assets/img/blackjack-900.jpg"
-            data-swap-alt="Blackjack table — advantage play and poker coaching"
-            data-swap-caption="Advantage play · poker coaching"
-            data-swap-pos="48% 58%"
-          >
-            <h3>Advantage Play &amp; Poker Coaching</h3>
-            <p>Applied Hi-Lo and Hi-Opt 1 card-counting frameworks as a blackjack specialist—resulting in absolute table bans across major Las Vegas and San Diego properties. Also coaches poker players on decision-making, edge, and bankroll—the same macro skills that win on the ladder and at the felt.</p>
-          </article>
-        </div>
-      </div>
-
-      <aside class="press-strip" data-reveal="fade" aria-label="Press and media">
-        <p class="press-strip-label mono"><span class="badge-dot" aria-hidden="true"></span>AS HEARD ON</p>
-        <ul class="press-strip-list">
-          <li>
-            <a
-              href="https://www.poker.org/latest-news/40k-view-bonuses-plus-hotels-wayne-chiang-on-wsops-vlogger-boom-aV7pB6K0laKG"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <span class="press-outlet mono">PokerOrg</span>
-              <span class="press-title">WSOP’s vlogger boom — Q&amp;A with Talent Manager Wayne Chiang</span>
-            </a>
-          </li>
-          <li>
-            <a
-              href="https://jeffgrosspodcast.podbean.com/e/wayne-chiang-starcraft-world-champion-wsop-talent-manager-betting-on-yourself/"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <span class="press-outlet mono">The Flow Show</span>
-              <span class="press-title">Jeff Gross — StarCraft World Champion, WSOP Talent Manager &amp; Betting on Yourself</span>
-            </a>
-          </li>
-          <li>
-            <a
-              href="https://creators.spotify.com/pod/profile/table-1-podcast/episodes/He-Made-Millions-Playing-PokerThen-His-Side-Hustle-Did-Even-Better-e3gouut"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <span class="press-outlet mono">Table 1 Podcast</span>
-              <span class="press-title">He Made Millions Playing Poker… Then His Side Hustle Did Even Better</span>
-            </a>
-          </li>
-          <li>
-            <a
-              href="https://chasingpokergreatness.com/wayne-chiang-former-owner-of-live-at-the-bike-starcraft-world-champion/"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <span class="press-outlet mono">Chasing Poker Greatness</span>
-              <span class="press-title">Former Owner of Live at the Bike &amp; StarCraft World Champion</span>
-            </a>
-          </li>
-        </ul>
-      </aside>
-    </section>
-
     <!-- BOOK — Betting on Yourself -->
     <section id="book" class="section section-book" data-node="book" data-bg="book" data-theme="book">
       <header class="section-head" data-reveal="twist">
@@ -1062,13 +917,221 @@
       </div>
     </section>
 
+    <!-- ABOUT -->
+    <section id="about" class="section section-about" data-node="about" data-bg="about">
+      <header class="section-head" data-reveal="twist">
+        <p class="eyebrow-badge mono"><span class="badge-dot" aria-hidden="true"></span>PERSONNEL FILE // ABOUT</p>
+        <h2>StarCraft Brood War’s First World Champion: Leader by Example</h2>
+        <p class="lede">The full origin story—from Case’s Ladder to the Brood War throne, and the long game that followed.</p>
+      </header>
+
+      <div class="about-layout">
+        <article class="about-prose" data-reveal="fade">
+          <p class="about-tldr">
+            The first official <strong>StarCraft: Brood War World Champion</strong> (1999, Random).
+            #1 Case’s Ladder in <em>Command &amp; Conquer</em> (1996) and <em>Warcraft II</em> (1997).
+            First StarCraft caster. Cube Draft co-originator. Now the WSOP Talent Manager and inventor of five patented casino games.
+          </p>
+          <blockquote class="transmission">
+            The ultimate macro-manager traded his hotkeys for higher stakes—proving that whether you’re building a
+            digital empire or a real-world legacy, the meta never really changes. You just have to be willing to bet on yourself.
+          </blockquote>
+
+          <details class="about-more">
+            <summary>
+              <span class="about-more-label">Read the full story</span>
+              <span class="about-more-icon" aria-hidden="true">
+                <span class="about-more-chevron">▾</span>
+              </span>
+            </summary>
+            <div class="about-more-content">
+              <h3>Dawn of Esports</h3>
+              <p>
+                Before the sold-out stadiums in Seoul, before multi-million dollar Twitch exclusivity contracts,
+                and long before you could Google “Zerg Rush,” the digital frontier was a wild, uncharted landscape.
+                In 1996, Wayne Chiang as “SoSOWAC” dominated 1v1 and teams on Case’s Ladder, ranking #1 at
+                <em>Command &amp; Conquer: Tiberian Dawn</em>. In 1997, he did the same for
+                <em>Warcraft II: Tides of Darkness</em>.
+              </p>
+              <p>
+                <strong>March 31, 1998</strong> changed everything. StarCraft was released—and esports would never be the same.
+                Once again, Chiang hit #1 on Case’s Ladder in 1v1 and teams. Then he won the first StarCraft tournament
+                against friend and eventual Chess.com co-founder Jay “Gadianton” Severson for $250, held at the legendary
+                Magic: The Gathering hotspot Neutral Ground Mountain View—close to Google and Apple headquarters.
+                Two $10 grudge-match victories over Severson followed. With nothing more to prove, Chiang was ready to move on.
+              </p>
+              <p>
+                Then, in September 1998, Severson let Chiang know the Professional Gamers’ League Season 3 was running
+                the first international StarCraft tournament. Chiang missed sign-ups by one day. For a lesser player,
+                that could have been a career-ending setback. Instead, he stated: “I want it all.” He set out to become
+                the top media personality and content creator for StarCraft—taking to the microphone as StarCraft’s
+                first-ever caster, and watching his rival and friend Gadianton take first place.
+              </p>
+              <p>
+                That early eye for talent and narrative caught the attention of esports heavyweights
+                5× FPS World Champion and Esports Hall of Famer Dennis “Thresh” Fong and Bob “Calbear” Colayco,
+                who handed Chiang the keys to GX StarCraft on Gamers.com. D11-Thresh inducted “SoSOWAC” to “D22-soso”
+                and “Gadianton” to “D23-Gadianton.”
+              </p>
+              <p>
+                D22-soso became the central nervous system of the community. He wasn’t just beating the best players
+                in the world—he was translating their brilliance for the masses. He wrote battle reports of high-ranked
+                ladder games, most notably battling rival Guillaume Patry. He set up <em>Pimpest Plays</em>: the original
+                SportsCenter Top 10 for esports, creating the foundation for every highlight reel you see on YouTube today.
+              </p>
+              <p>
+                While most early pros relied on blistering early-game APM, when Chiang and Patry clashed they dragged
+                each other into the depths of the late game—utilizing rarely-seen units like Ultralisks, Battlecruisers,
+                and Carriers.
+              </p>
+
+              <h3>The Ultimate Flex: World Champion</h3>
+              <p>
+                At the 1999 Brood War Season 1 Ladder Tournament—Blizzard’s first official World Championship—
+                D22-soso did the unthinkable. In a game defined by extreme, singular racial specialization, he played
+                <strong>Random</strong>. It was the equivalent of winning a scoring title while shooting ambidextrously.
+              </p>
+              <p>
+                In a legendary ~38-minute semi-final against Patry’s Zerg on Lost Temple, Chiang rolled Protoss.
+                Facing a map that was 75% controlled by the swarm, he orchestrated a masterclass three-pronged attack:
+                Reavers and Archons on the right, Dark Templars and Corsairs on the left, and a devastating push down
+                the middle. He broke Patry, advanced to the finals, and defeated Chris_Low in a five-game final
+                (Game 5 on Showdown, 35:37) to become the first StarCraft: Brood War World Champion—taking home $2,500.
+              </p>
+
+              <h3>The Walk-Off and The Long Game</h3>
+              <p>
+                Like a champion vacating the throne at the absolute peak of his powers, D22-soso eventually walked away.
+                With the esports scene shifting entirely to South Korea and the dot-com bubble looming, Patry—four years
+                his junior—was rapidly evolving. Choosing family, academics, and a grander vision for his future,
+                Chiang stepped away from the keyboard to pursue a Computer Science degree at UC San Diego.
+              </p>
+              <p>
+                He didn’t stick around to watch his mechanics fade. He handed the torch to a new generation—then, as
+                WSOP Talent Manager, brought StarCraft legend SlayerS_BoxeR into the Vlogger Program he runs,
+                after interviewing him at the 2025 World Series of Poker.
+              </p>
+              <p>
+                Ultimately, StarCraft was never just a video game for Wayne Chiang. It was Chapter One. The ability to
+                read opponents, calculate odds, evaluate raw talent, and design winning strategies didn’t retire in 1999.
+                It evolved. The battlefield simply shifted from the pixelated maps of Brood War to the green felt of
+                Las Vegas and the boardrooms of modern business.
+              </p>
+
+              <h3>Today</h3>
+              <p>
+                Wayne “D22-soso” Chiang operates on a different battlefield. He is the Talent Manager for the
+                World Series of Poker (WSOP), an inventor of patented casino games like 2 Hand Hold’em™ and Badugi Chase™,
+                and co-author of the self-investment guide <cite>Betting on Yourself</cite> (Kendall Hunt, 2025). But long before he was shaping
+                the modern poker landscape, he was pouring the concrete foundation for modern competitive gaming and
+                content creation.
+              </p>
+            </div>
+          </details>
+        </article>
+
+        <aside class="about-aside" data-reveal="jump">
+          <figure class="about-portrait">
+            <picture>
+              <source
+                type="image/avif"
+                srcset="assets/img/champ-pgl-640.avif 640w, assets/img/champ-pgl-1080.avif 1080w"
+                sizes="(max-width: 1023px) 90vw, 30vw"
+              />
+              <source
+                type="image/webp"
+                srcset="assets/img/champ-pgl-640.webp 640w, assets/img/champ-pgl-1080.webp 1080w"
+                sizes="(max-width: 1023px) 90vw, 30vw"
+              />
+              <img
+                src="assets/img/champ-pgl-1080.jpg"
+                alt="Wayne D22-soso Chiang with StarCraft trophies"
+                width="1080"
+                height="1620"
+                loading="lazy"
+                decoding="async"
+              />
+            </picture>
+            <figcaption class="mono">Champion archive · Brood War era</figcaption>
+          </figure>
+
+          <div class="about-timeline">
+            <p class="about-aside-label mono"><span class="badge-dot" aria-hidden="true"></span>COMPETITOR RECORD</p>
+            <ol class="career-timeline mono">
+              <li><time>1998</time><span>StarCraft Team Case’s Ladder #1</span></li>
+              <li><time>1998</time><span>Neutral Ground Mountain View — 1st StarCraft tournament winner</span></li>
+              <li><time>Oct 1998</time><span>First StarCraft tournament commentator — PGL Season 3</span></li>
+              <li><time>Feb 1999</time><span>B.net vs Kali #2 seed vs Guillaume Patry</span></li>
+              <li><time>Apr 1999</time><span>Brood War Battle.net Season 1 World Champion</span></li>
+              <li><time>May 1999</time><span>PGL Season 4 StarCraft World Championship — 2nd place</span></li>
+              <li><time>Jun 1999</time><span>USA vs Canada — MVP</span></li>
+              <li><time>Jul 1999</time><span>Sports Seoul Brood War #5 · World Champions Invitational #3</span></li>
+              <li><time>Sep 1999</time><span>Brood War Battle.net World Championships — 3rd place</span></li>
+            </ol>
+          </div>
+
+          <div class="cta-row about-ctas">
+            <a class="btn btn-primary btn-arrow" href="#esports">Open Esports Archive <span class="arrow" aria-hidden="true">→</span></a>
+            <a class="btn btn-gold" href="#poker">See the Felt Era</a>
+          </div>
+        </aside>
+      </div>
+    </section>
+
     <!-- CONTACT -->
     <section id="contact" class="section contact" data-node="contact" data-bg="contact">
       <header class="section-head" data-reveal="twist">
         <p class="eyebrow-badge mono"><span class="badge-dot" aria-hidden="true"></span>OPEN COMMS CHANNEL</p>
         <h2>Strategic Collaboration</h2>
-        <p class="lede">For licensing, media, talent, or partnership inquiries—open a channel. Connect on LinkedIn, Liquipedia, X, Instagram, or YouTube.</p>
+        <p class="lede">Licensing, media, talent, and partnership inquiries—one channel for business, then socials and press assets below.</p>
       </header>
+
+      <div class="contact-primary" data-reveal="jump">
+        <a
+          class="btn btn-gold btn-lg btn-arrow contact-primary-cta"
+          href="mailto:playbadugi@gmail.com?subject=Media%20%26%20licensing%20inquiry"
+        >
+          Media &amp; licensing <span class="arrow" aria-hidden="true">→</span>
+          <span class="mono contact-ig">Primary business channel</span>
+        </a>
+        <div class="contact-email-row">
+          <a class="contact-email-link mono" href="mailto:playbadugi@gmail.com">playbadugi@gmail.com</a>
+          <button
+            type="button"
+            class="btn btn-primary contact-copy-email"
+            id="copy-email"
+            data-email="playbadugi@gmail.com"
+          >
+            Copy email
+          </button>
+        </div>
+      </div>
+
+      <aside class="media-kit" data-reveal="fade" aria-labelledby="media-kit-heading">
+        <p class="eyebrow-badge mono"><span class="badge-dot" aria-hidden="true"></span>PRESS ARCHIVE // MEDIA KIT</p>
+        <h3 id="media-kit-heading">Press &amp; media kit</h3>
+        <p class="media-kit-lede">Short bio, long bio, fact sheet, and approved headshots—ready for podcasts, features, and lower-thirds.</p>
+        <div class="media-kit-actions">
+          <a class="btn btn-gold btn-arrow" href="assets/media-kit/d22soso-media-kit.zip" download>
+            Download full kit <span class="arrow" aria-hidden="true">→</span>
+          </a>
+          <a class="btn btn-primary" href="assets/media-kit/wayne-chiang-bio-short.txt" download>Short bio</a>
+          <a class="btn btn-primary" href="assets/media-kit/wayne-chiang-bio-long.txt" download>Long bio</a>
+          <a class="btn btn-primary" href="assets/media-kit/fact-sheet.txt" download>Fact sheet</a>
+        </div>
+        <ul class="media-kit-assets mono">
+          <li>
+            <a href="assets/media-kit/headshot-trophy.jpg" download>Headshot — trophy</a>
+          </li>
+          <li>
+            <a href="assets/media-kit/headshot-pgl.jpg" download>Headshot — PGL era</a>
+          </li>
+          <li>
+            <a href="assets/media-kit/headshot-closeup.jpg" download>Headshot — close-up</a>
+          </li>
+        </ul>
+      </aside>
+
       <div class="contact-actions" data-reveal="jump">
         <a
           class="btn btn-gold btn-lg btn-arrow"
@@ -1115,11 +1178,6 @@
           YouTube <span class="arrow" aria-hidden="true">→</span>
           <span class="mono contact-ig">Wayne Chiang Poker</span>
         </a>
-        <a class="btn btn-primary btn-lg btn-arrow" href="mailto:playbadugi@gmail.com">
-          Email Wayne <span class="arrow" aria-hidden="true">→</span>
-          <br class="break-sm" />
-          <span class="mono contact-email">playbadugi@gmail.com</span>
-        </a>
         <a
           class="btn btn-gold btn-lg btn-arrow"
           id="feedback-email"
@@ -1141,11 +1199,39 @@
         ·
         <a href="https://www.youtube.com/@WayneChiangPoker" target="_blank" rel="noopener noreferrer">YouTube</a>
         ·
+        <a href="#contact">Media kit</a>
+        ·
         <a href="https://www.instagram.com/p/Cr2A8JJrgVa/?img_index=1" target="_blank" rel="noopener noreferrer">2 Hand Holdem created by StarCraft: Brood War World Champion Wayne “D22-soso” Chiang</a>
         · Portfolio archive · Bet on yourself
       </p>
     </section>
   </main>
+
+  <button type="button" class="back-top" id="back-top" aria-label="Back to top" aria-hidden="true" tabindex="-1">
+    <span class="back-top-chevron" aria-hidden="true">↑</span>
+    <span class="back-top-label mono">Top</span>
+  </button>
+
+  <dialog class="hotkey-help" id="hotkey-help" aria-labelledby="hotkey-help-title">
+    <div class="hotkey-help-panel">
+      <header class="hotkey-help-head">
+        <p class="eyebrow-badge mono"><span class="badge-dot" aria-hidden="true"></span>COMMAND HELP</p>
+        <h2 id="hotkey-help-title">Keyboard shortcuts</h2>
+      </header>
+      <dl class="hotkey-help-list mono">
+        <div><dt><kbd>1</kbd></dt><dd>Poker</dd></div>
+        <div><dt><kbd>2</kbd></dt><dd>Esports</dd></div>
+        <div><dt><kbd>3</kbd></dt><dd>Book</dd></div>
+        <div><dt><kbd>4</kbd></dt><dd>Inventions</dd></div>
+        <div><dt><kbd>5</kbd></dt><dd>About</dd></div>
+        <div><dt><kbd>R</kbd></dt><dd>Random race roll (StarCraft panel)</dd></div>
+        <div><dt><kbd>?</kbd></dt><dd>Toggle this help</dd></div>
+        <div><dt><kbd>Esc</kbd></dt><dd>Close help / exit immersive table</dd></div>
+      </dl>
+      <button type="button" class="btn btn-primary" id="hotkey-help-close">Close</button>
+      <p class="hotkey-help-hint mono">Press <kbd>?</kbd> anytime · not while typing in a field</p>
+    </div>
+  </dialog>
 
   <script type="module" src="script.js"></script>
 </body>

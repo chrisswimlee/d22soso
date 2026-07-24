@@ -810,15 +810,18 @@ body[data-bg^="hearthstone"] #webgl-bg {
 }
 
 
-/* Current-section indicator (replaces the minimap radar) */
+/* Current-section indicator — pinned under header, width-stable */
 .section-indicator {
   position: fixed;
+  top: calc(var(--header-h) + 0.55rem);
   right: max(14px, env(safe-area-inset-right, 0px));
-  bottom: max(14px, var(--safe-bottom));
-  z-index: 60;
+  bottom: auto;
+  z-index: 90;
   display: inline-flex;
   align-items: center;
   gap: 0.6rem;
+  min-width: 11.5rem;
+  max-width: min(18rem, calc(100vw - 2rem));
   padding: 0.55rem 0.9rem;
   border: 1px solid color-mix(in srgb, var(--theme-accent) 40%, var(--border));
   border-radius: 999px;
@@ -826,12 +829,13 @@ body[data-bg^="hearthstone"] #webgl-bg {
   backdrop-filter: blur(10px);
   box-shadow: 0 8px 28px rgba(0, 0, 0, 0.5);
   pointer-events: none;
-  transition: border-color 0.4s ease, box-shadow 0.4s ease;
+  transition: border-color 0.4s ease, box-shadow 0.4s ease, top 0.2s ease;
 }
 
 .section-indicator .si-dot {
   width: 8px;
   height: 8px;
+  flex-shrink: 0;
   border-radius: 50%;
   background: var(--theme-accent);
   box-shadow: 0 0 10px var(--theme-accent);
@@ -841,6 +845,8 @@ body[data-bg^="hearthstone"] #webgl-bg {
 .section-indicator .si-text {
   display: grid;
   line-height: 1.1;
+  min-width: 0;
+  flex: 1 1 auto;
 }
 
 .section-indicator .si-kicker {
@@ -854,7 +860,14 @@ body[data-bg^="hearthstone"] #webgl-bg {
   font-weight: 600;
   letter-spacing: 0.02em;
   color: var(--theme-accent);
-  transition: color 0.4s ease;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: color 0.35s ease, opacity 0.12s ease;
+}
+
+.section-indicator .si-label.is-swapping {
+  opacity: 0;
 }
 
 /* Header — fixed so nav stays clickable above transformed sections */
@@ -890,6 +903,18 @@ body[data-bg^="hearthstone"] #webgl-bg {
   flex-shrink: 0;
   position: relative;
   z-index: 2;
+  text-decoration: none;
+  border-radius: 3px;
+  transition: color 0.2s, background 0.2s, box-shadow 0.2s;
+}
+
+.brand.is-active .brand-mark {
+  background: color-mix(in srgb, var(--theme-accent) 18%, transparent);
+  box-shadow: inset 0 0 14px color-mix(in srgb, var(--theme-accent) 35%, transparent);
+}
+
+.brand.is-active .brand-text {
+  color: var(--text);
 }
 
 .brand-mark {
@@ -925,9 +950,10 @@ body[data-bg^="hearthstone"] #webgl-bg {
   scrollbar-width: thin;
   overscroll-behavior-x: contain;
   scroll-padding-inline: 0.75rem;
-  padding-inline: 0.1rem 0.35rem;
-  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 1.25rem, #000 calc(100% - 1.25rem), transparent 100%);
-  mask-image: linear-gradient(90deg, transparent 0, #000 1.25rem, #000 calc(100% - 1.25rem), transparent 100%);
+  /* Left stays solid so Poker isn’t clipped; fade only the scroll overflow on the right */
+  padding-inline: 0.2rem 0.35rem;
+  -webkit-mask-image: linear-gradient(90deg, #000 0, #000 calc(100% - 1.25rem), transparent 100%);
+  mask-image: linear-gradient(90deg, #000 0, #000 calc(100% - 1.25rem), transparent 100%);
 }
 
 /* End spacer so item 8 / Comms can fully clear the scroll edge */
@@ -965,11 +991,83 @@ body[data-bg^="hearthstone"] #webgl-bg {
   transition: border-color 0.2s, color 0.2s, background 0.2s;
 }
 
+.command-nav a.is-active {
+  border-color: var(--theme-accent);
+  color: var(--text);
+  background: color-mix(in srgb, var(--theme-accent) 18%, transparent);
+  box-shadow:
+    inset 0 -2px 0 var(--theme-accent),
+    0 0 16px color-mix(in srgb, var(--theme-accent) 22%, transparent);
+}
+
 .command-nav a.pulse {
   border-color: var(--theme-accent);
   color: var(--text);
   background: color-mix(in srgb, var(--theme-accent) 14%, transparent);
   box-shadow: 0 0 18px color-mix(in srgb, var(--theme-accent) 28%, transparent);
+}
+
+/* ESPORTS ↔ games: JS sets pixel max-width; CSS eases both directions */
+.nav-esports {
+  --esports-ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --esports-dur: 0.4s;
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  min-width: 0;
+}
+
+.nav-esports-root-slot,
+.nav-esports-games {
+  overflow: hidden;
+  max-width: 0;
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    max-width var(--esports-dur) var(--esports-ease),
+    opacity calc(var(--esports-dur) * 0.75) var(--esports-ease);
+}
+
+/* Collapsed default: ESPORTS visible (width set by JS; fallback for first paint) */
+.nav-esports:not(.is-expanded) .nav-esports-root-slot {
+  max-width: 7.5rem;
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.nav-esports.is-expanded .nav-esports-games {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.nav-esports.is-expanded .nav-esports-root {
+  pointer-events: none;
+}
+
+.nav-esports-games-track {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 0.1rem;
+  width: max-content;
+}
+
+.nav-esports-games a {
+  font-family: var(--mono);
+  font-size: 0.64rem;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  text-decoration: none;
+  padding: 0.4rem 0.42rem;
+  min-height: 36px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nav-esports-root-slot,
+  .nav-esports-games {
+    transition-duration: 0.01ms !important;
+    transition-delay: 0s !important;
+  }
 }
 
 .nav-social {
@@ -3490,6 +3588,112 @@ body.play-2hh-immersive .play-ctas {
   margin-right: auto;
 }
 
+.contact-primary {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  margin: 0 auto 2.25rem;
+  max-width: 36rem;
+}
+
+.contact-primary-cta {
+  width: min(100%, 28rem);
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.contact-email-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem 0.85rem;
+}
+
+.contact-email-link {
+  color: var(--text);
+  text-decoration: none;
+  letter-spacing: 0.04em;
+  border-bottom: 1px solid color-mix(in srgb, var(--theme-accent) 45%, transparent);
+  padding-bottom: 0.1rem;
+  transition: color 0.2s, border-color 0.2s;
+}
+
+.contact-email-link:hover,
+.contact-email-link:focus-visible {
+  color: var(--gold);
+  border-bottom-color: var(--gold);
+}
+
+.contact-copy-email {
+  min-height: 40px;
+  padding: 0.45rem 0.85rem;
+  font-size: 0.78rem;
+}
+
+.contact-copy-email.is-copied {
+  border-color: var(--theme-accent);
+  color: var(--text);
+  background: color-mix(in srgb, var(--theme-accent) 18%, transparent);
+}
+
+.media-kit {
+  margin: 0 auto 2.75rem;
+  max-width: 40rem;
+  padding: 1.5rem 1.35rem 1.6rem;
+  text-align: left;
+  border: 1px solid color-mix(in srgb, var(--theme-accent) 28%, var(--border));
+  background: color-mix(in srgb, var(--theme-accent) 6%, rgba(10, 10, 12, 0.55));
+}
+
+.media-kit .eyebrow-badge {
+  margin-bottom: 0.75rem;
+}
+
+.media-kit h3 {
+  margin: 0 0 0.55rem;
+  font-size: clamp(1.25rem, 2.4vw, 1.55rem);
+}
+
+.media-kit-lede {
+  margin: 0 0 1.15rem;
+  color: var(--muted);
+  font-size: 0.95rem;
+  line-height: 1.55;
+}
+
+.media-kit-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  margin-bottom: 1rem;
+}
+
+.media-kit-assets {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 1.1rem;
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+}
+
+.media-kit-assets a {
+  color: var(--muted);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: color 0.2s, border-color 0.2s;
+}
+
+.media-kit-assets a:hover,
+.media-kit-assets a:focus-visible {
+  color: var(--text);
+  border-bottom-color: var(--theme-accent);
+}
+
 .contact-actions {
   display: flex;
   flex-wrap: wrap;
@@ -3517,6 +3721,141 @@ body.play-2hh-immersive .play-ctas {
   display: block;
   margin-top: 0.15rem;
   letter-spacing: 0.06em;
+}
+
+/* Back to top */
+.back-top {
+  position: fixed;
+  right: max(0.85rem, var(--safe-right));
+  bottom: max(1rem, calc(0.75rem + var(--safe-bottom)));
+  z-index: 95;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 44px;
+  padding: 0.55rem 0.85rem;
+  color: var(--text);
+  font: inherit;
+  font-size: 0.78rem;
+  background: rgba(10, 10, 12, 0.88);
+  border: 1px solid color-mix(in srgb, var(--theme-accent) 45%, var(--border));
+  border-radius: 3px;
+  backdrop-filter: blur(10px);
+  cursor: pointer;
+  touch-action: manipulation;
+  opacity: 0;
+  transform: translate3d(0, 8px, 0);
+  pointer-events: none;
+  transition:
+    opacity 0.25s ease,
+    transform 0.25s ease,
+    border-color 0.2s,
+    background 0.2s;
+}
+
+.back-top.is-visible {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+  pointer-events: auto;
+}
+
+.back-top:hover,
+.back-top:focus-visible {
+  border-color: var(--theme-accent);
+  background: color-mix(in srgb, var(--theme-accent) 14%, rgba(10, 10, 12, 0.92));
+}
+
+.back-top-chevron {
+  font-size: 0.95rem;
+  line-height: 1;
+  color: var(--theme-accent);
+}
+
+.back-top-label {
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 0.68rem;
+}
+
+/* Keyboard help overlay */
+.hotkey-help {
+  width: min(28rem, calc(100vw - 2rem));
+  max-width: calc(100vw - 2rem);
+  margin: auto;
+  padding: 0;
+  border: 1px solid color-mix(in srgb, var(--theme-accent) 40%, var(--border));
+  background: rgba(10, 10, 12, 0.96);
+  color: var(--text);
+  box-shadow: none;
+}
+
+.hotkey-help::backdrop {
+  background: rgba(4, 4, 8, 0.72);
+  backdrop-filter: blur(4px);
+}
+
+.hotkey-help-panel {
+  padding: 1.35rem 1.35rem 1.2rem;
+}
+
+.hotkey-help-head {
+  margin-bottom: 1.1rem;
+}
+
+.hotkey-help-head h2 {
+  margin: 0.45rem 0 0;
+  font-size: 1.35rem;
+}
+
+.hotkey-help-list {
+  display: grid;
+  gap: 0.55rem;
+  margin: 0 0 1.25rem;
+}
+
+.hotkey-help-list > div {
+  display: grid;
+  grid-template-columns: 4.5rem 1fr;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.hotkey-help-list dt {
+  margin: 0;
+}
+
+.hotkey-help-list dd {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+}
+
+.hotkey-help kbd {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.75rem;
+  min-height: 1.75rem;
+  padding: 0.2rem 0.45rem;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--text);
+  background: color-mix(in srgb, var(--theme-accent) 14%, transparent);
+  border: 1px solid color-mix(in srgb, var(--theme-accent) 50%, var(--border));
+  border-radius: 3px;
+}
+
+.hotkey-help-hint {
+  margin: 0.85rem 0 0;
+  font-size: 0.68rem;
+  color: var(--muted);
+  letter-spacing: 0.04em;
+}
+
+body.play-2hh-immersive .back-top {
+  visibility: hidden;
+  pointer-events: none;
 }
 
 .footer-meta {
@@ -3767,6 +4106,10 @@ body.play-2hh-immersive .play-ctas {
     gap: 0.2rem;
   }
 
+  .site-header {
+    flex-wrap: wrap;
+  }
+
   .nav-social-link {
     padding: 0.35rem 0.45rem;
     font-size: 0.65rem;
@@ -3792,6 +4135,18 @@ body.play-2hh-immersive .play-ctas {
 
   .nav-social .nav-label {
     display: none;
+  }
+
+  .back-top-label {
+    display: none;
+  }
+
+  .media-kit {
+    padding: 1.2rem 1rem 1.35rem;
+  }
+
+  .hotkey-help-list > div {
+    grid-template-columns: 3.5rem 1fr;
   }
 
   .hero {
