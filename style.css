@@ -156,6 +156,12 @@ body {
   opacity: 1;
 }
 
+/* Snappier crossfade while hovering hero identity panels */
+#bg-stage.is-hero-preview .bg-layer {
+  transition-duration: 0.45s;
+  transition-timing-function: ease;
+}
+
 /* Hero — Cosmic Violet void + StarCraft icons only (no photo) */
 .bg-layer[data-bg="hero"] {
   background:
