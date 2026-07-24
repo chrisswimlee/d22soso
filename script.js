@@ -535,7 +535,7 @@ const reduced =
   C.init2HH(document.getElementById("cards-2hh"));
   C.initBadugi(document.getElementById("cards-badugi"));
 
-  /* Hero panels — hover/focus previews matching feature backgrounds */
+  /* Hero panels — hover/focus/tap previews matching feature backgrounds */
   (function initHeroPanelBgPreview() {
     const root = document.querySelector(".hero-panels");
     const stage = document.getElementById("bg-stage");
@@ -548,6 +548,9 @@ const reduced =
     };
 
     let previewActive = false;
+    const fineHover =
+      typeof matchMedia !== "undefined" &&
+      matchMedia("(hover: hover) and (pointer: fine)").matches;
 
     function setPreviewing(on) {
       previewActive = on;
@@ -569,26 +572,45 @@ const reduced =
       setSceneBg("hero", "starcraft");
     }
 
-    root.addEventListener("pointerover", (e) => {
-      const panel = e.target.closest(".hero-panel");
-      if (!panel || !root.contains(panel)) return;
-      /* Ignore bubbled moves within the same panel */
-      const from = e.relatedTarget;
-      if (from && panel.contains(from)) return;
-      previewPanel(panel);
-    });
+    if (fineHover) {
+      root.addEventListener("pointerover", (e) => {
+        const panel = e.target.closest(".hero-panel");
+        if (!panel || !root.contains(panel)) return;
+        const from = e.relatedTarget;
+        if (from && panel.contains(from)) return;
+        previewPanel(panel);
+      });
 
-    root.addEventListener("pointerout", (e) => {
-      const to = e.relatedTarget;
-      if (to && root.contains(to)) {
-        const nextPanel = to.closest?.(".hero-panel");
-        if (nextPanel && root.contains(nextPanel)) {
-          previewPanel(nextPanel);
-          return;
+      root.addEventListener("pointerout", (e) => {
+        const to = e.relatedTarget;
+        if (to && root.contains(to)) {
+          const nextPanel = to.closest?.(".hero-panel");
+          if (nextPanel && root.contains(nextPanel)) {
+            previewPanel(nextPanel);
+            return;
+          }
         }
-      }
-      clearPreview();
-    });
+        clearPreview();
+      });
+    } else {
+      /* Touch: preview on press; clear when leaving hero or scrolling away */
+      root.addEventListener(
+        "pointerdown",
+        (e) => {
+          const panel = e.target.closest(".hero-panel");
+          if (!panel || !root.contains(panel)) return;
+          previewPanel(panel);
+        },
+        { passive: true }
+      );
+      window.addEventListener(
+        "scroll",
+        () => {
+          if (previewActive) clearPreview();
+        },
+        { passive: true }
+      );
+    }
 
     root.querySelectorAll(".hero-panel").forEach((panel) => {
       panel.addEventListener("focus", () => previewPanel(panel));
@@ -598,6 +620,20 @@ const reduced =
         clearPreview();
       });
     });
+
+    /* If nav/scroll leaves hero while a preview is sticky, drop it */
+    const heroSection = document.getElementById("hero");
+    if (heroSection && typeof IntersectionObserver !== "undefined") {
+      const leaveObs = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (!entry.isIntersecting && previewActive) clearPreview();
+          });
+        },
+        { threshold: 0.2 }
+      );
+      leaveObs.observe(heroSection);
+    }
   })();
 
   /* Active nav underline — deferred to pickCenteredSection during programmatic jumps */

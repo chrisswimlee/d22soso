@@ -172,24 +172,27 @@
         </h1>
         <div class="hero-panels" role="navigation" aria-label="Identity portals">
           <a class="hero-panel reveal-item" href="#esports" data-panel="champion" aria-label="World Champion — jump to StarCraft">
-            <span class="hero-panel-label mono">World Champion</span>
+            <span class="hero-panel-label mono">
+              <span class="hero-panel-label-full">World Champion</span>
+              <span class="hero-panel-label-short" aria-hidden="true">Champion</span>
+            </span>
             <span class="hero-panel-media">
               <picture>
                 <source
                   type="image/avif"
                   srcset="assets/img/champ-trophy-640.avif 640w, assets/img/champ-trophy-1080.avif 1080w"
-                  sizes="(max-width: 1023px) 88vw, 28vw"
+                  sizes="(max-width: 480px) 30vw, (max-width: 1023px) 30vw, 28vw"
                 />
                 <source
                   type="image/webp"
                   srcset="assets/img/champ-trophy-640.webp 640w, assets/img/champ-trophy-1080.webp 1080w"
-                  sizes="(max-width: 1023px) 88vw, 28vw"
+                  sizes="(max-width: 480px) 30vw, (max-width: 1023px) 30vw, 28vw"
                 />
                 <img
-                  src="assets/img/champ-trophy-1080.jpg"
+                  src="assets/img/champ-trophy-640.jpg"
                   alt="Wayne D22-soso Chiang with StarCraft Brood War world championship trophy"
-                  width="1080"
-                  height="1620"
+                  width="640"
+                  height="960"
                   fetchpriority="high"
                   decoding="async"
                 />
