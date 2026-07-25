@@ -156,6 +156,12 @@ body {
   opacity: 1;
 }
 
+/* Theme photos are ~4MB across all layers. Hold them back until a layer is
+   shown (or primed on idle) so they never compete with first paint. */
+.bg-layer:not(.is-active):not(.is-primed) {
+  background-image: none;
+}
+
 /* Snappier crossfade while hovering hero identity panels */
 #bg-stage.is-hero-preview .bg-layer {
   transition-duration: 0.45s;
