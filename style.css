@@ -1453,7 +1453,7 @@ h3 {
 
 .hero-panel-media img {
   object-fit: cover;
-  object-position: 48% 36%;
+  object-position: 50% 18%;
   max-height: 100%;
   filter: contrast(1.05) saturate(0.92);
   transition: transform 0.5s ease, filter 0.5s ease;

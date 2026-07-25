@@ -24,7 +24,7 @@ export default function Hero() {
         <img
           src="/champ-trophy.webp"
           alt=""
-          className="h-full w-full object-cover object-[center_18%] opacity-70 sm:opacity-[0.78]"
+          className="h-full w-full object-cover object-[center_12%] opacity-70 sm:object-[72%_10%] sm:opacity-[0.78]"
         />
         {/* Bottom vignette only — keep the trophy readable */}
         <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/45 to-slate-950/15" />
