@@ -69,17 +69,33 @@ gen twohh-logo     "$SRC/2hh LOGO OFFICIAL TRADEMARK APPLIED.png"               
 gen badugi-play    "$SRC/Badugi Play 4.png"                                                       png 900
 
 echo "== Theme backgrounds (resize + AVIF/WebP + compressed JPG) =="
+# Cover backgrounds sit behind gradients/vignettes — 1600×1200 at moderate
+# quality is plenty, and portrait sources get height-capped so they don't
+# ship 2× the pixels the viewport can ever show.
+BG_W=1600
+BG_H_MAX=1200
+BG_AVIF_Q=48
+BG_WEBP_Q=70
+BG_JPG_Q=68
+
 # genbg <name> — reads themes/<name>.jpg, writes img/bg-<name>.{avif,webp,jpg}
 genbg() {
-  local name="$1" w=1920
+  local name="$1"
   local src="$THEMES/${name}.jpg"
   if [ ! -f "$src" ]; then echo "  ! MISSING theme: $src" >&2; return; fi
   local base="$TMP/bg-${name}.png"
-  sips --resampleWidth "$w" "$src" --out "$base" >/dev/null 2>&1
-  avifenc -q 55 -s "$AVIF_SPEED" "$base" "$OUT/bg-${name}.avif" >/dev/null 2>&1
-  cwebp -quiet -q 76 "$base" -o "$OUT/bg-${name}.webp"
-  sips -s format jpeg -s formatOptions 74 "$base" --out "$OUT/bg-${name}.jpg" >/dev/null 2>&1
-  printf "  %-18s avif %5sK  webp %5sK  jpg %5sK\n" "$name" \
+  sips --resampleWidth "$BG_W" "$src" --out "$base" >/dev/null 2>&1
+  local h
+  h=$(sips -g pixelHeight "$base" 2>/dev/null | awk '/pixelHeight/{print $2}')
+  if [ "${h:-0}" -gt "$BG_H_MAX" ]; then
+    sips --resampleHeight "$BG_H_MAX" "$base" --out "$base" >/dev/null 2>&1
+  fi
+  avifenc -q "$BG_AVIF_Q" -s "$AVIF_SPEED" -y 420 "$base" "$OUT/bg-${name}.avif" >/dev/null 2>&1
+  cwebp -quiet -q "$BG_WEBP_Q" -m 6 "$base" -o "$OUT/bg-${name}.webp"
+  sips -s format jpeg -s formatOptions "$BG_JPG_Q" "$base" --out "$OUT/bg-${name}.jpg" >/dev/null 2>&1
+  local dim
+  dim=$(sips -g pixelWidth -g pixelHeight "$base" 2>/dev/null | awk '/pixelWidth/{w=$2} /pixelHeight/{h=$2} END{print w"x"h}')
+  printf "  %-18s %-10s avif %5sK  webp %5sK  jpg %5sK\n" "$name" "$dim" \
     "$(( ($(stat -f%z "$OUT/bg-${name}.avif") + 512) / 1024 ))" \
     "$(( ($(stat -f%z "$OUT/bg-${name}.webp") + 512) / 1024 ))" \
     "$(( ($(stat -f%z "$OUT/bg-${name}.jpg") + 512) / 1024 ))"
