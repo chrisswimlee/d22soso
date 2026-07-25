@@ -57,7 +57,10 @@ const reduced =
       activeBg = bg;
       document.body.dataset.bg = bg;
       bgLayers.forEach((layer) => {
-        layer.classList.toggle("is-active", layer.dataset.bg === bg);
+        const on = layer.dataset.bg === bg;
+        layer.classList.toggle("is-active", on);
+        /* Keep the photo on outgoing layers so the crossfade still has something to fade */
+        if (on) layer.classList.add("is-primed");
       });
     }
     if (document.body.dataset.theme !== theme) {
@@ -65,6 +68,23 @@ const reduced =
     }
     syncThemeColor();
   }
+
+  /* Once the critical path is done, pull the remaining theme photos in so
+     scrolling into a section never waits on a download. */
+  function primeAllBgLayers() {
+    bgLayers.forEach((layer) => layer.classList.add("is-primed"));
+  }
+
+  function scheduleBgPriming() {
+    if (typeof window.requestIdleCallback === "function") {
+      window.requestIdleCallback(primeAllBgLayers, { timeout: 3000 });
+    } else {
+      setTimeout(primeAllBgLayers, 1200);
+    }
+  }
+
+  if (document.readyState === "complete") scheduleBgPriming();
+  else window.addEventListener("load", scheduleBgPriming, { once: true });
 
   function variantKeyForSection(section) {
     const base = section?.dataset.baseTheme;
