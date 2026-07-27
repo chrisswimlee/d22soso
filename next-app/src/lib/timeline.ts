@@ -38,9 +38,9 @@ export const TIMELINE: TimelineMilestone[] = [
     sortYear: 1998.4,
     category: "esports",
     title: "StarCraft Case's Ladder #1",
-    summary: "Hit #1 in 1v1 and teams shortly after StarCraft's release.",
+    summary: "Hit #1 in 1v1 and teams after SuperPeon mailed him StarCraft.",
     detail:
-      "When StarCraft launched in April 1998, Chiang climbed to Case's Ladder #1 in both 1v1 and teams with C4L — then won an early tournament at Neutral Ground Mountain View.",
+      "Planning to retire after Warcraft II, Chiang returned when teammate SuperPeon mailed him StarCraft (March 31, 1998). He climbed to Case's Ladder #1 in 1v1 and teams, held top-10 Battle.net ranks seasons 1–4, and in April 1998 won the first StarCraft tournament at Neutral Ground Mountain View ($250) vs Jay \"Gadianton\" Severson.",
   },
   {
     id: "pimpest-1998",
@@ -48,9 +48,9 @@ export const TIMELINE: TimelineMilestone[] = [
     sortYear: 1998.8,
     category: "esports",
     title: "Pimpest Plays & GX StarCraft",
-    summary: "Created Pimpest Plays and authored GX StarCraft battle reports.",
+    summary: "Led GX StarCraft: Tips of the Day, patch updates, battle reports, Pimpest Plays.",
     detail:
-      "Alongside Thresh and Calbear on Gamers.com, Chiang helped invent the highlight-reel culture of esports through Pimpest Plays and ladder battle reports — a template still echoed in modern esports media.",
+      "After missing PGL Season 3 registration by one day, Chiang became StarCraft's first caster. Thresh and Calbear recruited him to lead GX StarCraft on Gamers.com — Tips of the Day, patch strategy updates, post-match battle reports vs rivals like Grrrr…, and Pimpest Plays, the original esports Top 10.",
   },
   {
     id: "bw-champ-1999",
@@ -60,7 +60,7 @@ export const TIMELINE: TimelineMilestone[] = [
     title: "1999 Brood War World Champion",
     summary: "First official Blizzard Brood War Season 1 Ladder Tournament champion — Random.",
     detail:
-      "On April 28, 1999, Wayne \"D22-soso\" Chiang won Blizzard's first official StarCraft: Brood War Season 1 Ladder Tournament World Championship ($2,500), playing Random. Renamed D22-soso by Dennis \"Thresh\" Fong.",
+      "Playing Random, Wayne \"D22-soso\" Chiang bested Nautosoft, Shin Ju Young, and Guillaume \"Grrrr…\" Patry (Lost Temple semi), then defeated Crexis (Chris Low) on Showdown — after losing a Terran cliff war, micromanaged infantry, Ghosts, and Siege Tanks closed Game 5 (35:37) for $2,500. Renamed D22-soso by Dennis \"Thresh\" Fong.",
     link: {
       href: "https://liquipedia.net/starcraft/Soso",
       label: "Liquipedia — Soso",
@@ -117,14 +117,14 @@ export const TIMELINE: TimelineMilestone[] = [
       "Active as World Series of Poker Talent Manager (Media Team) from April 2025, including the Vlogger Program — bridging pioneer esports storytelling with modern poker media. Interviewed SlayerS_BoxeR at the 2025 WSOP.",
   },
   {
-    id: "book-2026",
-    year: "2026",
-    sortYear: 2026,
+    id: "book-2025",
+    year: "2025",
+    sortYear: 2025.9,
     category: "poker",
     title: "Betting on Yourself",
-    summary: "Co-authored with Joe Matton (Kendall Hunt) — WEB framework.",
+    summary: "Co-authored with Joe Matton (Kendall Hunt, Dec 2025) — WEB framework.",
     detail:
-      "Published Betting on Yourself with Joe Matton via Kendall Hunt, translating competitive decision frameworks from esports and poker into a personal operating system for high-stakes choices.",
+      "Published Betting on Yourself with Joe Matton via Kendall Hunt (Dec 2025, ISBN 9798319708007), translating competitive decision frameworks from esports and poker into a personal operating system for high-stakes choices.",
   },
 ];
 

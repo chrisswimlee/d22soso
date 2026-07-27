@@ -1,70 +1,66 @@
-StarCraft Brood War’s First World Champion: Leader by Example.
+# StarCraft Brood War’s First World Champion: Leader by Example
 
-Dawn of Esports
-Before the sold-out stadiums in Seoul, before multi-million dollar Twitch exclusivity contracts, and long before you can Google "Zerg Rush" the digital frontier was a wild, uncharted landscape. In 1996 Wayne Chiang as “SoSOWAC” dominated 1 vs. 1 and teams on Case’s ladder ranking #1 at Command & Conquer Tiberian Dawn. In 1997, he did the same for WarCraft 2 Tides of Darkness.
-3/31/1998 changed everything. StarCraft was released and eSports would never be the same.
-Once again, Chiang hit #1 Case’s Ladder 1 vs. 1 and teams. Then won the first StarCraft tournament against friend and eventual chess.com co-founder Jay “Gadianton” Severson for $250 held at legendary Magic: the Gathering hotspot Neutral Ground Mountain View close to Google and Apple Headquarters. Two $10 grudge-match victories over Severson followed. With nothing more to prove, Chiang was ready to move on. 
-Then September 1998, Severson let Chiang know Professional Gamer’s League 3 was running the first international StarCraft tournament. Chiang missed sign ups by one day. Missing the registration for PGL Season 3 by a single day could have been a career-ending setback for a lesser player. Instead, he stated “I want it all”. He set out to be the top media personality and content creator for StarCraft. He took to the microphone, becoming StarCraft’s first-ever caster and watching his rival and friend, Gadianton, take the first place.
-This early eye for talent and narrative caught the attention of esports heavyweights 5x First Person Shooter World Champion and Esports Hall of Famer Dennis “Thresh” Fong and Bob “Calbear” Colayco, who handed Chiang the keys to GX StarCraft on Gamers.com. D11-Thresh inducted “SoSOWAC” to “D22-soso” and “Gadianton” to “D23-Gadianton”.
-D22-soso became the central nervous system of the community. He wasn't just beating the best players in the world; he was translating their brilliance for the masses. He wrote battle reports of high ranked ladder games most notably battling rival Guillaume Patry. Set up Pimpest Plays: The original SportsCenter Top 10 for esports, creating the foundation for every highlight reel you see on YouTube today.
-While most early pros relied on blistering early-game APM, when Chiang and Patry clashed, they dragged each other into the depths of the late game, utilizing rarely-seen units like Ultralisks, Battle Cruisers, and Carriers.
-At the 1999 Brood War Season 1 Ladder Tournament(LINK) was Blizzard’s first official World Championship—D22-soso did the unthinkable. In a game defined by extreme, singular racial specialization, he played Random. It was the equivalent of winning a scoring title while shooting ambidextrously.
-In a legendary 38-minute semi-final match against Patry's Zerg on Lost Temple, Chiang rolled Protoss. Facing a map that was 75% controlled by the swarm, he orchestrated a masterclass three-pronged attack: Reavers and Archons on the right, Dark Templars and Corsairs on the left, and a devastating push down the middle. He broke Patry, advanced to the finals, and defeated Crexis to become the first StarCraft: Brood War World Champion, taking home $2,500.
-StarCraft Team Case’s Ladder #1 1998
-Neutral Ground Mountain View StarCraft Tournament 1st Place(1st StarCraft Tournament Winner) 1998
-October 1998 1st StarCraft Tournament Commentator PGL Season 3 StarCraft World Championship
-February 1999 B.net vs Kali #2 Seed vs. Guillaume Patry 
-April 1999 StarCraft Brood War Battle.net Season 1 World Champion 1999
-May 1999 PGL Season 4 Starcraft World Championship 2nd Place 1999
-June USA Vs. Canada MVP 1999
-July 1999 Sports Seoul Starcraft Brood War #5 1999
-July 1999 StarCraft World Champions Invitational #3 1999
-September 1999 Starcraft Brood War Battle.net World Championships #3, 1999
+Source: `D22-soso Wayne Chiang StarCraft bio.pdf` (2026).
 
+## The Dawn of Esports
 
+Long before sold-out stadiums in Seoul, multi-million dollar streaming contracts, or even the ability to type "Zerg Rush" into Google, the digital frontier was a wild, uncharted landscape. Defining greatness in this era required true pioneers. Among them was Wayne Chiang, initially known online as "SoSOWAC."
 
-As a competitor:
-StarCraft Team Case’s Ladder #1 1998
-Neutral Ground Mountain View StarCraft Tournament 1st Place(1st StarCraft Tournament Winner) 1998
-October 1998 1st StarCraft Tournament Commentator PGL Season 3 StarCraft World Championship
-February 1999 B.net vs Kali #2 Seed vs. Guillaume Patry 
-April 1999 StarCraft Brood War Battle.net Season 1 World Champion 1999
-May 1999 PGL Season 4 Starcraft World Championship 2nd Place 1999
-June USA Vs. Canada MVP 1999
-July 1999 Sports Seoul Starcraft Brood War #5 1999
-July 1999 StarCraft World Champions Invitational #3 1999
-September 1999 Starcraft Brood War Battle.net World Championships #3, 1999
+Chiang’s competitive journey began in 1996, dominating 1v1 and team play on Case’s Ladder in *Command & Conquer: Tiberian Dawn* (1996) and *Warcraft II: Tides of Darkness* (1997), ranking #1. Planning to retire from competitive gaming after Warcraft II, Chiang was lured back on March 31, 1998, when his teammate "SuperPeon" mailed him a copy of Blizzard Entertainment’s newly released *StarCraft*.
 
-As a content creator
+Esports would never be the same. Chiang rapidly claimed the #1 spot on Case’s Ladder in both 1v1 and team modes. He achieved and maintained top 10 ladder rankings on Battle.net from seasons 1 to 4. In April 1998, he entered and won the first StarCraft tournament ever — a 20-player event taking $250 at Neutral Ground Mountain View, a legendary Magic: The Gathering hotspot nestled in Silicon Valley near Google and Apple headquarters. Chiang defeated his friend and future Chess.com co-founder, Jay “Gadianton” Severson, followed by two $10 grudge-match victories.
 
+## The First Caster & The Architect of GX StarCraft
 
+In September 1998, Severson alerted Chiang about the Professional Gamers League (PGL) Season 3, the first international StarCraft tournament. Having missed registration by a single day, Chiang pivoted into the first StarCraft content creator who was also a competitor. Declaring "I want it all," he took to the microphone to become *StarCraft*’s first-ever caster, watching Severson capture the tournament title.
 
-The Walk-Off and The Long Game
-Like a champion vacating the throne at the absolute peak of his powers, D22-soso eventually walked away.
-With the esports scene shifting entirely to South Korea and the dot-com bubble looming, Patry—four years his junior—was rapidly evolving. Choosing family, academics, and a grander vision for his future, Chiang stepped away from the keyboard to pursue a Computer Science degree at UC San Diego.
-He didn't stick around to watch his mechanics fade. He handed the torch to a new generation, eventually interviewing legends like SlayerS_BoxeR at the 2025 World Series of Poker—a meeting of the man who built the throne, and the man who sat on it.
-Ultimately, StarCraft was never just a video game for Wayne Chiang. It was Chapter One. The ability to read opponents, calculate odds, evaluate raw talent, and design winning strategies didn't retire in 1999. It evolved. The battlefield simply shifted from the pixelated maps of Brood War to the green felt of Las Vegas and the boardrooms of modern business. The ultimate macro-manager traded his hotkeys for higher stakes, proving that whether you're building a digital empire or a real-world legacy, the meta never really changes—you just have to be willing to bet on yourself.
+Chiang’s early eye for talent, deep game sense, and narrative flair caught the attention of esports heavyweights Dennis “Thresh” Fong (5-time First Person Shooter World Champion) and Bob “Calbear” Colayco. They recruited Chiang to lead GX StarCraft on Gamers.com, inducting him as “D22-soso” alongside “D23-Gadianton.”
 
-—---
+GX StarCraft quickly became the premier hub for StarCraft content outside of Blizzard’s official site. D22-soso operated as the central nervous system of the community, translating top-level brilliance for the masses through:
 
+- **Tips of the Day & Strategy Articles** — Unpacking macro strategies and high-level unit combinations in an era before replay files existed.
+- **Patch Strategy Updates** — Analyzing how balance changes reshaped competitive play.
+- **Battle Reports** — Writing detailed, game-by-game accounts of high-stakes ladder and tournament matches against top rivals like Guillaume "x'Ds~Grrrr..." Patry right after the matches.
+- **Pimpest Plays** — Launching the original esports "Top 10" highlight concept, laying the foundation for modern gaming highlight reels.
 
-—-
+## The Ultimate Flex: World Champion
 
-StarCraft Brood War’s First World Champion Sets Example
+The first StarCraft rivalry was defined by D22-soso versus the young French-Canadian prodigy, Guillaume "x'Ds~Grrrr..." Patry. While most early pros relied strictly on blistering early-game APM, matches between Chiang and Patry dragged each other into deep, complex late-game scenarios featuring rarely-seen units like Ultralisks, Battlecruisers, Carriers, Science Vessels, and Ghosts.
 
+The 1999 Brood War Season 1 Ladder Tournament was the first official Brood War international tournament. D22-soso executed the ultimate flex: he played Random. Path to the title: besting Nautosoft, Shin Ju Young, x’Ds~Grrrr… (including a Lost Temple semi-final), then Chris Low.
 
-Before sold-out stadiums in Seoul and multi-million dollar streaming contracts, the digital frontier was an uncharted landscape. It required a pioneer to define greatness.
-Today, Wayne “D22-soso” Chiang operates on a different battlefield. He is the Talent Manager for the World Series of Poker (WSOP), an inventor of patented casino games like 2 Hand Holdem and Badugi Chase, and co-author of the self-investment guide, Betting on Yourself. But in 1998, he wasn't just playing StarCraft; he was pouring the concrete foundation for modern competitive gaming and content creation.
+In the finals on Showdown against Crexis (Chris Low), after losing the cliff war Terran vs. Terran, D22-soso’s micromanaged infantry, Ghosts, and Siege Tanks secured Game 5 (35:37). D22-soso became the first *StarCraft: Brood War* World Champion, taking home $2,500.
 
+## Competitive Timeline
 
-The Ultimate Flex: World Champion
-Every era needs a rivalry. For D22-soso, that rival was the legendary Guillaume "x’Ds~Grrrr…" Patry. While most pros relied on early-game speed, Chiang and Patry pushed matches into complex "late-game" scenarios using advanced units like Ultralisks and Science Vessels.
-At the 1999 Brood War Season 1 Ladder Tournament—Blizzard’s first official World Championship—Chiang did the unthinkable: he played Random.
-In a legendary 38-minute semi-final against Patry on Lost Temple, Chiang rolled Protoss. Despite Patry controlling 75% of the map, Chiang orchestrated a masterclass three-pronged attack involving Reavers, Archons, and Dark Templars. He broke the swarm, advanced to the finals, and became the first StarCraft: Brood War World Champion.
+| Date | Event | Result |
+|------|-------|--------|
+| April 1998 | StarCraft Case’s Ladder 1v1 & Teams | #1 Rank |
+| April 1998 | Neutral Ground Mountain View Tournament | 1st Place ($250) |
+| October 1998 | PGL Season 3 | 1st StarCraft Caster |
+| January 1999 | Battle.net vs. Kali (#2 Seed Match vs. Guillaume Patry) | 2–3 Loss |
+| April 1999 | Battle.net Brood War Season 1 Tournament | World Champion ($2,500) |
+| May 1999 | PGL Season 4 | 2nd Place ($7,000) |
+| June 1999 | USA vs. Canada Showcase | MVP (3–0) |
+| July 1999 | Sports Seoul Brood War Tournament | 5th–8th Place ($850) |
+| August 1999 | StarCraft World Champions Invitational | 3rd Place ($1,500) |
+| September 1999 | Battle.net World Championship Finals | 3rd Place ($1,000) |
 
-The Evolution of the Macro-Manager
-At the peak of his powers, Chiang chose a "walk-off" win. As the professional scene shifted toward South Korea, he stepped away to pursue a Computer Science degree at UC San Diego, handing the torch to the next generation.
-Years later, he would interview icons like SlayerS_BoxeR at the 2025 World Series of Poker—a symbolic meeting between the man who built the throne and the man who sat upon it.
-For Wayne Chiang, StarCraft was simply Chapter One. The ability to read opponents, calculate odds, and design winning strategies merely shifted from pixelated maps to the green felt of Las Vegas. He proved that whether you are managing digital units or a global poker brand, the "meta" never really changes: you just have to be willing to bet on yourself.
+### Interviews
 
-Today, Wayne “D22-soso” Chiang operates on a different battlefield. He is the Talent Manager for the World Series of Poker(WSOP), the inventor of patented casino games 2 Hand Holdem and Badugi Chase,  and the co-author of the ultimate guide to self-investment, Betting on Yourself(Link amazon). But long before he was shaping the modern poker landscape, he was mastering the ultimate game of strategy. In 1998, he wasn't just playing StarCraft; he was pouring the concrete foundation for modern competitive gaming.
+- Zombie Grub’s D22-soso Comprehensive StarCraft Interview: https://www.youtube.com/watch?v=CHd4-eZx2Do
+- Tasteless and Artosis D22-soso Throwback: https://www.youtube.com/watch?v=92bufUCAF6k
+
+## Applying StarCraft’s Lessons to the Real World
+
+With the professional scene rapidly shifting to South Korea, the impending dot-com crash, and Patry being four years his junior, Chiang made a calculated decision. Prioritizing family, academics, and long-term ambition, he stepped away at the peak of his competitive career—entering Computer Science and Engineering at UC San Diego before graduating with a B.A. in Economics (Class of 2007).
+
+Chiang handed the torch to a new generation of legends like Garimto, SlayerS_BoxeR, Nal_ra, NaDa, Flash, and Jaedong. Decades later, at the 2025 World Series of Poker (WSOP), Chiang reconnected with and interviewed SlayerS_BoxeR — a poignant meeting between the man who set the foundation for the throne and the icon who sat upon it.
+
+## The Evolution of the Macro-Manager
+
+For Wayne "D22-soso" Chiang, StarCraft was never the destination; it was Chapter One. Today, Chiang operates on a different high-stakes battlefield. He serves as the Talent Manager for the World Series of Poker (WSOP), the inventor of patented casino games such as 2 Hand Hold’em and Badugi Chase, and co-author of the self-investment guide *Betting on Yourself*.
+
+The skills that brought him to the top of Case's Ladder — reading opponents, calculating real-time odds, managing macro resources, and executing long-term strategy — retired neither in 1999 nor on the digital battlefield. They simply evolved from pixelated maps to the green felt of Las Vegas and modern corporate boardrooms, proving that while the stakes may change, the core meta remains the same: you just have to be willing to bet on yourself.
+
+Chiang stays in contact with StarCraft’s elite as they mutually help each other in life in this elite performing clan of professional gamers.
