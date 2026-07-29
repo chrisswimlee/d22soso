@@ -1,0 +1,3 @@
+three.js r170 (0.170.0)
+Source: npm package three@0.170.0 build/three.module.js
+License: MIT (see LICENSE)

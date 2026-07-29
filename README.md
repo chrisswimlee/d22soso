@@ -4,7 +4,7 @@ Premium single-page portfolio for Wayne “D22-soso” Chiang: StarCraft: Brood 
 
 ## Run locally
 
-ES modules + CDN imports require HTTP (not `file://`). From this folder:
+ES modules + vendored imports require HTTP (not `file://`). From this folder:
 
 ```bash
 python3 -m http.server 8080
@@ -16,7 +16,8 @@ Then visit [http://localhost:8080](http://localhost:8080).
 
 | File | Role |
 |------|------|
-| `index.html` | Page structure, import map (Three.js + GSAP) |
+| `index.html` | Page structure, import map (Three.js + GSAP → `vendor/`) |
+| `vendor/` | Self-hosted ESM builds of Three.js + GSAP |
 | `style.css` | Brood War shell + per-tab themes |
 | `script.js` | Tabs, hotkeys, theme orchestration, WebGL boot |
 | `js/webgl-scene.js` | Shared WebGL fleets + fog-of-war scout |
@@ -29,7 +30,7 @@ Then visit [http://localhost:8080](http://localhost:8080).
 
 - **Three.js** (WebGL) for background fleets, fog scout, and panel scenes
 - **GSAP + ScrollTrigger** for theme crossfades, race/battle/card motion, scroll parallax
-- Vanilla HTML/CSS orchestration (no build step; CDN ESM via import map)
+- Vanilla HTML/CSS orchestration (no build step; vendored ESM via import map)
 
 ## Game controls
 
