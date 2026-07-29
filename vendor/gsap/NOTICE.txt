@@ -1,0 +1,2 @@
+GSAP 3.12.5 — https://gsap.com
+Vendored from npm package gsap@3.12.5 for offline/self-hosted ESM use.

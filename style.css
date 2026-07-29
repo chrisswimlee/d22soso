@@ -148,8 +148,12 @@ body {
   inset: 0;
   opacity: 0;
   transition: opacity 1.85s cubic-bezier(0.33, 0.05, 0.2, 1);
-  will-change: opacity;
   z-index: 1;
+}
+
+.bg-layer.is-active,
+.bg-layer.is-fading {
+  will-change: opacity;
 }
 
 .bg-layer.is-active {
@@ -509,57 +513,46 @@ a:hover {
 html.reveal-on [data-reveal]:not(.is-inview) {
   opacity: 0;
   transform: translate3d(0, 28px, 0);
-  filter: blur(2px);
   /* Keep controls clickable near the viewport edge (Launch / theme panels / poker) */
 }
 
 html.reveal-on [data-reveal] {
   transition:
     opacity 0.55s ease,
-    transform 0.7s var(--ease-spring),
-    filter 0.55s ease;
-  will-change: opacity, transform;
+    transform 0.7s var(--ease-spring);
 }
 
 html.reveal-on [data-reveal].is-inview {
   opacity: 1;
   transform: none;
-  filter: none;
 }
 
 /* Directional exits — opposite of the enter path */
 html.reveal-on [data-reveal][data-exit="up"]:not(.is-inview) {
   transform: translate3d(0, -40px, 0);
-  filter: blur(3px);
 }
 
 html.reveal-on [data-reveal][data-exit="down"]:not(.is-inview) {
   transform: translate3d(0, 40px, 0);
-  filter: blur(3px);
 }
 
 /* StarCraft — warp in from left; exit flies the other way */
 html.reveal-on [data-reveal="warp"]:not(.is-inview):not([data-exit]) {
   transform: translate3d(-48px, 18px, 0) scale(0.96);
-  filter: blur(4px) saturate(0.6);
 }
 html.reveal-on [data-reveal="warp"][data-exit="up"]:not(.is-inview) {
   transform: translate3d(52px, -28px, 0) scale(0.94);
-  filter: blur(5px) saturate(0.5);
 }
 html.reveal-on [data-reveal="warp"][data-exit="down"]:not(.is-inview) {
   transform: translate3d(-52px, 32px, 0) scale(0.94);
-  filter: blur(5px) saturate(0.5);
 }
 
 /* C&C — CRT scan-in / scan-out */
 html.reveal-on [data-reveal="scan"]:not(.is-inview):not([data-exit]) {
   transform: translate3d(0, 12px, 0) scaleY(1.04);
-  filter: brightness(1.4) saturate(1.6);
 }
 html.reveal-on [data-reveal="scan"][data-exit]:not(.is-inview) {
   transform: translate3d(0, 0, 0) scaleY(0.04);
-  filter: brightness(1.8) saturate(2);
   opacity: 0;
 }
 
@@ -635,22 +628,18 @@ html.reveal-on [data-reveal="twist"] {
 html.reveal-on [data-reveal="twist"]:not(.is-inview):not([data-exit]) {
   opacity: 0;
   transform: perspective(900px) rotateY(-32deg) rotateZ(-3deg) translate3d(-28px, 12px, 0);
-  filter: blur(2px);
 }
 html.reveal-on [data-reveal="twist"][data-exit="up"]:not(.is-inview) {
   transform: perspective(900px) rotateY(28deg) rotateZ(4deg) translate3d(24px, -28px, 0);
-  filter: blur(3px);
 }
 html.reveal-on [data-reveal="twist"][data-exit="down"]:not(.is-inview) {
   transform: perspective(900px) rotateY(-28deg) rotateZ(-4deg) translate3d(-24px, 32px, 0);
-  filter: blur(3px);
 }
 
 /* Text boxes — jump in (springy pop) */
 html.reveal-on [data-reveal="jump"]:not(.is-inview):not([data-exit]) {
   opacity: 0;
   transform: translate3d(0, 64px, 0) scale(0.78);
-  filter: none;
 }
 html.reveal-on [data-reveal="jump"][data-exit="up"]:not(.is-inview) {
   transform: translate3d(0, -48px, 0) scale(0.86);
@@ -661,25 +650,21 @@ html.reveal-on [data-reveal="jump"][data-exit="down"]:not(.is-inview) {
 html.reveal-on [data-reveal="jump"] {
   transition:
     opacity 0.4s ease,
-    transform 0.75s var(--ease-spring),
-    filter 0.4s ease;
+    transform 0.75s var(--ease-spring);
 }
 
 /* Text boxes — soft fade in */
 html.reveal-on [data-reveal="fade"]:not(.is-inview):not([data-exit]) {
   opacity: 0;
   transform: none;
-  filter: blur(6px);
 }
 html.reveal-on [data-reveal="fade"][data-exit]:not(.is-inview) {
   opacity: 0;
   transform: none;
-  filter: blur(8px);
 }
 html.reveal-on [data-reveal="fade"] {
   transition:
     opacity 0.85s ease,
-    filter 0.85s ease,
     transform 0.85s ease;
 }
 
@@ -690,17 +675,14 @@ html.reveal-on [data-reveal="stagger"]:not(.is-inview) .reveal-item {
 
 html.reveal-on [data-reveal="stagger"]:not(.is-inview):not([data-exit]) .reveal-item:nth-child(3n + 1) {
   transform: perspective(800px) rotateY(-24deg) translate3d(-18px, 8px, 0);
-  filter: blur(2px);
 }
 
 html.reveal-on [data-reveal="stagger"]:not(.is-inview):not([data-exit]) .reveal-item:nth-child(3n + 2) {
   transform: translate3d(0, 48px, 0) scale(0.84);
-  filter: none;
 }
 
 html.reveal-on [data-reveal="stagger"]:not(.is-inview):not([data-exit]) .reveal-item:nth-child(3n) {
   transform: none;
-  filter: blur(7px);
 }
 
 html.reveal-on [data-reveal="stagger"][data-exit="up"]:not(.is-inview) .reveal-item:nth-child(3n + 1) {
@@ -711,7 +693,6 @@ html.reveal-on [data-reveal="stagger"][data-exit="up"]:not(.is-inview) .reveal-i
 }
 html.reveal-on [data-reveal="stagger"][data-exit="up"]:not(.is-inview) .reveal-item:nth-child(3n) {
   transform: none;
-  filter: blur(8px);
 }
 
 html.reveal-on [data-reveal="stagger"][data-exit="down"]:not(.is-inview) .reveal-item:nth-child(3n + 1) {
@@ -722,7 +703,6 @@ html.reveal-on [data-reveal="stagger"][data-exit="down"]:not(.is-inview) .reveal
 }
 html.reveal-on [data-reveal="stagger"][data-exit="down"]:not(.is-inview) .reveal-item:nth-child(3n) {
   transform: none;
-  filter: blur(8px);
 }
 
 html.reveal-on [data-reveal="stagger"] .reveal-item {
@@ -735,7 +715,6 @@ html.reveal-on [data-reveal="stagger"] .reveal-item {
 html.reveal-on [data-reveal="stagger"].is-inview .reveal-item {
   opacity: 1;
   transform: none;
-  filter: none;
 }
 
 html.reveal-on [data-reveal="stagger"].is-inview .reveal-item:nth-child(1) { transition-delay: 0.04s; }
@@ -831,8 +810,7 @@ body[data-bg^="hearthstone"] #webgl-bg {
   padding: 0.55rem 0.9rem;
   border: 1px solid color-mix(in srgb, var(--theme-accent) 40%, var(--border));
   border-radius: 999px;
-  background: rgba(10, 10, 12, 0.82);
-  backdrop-filter: blur(10px);
+  background: rgba(10, 10, 12, 0.94);
   box-shadow: 0 8px 28px rgba(0, 0, 0, 0.5);
   pointer-events: none;
   transition: border-color 0.4s ease, box-shadow 0.4s ease, top 0.2s ease;
@@ -893,8 +871,7 @@ body[data-bg^="hearthstone"] #webgl-bg {
   padding-bottom: 0.55rem;
   padding-left: max(var(--pad-x), var(--safe-left));
   padding-right: max(var(--pad-x), var(--safe-right));
-  background: rgba(10, 10, 10, 0.92);
-  backdrop-filter: blur(12px);
+  background: rgba(10, 10, 10, 0.97);
   border-bottom: 1px solid var(--border);
   pointer-events: auto;
   isolation: isolate;
@@ -1078,12 +1055,12 @@ body[data-bg^="hearthstone"] #webgl-bg {
 
 .nav-social {
   display: inline-flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   align-items: center;
   justify-content: flex-end;
-  gap: 0.25rem;
+  gap: 0.2rem;
   flex-shrink: 0;
-  max-width: min(100%, 34rem);
+  max-width: none;
 }
 
 .nav-social-link {
@@ -1293,31 +1270,24 @@ h3 {
   content: "";
   position: absolute;
   border-radius: 50%;
-  filter: blur(60px);
-  opacity: 0.5;
+  opacity: 0.55;
+  /* Soft gradients only — no live CSS blur/animation (major composite cost) */
 }
 
 .hero-fog::before {
-  width: 420px;
-  height: 420px;
-  top: -10%;
-  left: -8%;
-  background: radial-gradient(circle, rgba(139, 92, 246, 0.22), transparent 65%);
-  animation: orbDrift 18s ease-in-out infinite alternate;
+  width: 520px;
+  height: 520px;
+  top: -16%;
+  left: -12%;
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.28), transparent 68%);
 }
 
 .hero-fog::after {
-  width: 360px;
-  height: 360px;
-  bottom: -12%;
-  right: -6%;
-  background: radial-gradient(circle, rgba(212, 175, 55, 0.14), transparent 65%);
-  animation: orbDrift 22s ease-in-out infinite alternate-reverse;
-}
-
-@keyframes orbDrift {
-  from { transform: translate3d(0, 0, 0) scale(1); }
-  to { transform: translate3d(6vw, 4vh, 0) scale(1.15); }
+  width: 460px;
+  height: 460px;
+  bottom: -18%;
+  right: -10%;
+  background: radial-gradient(circle, rgba(212, 175, 55, 0.18), transparent 68%);
 }
 
 .hero-gate {
@@ -1500,11 +1470,35 @@ h3 {
   max-width: 100%;
   max-height: min(28svh, 220px);
   margin: 0 auto;
-  filter: none;
 }
 
 .hero-panel[data-panel="media"] .hero-panel-media--logo img {
   max-height: min(24svh, 190px);
+}
+
+/* Quiet business path — secondary to identity portals */
+.hero-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.5rem;
+  padding: 0.45rem 0.85rem;
+  margin-top: 0.15rem;
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--gold);
+  border-bottom: 1px solid color-mix(in srgb, var(--gold) 45%, transparent);
+  transition: color 0.2s, border-color 0.2s, background 0.2s;
+}
+
+.hero-cta:hover,
+.hero-cta:focus-visible {
+  color: color-mix(in srgb, var(--gold) 85%, #fff);
+  border-bottom-color: var(--gold);
+  background: rgba(212, 175, 55, 0.08);
+  outline: none;
 }
 
 /* Eyebrow badge chip with live-status dot */
@@ -2057,11 +2051,9 @@ kbd {
 @keyframes aboutMoreReveal {
   from {
     opacity: 0.35;
-    filter: blur(1px);
   }
   to {
     opacity: 1;
-    filter: blur(0);
   }
 }
 
@@ -4308,50 +4300,57 @@ body.play-2hh-immersive .back-top {
   }
 }
 
-/* Stack menu under brand; keep social pinned top-right */
+/* Keep one compact header row — nav scrolls, socials stay icon-only */
+@media (max-width: 1100px) {
+  .nav-social .nav-label {
+    display: none;
+  }
+
+  .nav-social-link {
+    padding: 0.35rem;
+    min-width: 36px;
+    gap: 0;
+  }
+}
+
 @media (max-width: 900px) {
   :root {
-    /* Two-row header before JS measures — avoid content under nav on first paint */
-    --header-h: 104px;
+    --header-h: 52px;
   }
 
   .site-header {
-    flex-wrap: wrap;
-    gap: 0.35rem;
+    flex-wrap: nowrap;
+    gap: 0.4rem;
+    padding-top: calc(0.4rem + var(--safe-top));
+    padding-bottom: 0.4rem;
   }
 
   .brand {
-    width: auto;
-    flex: 1 1 auto;
+    flex: 0 0 auto;
     min-width: 0;
   }
 
   .header-tools {
-    display: contents;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    flex: 1 1 auto;
+    min-width: 0;
   }
 
   .command-nav {
-    order: 3;
-    width: 100%;
-    max-width: none;
-    flex: 1 1 100%;
+    flex: 1 1 auto;
+    min-width: 0;
   }
 
   .nav-social {
-    order: 2;
-    margin-left: auto;
-    max-width: min(100%, 22rem);
-    gap: 0.2rem;
-  }
-
-  .site-header {
-    flex-wrap: wrap;
+    gap: 0.15rem;
   }
 
   .nav-social-link {
-    padding: 0.35rem 0.45rem;
-    font-size: 0.65rem;
-    gap: 0.28rem;
+    padding: 0.3rem;
+    min-height: 36px;
+    min-width: 34px;
   }
 
   .nav-social-icon {
@@ -4362,17 +4361,14 @@ body.play-2hh-immersive .back-top {
 
 /* Phone — 3 columns with readable short labels */
 @media (max-width: 480px) {
-  .nav-social {
-    max-width: min(100%, 16rem);
+  .brand-text {
+    display: none;
   }
 
   .nav-social-link {
-    padding: 0.32rem 0.4rem;
-    font-size: 0.62rem;
-  }
-
-  .nav-social .nav-label {
-    display: none;
+    padding: 0.28rem;
+    min-width: 32px;
+    min-height: 34px;
   }
 
   .back-top-label {

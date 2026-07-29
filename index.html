@@ -46,7 +46,7 @@
   </style>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link rel="preconnect" href="https://esm.sh" crossorigin />
+  <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png" />
   <link rel="stylesheet" href="style.css" />
   <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
@@ -54,14 +54,14 @@
   <script type="importmap">
   {
     "imports": {
-      "three": "https://esm.sh/three@0.170.0",
-      "gsap": "https://esm.sh/gsap@3.12.5"
+      "three": "./vendor/three/three.module.js",
+      "gsap": "./vendor/gsap/index.js"
     }
   }
   </script>
   <!-- Starts the Three.js/GSAP download with the HTML instead of after script.js parses -->
-  <link rel="modulepreload" href="https://esm.sh/three@0.170.0" crossorigin />
-  <link rel="modulepreload" href="https://esm.sh/gsap@3.12.5" crossorigin />
+  <link rel="modulepreload" href="./vendor/three/three.module.js" />
+  <link rel="modulepreload" href="./vendor/gsap/index.js" />
   <link rel="modulepreload" href="script.js" />
   <link rel="modulepreload" href="js/webgl-scene.js" />
   <link rel="modulepreload" href="js/webgl-interactives.js" />
@@ -261,6 +261,7 @@
             </span>
           </a>
         </div>
+        <a class="hero-cta mono" href="#contact">Media kit</a>
       </div>
       <a class="scroll-cue mono" href="#poker" aria-label="Scroll to Poker">
         <span class="scroll-cue-text">SCROLL</span>

@@ -243,7 +243,7 @@ function makeMesh(kind, color, scale) {
 }
 
 function createFogShader() {
-  const maxHoles = 48;
+  const maxHoles = coarse ? 16 : 24;
   const holeData = new Float32Array(maxHoles * 3); // x, y, r (ndc-ish 0..1)
   return {
     maxHoles,
@@ -303,7 +303,7 @@ export function initBgScene(canvas) {
     antialias: !coarse,
     powerPreference: "high-performance",
   });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, coarse ? 1.25 : 1.75));
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, coarse ? 1 : 1.25));
   renderer.setClearColor(0x000000, 0);
 
   const scene = new THREE.Scene();
@@ -553,14 +553,44 @@ export function initBgScene(canvas) {
   new MutationObserver(() => {
     setTheme(document.body.dataset.bg || "starcraft");
     syncFogOpacity();
+    bumpActivity();
   }).observe(document.body, { attributes: true, attributeFilter: ["data-bg"] });
 
   let running = true;
   let raf = 0;
+  let lastActivity = performance.now();
+  const IDLE_MS = 1800;
   const clock = new THREE.Clock();
+
+  function bumpActivity() {
+    lastActivity = performance.now();
+    if (!running && !document.hidden && !shortLandscapeMq?.matches) {
+      running = true;
+      clock.start();
+      raf = requestAnimationFrame(frame);
+    }
+  }
+
+  if (!reduced) {
+    window.addEventListener("pointermove", bumpActivity, { passive: true });
+    window.addEventListener("pointerdown", bumpActivity, { passive: true });
+    window.addEventListener("scroll", bumpActivity, { passive: true });
+  }
 
   function frame() {
     if (!running) return;
+    const now = performance.now();
+    const idle = now - lastActivity > IDLE_MS;
+    const scrollSettled = Math.abs(parallax.scrollTarget - parallax.scroll) < 0.002;
+    const pointerSettled =
+      Math.abs(pointerX - smoothPX) < 0.01 && Math.abs(pointerY - smoothPY) < 0.01;
+    if (idle && scrollSettled && pointerSettled) {
+      /* One last settled frame, then sleep until input/scroll/theme */
+      renderer.render(scene, camera);
+      running = false;
+      raf = 0;
+      return;
+    }
     const t = clock.getElapsedTime();
     const group = themeGroups.get(activeKey);
     if (group && !reduced) {

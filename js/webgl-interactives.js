@@ -7,14 +7,16 @@ const reduced =
   matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 function makeRenderer(canvas) {
+  const coarse =
+    typeof matchMedia !== "undefined" && matchMedia("(pointer: coarse)").matches;
   const renderer = new THREE.WebGLRenderer({
     canvas,
     alpha: false,
-    antialias: true,
+    antialias: !coarse,
     powerPreference: "high-performance",
   });
   renderer.setClearColor(0x08080c, 1);
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.75));
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, coarse ? 1 : 1.25));
   return renderer;
 }
 
@@ -218,15 +220,47 @@ function makeZoneLabel(text, color) {
 }
 
 function observeVisibility(canvas, onChange) {
-  let visible = true;
+  let visible = false;
   if ("IntersectionObserver" in window) {
-    const obs = new IntersectionObserver(([e]) => {
-      visible = e.isIntersecting;
-      onChange?.(visible);
-    });
+    const obs = new IntersectionObserver(
+      ([e]) => {
+        visible = e.isIntersecting && e.intersectionRatio > 0;
+        onChange?.(visible);
+      },
+      { rootMargin: "80px 0px", threshold: 0.01 }
+    );
     obs.observe(canvas);
+  } else {
+    visible = true;
+    onChange?.(true);
   }
   return () => visible;
+}
+
+/** rAF only while intersecting — fit on resize / become-visible, not every frame */
+function bindVisibleLoop(canvas, tick, { onHide } = {}) {
+  let raf = 0;
+  const isVisible = observeVisibility(canvas, (vis) => {
+    if (vis) {
+      if (!raf) {
+        tick(true); // allow one fit+render on show
+        raf = requestAnimationFrame(loop);
+      }
+    } else {
+      cancelAnimationFrame(raf);
+      raf = 0;
+      onHide?.();
+    }
+  });
+  function loop() {
+    if (!isVisible()) {
+      raf = 0;
+      return;
+    }
+    tick(false);
+    raf = requestAnimationFrame(loop);
+  }
+  return { isVisible };
 }
 
 /* ---------- RANDOM RACE ROLL ---------- */
@@ -307,7 +341,6 @@ function initRaceRoll(canvas) {
   let settled = false;
   let spinProxy = { t: 0 };
   let spinTween = null;
-  const isVisible = observeVisibility(canvas);
 
   function setActiveIndex(idx, showAll) {
     pillars.forEach((p, i) => {
@@ -404,15 +437,13 @@ function initRaceRoll(canvas) {
   canvas.addEventListener("click", roll);
   canvas.style.cursor = "pointer";
 
-  let raf = 0;
-  function loop() {
-    fitRenderer(renderer, camera, canvas, 420, 280);
-    if (isVisible()) renderer.render(scene, camera);
-    raf = requestAnimationFrame(loop);
-  }
-  loop();
-
-  window.addEventListener("resize", () => fitRenderer(renderer, camera, canvas, 420, 280));
+  const fit = () => fitRenderer(renderer, camera, canvas, 420, 280);
+  fit();
+  bindVisibleLoop(canvas, (first) => {
+    if (first) fit();
+    renderer.render(scene, camera);
+  });
+  window.addEventListener("resize", fit);
 
   return { roll };
 }
@@ -572,7 +603,6 @@ function initBattleMap(canvas) {
   cap.rotation.x = -0.42;
   scene.add(cap);
 
-  const isVisible = observeVisibility(canvas);
   let tl = null;
   let clock = 0;
 
@@ -640,13 +670,16 @@ function initBattleMap(canvas) {
     }
   }
   playAssault();
+  if (tl) tl.pause();
 
-  function loop() {
-    fitRenderer(renderer, camera, canvas, 480, 300);
-    clock += 0.016;
-    if (isVisible()) {
+  const fit = () => fitRenderer(renderer, camera, canvas, 480, 300);
+  fit();
+  bindVisibleLoop(
+    canvas,
+    (first) => {
+      if (first) fit();
+      clock += 0.016;
       if (tl && tl.paused()) tl.resume();
-      /* Soft camera orbit for presence */
       if (!reduced) {
         camera.position.x = Math.sin(clock * 0.18) * 0.35;
         camera.lookAt(0, 0, 0);
@@ -665,12 +698,14 @@ function initBattleMap(canvas) {
       }
       fogPlane.material.opacity = 0.42 + Math.sin(clock * 0.7) * 0.06;
       renderer.render(scene, camera);
-    } else if (tl && !tl.paused()) {
-      tl.pause();
+    },
+    {
+      onHide: () => {
+        if (tl && !tl.paused()) tl.pause();
+      },
     }
-    requestAnimationFrame(loop);
-  }
-  loop();
+  );
+  window.addEventListener("resize", fit);
 }
 
 /* ---------- 2 HAND HOLD'EM ---------- */
@@ -878,23 +913,21 @@ function init2HH(canvas) {
   });
   canvas.style.cursor = "pointer";
 
-  const isVisible = observeVisibility(canvas);
   let clock = 0;
-  function loop() {
-    fitRenderer(renderer, camera, canvas, 480, 300);
+  const fit = () => fitRenderer(renderer, camera, canvas, 480, 300);
+  fit();
+  bindVisibleLoop(canvas, (first) => {
+    if (first) fit();
     clock += 0.016;
-    if (isVisible()) {
-      if (!reduced) {
-        camera.position.x = Math.sin(clock * 0.22) * 0.12;
-        camera.position.y = 4.1 + Math.sin(clock * 0.18) * 0.04;
-        camera.lookAt(0, 0.15, 0.1);
-        label.lookAt(camera.position);
-      }
-      renderer.render(scene, camera);
+    if (!reduced) {
+      camera.position.x = Math.sin(clock * 0.22) * 0.12;
+      camera.position.y = 4.1 + Math.sin(clock * 0.18) * 0.04;
+      camera.lookAt(0, 0.15, 0.1);
+      label.lookAt(camera.position);
     }
-    requestAnimationFrame(loop);
-  }
-  loop();
+    renderer.render(scene, camera);
+  });
+  window.addEventListener("resize", fit);
 }
 
 /* ---------- BADUGI TRIAD ---------- */
@@ -1160,26 +1193,24 @@ function initBadugi(canvas) {
   });
   canvas.style.cursor = "pointer";
 
-  const isVisible = observeVisibility(canvas);
   let clock = 0;
-  function loop() {
-    fitRenderer(renderer, camera, canvas, 480, 300);
+  const fit = () => fitRenderer(renderer, camera, canvas, 480, 300);
+  fit();
+  bindVisibleLoop(canvas, (first) => {
+    if (first) fit();
     clock += 0.016;
-    if (isVisible()) {
-      if (!reduced) {
-        camera.position.x = Math.sin(clock * 0.2) * 0.1;
-        camera.lookAt(0, 0.2, 0.15);
-        label.lookAt(camera.position);
-        triad.rotation.z = Math.PI / 6 + clock * 0.08;
-        if (picked) {
-          pickRing.rotation.z = clock * 0.6;
-        }
+    if (!reduced) {
+      camera.position.x = Math.sin(clock * 0.2) * 0.1;
+      camera.lookAt(0, 0.2, 0.15);
+      label.lookAt(camera.position);
+      triad.rotation.z = Math.PI / 6 + clock * 0.08;
+      if (picked) {
+        pickRing.rotation.z = clock * 0.6;
       }
-      renderer.render(scene, camera);
     }
-    requestAnimationFrame(loop);
-  }
-  loop();
+    renderer.render(scene, camera);
+  });
+  window.addEventListener("resize", fit);
 }
 
 /* Compatibility shim — same surface as legacy D22Canvas */
