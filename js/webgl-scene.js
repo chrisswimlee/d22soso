@@ -180,7 +180,7 @@ function makeMesh(kind, color, scale) {
       geo = new THREE.BoxGeometry(1.1 * scale, 0.35 * scale, 0.7 * scale);
       break;
     case "ring":
-      geo = new THREE.TorusGeometry(0.55 * scale, 0.08 * scale, 10, 32);
+      geo = new THREE.TorusGeometry(0.55 * scale, 0.08 * scale, 8, 16);
       break;
     case "crystal":
       geo = new THREE.OctahedronGeometry(0.55 * scale, 0);
@@ -189,7 +189,7 @@ function makeMesh(kind, color, scale) {
       geo = new THREE.TetrahedronGeometry(0.6 * scale, 0);
       break;
     case "spark":
-      geo = new THREE.SphereGeometry(0.5 * scale, 8, 8);
+      geo = new THREE.SphereGeometry(0.5 * scale, 6, 6);
       break;
     case "star":
       geo = new THREE.IcosahedronGeometry(0.55 * scale, 0);
@@ -220,10 +220,10 @@ function makeMesh(kind, color, scale) {
       geo = new THREE.BoxGeometry(0.7 * scale, 1.0 * scale, 0.04 * scale);
       break;
     case "pip":
-      geo = new THREE.SphereGeometry(0.35 * scale, 12, 12);
+      geo = new THREE.SphereGeometry(0.35 * scale, 8, 8);
       break;
     case "chip":
-      geo = new THREE.CylinderGeometry(0.45 * scale, 0.45 * scale, 0.1 * scale, 24);
+      geo = new THREE.CylinderGeometry(0.45 * scale, 0.45 * scale, 0.1 * scale, 12);
       break;
     case "book":
       geo = new THREE.BoxGeometry(0.9 * scale, 1.15 * scale, 0.22 * scale);
@@ -314,11 +314,23 @@ export function initBgScene(canvas) {
   scene.add(root);
 
   const themeGroups = new Map();
-  Object.keys(FLEETS).forEach((key) => {
-    const group = new THREE.Group();
+
+  function resolveFleetKey(key) {
+    const raw = key || "starcraft";
+    if (raw === "hero") return "starcraft";
+    if (FLEETS[raw]) return raw;
+    const base = raw.replace(/-v[23]$/, "");
+    return FLEETS[base] ? base : "starcraft";
+  }
+
+  function ensureFleet(key) {
+    const next = resolveFleetKey(key);
+    let group = themeGroups.get(next);
+    if (group) return group;
+    group = new THREE.Group();
     group.visible = false;
     group.userData.assets = [];
-    FLEETS[key].forEach((spec, idx) => {
+    (FLEETS[next] || []).forEach((spec, idx) => {
       const mesh = makeMesh(spec.kind, spec.c, spec.s);
       mesh.position.set(spec.x, spec.y, spec.z);
       mesh.userData = {
@@ -332,8 +344,9 @@ export function initBgScene(canvas) {
       group.userData.assets.push(mesh);
     });
     root.add(group);
-    themeGroups.set(key, group);
-  });
+    themeGroups.set(next, group);
+    return group;
+  }
 
   /* Fog plane in front of fleets (screen-space) */
   const fog = createFogShader();
@@ -376,31 +389,17 @@ export function initBgScene(canvas) {
     fogMesh.visible = false;
   }
 
-  function resolveFleetKey(key) {
-    const raw = key || "starcraft";
-    if (raw === "hero") return themeGroups.has("starcraft") ? "starcraft" : "starcraft";
-    if (themeGroups.has(raw)) return raw;
-    const base = raw.replace(/-v[23]$/, "");
-    return themeGroups.has(base) ? base : "starcraft";
-  }
-
   let activeKey = resolveFleetKey(document.body.dataset.bg);
   function setTheme(key) {
     const next = resolveFleetKey(key);
-    if (next === activeKey && themeGroups.get(next)?.visible) return;
-    const prev = themeGroups.get(activeKey);
-    const cur = themeGroups.get(next);
+    const cur = ensureFleet(next);
+    if (next === activeKey && cur.visible) return;
     activeKey = next;
     if (reduced) {
       themeGroups.forEach((g, k) => {
         g.visible = k === next;
-        g.traverse((o) => {
-          if (o.material && o.material.opacity != null && o.userData?.kind !== "spark") {
-            /* leave */
-          }
-        });
       });
-      if (cur) cur.visible = true;
+      cur.visible = true;
       return;
     }
     themeGroups.forEach((g, k) => {
@@ -459,6 +458,7 @@ export function initBgScene(canvas) {
 
   /* Pointer scout */
   let lastScout = 0;
+  let persistTimer = 0;
   function scout(clientX, clientY, radiusPx) {
     if (reduced || !w || !h) return;
     const x = clientX / w;
@@ -474,17 +474,21 @@ export function initBgScene(canvas) {
     fog.holeData[i + 2] = r;
     fog.holeCount++;
     fog.material.uniforms.uHoleCount.value = fog.holeCount;
-    try {
-      const packed = [];
-      for (let n = 0; n < fog.holeCount; n++) {
-        packed.push({
-          x: fog.holeData[n * 3],
-          y: 1 - fog.holeData[n * 3 + 1],
-          r: fog.holeData[n * 3 + 2],
-        });
-      }
-      sessionStorage.setItem(holeKey, JSON.stringify(packed.slice(-40)));
-    } catch (_) {}
+    if (persistTimer) return;
+    persistTimer = setTimeout(() => {
+      persistTimer = 0;
+      try {
+        const packed = [];
+        for (let n = 0; n < fog.holeCount; n++) {
+          packed.push({
+            x: fog.holeData[n * 3],
+            y: 1 - fog.holeData[n * 3 + 1],
+            r: fog.holeData[n * 3 + 2],
+          });
+        }
+        sessionStorage.setItem(holeKey, JSON.stringify(packed.slice(-40)));
+      } catch (_) {}
+    }, 450);
   }
 
   function onPointer(e) {

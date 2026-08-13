@@ -16,7 +16,7 @@ export default function Home() {
         alt="Wayne D22-soso Chiang with StarCraft Brood War championship trophy"
         kicker="1999"
         caption="First official Brood War World Champion — Random."
-        objectPosition="center 30%"
+        objectPosition="8% 12%"
       />
       <CareerTimeline />
       <ApmTestWidget />
@@ -25,7 +25,7 @@ export default function Home() {
         alt="Wayne Chiang with SlayerS_BoxeR at the World Series of Poker"
         kicker="WSOP"
         caption="From esports pioneer to poker media desk."
-        objectPosition="center 25%"
+        objectPosition="center 28%"
       />
       <MediaHub />
       <ContactSection />

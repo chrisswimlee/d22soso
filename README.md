@@ -19,7 +19,11 @@ Then visit [http://localhost:8080](http://localhost:8080).
 | `index.html` | Page structure, import map (Three.js + GSAP → `vendor/`) |
 | `vendor/` | Self-hosted ESM builds of Three.js + GSAP |
 | `style.css` | Brood War shell + per-tab themes |
-| `script.js` | Tabs, hotkeys, theme orchestration, WebGL boot |
+| `script.js` | Thin boot — chrome, motion, widgets; WebGL deferred |
+| `js/theme-nav.js` | Tabs, hotkeys, theme, bg crossfade, command nav |
+| `js/motion.js` | Scroll progress, parallax, one-shot theater enters |
+| `js/widgets.js` | Hero preview, about fold, poker gallery, 2HH embed |
+| `js/webgl-boot.js` | Idle / on-viewport Three.js loader |
 | `js/webgl-scene.js` | Shared WebGL fleets + fog-of-war scout |
 | `js/webgl-interactives.js` | Race roll, Lost Temple battle, 2HH / Badugi cards |
 | `wayne-chiang-truth-document.md` | Fact source of truth |
@@ -28,8 +32,8 @@ Then visit [http://localhost:8080](http://localhost:8080).
 
 ## Stack
 
-- **Three.js** (WebGL) for background fleets, fog scout, and panel scenes
-- **GSAP + ScrollTrigger** for theme crossfades, race/battle/card motion, scroll parallax
+- **Three.js** (WebGL) for background fleets, fog scout, and panel scenes — loaded after first paint, panel canvases only when near the viewport
+- **GSAP** for theater enters, race/battle/card motion
 - Vanilla HTML/CSS orchestration (no build step; vendored ESM via import map)
 
 ## Game controls

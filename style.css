@@ -14,8 +14,9 @@
   --phosphor: #39ff14;
   --ember: #f59e0b;
   --felt: #0d2818;
-  --font: "Inter", system-ui, sans-serif;
-  --mono: "JetBrains Mono", ui-monospace, monospace;
+  --font-display: "Space Grotesk", system-ui, sans-serif;
+  --font: "IBM Plex Sans", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, monospace;
   --header-h: 64px;
   --pad-x: clamp(1rem, 3vw, 1.75rem);
   --section-y: clamp(3rem, 8vw, 5.5rem);
@@ -26,6 +27,11 @@
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
   --theme-accent: var(--violet);
   --theme-accent-2: var(--gold);
+  /* Frame scale. A surface is one of three things: a section container, a media
+     crop, or a control. Everything else earns a rule or a tint — never a frame. */
+  --r-panel: 8px;
+  --r-media: 6px;
+  --r-control: 3px;
 }
 
 *,
@@ -149,47 +155,53 @@ body {
   opacity: 0;
   transition: opacity 1.85s cubic-bezier(0.33, 0.05, 0.2, 1);
   z-index: 1;
+  /* Avoid mid-fade bitmap decode flashes (esp. iOS Safari) */
+  background-color: #0a0a0a;
 }
 
 .bg-layer.is-active,
-.bg-layer.is-fading {
-  will-change: opacity;
+.bg-layer.is-primed {
+  transform: translateZ(0);
+  backface-visibility: hidden;
 }
 
 .bg-layer.is-active {
+  will-change: opacity;
   opacity: 1;
 }
 
 /* Theme photos are ~4MB across all layers. Hold them back until a layer is
-   shown (or primed on idle) so they never compete with first paint. */
+   shown or primed as the next section so they never compete with first paint. */
 .bg-layer:not(.is-active):not(.is-primed) {
   background-image: none;
 }
 
-/* Snappier crossfade while hovering hero identity panels */
-#bg-stage.is-hero-preview .bg-layer {
-  transition-duration: 0.45s;
-  transition-timing-function: ease;
+/* Snappier, less flashy crossfade on touch / coarse pointers */
+@media (hover: none), (pointer: coarse) {
+  .bg-layer {
+    transition-duration: 0.4s;
+    transition-timing-function: ease;
+  }
 }
 
-/* Hero — Cosmic Violet void + StarCraft icons only (no photo) */
+/* Hero — graphite/gold underlay; photo in .hero-photo wins on top */
 .bg-layer[data-bg="hero"] {
   background:
-    radial-gradient(1px 1px at 12% 22%, rgba(232, 230, 255, 0.55), transparent),
-    radial-gradient(1px 1px at 28% 68%, rgba(200, 190, 255, 0.35), transparent),
-    radial-gradient(1.5px 1.5px at 63% 18%, rgba(255, 255, 255, 0.4), transparent),
-    radial-gradient(1px 1px at 81% 44%, rgba(168, 230, 255, 0.3), transparent),
-    radial-gradient(1px 1px at 45% 82%, rgba(212, 175, 55, 0.28), transparent),
-    radial-gradient(1px 1px at 91% 76%, rgba(220, 210, 255, 0.25), transparent),
-    radial-gradient(ellipse 90% 60% at 50% -5%, rgba(139, 92, 246, 0.42), transparent 58%),
-    radial-gradient(ellipse 50% 40% at 90% 75%, rgba(45, 212, 191, 0.16), transparent 55%),
-    radial-gradient(ellipse 40% 35% at 10% 65%, rgba(212, 175, 55, 0.1), transparent 50%),
+    radial-gradient(1px 1px at 12% 22%, rgba(232, 230, 220, 0.4), transparent),
+    radial-gradient(1px 1px at 28% 68%, rgba(210, 200, 180, 0.28), transparent),
+    radial-gradient(1.5px 1.5px at 63% 18%, rgba(255, 255, 255, 0.35), transparent),
+    radial-gradient(1px 1px at 81% 44%, rgba(212, 175, 55, 0.22), transparent),
+    radial-gradient(1px 1px at 45% 82%, rgba(212, 175, 55, 0.2), transparent),
+    radial-gradient(1px 1px at 91% 76%, rgba(220, 210, 200, 0.2), transparent),
+    radial-gradient(ellipse 90% 60% at 50% -5%, rgba(212, 175, 55, 0.14), transparent 58%),
+    radial-gradient(ellipse 50% 40% at 90% 75%, rgba(138, 134, 120, 0.12), transparent 55%),
+    radial-gradient(ellipse 40% 35% at 10% 65%, rgba(212, 175, 55, 0.08), transparent 50%),
     repeating-linear-gradient(
       118deg,
       transparent 0 46px,
-      rgba(139, 92, 246, 0.025) 46px 47px
+      rgba(212, 175, 55, 0.02) 46px 47px
     ),
-    linear-gradient(180deg, #0b0618 0%, #100c1c 45%, #0a0a0e 100%);
+    linear-gradient(180deg, #0a0a0a 0%, #10100e 45%, #0a0a0a 100%);
 }
 
 /* StarCraft — Cosmic Violet: free nebula stock */
@@ -201,7 +213,7 @@ body {
     image-set(
       url("assets/img/bg-starcraft.avif") type("image/avif"),
       url("assets/img/bg-starcraft.webp") type("image/webp"),
-      url("assets/img/bg-starcraft.jpg") type("image/jpeg")) center 40% / cover no-repeat,
+      url("assets/img/bg-starcraft.jpg") type("image/jpeg")) 38% 58% / cover no-repeat,
     linear-gradient(180deg, #0b0618 0%, #100c1c 45%, #0a0a0e 100%);
 }
 
@@ -255,7 +267,7 @@ body {
     image-set(
       url("assets/img/bg-cnc.avif") type("image/avif"),
       url("assets/img/bg-cnc.webp") type("image/webp"),
-      url("assets/img/bg-cnc.jpg") type("image/jpeg")) center 40% / cover no-repeat,
+      url("assets/img/bg-cnc.jpg") type("image/jpeg")) 50% 48% / cover no-repeat,
     linear-gradient(180deg, #020502 0%, #0a1208 100%);
 }
 
@@ -269,7 +281,7 @@ body {
     image-set(
       url("assets/img/bg-cnc-v2.avif") type("image/avif"),
       url("assets/img/bg-cnc-v2.webp") type("image/webp"),
-      url("assets/img/bg-cnc-v2.jpg") type("image/jpeg")) center 40% / cover no-repeat,
+      url("assets/img/bg-cnc-v2.jpg") type("image/jpeg")) 50% 48% / cover no-repeat,
     linear-gradient(180deg, #060203 0%, #100808 48%, #0a0c0e 100%);
 }
 
@@ -284,7 +296,7 @@ body {
     image-set(
       url("assets/img/bg-cnc-v3.avif") type("image/avif"),
       url("assets/img/bg-cnc-v3.webp") type("image/webp"),
-      url("assets/img/bg-cnc-v3.jpg") type("image/jpeg")) center 40% / cover no-repeat,
+      url("assets/img/bg-cnc-v3.jpg") type("image/jpeg")) 50% 48% / cover no-repeat,
     linear-gradient(180deg, #05070a 0%, #0c1014 50%, #0a0c0e 100%);
 }
 
@@ -298,7 +310,7 @@ body {
     image-set(
       url("assets/img/bg-warcraft.avif") type("image/avif"),
       url("assets/img/bg-warcraft.webp") type("image/webp"),
-      url("assets/img/bg-warcraft.jpg") type("image/jpeg")) center 35% / cover no-repeat,
+      url("assets/img/bg-warcraft.jpg") type("image/jpeg")) 58% 42% / cover no-repeat,
     linear-gradient(180deg, #120e0a 0%, #1a1410 55%, #0c0a08 100%);
 }
 
@@ -313,7 +325,7 @@ body {
     image-set(
       url("assets/img/bg-warcraft-v2.avif") type("image/avif"),
       url("assets/img/bg-warcraft-v2.webp") type("image/webp"),
-      url("assets/img/bg-warcraft-v2.jpg") type("image/jpeg")) center 30% / cover no-repeat,
+      url("assets/img/bg-warcraft-v2.jpg") type("image/jpeg")) 55% 38% / cover no-repeat,
     linear-gradient(180deg, #0a1220 0%, #121a28 52%, #080a0e 100%);
 }
 
@@ -380,7 +392,7 @@ body {
     image-set(
       url("assets/img/bg-hearthstone.avif") type("image/avif"),
       url("assets/img/bg-hearthstone.webp") type("image/webp"),
-      url("assets/img/bg-hearthstone.jpg") type("image/jpeg")) center 40% / cover no-repeat,
+      url("assets/img/bg-hearthstone.jpg") type("image/jpeg")) 46% 58% / cover no-repeat,
     linear-gradient(180deg, #1a0c04 0%, #201208 50%, #100a08 100%);
 }
 
@@ -394,7 +406,7 @@ body {
     image-set(
       url("assets/img/bg-hearthstone-v2.avif") type("image/avif"),
       url("assets/img/bg-hearthstone-v2.webp") type("image/webp"),
-      url("assets/img/bg-hearthstone-v2.jpg") type("image/jpeg")) center 40% / cover no-repeat,
+      url("assets/img/bg-hearthstone-v2.jpg") type("image/jpeg")) 46% 58% / cover no-repeat,
     linear-gradient(180deg, #040e14 0%, #08161c 50%, #04080c 100%);
 }
 
@@ -407,7 +419,7 @@ body {
     image-set(
       url("assets/img/bg-hearthstone-v3.avif") type("image/avif"),
       url("assets/img/bg-hearthstone-v3.webp") type("image/webp"),
-      url("assets/img/bg-hearthstone-v3.jpg") type("image/jpeg")) center 40% / cover no-repeat,
+      url("assets/img/bg-hearthstone-v3.jpg") type("image/jpeg")) 46% 58% / cover no-repeat,
     linear-gradient(180deg, #080a0e 0%, #0f1218 50%, #040508 100%);
 }
 
@@ -459,6 +471,11 @@ img {
   display: block;
 }
 
+picture {
+  display: block;
+  line-height: 0;
+}
+
 a {
   color: var(--theme-accent);
   text-decoration: none;
@@ -498,8 +515,8 @@ a:hover {
   display: block;
   height: 100%;
   width: 0%;
-  background: linear-gradient(90deg, var(--violet), var(--gold), var(--teal));
-  box-shadow: 0 0 12px rgba(139, 92, 246, 0.55);
+  background: color-mix(in srgb, var(--gold) 55%, #5a564e);
+  box-shadow: none;
   transform-origin: left center;
   transition: width 0.08s linear;
 }
@@ -736,6 +753,16 @@ html.reveal-on [data-reveal="stagger"]:not(.is-inview) .reveal-item:nth-child(5)
 html.reveal-on [data-reveal="stagger"]:not(.is-inview) .reveal-item:nth-child(6) { transition-delay: 0.03s; }
 html.reveal-on [data-reveal="stagger"]:not(.is-inview) .reveal-item:nth-child(7) { transition-delay: 0s; }
 
+/* Hero triptych — uniform fade-up (override mixed stagger transforms) */
+html.reveal-on .hero [data-reveal="stagger"]:not(.is-inview) .reveal-item,
+html.reveal-on .hero [data-reveal="stagger"]:not(.is-inview) .hero-trio .reveal-item {
+  transform: translate3d(0, 20px, 0);
+}
+
+html.reveal-on .hero [data-reveal="stagger"].is-inview .reveal-item {
+  transform: none;
+}
+
 /* Idle float after reveal — light game atmosphere (skip parallax hosts) */
 html.reveal-on [data-reveal="float"].is-inview:not([data-parallax]),
 html.reveal-on [data-reveal="warp"].is-inview .panel-media,
@@ -744,7 +771,7 @@ html.reveal-on [data-reveal="drop"].is-inview .heraldic-plate {
   animation: sectionFloat 7s ease-in-out infinite;
 }
 
-html.reveal-on [data-reveal="scan"].is-inview .dossier {
+html.reveal-on [data-reveal="scan"].is-inview .dossier-meta div {
   animation: scanPulse 5.5s ease-in-out infinite;
 }
 
@@ -754,8 +781,8 @@ html.reveal-on [data-reveal="scan"].is-inview .dossier {
 }
 
 @keyframes scanPulse {
-  0%, 100% { box-shadow: inset 0 0 40px rgba(57, 255, 20, 0.06); }
-  50% { box-shadow: inset 0 0 52px rgba(57, 255, 20, 0.14); }
+  0%, 100% { border-bottom-color: rgba(57, 255, 20, 0.25); }
+  50% { border-bottom-color: rgba(57, 255, 20, 0.55); }
 }
 
 [data-parallax] {
@@ -763,6 +790,8 @@ html.reveal-on [data-reveal="scan"].is-inview .dossier {
 }
 
 /* Theme accents — kept distinct across theaters (no shared primary hexes) */
+/* First viewport — gold/stone restraint (no violet chrome) */
+body[data-theme="hero"] { --theme-accent: var(--gold); --theme-accent-2: #8a8680; }
 body[data-theme="starcraft"] { --theme-accent: var(--violet); --theme-accent-2: var(--gold); }
 body[data-theme="starcraft-v2"] { --theme-accent: #2dd4bf; --theme-accent-2: #a8e6ff; }
 body[data-theme="starcraft-v3"] { --theme-accent: #ea580c; --theme-accent-2: #b45309; }
@@ -804,26 +833,31 @@ body[data-bg^="hearthstone"] #webgl-bg {
   z-index: 90;
   display: inline-flex;
   align-items: center;
-  gap: 0.6rem;
-  min-width: 11.5rem;
-  max-width: min(18rem, calc(100vw - 2rem));
-  padding: 0.55rem 0.9rem;
-  border: 1px solid color-mix(in srgb, var(--theme-accent) 40%, var(--border));
-  border-radius: 999px;
-  background: rgba(10, 10, 12, 0.94);
-  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.5);
+  gap: 0.45rem;
+  min-width: 0;
+  max-width: min(16rem, calc(100vw - 2rem));
+  padding: 0.2rem 0;
+  border: 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--theme-accent) 35%, var(--border));
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
   pointer-events: none;
-  transition: border-color 0.4s ease, box-shadow 0.4s ease, top 0.2s ease;
+  transition: border-color 0.4s ease, opacity 0.25s ease, visibility 0.25s ease, top 0.2s ease;
+}
+
+body[data-theme="hero"] #section-indicator {
+  opacity: 0;
+  visibility: hidden;
 }
 
 .section-indicator .si-dot {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
   flex-shrink: 0;
   border-radius: 50%;
   background: var(--theme-accent);
-  box-shadow: 0 0 10px var(--theme-accent);
-  animation: dotPulse 2.2s ease-in-out infinite;
+  box-shadow: none;
 }
 
 .section-indicator .si-text {
@@ -834,9 +868,7 @@ body[data-bg^="hearthstone"] #webgl-bg {
 }
 
 .section-indicator .si-kicker {
-  font-size: 0.52rem;
-  letter-spacing: 0.14em;
-  color: var(--muted);
+  display: none;
 }
 
 .section-indicator .si-label {
@@ -904,9 +936,9 @@ body[data-bg^="hearthstone"] #webgl-bg {
   font-family: var(--mono);
   font-size: 0.75rem;
   padding: 0.35rem 0.5rem;
-  border: 1px solid var(--violet);
-  color: var(--violet);
-  box-shadow: inset 0 0 12px rgba(139, 92, 246, 0.25);
+  border: 1px solid var(--theme-accent);
+  color: var(--theme-accent);
+  box-shadow: inset 0 0 12px color-mix(in srgb, var(--theme-accent) 25%, transparent);
 }
 
 /* Scrollable section links + pinned IG (never clipped by overflow) */
@@ -1115,7 +1147,7 @@ body[data-bg^="hearthstone"] #webgl-bg {
 .command-nav a:focus-visible {
   color: var(--text);
   border-color: var(--theme-accent);
-  background: rgba(139, 92, 246, 0.08);
+  background: color-mix(in srgb, var(--theme-accent) 12%, transparent);
 }
 
 .command-nav .hk {
@@ -1186,6 +1218,7 @@ html.reveal-on .section-head:not(.is-inview) h2::after {
 }
 
 h1, h2, h3 {
+  font-family: var(--font-display);
   line-height: 1.15;
   font-weight: 700;
   letter-spacing: -0.02em;
@@ -1216,22 +1249,29 @@ h3 {
   margin-right: auto;
 }
 
-/* Hero — full-viewport identity gate */
+/* Hero — Pillar Triptych (executive trio, no teleports) */
 .hero {
   max-width: none;
   min-height: calc(100svh - var(--header-h));
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  padding: clamp(0.75rem, 2vw, 1.5rem) max(var(--pad-x), var(--safe-right)) clamp(2.5rem, 5vw, 3.25rem) max(var(--pad-x), var(--safe-left));
+  justify-content: flex-start;
+  padding: clamp(1.5rem, 4vw, 2.75rem) max(var(--pad-x), var(--safe-right)) clamp(3.25rem, 7vw, 4.5rem) max(var(--pad-x), var(--safe-left));
+  overflow: hidden;
+  isolation: isolate;
 }
 
-/* Desktop: lock first screen; never clip on short windows */
+/* Desktop: lock first screen; lockup at top, pillars at the bottom */
 @media (min-width: 1024px) and (min-height: 700px) {
   .hero {
     height: calc(100svh - var(--header-h));
-    overflow: hidden;
+    justify-content: flex-start;
+    padding-bottom: clamp(3.5rem, 8vh, 5.5rem);
+  }
+
+  .hero-photo[data-hero-scene="champ"] img {
+    object-position: 50% 40%;
   }
 }
 
@@ -1239,251 +1279,361 @@ h3 {
   .hero {
     min-height: calc(100svh - var(--header-h));
     height: auto;
-    overflow: visible;
-    padding-top: 0.75rem;
-    padding-bottom: 2rem;
-  }
-
-  .hero-panel {
-    min-height: min(38svh, 260px);
-    max-height: min(42svh, 300px);
-  }
-
-  .hero-tagline {
-    display: none;
+    padding-top: 1.25rem;
+    padding-bottom: 2.25rem;
   }
 }
 
-.hero-fog {
+/* Soft proof plane — championship portrait; WSOP / 2HH emblems sit in the gate mid-band */
+.hero-photo-stack {
   position: absolute;
   inset: 0;
-  overflow: hidden;
-  background:
-    radial-gradient(circle at 30% 40%, rgba(139, 92, 246, 0.15), transparent 40%),
-    radial-gradient(circle at 70% 60%, rgba(45, 212, 191, 0.08), transparent 35%);
+  z-index: 0;
+  margin: 0;
   pointer-events: none;
-  z-index: -1;
+  background: #0a0a0a;
+  opacity: 0.97;
+  transition: opacity 0.35s ease;
 }
 
-.hero-fog::before,
-.hero-fog::after {
-  content: "";
+.hero[data-hero-active="wsop"] .hero-photo-stack,
+.hero[data-hero-active="2hh"] .hero-photo-stack {
+  opacity: 1;
+}
+
+.hero-photo {
   position: absolute;
-  border-radius: 50%;
-  opacity: 0.55;
-  /* Soft gradients only — no live CSS blur/animation (major composite cost) */
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: opacity 0.4s ease;
 }
 
-.hero-fog::before {
-  width: 520px;
-  height: 520px;
-  top: -16%;
-  left: -12%;
-  background: radial-gradient(circle, rgba(139, 92, 246, 0.28), transparent 68%);
+.hero-photo.is-active {
+  opacity: 1;
 }
 
-.hero-fog::after {
-  width: 460px;
-  height: 460px;
-  bottom: -18%;
-  right: -10%;
-  background: radial-gradient(circle, rgba(212, 175, 55, 0.18), transparent 68%);
+.hero-photo img {
+  display: block;
+  filter: none;
+}
+
+/* Champ — full-bleed portrait (2:3). Crop sides on tall phones, top/bottom on wide. */
+.hero-photo[data-hero-scene="champ"] img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 48% 40%;
+  filter: contrast(1.06) saturate(0.92);
+}
+
+.hero-scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  transition: background 0.4s ease;
+  background:
+    /* Soft top veil for the lockup; heavier bottom for pillars */
+    linear-gradient(
+      180deg,
+      rgba(10, 10, 10, 0.62) 0%,
+      rgba(10, 10, 10, 0.18) 22%,
+      rgba(10, 10, 10, 0.12) 42%,
+      rgba(10, 10, 10, 0.42) 62%,
+      rgba(10, 10, 10, 0.72) 100%
+    ),
+    /* Soft left wash for type; keep right side open for face/trophy */
+    linear-gradient(
+      100deg,
+      rgba(10, 10, 10, 0.42) 0%,
+      rgba(10, 10, 10, 0.2) 40%,
+      rgba(10, 10, 10, 0.06) 70%,
+      rgba(10, 10, 10, 0.12) 100%
+    );
+}
+
+/* Logo scenes: dark lockup + pillars, open mid-band for the emblem */
+.hero[data-hero-active="wsop"] .hero-scrim,
+.hero[data-hero-active="2hh"] .hero-scrim {
+  background:
+    linear-gradient(
+      180deg,
+      rgba(10, 10, 10, 0.72) 0%,
+      rgba(10, 10, 10, 0.1) 18%,
+      rgba(10, 10, 10, 0.04) 42%,
+      rgba(10, 10, 10, 0.2) 68%,
+      rgba(10, 10, 10, 0.82) 100%
+    );
 }
 
 .hero-gate {
-  width: min(1120px, 100%);
+  position: relative;
+  z-index: 2;
+  width: min(880px, 100%);
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: clamp(0.85rem, 2vw, 1.35rem);
+  text-align: center;
+  gap: clamp(0.45rem, 1.2vw, 0.75rem);
+  margin: 0;
   flex: 1 1 auto;
   min-height: 0;
 }
 
 .hero-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  margin: 0;
+}
+
+.hero-brand-mark {
+  font-family: var(--font-display);
+  font-size: clamp(0.85rem, 1.4vw, 1rem);
+  padding: 0.38rem 0.55rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  border: 1px solid color-mix(in srgb, var(--gold) 55%, #8a8680);
+  color: var(--gold);
+  background: color-mix(in srgb, #0a0a0a 55%, transparent);
+}
+
+.hero-brand-text {
+  font-family: var(--font-display);
+  font-size: clamp(1.55rem, 3.4vw, 2.15rem);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: color-mix(in srgb, var(--text) 90%, var(--gold));
+  text-shadow: 0 1px 14px rgba(10, 10, 10, 0.5);
+}
+
+.hero-name {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.25rem, 2.2vw, 1.65rem);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  font-weight: 600;
+  color: color-mix(in srgb, var(--text) 88%, var(--muted));
+  text-shadow: 0 1px 14px rgba(10, 10, 10, 0.35);
+}
+
+.hero-proof {
+  margin: 0;
+  max-width: 42rem;
+  font-size: clamp(0.92rem, 2vw, 1.22rem);
+  line-height: 1.35;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: color-mix(in srgb, var(--gold) 78%, var(--text));
+  text-shadow: 0 1px 12px rgba(10, 10, 10, 0.45);
+}
+
+/* Mid-band between proof line and pillar hairlines — emblems center here */
+.hero-emblem-slot {
+  flex: 1 1 auto;
+  position: relative;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr);
+  place-items: center;
+  width: 100%;
+  min-height: 5rem;
+  margin: 0;
+  pointer-events: none;
+}
+
+.hero-emblem {
+  grid-area: 1 / 1;
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  opacity: 0;
+  transform: scale(0.92) translateY(8px);
+  transition:
+    opacity 0.32s ease,
+    transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.hero-emblem.is-active {
+  opacity: 1;
+  transform: none;
+}
+
+.hero-emblem img {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: min(38vw, 240px);
+  max-height: min(100%, 28vh);
+  object-fit: contain;
+  filter: drop-shadow(0 14px 28px rgba(0, 0, 0, 0.5));
+}
+
+.hero[data-hero-active="wsop"] .hero-emblem-slot::before,
+.hero[data-hero-active="2hh"] .hero-emblem-slot::before {
+  content: "";
+  position: absolute;
+  inset: 12% 22%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.hero[data-hero-active="wsop"] .hero-emblem-slot::before {
+  background: radial-gradient(ellipse 50% 48% at 50% 50%, rgba(255, 255, 255, 0.08), transparent 70%);
+}
+
+.hero[data-hero-active="2hh"] .hero-emblem-slot::before {
+  background: radial-gradient(ellipse 50% 48% at 50% 50%, rgba(160, 24, 24, 0.18), transparent 70%);
+}
+
+.hero-trio {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  flex: 0 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(0.45rem, 1.1vw, 0.75rem);
+  text-align: center;
+}
+
+.hero-pillar {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.2rem;
-  margin: 0;
   text-align: center;
-  flex-shrink: 0;
+  gap: 0.35rem;
+  min-height: 100%;
+  padding: 0.35rem 0.15rem 0.45rem;
+  border: 0;
+  border-top: 1px solid color-mix(in srgb, #8a8680 28%, var(--border));
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  cursor: pointer;
+  transition: border-color 0.25s ease, color 0.25s ease;
 }
 
-/* Callsign stays one unit — never wrap mid “D22-soso” */
-.brand-callsign {
-  display: block;
-  font-size: clamp(2.2rem, 5.5vw, 3.6rem);
-  line-height: 0.95;
-  letter-spacing: -0.035em;
-  font-weight: 700;
-  white-space: nowrap;
-}
-
-.brand-legal {
-  display: block;
-  font-size: clamp(0.9rem, 1.8vw, 1.15rem);
-  line-height: 1.2;
-  letter-spacing: 0.06em;
-  font-weight: 500;
-  color: color-mix(in srgb, var(--text) 78%, var(--muted));
-  text-transform: none;
-}
-
-.hero-tagline {
-  display: block;
-  margin-top: 0.45rem;
-  max-width: 36rem;
-  font-size: clamp(0.68rem, 1.35vw, 0.8rem);
-  line-height: 1.35;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: color-mix(in srgb, var(--muted) 88%, var(--gold));
-  text-align: center;
-}
-
-.accent-gradient {
-  background: linear-gradient(100deg, var(--violet) 10%, var(--teal) 55%, var(--gold) 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-
-/* Three horizontal panels — one viewport */
-.hero-panels {
-  width: 100%;
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: clamp(0.65rem, 1.5vw, 1.1rem);
-  align-items: stretch;
-}
-
-.hero-panel {
-  display: grid;
-  grid-template-rows: auto 1fr;
-  min-height: min(48svh, 380px);
-  max-height: min(52svh, 420px);
-  border: 1px solid color-mix(in srgb, var(--violet) 40%, var(--border));
-  border-radius: 2px;
-  background:
-    linear-gradient(180deg, color-mix(in srgb, var(--surface) 92%, transparent), rgba(8, 8, 12, 0.92));
-  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.35);
-  text-decoration: none;
-  color: inherit;
-  overflow: hidden;
-  transition:
-    transform 0.35s var(--ease-spring),
-    border-color 0.25s,
-    box-shadow 0.25s;
-}
-
-.hero-panel:hover,
-.hero-panel:focus-visible {
-  transform: translateY(-3px);
-  border-color: color-mix(in srgb, var(--gold) 65%, var(--violet));
-  box-shadow:
-    0 18px 48px rgba(0, 0, 0, 0.45),
-    0 0 32px color-mix(in srgb, var(--violet) 22%, transparent);
+.hero-pillar:hover,
+.hero-pillar:focus-visible,
+.hero-pillar.is-previewing {
+  border-top-color: color-mix(in srgb, var(--gold) 55%, var(--border));
   outline: none;
 }
 
-.hero-panel-label {
-  display: block;
-  padding: 0.7rem 0.75rem 0.6rem;
-  font-size: 0.68rem;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  text-align: center;
-  line-height: 1.25;
-  color: color-mix(in srgb, var(--gold) 80%, var(--text));
-  border-bottom: 1px solid color-mix(in srgb, var(--gold) 28%, transparent);
-  background: linear-gradient(
-    180deg,
-    color-mix(in srgb, var(--gold) 10%, transparent),
-    transparent
-  );
+.hero-pillar:hover .pillar-title,
+.hero-pillar:focus-visible .pillar-title,
+.hero-pillar.is-previewing .pillar-title {
+  color: color-mix(in srgb, var(--text) 92%, var(--gold));
 }
 
-.hero-panel-label-short {
+.pillar-mark {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  margin: 0.25rem 0 0.35rem;
+  line-height: 0;
+}
+
+.pillar-header {
+  margin: 0;
+  width: 100%;
+  text-align: center;
+  font-size: 0.62rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--gold) 70%, var(--muted));
+}
+
+.pillar-title {
+  margin: 0;
+  width: 100%;
+  text-align: center;
+  font-family: var(--font-display);
+  font-size: clamp(0.88rem, 1.3vw, 1rem);
+  line-height: 1.25;
+  letter-spacing: -0.015em;
+  font-weight: 600;
+  color: var(--text);
+  transition: color 0.25s ease;
+}
+
+.pillar-title-short {
   display: none;
 }
 
-.hero-panel-media {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 0;
-  min-width: 0;
-  padding: 0.55rem;
-  background:
-    radial-gradient(circle at 50% 35%, rgba(139, 92, 246, 0.12), transparent 55%);
-}
-
-.hero-panel-media picture,
-.hero-panel-media img {
+.pillar-mark-img {
   display: block;
-  width: 100%;
-  height: 100%;
-}
-
-.hero-panel-media img {
-  object-fit: cover;
-  object-position: 50% 18%;
-  max-height: 100%;
-  filter: contrast(1.05) saturate(0.92);
-  transition: transform 0.5s ease, filter 0.5s ease;
-}
-
-.hero-panel:hover .hero-panel-media img,
-.hero-panel:focus-visible .hero-panel-media img {
-  transform: scale(1.03);
-  filter: contrast(1.08) saturate(1);
-}
-
-.hero-panel-media--logo {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: clamp(0.75rem, 2vw, 1.25rem);
-  background:
-    radial-gradient(circle at 50% 45%, rgba(255, 255, 255, 0.06), transparent 60%),
-    rgba(6, 6, 10, 0.55);
-}
-
-.hero-panel-media--logo picture {
-  display: flex;
-  align-items: center;
-  justify-content: center;
   width: auto;
-  height: auto;
-  max-width: 100%;
-  max-height: 100%;
-  margin: auto;
-}
-
-.hero-panel-media--logo img {
+  height: clamp(4.5rem, 11vw, 7rem);
+  max-width: min(11rem, 100%);
   object-fit: contain;
-  object-position: center;
-  width: auto;
-  height: auto;
-  max-width: 100%;
-  max-height: min(28svh, 220px);
-  margin: 0 auto;
+  filter: drop-shadow(0 6px 18px rgba(0, 0, 0, 0.45));
+  opacity: 0.95;
+  transition: opacity 0.2s, transform 0.2s;
 }
 
-.hero-panel[data-panel="media"] .hero-panel-media--logo img {
-  max-height: min(24svh, 190px);
+.pillar-mark-img--champ {
+  width: clamp(4.5rem, 11vw, 7rem);
+  height: clamp(4.5rem, 11vw, 7rem);
+  max-width: none;
+  object-fit: cover;
+  /* 2:3 studio frame: face sits below headroom, slightly right of center */
+  object-position: 54% 38%;
+  border-radius: 50%;
+  border: 1px solid color-mix(in srgb, var(--gold) 40%, transparent);
 }
 
-/* Quiet business path — secondary to identity portals */
+.pillar-mark-img--wsop {
+  height: clamp(4.5rem, 11vw, 7rem);
+  background: transparent;
+  border-radius: 0;
+  filter: drop-shadow(0 6px 16px rgba(0, 0, 0, 0.5));
+}
+
+.pillar-mark-img--2hh {
+  height: clamp(4.25rem, 10.5vw, 6.5rem);
+  filter: drop-shadow(0 8px 20px rgba(0, 0, 0, 0.5));
+}
+
+.hero-pillar:hover .pillar-mark-img,
+.hero-pillar:focus-visible .pillar-mark-img,
+.hero-pillar.is-previewing .pillar-mark-img {
+  opacity: 1;
+  transform: translateY(-1px);
+}
+
+.pillar-body {
+  margin: 0;
+  width: 100%;
+  text-align: center;
+  font-size: clamp(0.75rem, 1.15vw, 0.82rem);
+  line-height: 1.45;
+  color: var(--muted);
+}
+
 .hero-cta {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   min-height: 2.5rem;
-  padding: 0.45rem 0.85rem;
-  margin-top: 0.15rem;
+  padding: 0.45rem 0.1rem;
+  margin-top: clamp(0.35rem, 1vw, 0.65rem);
   font-size: 0.72rem;
   letter-spacing: 0.16em;
   text-transform: uppercase;
@@ -1501,34 +1651,24 @@ h3 {
   outline: none;
 }
 
-/* Eyebrow badge chip with live-status dot */
+/* Eyebrow label with live-status dot — type and colour only, no chip */
 .eyebrow-badge {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.55rem;
   margin: 0 0 1.25rem;
-  padding: 0.4rem 0.75rem;
   font-size: 0.68rem;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.14em;
   color: var(--theme-accent);
-  border: 1px solid color-mix(in srgb, var(--theme-accent) 45%, transparent);
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--theme-accent) 8%, transparent);
 }
 
 .badge-dot {
-  width: 7px;
-  height: 7px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
   background: var(--theme-accent);
-  box-shadow: 0 0 8px var(--theme-accent);
-  animation: dotPulse 2.2s ease-in-out infinite;
-}
-
-@keyframes dotPulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.45; transform: scale(0.8); }
+  box-shadow: none;
 }
 
 .transmission {
@@ -1709,49 +1849,21 @@ kbd {
   max-width: min(420px, 42svh);
   height: auto;
   aspect-ratio: 420 / 280;
-  border: 1px solid var(--border);
-  border-radius: 4px;
+  border: 1px solid color-mix(in srgb, var(--theme-accent) 22%, transparent);
+  border-radius: var(--r-media);
   background: #08080c;
   cursor: pointer;
   touch-action: manipulation;
-  box-shadow: 0 0 40px rgba(139, 92, 246, 0.15);
+  box-shadow: 0 0 40px color-mix(in srgb, var(--theme-accent) 15%, transparent);
   transition: border-color 0.25s, box-shadow 0.25s;
 }
 
 #race-canvas:hover {
-  border-color: rgba(139, 92, 246, 0.55);
-  box-shadow: 0 0 50px rgba(139, 92, 246, 0.28);
+  border-color: color-mix(in srgb, var(--theme-accent) 55%, transparent);
+  box-shadow: 0 0 50px color-mix(in srgb, var(--theme-accent) 28%, transparent);
 }
 
-/* Scroll cue */
-.scroll-cue {
-  position: absolute;
-  left: 50%;
-  bottom: 1rem;
-  transform: translateX(-50%);
-  display: inline-flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.1rem;
-  font-size: 0.6rem;
-  letter-spacing: 0.22em;
-  color: var(--muted);
-  transition: color 0.2s;
-}
-
-.scroll-cue:hover {
-  color: var(--theme-accent);
-}
-
-.scroll-cue-chevron {
-  font-size: 1rem;
-  animation: cueBounce 1.8s ease-in-out infinite;
-}
-
-@keyframes cueBounce {
-  0%, 100% { transform: translateY(0); opacity: 0.6; }
-  50% { transform: translateY(5px); opacity: 1; }
-}
+/* Scroll cue removed — hero CTA is the single enter path */
 
 /* About */
 .section-about {
@@ -1765,26 +1877,32 @@ kbd {
 
 .about-roles {
   list-style: none;
-  margin: 0.15rem 0 0;
+  margin: 0.35rem 0 0;
   padding: 0;
   display: flex;
   flex-wrap: wrap;
-  gap: 0.45rem 0.55rem;
+  gap: 0;
   max-width: 40rem;
 }
 
 .about-roles li {
   margin: 0;
-  padding: 0.35rem 0.7rem;
+  padding: 0.2rem 0.85rem 0.2rem 0;
   font-family: var(--mono);
   font-size: clamp(0.62rem, 1.4vw, 0.7rem);
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: color-mix(in srgb, var(--text) 88%, var(--theme-accent));
-  border: 1px solid color-mix(in srgb, var(--theme-accent) 35%, var(--border));
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--theme-accent) 8%, transparent);
+  color: color-mix(in srgb, var(--text) 82%, var(--theme-accent));
+  border: 0;
+  border-right: 1px solid color-mix(in srgb, var(--theme-accent) 28%, var(--border));
+  border-radius: 0;
+  background: transparent;
   white-space: nowrap;
+}
+
+.about-roles li:last-child {
+  border-right: 0;
+  padding-right: 0;
 }
 
 .about-layout {
@@ -1798,11 +1916,12 @@ kbd {
 
 .about-prose {
   min-width: 0;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: clamp(1.25rem, 3vw, 2.25rem);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.28);
+  background: transparent;
+  border: 0;
+  border-left: 2px solid color-mix(in srgb, var(--theme-accent) 45%, transparent);
+  border-radius: 0;
+  padding: clamp(0.25rem, 1vw, 0.5rem) 0 clamp(0.25rem, 1vw, 0.5rem) clamp(1.1rem, 2.8vw, 1.75rem);
+  box-shadow: none;
   overflow-wrap: break-word;
 }
 
@@ -1870,15 +1989,13 @@ kbd {
   margin: 0.85rem 0 0;
   padding: 0;
   display: grid;
-  gap: 0.75rem;
+  gap: 1.15rem;
 }
 
 .about-fact {
   margin: 0;
-  padding: 0.85rem 0.95rem;
-  border: 1px solid color-mix(in srgb, var(--border) 85%, var(--theme-accent));
-  border-radius: 6px;
-  background: color-mix(in srgb, var(--theme-accent) 4%, transparent);
+  padding: 0.15rem 0 0.15rem 1rem;
+  border-left: 1px solid color-mix(in srgb, var(--theme-accent) 40%, var(--border));
 }
 
 .about-fact dt {
@@ -1905,15 +2022,13 @@ kbd {
   margin: 0.85rem 0 0;
   padding: 0;
   display: grid;
-  gap: 0.75rem;
+  gap: 1.15rem;
 }
 
 .about-credentials li {
   margin: 0;
-  padding: 0.9rem 1rem;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  background: color-mix(in srgb, var(--surface-2) 80%, transparent);
+  padding: 0.15rem 0 0.15rem 1rem;
+  border-left: 1px solid var(--border);
 }
 
 .about-credential-title {
@@ -1933,16 +2048,8 @@ kbd {
 
 .about-book {
   margin-top: 0.85rem;
-  padding: 1rem 1.05rem;
-  border: 1px solid color-mix(in srgb, var(--gold) 40%, var(--border));
-  border-radius: 6px;
-  background:
-    linear-gradient(
-      135deg,
-      color-mix(in srgb, var(--gold) 10%, transparent),
-      transparent 55%
-    ),
-    color-mix(in srgb, var(--surface-2) 70%, transparent);
+  padding: 0.15rem 0 0.15rem 1rem;
+  border-left: 1px solid color-mix(in srgb, var(--gold) 50%, var(--border));
 }
 
 .about-book-title {
@@ -2103,9 +2210,13 @@ kbd {
   margin: 0;
   position: relative;
   overflow: hidden;
-  border: 1px solid color-mix(in srgb, var(--theme-accent) 35%, transparent);
-  border-radius: 6px;
+  border-radius: var(--r-media);
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
+  width: 100%;
+}
+
+.about-portrait picture {
+  display: block;
   width: 100%;
 }
 
@@ -2116,8 +2227,8 @@ kbd {
   aspect-ratio: 4 / 5;
   max-height: min(360px, 48vh);
   object-fit: cover;
-  /* Subject is centered; bias slightly down past headroom */
-  object-position: 50% 40%;
+  /* Face + both trophies; skip the empty headroom */
+  object-position: 50% 38%;
   filter: contrast(1.05) saturate(0.92);
   transition: transform 0.55s ease;
 }
@@ -2139,11 +2250,11 @@ kbd {
 }
 
 .about-timeline {
-  padding: clamp(1rem, 2.5vw, 1.15rem) clamp(0.95rem, 2.5vw, 1.2rem);
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.28);
+  padding: 0.15rem 0 0;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
   min-width: 0;
 }
 
@@ -2317,23 +2428,34 @@ kbd {
 .book-points li {
   display: grid;
   grid-template-columns: 2rem 1fr;
-  align-items: center;
+  align-items: start;
   gap: 0.85rem;
   font-size: 0.82rem;
   color: var(--muted);
+  line-height: 1.55;
 }
 
-.book-points span {
+.book-points li strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.book-points li > span:first-child {
   display: grid;
   place-items: center;
   width: 2rem;
   height: 2rem;
-  border-radius: 4px;
+  margin-top: 0.05rem;
+  border-radius: var(--r-control);
   font-size: 0.9rem;
   font-weight: 600;
   color: var(--gold);
   border: 1px solid var(--gold-dim);
   background: linear-gradient(180deg, rgba(212, 175, 55, 0.16), rgba(212, 175, 55, 0.02));
+}
+
+.book-points li > span:last-child {
+  min-width: 0;
 }
 
 .book-ctas {
@@ -2356,6 +2478,15 @@ kbd {
   border-color: color-mix(in srgb, var(--theme-accent) 35%, var(--border));
 }
 
+.game-subsection.art-view > .game-panel {
+  border-style: solid;
+  border-color: transparent;
+  border-left-width: 2px;
+  border-left-color: color-mix(in srgb, var(--theme-accent) 45%, transparent);
+  padding-top: clamp(1rem, 2.4vw, 1.75rem);
+  padding-bottom: clamp(1rem, 2.4vw, 1.75rem);
+}
+
 .game-subsection .game-tag {
   letter-spacing: 0.06em;
 }
@@ -2366,11 +2497,10 @@ kbd {
     linear-gradient(145deg, color-mix(in srgb, var(--theme-accent) 6%, var(--surface)), var(--surface) 42%),
     var(--surface);
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: var(--r-panel);
   padding: clamp(1.5rem, 3vw, 2.5rem);
   box-shadow:
     0 20px 60px rgba(0, 0, 0, 0.35),
-    0 0 0 1px rgba(255, 255, 255, 0.02),
     inset 0 1px 0 rgba(255, 255, 255, 0.04);
   transition: border-color 0.3s, box-shadow 0.3s, transform 0.3s var(--ease-spring);
   overflow: hidden;
@@ -2430,16 +2560,12 @@ kbd {
 .game-tag {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.55rem;
   margin: 0 0 0.65rem;
-  padding: 0.4rem 0.8rem;
   font-size: 0.66rem;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.16em;
   color: var(--theme-accent);
-  border: 1px solid color-mix(in srgb, var(--theme-accent) 40%, transparent);
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--theme-accent) 8%, transparent);
 }
 
 .theme-pips {
@@ -2461,7 +2587,7 @@ kbd {
 .theme-pip.is-active {
   background: var(--theme-accent);
   border-color: var(--theme-accent);
-  box-shadow: 0 0 10px color-mix(in srgb, var(--theme-accent) 45%, transparent);
+  box-shadow: none;
 }
 
 /* Panel materials scoped to each panel's own data-theme (not body — avoids painting every theater) */
@@ -2472,7 +2598,6 @@ kbd {
     linear-gradient(145deg, color-mix(in srgb, #8b5cf6 7%, var(--surface)), var(--surface) 42%);
   box-shadow:
     0 20px 60px rgba(0, 0, 0, 0.35),
-    0 0 0 1px rgba(139, 92, 246, 0.12),
     inset 0 1px 0 rgba(255, 255, 255, 0.05),
     inset 0 0 40px rgba(139, 92, 246, 0.04);
 }
@@ -2505,7 +2630,6 @@ kbd {
   box-shadow:
     0 20px 60px rgba(0, 0, 0, 0.4),
     inset 0 0 0 2px rgba(10, 18, 8, 0.9),
-    inset 0 0 0 3px rgba(57, 255, 20, 0.12),
     inset 0 1px 0 rgba(57, 255, 20, 0.15);
 }
 
@@ -2557,7 +2681,6 @@ kbd {
     linear-gradient(145deg, color-mix(in srgb, #b91c1c 9%, var(--surface)), var(--surface) 42%);
   box-shadow:
     0 20px 60px rgba(0, 0, 0, 0.42),
-    0 0 0 1px rgba(185, 28, 28, 0.28),
     inset 0 0 32px rgba(132, 204, 22, 0.06);
 }
 
@@ -2567,8 +2690,6 @@ kbd {
     linear-gradient(145deg, color-mix(in srgb, #e879f9 8%, var(--surface)), var(--surface) 42%);
   box-shadow:
     0 20px 60px rgba(0, 0, 0, 0.35),
-    0 0 0 1px rgba(232, 121, 249, 0.28),
-    0 0 0 2px rgba(251, 191, 36, 0.12),
     inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
@@ -2588,8 +2709,7 @@ kbd {
     linear-gradient(145deg, color-mix(in srgb, #eab308 10%, var(--surface)), var(--surface) 45%);
   box-shadow:
     0 20px 60px rgba(0, 0, 0, 0.35),
-    inset 0 0 0 1px rgba(245, 240, 225, 0.18),
-    inset 0 0 0 2px rgba(234, 179, 8, 0.12);
+    inset 0 0 0 1px rgba(245, 240, 225, 0.14);
 }
 
 .game-panel[data-theme="hearthstone"] {
@@ -2633,11 +2753,9 @@ kbd {
 .tablist-wrap {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: var(--r-panel);
   overflow: hidden;
-  box-shadow:
-    0 20px 60px rgba(0, 0, 0, 0.35),
-    0 0 0 1px rgba(255, 255, 255, 0.02);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
   transition: border-color 0.3s, box-shadow 0.3s;
 }
 
@@ -2719,6 +2837,58 @@ kbd {
   line-height: 1.7;
 }
 
+.game-tagline {
+  margin: -0.15rem 0 1rem;
+  font-size: 1.02rem;
+  font-style: italic;
+  letter-spacing: 0.02em;
+  color: var(--gold);
+}
+
+.panel-subhead {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin: 1.45rem 0 0.2rem;
+  font-size: 0.66rem;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--theme-accent);
+}
+
+.play-steps {
+  list-style: none;
+}
+
+.play-steps li {
+  align-items: start;
+}
+
+.play-steps strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.payout-list span {
+  font-variant-numeric: tabular-nums;
+}
+
+.side-bets {
+  margin: 0.65rem 0 1rem;
+  font-size: 0.8rem;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+.book-copy .transmission {
+  margin: 0 0 1.35rem;
+}
+
+.book-copy .panel-subhead {
+  margin: 1.45rem 0 0.2rem;
+  color: var(--theme-accent);
+}
+
 .interview-cite {
   display: grid;
   grid-template-columns: minmax(140px, 200px) minmax(0, 1fr);
@@ -2734,9 +2904,9 @@ kbd {
   display: block;
   aspect-ratio: 16 / 9;
   overflow: hidden;
+  border-radius: var(--r-control);
   background: #0a0a0a;
-  outline: 1px solid color-mix(in srgb, var(--theme-accent) 28%, transparent);
-  transition: outline-color 0.2s ease, transform 0.25s var(--ease-spring);
+  transition: transform 0.25s var(--ease-spring);
 }
 
 .interview-cite-thumb img {
@@ -2744,6 +2914,7 @@ kbd {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: center;
   filter: saturate(0.92) contrast(1.05);
   transition: transform 0.35s ease, filter 0.25s ease;
 }
@@ -2771,8 +2942,12 @@ kbd {
 
 .interview-cite-thumb:hover,
 .interview-cite-thumb:focus-visible {
-  outline-color: color-mix(in srgb, var(--theme-accent) 70%, transparent);
   transform: translateY(-1px);
+}
+
+.interview-cite-thumb:focus-visible {
+  outline: 2px solid var(--theme-accent);
+  outline-offset: 2px;
 }
 
 .interview-cite-thumb:hover img,
@@ -2829,26 +3004,23 @@ kbd {
   }
 }
 
+/* Engraved credential line — a rule under the type, not a box around it */
 .plaque {
   display: inline-block;
-  margin: 0 0 1rem;
-  padding: 0.45rem 0.75rem;
+  margin: 0 0 1.15rem;
+  padding: 0 0 0.4rem;
   font-size: 0.72rem;
+  letter-spacing: 0.04em;
   color: var(--gold);
-  border: 1px solid var(--gold-dim);
-  border-radius: 3px;
-  background: linear-gradient(180deg, rgba(212, 175, 55, 0.14), rgba(212, 175, 55, 0.02));
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  border-bottom: 1px solid color-mix(in srgb, var(--gold) 32%, transparent);
   max-width: 100%;
   overflow-wrap: anywhere;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition: border-color 0.2s, color 0.2s;
 }
 
 .plaque:hover {
-  border-color: var(--gold);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.08),
-    0 0 18px rgba(212, 175, 55, 0.12);
+  color: color-mix(in srgb, var(--gold) 80%, #fff);
+  border-bottom-color: color-mix(in srgb, var(--gold) 65%, transparent);
 }
 
 .stat-list {
@@ -2905,19 +3077,22 @@ kbd {
   gap: 1rem;
 }
 
+.panel-media picture {
+  display: block;
+  width: 100%;
+}
+
 .panel-img {
   width: 100%;
-  border-radius: 6px;
-  border: 1px solid var(--border);
+  border-radius: var(--r-media);
   object-fit: cover;
   object-position: center;
   max-height: 280px;
   justify-self: center;
-  transition: border-color 0.3s, box-shadow 0.3s, transform 0.45s ease;
+  transition: box-shadow 0.3s, transform 0.45s ease;
 }
 
 .panel-img:hover {
-  border-color: color-mix(in srgb, var(--theme-accent) 45%, var(--border));
   box-shadow: 0 12px 36px rgba(0, 0, 0, 0.35);
   transform: translateY(-2px);
 }
@@ -2965,6 +3140,18 @@ kbd {
   aspect-ratio: 9 / 14;
 }
 
+/* Left-weighted archive pages: fill the frame, pin content to the left */
+.panel-img--archive {
+  width: 100%;
+  max-height: 360px;
+  aspect-ratio: 9 / 14;
+  object-fit: cover;
+  object-position: 0% 4%;
+  justify-self: center;
+  margin-inline: auto;
+  background: #08080c;
+}
+
 #battle-canvas,
 #cards-2hh,
 #cards-badugi {
@@ -2972,8 +3159,9 @@ kbd {
   max-width: 100%;
   height: auto;
   aspect-ratio: 480 / 300;
-  border: 1px solid color-mix(in srgb, var(--theme-accent) 28%, var(--border));
-  border-radius: 6px;
+  /* Canvases keep a hairline: it reads as "screen you can click", not decoration */
+  border: 1px solid color-mix(in srgb, var(--theme-accent) 22%, transparent);
+  border-radius: var(--r-media);
   background:
     radial-gradient(ellipse 70% 60% at 50% 40%, color-mix(in srgb, var(--theme-accent) 12%, #08080c), #08080c);
   cursor: pointer;
@@ -2996,33 +3184,15 @@ kbd {
 #battle-canvas:hover,
 #cards-2hh:hover,
 #cards-badugi:hover {
-  border-color: color-mix(in srgb, var(--theme-accent) 50%, var(--border));
+  border-color: color-mix(in srgb, var(--theme-accent) 45%, transparent);
   box-shadow:
     inset 0 0 40px rgba(0, 0, 0, 0.3),
     0 0 36px color-mix(in srgb, var(--theme-accent) 22%, transparent);
   transform: translateY(-2px);
 }
 
-.panel-media::before {
-  content: "";
-  position: absolute;
-  inset: -1px;
-  border-radius: 8px;
-  background: linear-gradient(
-    135deg,
-    color-mix(in srgb, var(--theme-accent) 35%, transparent),
-    transparent 40%,
-    transparent 60%,
-    color-mix(in srgb, var(--theme-accent-2) 28%, transparent)
-  );
-  opacity: 0.45;
-  pointer-events: none;
-  z-index: 0;
-}
-
 .panel-media > * {
   position: relative;
-  z-index: 1;
 }
 
 .logo-inline {
@@ -3034,6 +3204,19 @@ kbd {
   object-fit: contain;
   object-position: center;
   transition: transform 0.25s var(--ease-spring), opacity 0.25s;
+}
+
+.logo-inline.logo-float {
+  filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.45));
+}
+
+/* LATB banner: wordmark sits in the lower half of the source */
+.logo-inline--latb {
+  width: min(180px, 100%);
+  height: 3.5rem;
+  max-width: 180px;
+  object-fit: cover;
+  object-position: 50% 78%;
 }
 
 .panel-media .logo-inline {
@@ -3051,11 +3234,9 @@ kbd {
 }
 
 /* C&C dossier */
+/* Phosphor readout — the dashed row rules carry it; no enclosing frame */
 .dossier {
-  border: 1px solid var(--phosphor);
-  background: #050805;
-  padding: 1.25rem;
-  box-shadow: inset 0 0 40px rgba(57, 255, 20, 0.06);
+  padding: 0.25rem 0 0;
 }
 
 .dossier-meta {
@@ -3083,24 +3264,20 @@ kbd {
   color: #c8f5c0;
 }
 
-/* Warcraft heraldry */
+/* Warcraft heraldry — the plate is the only frame; the field is atmosphere */
 .heraldry {
   display: grid;
   place-items: center;
   min-height: 220px;
-  background:
-    radial-gradient(circle at 50% 40%, rgba(96, 165, 250, 0.12), transparent 60%),
-    linear-gradient(180deg, #14110c, #0a0a0a);
-  border: 1px solid #3d3424;
-  border-radius: 4px;
+  background: radial-gradient(circle at 50% 40%, rgba(96, 165, 250, 0.1), transparent 65%);
 }
 
 .heraldic-plate {
   text-align: center;
   padding: 1.5rem 2rem;
-  border: 2px solid var(--gold);
+  border: 1px solid var(--gold);
   background: linear-gradient(160deg, #1a1610, #0e0c09);
-  box-shadow: 0 0 0 4px #2a2418, inset 0 0 30px rgba(212, 175, 55, 0.15);
+  box-shadow: inset 0 0 30px rgba(212, 175, 55, 0.15);
 }
 
 .heraldic-plate span {
@@ -3139,26 +3316,23 @@ kbd {
 
 .poker-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1.5rem;
+  grid-template-columns: minmax(240px, 1fr) minmax(0, 1fr);
+  gap: 1.5rem 2rem;
+  align-items: start;
 }
 
+/* Broadcast lower-third — full-width above the photo + two chapters */
 .lower-third {
   grid-column: 1 / -1;
-  padding: 1.35rem 1.6rem;
-  background: linear-gradient(90deg, rgba(0, 0, 0, 0.92), rgba(13, 40, 24, 0.72));
-  border-left: 4px solid var(--gold);
-  border-bottom: 1px solid rgba(212, 175, 55, 0.35);
-  border-radius: 0 6px 6px 0;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
-  transition: border-color 0.25s, box-shadow 0.25s;
+  padding: 1.15rem 1.6rem;
+  background: linear-gradient(90deg, rgba(13, 40, 24, 0.55), transparent 80%);
+  border-left: 3px solid var(--gold);
+  transition: border-color 0.25s, background 0.25s;
 }
 
 .lower-third:hover {
   border-left-color: #f0d060;
-  box-shadow:
-    0 16px 48px rgba(0, 0, 0, 0.3),
-    0 0 28px rgba(212, 175, 55, 0.08);
+  background: linear-gradient(90deg, rgba(13, 40, 24, 0.7), transparent 80%);
 }
 
 .lt-label {
@@ -3185,37 +3359,47 @@ kbd {
 .poker-photo {
   position: relative;
   margin: 0;
-  border: 1px solid rgba(74, 222, 128, 0.25);
-  border-radius: 6px;
+  border-radius: var(--r-media);
   overflow: hidden;
-  /* Locked frame so landscape swaps (Advantage Play) can't resize the grid */
-  aspect-ratio: 3 / 4;
-  min-height: 280px;
-  max-height: 520px;
+  /* Native BoxeR frame is ~2:3; keep the slab vertical beside the chapters */
+  width: 100%;
+  height: auto;
+  aspect-ratio: 2 / 3;
   background: #0a120e;
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
   transition: border-color 0.3s, box-shadow 0.3s;
 }
 
 .poker-photo:hover {
-  border-color: rgba(212, 175, 55, 0.5);
   box-shadow:
     0 20px 50px rgba(0, 0, 0, 0.4),
     0 0 36px rgba(74, 222, 128, 0.1);
 }
 
 .poker-photo img {
+  position: absolute;
+  inset: 0;
   display: block;
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: 50% 32%;
+  object-position: 50% 28%;
   transition: transform 0.55s ease, filter 0.55s ease, opacity 0.2s ease;
+}
+
+.poker-photo img.is-contain {
+  object-fit: contain;
+  object-position: center;
+  background: #07110c;
 }
 
 .poker-photo:hover img {
   transform: scale(1.03);
   filter: contrast(1.04) saturate(1.05);
+}
+
+.poker-photo:hover img.is-contain {
+  transform: none;
 }
 
 /* Gallery crossfade state — keep layout stable while src changes */
@@ -3245,23 +3429,62 @@ kbd {
   outline-offset: 3px;
 }
 
-.press-strip {
-  margin: 2.5rem auto 0;
-  max-width: 1100px;
-  padding: 1.25rem 1.35rem;
-  border: 1px solid color-mix(in srgb, var(--theme-accent) 28%, var(--border));
-  border-radius: 4px;
-  background: color-mix(in srgb, var(--theme-accent) 6%, rgba(0, 0, 0, 0.35));
+.poker-grid [data-swap-img].is-selected {
+  border-left-width: 4px;
+  border-left-color: #f0d060;
+  background: linear-gradient(90deg, rgba(13, 40, 24, 0.78), transparent 82%);
 }
 
-.press-strip-label {
+/* Press fold — collapsed under poker so first viewport stays broadcast desk */
+.press-fold {
+  margin: 2.5rem auto 0;
+  max-width: min(1200px, 100%);
+  width: 100%;
+  padding: 0;
+  border-top: 1px solid var(--border);
+}
+
+.press-fold-summary {
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
-  margin: 0 0 0.85rem;
+  margin: 0;
+  padding: 1rem 0;
   font-size: 0.68rem;
   letter-spacing: 0.12em;
+  text-transform: uppercase;
   color: var(--muted);
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+}
+
+.press-fold-summary::-webkit-details-marker {
+  display: none;
+}
+
+.press-fold-summary::after {
+  content: "▾";
+  margin-left: 0.35rem;
+  opacity: 0.7;
+  transition: transform 0.2s ease;
+}
+
+.press-fold[open] .press-fold-summary::after {
+  transform: rotate(-180deg);
+}
+
+.press-fold-summary:hover,
+.press-fold-summary:focus-visible {
+  color: color-mix(in srgb, var(--muted) 70%, var(--gold));
+  outline: none;
+}
+
+.press-strip {
+  margin: 0;
+  max-width: none;
+  padding: 0 0 0.5rem;
+  border-top: 0;
 }
 
 .press-strip-list {
@@ -3275,17 +3498,16 @@ kbd {
 .press-strip-list a {
   display: grid;
   gap: 0.15rem;
-  padding: 0.65rem 0.75rem;
-  border: 1px solid transparent;
-  border-radius: 3px;
+  padding: 0.6rem 0.75rem;
+  margin: 0 -0.75rem;
+  border-radius: var(--r-control);
   text-decoration: none;
   color: inherit;
-  transition: border-color 0.2s, background 0.2s;
+  transition: background 0.2s;
 }
 
 .press-strip-list a:hover,
 .press-strip-list a:focus-visible {
-  border-color: color-mix(in srgb, var(--theme-accent) 40%, transparent);
   background: color-mix(in srgb, var(--theme-accent) 10%, transparent);
 }
 
@@ -3310,30 +3532,30 @@ kbd {
 .poker-cards {
   display: grid;
   gap: 1rem;
+  min-width: 0;
+  align-content: start;
 }
 
+/* Felt material is the container cue — no border on top of it */
 .felt-card {
   padding: 1.25rem;
   background: linear-gradient(160deg, #12261a, #0a120e);
-  border: 1px solid #1f3d2a;
-  border-radius: 4px;
+  border-radius: var(--r-media);
   box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.35);
-  transition: transform 0.3s var(--ease-spring), border-color 0.25s, box-shadow 0.25s;
+  transition: transform 0.3s var(--ease-spring), box-shadow 0.25s;
 }
 
 .felt-card:hover {
   transform: translateY(-4px);
-  border-color: rgba(212, 175, 55, 0.45);
   box-shadow:
     inset 0 0 40px rgba(0, 0, 0, 0.35),
     0 12px 32px rgba(0, 0, 0, 0.4);
 }
 
-/* Swap cards: no lift — translateY makes the pointer slip off and flicker the gallery */
+/* Swap cards: no lift — translateY makes the pointer slip off the hit target */
 .poker-cards .felt-card[data-swap-img]:hover,
 .poker-cards .felt-card[data-swap-img]:focus-visible {
   transform: none;
-  border-color: rgba(212, 175, 55, 0.55);
   box-shadow:
     inset 0 0 40px rgba(0, 0, 0, 0.35),
     0 0 28px rgba(74, 222, 128, 0.12);
@@ -3348,6 +3570,704 @@ kbd {
   color: var(--muted);
   font-size: 0.95rem;
   margin: 0;
+}
+
+/* ─── Art views — gallery bleeds (hero + all esports theaters / poker / book) ───
+   Innovation tabs remain the sole dossier frame. Theaters open into #bg-stage. */
+.art-view {
+  max-width: none;
+}
+
+.art-view > .section-head,
+.art-view > .sc-command > .section-head {
+  max-width: min(44rem, 100%);
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Shared content column — readable on ultrawide, full-width on phone */
+.art-view > .game-panel,
+.art-view > .poker-grid,
+.art-view > .book-layout,
+.art-view > .press-fold,
+.art-view > .sc-command {
+  max-width: min(1200px, 100%);
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Theaters — wash + accent rule, no enclosed panel */
+.art-view > .game-panel {
+  border: 0;
+  border-left: 3px solid color-mix(in srgb, var(--theme-accent) 70%, transparent);
+  border-radius: 0;
+  box-shadow: none;
+  background-color: transparent;
+  padding: clamp(1.35rem, 3.2vw, 2.75rem) clamp(1rem, 2.8vw, 2rem);
+  overflow: visible;
+  transition:
+    border-color 0.3s,
+    background 0.35s ease,
+    box-shadow 0.3s;
+  will-change: clip-path;
+}
+
+.art-view > .game-panel::before,
+.art-view > .game-panel::after {
+  content: none;
+  display: none;
+}
+
+.art-view > .game-panel:focus-visible {
+  outline-offset: 4px;
+}
+
+.art-view > .game-panel[data-theme]:hover,
+.art-view > .game-panel[data-theme].is-theme-active {
+  border-color: transparent;
+  border-left-color: var(--theme-accent);
+}
+
+.art-view > .game-panel[data-theme="starcraft"] {
+  background-image:
+    radial-gradient(1px 1px at 18% 28%, rgba(232, 230, 255, 0.22), transparent),
+    radial-gradient(1px 1px at 72% 62%, rgba(139, 92, 246, 0.16), transparent),
+    radial-gradient(ellipse 75% 90% at 0% 35%, color-mix(in srgb, #8b5cf6 20%, transparent), transparent 72%),
+    linear-gradient(90deg, color-mix(in srgb, #8b5cf6 12%, transparent), transparent 70%);
+  box-shadow: none;
+}
+
+.art-view > .game-panel[data-theme="starcraft-v2"] {
+  background-image:
+    repeating-linear-gradient(135deg, transparent 0 10px, rgba(168, 230, 255, 0.035) 10px 11px),
+    radial-gradient(ellipse 75% 90% at 0% 35%, color-mix(in srgb, #2dd4bf 18%, transparent), transparent 72%),
+    linear-gradient(90deg, color-mix(in srgb, #2dd4bf 12%, transparent), transparent 70%);
+  box-shadow: none;
+}
+
+.art-view > .game-panel[data-theme="starcraft-v3"] {
+  background-image:
+    repeating-linear-gradient(0deg, transparent 0 6px, rgba(234, 88, 12, 0.035) 6px 7px),
+    radial-gradient(ellipse 75% 90% at 0% 35%, color-mix(in srgb, #ea580c 18%, transparent), transparent 72%),
+    linear-gradient(90deg, color-mix(in srgb, #ea580c 12%, transparent), transparent 70%);
+  box-shadow: none;
+}
+
+.art-view > .game-panel:hover[data-theme="starcraft"],
+.art-view > .game-panel.is-theme-active[data-theme="starcraft"] {
+  background-image:
+    radial-gradient(1px 1px at 18% 28%, rgba(232, 230, 255, 0.28), transparent),
+    radial-gradient(1px 1px at 72% 62%, rgba(139, 92, 246, 0.22), transparent),
+    radial-gradient(ellipse 78% 92% at 0% 35%, color-mix(in srgb, #8b5cf6 26%, transparent), transparent 74%),
+    linear-gradient(90deg, color-mix(in srgb, #8b5cf6 16%, transparent), transparent 72%);
+}
+
+.art-view > .game-panel:hover[data-theme="starcraft-v2"],
+.art-view > .game-panel.is-theme-active[data-theme="starcraft-v2"] {
+  background-image:
+    repeating-linear-gradient(135deg, transparent 0 10px, rgba(168, 230, 255, 0.05) 10px 11px),
+    radial-gradient(ellipse 78% 92% at 0% 35%, color-mix(in srgb, #2dd4bf 24%, transparent), transparent 74%),
+    linear-gradient(90deg, color-mix(in srgb, #2dd4bf 16%, transparent), transparent 72%);
+}
+
+.art-view > .game-panel:hover[data-theme="starcraft-v3"],
+.art-view > .game-panel.is-theme-active[data-theme="starcraft-v3"] {
+  background-image:
+    repeating-linear-gradient(0deg, transparent 0 6px, rgba(234, 88, 12, 0.05) 6px 7px),
+    radial-gradient(ellipse 78% 92% at 0% 35%, color-mix(in srgb, #ea580c 24%, transparent), transparent 74%),
+    linear-gradient(90deg, color-mix(in srgb, #ea580c 16%, transparent), transparent 72%);
+}
+
+/* C&C — phosphor grid + CRT vignette */
+.art-view > .game-panel[data-theme="cnc"] {
+  background-image:
+    repeating-linear-gradient(0deg, transparent 0 3px, rgba(57, 255, 20, 0.03) 3px 4px),
+    radial-gradient(ellipse 90% 80% at 50% 50%, transparent 45%, rgba(0, 0, 0, 0.35) 100%),
+    radial-gradient(ellipse 70% 85% at 0% 40%, color-mix(in srgb, #39ff14 14%, transparent), transparent 72%),
+    linear-gradient(90deg, color-mix(in srgb, #39ff14 10%, transparent), transparent 68%);
+}
+
+.art-view > .game-panel[data-theme="cnc-v2"] {
+  background-image:
+    repeating-linear-gradient(0deg, transparent 0 3px, rgba(180, 35, 24, 0.035) 3px 4px),
+    radial-gradient(ellipse 90% 80% at 50% 50%, transparent 45%, rgba(0, 0, 0, 0.4) 100%),
+    radial-gradient(ellipse 70% 85% at 0% 40%, color-mix(in srgb, #b42318 16%, transparent), transparent 72%),
+    linear-gradient(90deg, color-mix(in srgb, #b42318 12%, transparent), transparent 68%);
+}
+
+.art-view > .game-panel[data-theme="cnc-v3"] {
+  background-image:
+    repeating-linear-gradient(0deg, transparent 0 3px, rgba(196, 160, 53, 0.035) 3px 4px),
+    radial-gradient(ellipse 90% 80% at 50% 50%, transparent 45%, rgba(0, 0, 0, 0.35) 100%),
+    radial-gradient(ellipse 70% 85% at 0% 40%, color-mix(in srgb, #c4a035 14%, transparent), transparent 72%),
+    linear-gradient(90deg, color-mix(in srgb, #c4a035 10%, transparent), transparent 68%);
+}
+
+.art-view > .game-panel:hover[data-theme="cnc"],
+.art-view > .game-panel.is-theme-active[data-theme="cnc"] {
+  background-image:
+    repeating-linear-gradient(0deg, transparent 0 3px, rgba(57, 255, 20, 0.05) 3px 4px),
+    radial-gradient(ellipse 90% 80% at 50% 50%, transparent 42%, rgba(0, 0, 0, 0.28) 100%),
+    radial-gradient(ellipse 72% 88% at 0% 40%, color-mix(in srgb, #39ff14 20%, transparent), transparent 74%),
+    linear-gradient(90deg, color-mix(in srgb, #39ff14 14%, transparent), transparent 70%);
+}
+
+.art-view > .game-panel:hover[data-theme="cnc-v2"],
+.art-view > .game-panel.is-theme-active[data-theme="cnc-v2"] {
+  background-image:
+    repeating-linear-gradient(0deg, transparent 0 3px, rgba(180, 35, 24, 0.055) 3px 4px),
+    radial-gradient(ellipse 90% 80% at 50% 50%, transparent 42%, rgba(0, 0, 0, 0.32) 100%),
+    radial-gradient(ellipse 72% 88% at 0% 40%, color-mix(in srgb, #b42318 22%, transparent), transparent 74%),
+    linear-gradient(90deg, color-mix(in srgb, #b42318 16%, transparent), transparent 70%);
+}
+
+.art-view > .game-panel:hover[data-theme="cnc-v3"],
+.art-view > .game-panel.is-theme-active[data-theme="cnc-v3"] {
+  background-image:
+    repeating-linear-gradient(0deg, transparent 0 3px, rgba(196, 160, 53, 0.055) 3px 4px),
+    radial-gradient(ellipse 90% 80% at 50% 50%, transparent 42%, rgba(0, 0, 0, 0.28) 100%),
+    radial-gradient(ellipse 72% 88% at 0% 40%, color-mix(in srgb, #c4a035 20%, transparent), transparent 74%),
+    linear-gradient(90deg, color-mix(in srgb, #c4a035 14%, transparent), transparent 70%);
+}
+
+/* Warcraft — parchment radial + banner wash */
+.art-view > .game-panel[data-theme="warcraft"] {
+  background-image:
+    radial-gradient(ellipse 60% 50% at 85% 20%, color-mix(in srgb, #fbbf24 8%, transparent), transparent 70%),
+    radial-gradient(ellipse 75% 90% at 0% 40%, color-mix(in srgb, #60a5fa 16%, transparent), transparent 72%),
+    linear-gradient(90deg, color-mix(in srgb, #60a5fa 10%, transparent), transparent 68%);
+}
+
+.art-view > .game-panel[data-theme="warcraft-v2"] {
+  background-image:
+    radial-gradient(ellipse 55% 45% at 80% 15%, color-mix(in srgb, #d4af37 10%, transparent), transparent 70%),
+    radial-gradient(ellipse 75% 90% at 0% 40%, color-mix(in srgb, #3b82f6 16%, transparent), transparent 72%),
+    linear-gradient(90deg, color-mix(in srgb, #3b82f6 10%, transparent), transparent 68%);
+}
+
+.art-view > .game-panel[data-theme="warcraft-v3"] {
+  background-image:
+    radial-gradient(ellipse 55% 45% at 80% 20%, color-mix(in srgb, #84cc16 8%, transparent), transparent 70%),
+    radial-gradient(ellipse 75% 90% at 0% 40%, color-mix(in srgb, #b91c1c 16%, transparent), transparent 72%),
+    linear-gradient(90deg, color-mix(in srgb, #b91c1c 10%, transparent), transparent 68%);
+}
+
+.art-view > .game-panel:hover[data-theme="warcraft"],
+.art-view > .game-panel.is-theme-active[data-theme="warcraft"] {
+  background-image:
+    radial-gradient(ellipse 62% 52% at 85% 20%, color-mix(in srgb, #fbbf24 12%, transparent), transparent 70%),
+    radial-gradient(ellipse 78% 92% at 0% 40%, color-mix(in srgb, #60a5fa 22%, transparent), transparent 74%),
+    linear-gradient(90deg, color-mix(in srgb, #60a5fa 14%, transparent), transparent 70%);
+}
+
+.art-view > .game-panel:hover[data-theme="warcraft-v2"],
+.art-view > .game-panel.is-theme-active[data-theme="warcraft-v2"] {
+  background-image:
+    radial-gradient(ellipse 58% 48% at 80% 15%, color-mix(in srgb, #d4af37 14%, transparent), transparent 70%),
+    radial-gradient(ellipse 78% 92% at 0% 40%, color-mix(in srgb, #3b82f6 22%, transparent), transparent 74%),
+    linear-gradient(90deg, color-mix(in srgb, #3b82f6 14%, transparent), transparent 70%);
+}
+
+.art-view > .game-panel:hover[data-theme="warcraft-v3"],
+.art-view > .game-panel.is-theme-active[data-theme="warcraft-v3"] {
+  background-image:
+    radial-gradient(ellipse 58% 48% at 80% 20%, color-mix(in srgb, #84cc16 12%, transparent), transparent 70%),
+    radial-gradient(ellipse 78% 92% at 0% 40%, color-mix(in srgb, #b91c1c 22%, transparent), transparent 74%),
+    linear-gradient(90deg, color-mix(in srgb, #b91c1c 14%, transparent), transparent 70%);
+}
+
+/* MTG — lacquer magenta wash (Cube uses quieter continuation via subsection) */
+.art-view > .game-panel[data-theme="mtg"] {
+  background-image:
+    radial-gradient(ellipse 50% 40% at 90% 70%, color-mix(in srgb, #fbbf24 8%, transparent), transparent 65%),
+    radial-gradient(ellipse 75% 90% at 0% 35%, color-mix(in srgb, #e879f9 16%, transparent), transparent 72%),
+    linear-gradient(90deg, color-mix(in srgb, #e879f9 11%, transparent), transparent 68%);
+}
+
+.art-view > .game-panel[data-theme="mtg-v2"] {
+  background-image:
+    radial-gradient(ellipse 50% 40% at 90% 70%, color-mix(in srgb, #a8a29e 6%, transparent), transparent 65%),
+    radial-gradient(ellipse 75% 90% at 0% 35%, color-mix(in srgb, #86efac 14%, transparent), transparent 72%),
+    linear-gradient(90deg, color-mix(in srgb, #86efac 10%, transparent), transparent 68%);
+}
+
+.art-view > .game-panel[data-theme="mtg-v3"] {
+  background-image:
+    radial-gradient(ellipse 50% 40% at 90% 70%, color-mix(in srgb, #eab308 8%, transparent), transparent 65%),
+    radial-gradient(ellipse 75% 90% at 0% 35%, color-mix(in srgb, #f5f0e1 12%, transparent), transparent 72%),
+    linear-gradient(90deg, color-mix(in srgb, #eab308 10%, transparent), transparent 68%);
+}
+
+.art-view > .game-panel:hover[data-theme="mtg"],
+.art-view > .game-panel.is-theme-active[data-theme="mtg"] {
+  background-image:
+    radial-gradient(ellipse 52% 42% at 90% 70%, color-mix(in srgb, #fbbf24 12%, transparent), transparent 65%),
+    radial-gradient(ellipse 78% 92% at 0% 35%, color-mix(in srgb, #e879f9 22%, transparent), transparent 74%),
+    linear-gradient(90deg, color-mix(in srgb, #e879f9 15%, transparent), transparent 70%);
+}
+
+.art-view > .game-panel:hover[data-theme="mtg-v2"],
+.art-view > .game-panel.is-theme-active[data-theme="mtg-v2"] {
+  background-image:
+    radial-gradient(ellipse 52% 42% at 90% 70%, color-mix(in srgb, #a8a29e 10%, transparent), transparent 65%),
+    radial-gradient(ellipse 78% 92% at 0% 35%, color-mix(in srgb, #86efac 20%, transparent), transparent 74%),
+    linear-gradient(90deg, color-mix(in srgb, #86efac 14%, transparent), transparent 70%);
+}
+
+.art-view > .game-panel:hover[data-theme="mtg-v3"],
+.art-view > .game-panel.is-theme-active[data-theme="mtg-v3"] {
+  background-image:
+    radial-gradient(ellipse 52% 42% at 90% 70%, color-mix(in srgb, #eab308 12%, transparent), transparent 65%),
+    radial-gradient(ellipse 78% 92% at 0% 35%, color-mix(in srgb, #f5f0e1 16%, transparent), transparent 74%),
+    linear-gradient(90deg, color-mix(in srgb, #eab308 14%, transparent), transparent 70%);
+}
+
+/* Cube subsection — quieter lacquer continuation */
+.game-subsection.art-view > .game-panel[data-theme="mtg"],
+.game-subsection.art-view > .game-panel[data-theme="mtg-v2"],
+.game-subsection.art-view > .game-panel[data-theme="mtg-v3"] {
+  background-image:
+    radial-gradient(ellipse 60% 70% at 0% 40%, color-mix(in srgb, var(--theme-accent) 10%, transparent), transparent 70%),
+    linear-gradient(90deg, color-mix(in srgb, var(--theme-accent) 6%, transparent), transparent 55%);
+}
+
+.game-subsection.art-view > .game-panel:hover[data-theme="mtg"],
+.game-subsection.art-view > .game-panel.is-theme-active[data-theme="mtg"],
+.game-subsection.art-view > .game-panel:hover[data-theme="mtg-v2"],
+.game-subsection.art-view > .game-panel.is-theme-active[data-theme="mtg-v2"],
+.game-subsection.art-view > .game-panel:hover[data-theme="mtg-v3"],
+.game-subsection.art-view > .game-panel.is-theme-active[data-theme="mtg-v3"] {
+  background-image:
+    radial-gradient(ellipse 62% 72% at 0% 40%, color-mix(in srgb, var(--theme-accent) 14%, transparent), transparent 72%),
+    linear-gradient(90deg, color-mix(in srgb, var(--theme-accent) 9%, transparent), transparent 58%);
+}
+
+/* Hearthstone — ember radial from screenshot side */
+.art-view > .game-panel[data-theme="hearthstone"] {
+  background-image:
+    radial-gradient(ellipse 55% 60% at 85% 55%, color-mix(in srgb, #f59e0b 18%, transparent), transparent 70%),
+    radial-gradient(ellipse 70% 85% at 0% 40%, color-mix(in srgb, #f59e0b 12%, transparent), transparent 72%),
+    linear-gradient(90deg, color-mix(in srgb, #f59e0b 9%, transparent), transparent 65%);
+}
+
+.art-view > .game-panel[data-theme="hearthstone-v2"] {
+  background-image:
+    radial-gradient(ellipse 55% 60% at 85% 55%, color-mix(in srgb, #67e8f9 16%, transparent), transparent 70%),
+    radial-gradient(ellipse 70% 85% at 0% 40%, color-mix(in srgb, #67e8f9 12%, transparent), transparent 72%),
+    linear-gradient(90deg, color-mix(in srgb, #67e8f9 9%, transparent), transparent 65%);
+}
+
+.art-view > .game-panel[data-theme="hearthstone-v3"] {
+  background-image:
+    radial-gradient(ellipse 55% 60% at 85% 55%, color-mix(in srgb, #94a3b8 14%, transparent), transparent 70%),
+    radial-gradient(ellipse 70% 85% at 0% 40%, color-mix(in srgb, #94a3b8 12%, transparent), transparent 72%),
+    linear-gradient(90deg, color-mix(in srgb, #94a3b8 9%, transparent), transparent 65%);
+}
+
+.art-view > .game-panel:hover[data-theme="hearthstone"],
+.art-view > .game-panel.is-theme-active[data-theme="hearthstone"] {
+  background-image:
+    radial-gradient(ellipse 58% 64% at 85% 55%, color-mix(in srgb, #f59e0b 24%, transparent), transparent 72%),
+    radial-gradient(ellipse 72% 88% at 0% 40%, color-mix(in srgb, #f59e0b 16%, transparent), transparent 74%),
+    linear-gradient(90deg, color-mix(in srgb, #f59e0b 12%, transparent), transparent 68%);
+}
+
+.art-view > .game-panel:hover[data-theme="hearthstone-v2"],
+.art-view > .game-panel.is-theme-active[data-theme="hearthstone-v2"] {
+  background-image:
+    radial-gradient(ellipse 58% 64% at 85% 55%, color-mix(in srgb, #67e8f9 22%, transparent), transparent 72%),
+    radial-gradient(ellipse 72% 88% at 0% 40%, color-mix(in srgb, #67e8f9 16%, transparent), transparent 74%),
+    linear-gradient(90deg, color-mix(in srgb, #67e8f9 12%, transparent), transparent 68%);
+}
+
+.art-view > .game-panel:hover[data-theme="hearthstone-v3"],
+.art-view > .game-panel.is-theme-active[data-theme="hearthstone-v3"] {
+  background-image:
+    radial-gradient(ellipse 58% 64% at 85% 55%, color-mix(in srgb, #94a3b8 20%, transparent), transparent 72%),
+    radial-gradient(ellipse 72% 88% at 0% 40%, color-mix(in srgb, #94a3b8 16%, transparent), transparent 74%),
+    linear-gradient(90deg, color-mix(in srgb, #94a3b8 12%, transparent), transparent 68%);
+}
+
+/* Theater enter helpers — C&C scanline, MTG foil, Cube lid */
+.theater-scanline {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -8%;
+  height: 18%;
+  pointer-events: none;
+  z-index: 4;
+  opacity: 0;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    color-mix(in srgb, var(--theme-accent) 35%, transparent) 45%,
+    transparent 100%
+  );
+  mix-blend-mode: screen;
+}
+
+.art-view > .game-panel[data-reveal="deal"] {
+  isolation: isolate;
+}
+
+.art-view > .game-panel[data-reveal="deal"]::after {
+  content: "";
+  display: block;
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 3;
+  opacity: 0;
+  background: linear-gradient(
+    115deg,
+    transparent 35%,
+    color-mix(in srgb, #fff 28%, transparent) 48%,
+    color-mix(in srgb, var(--theme-accent) 35%, transparent) 52%,
+    transparent 65%
+  );
+  transform: translateX(-45%);
+}
+
+.art-view > .game-panel[data-reveal="deal"].is-foil-sweep::after {
+  animation: foilSweep 0.75s ease-in-out forwards;
+}
+
+@keyframes foilSweep {
+  0% {
+    opacity: 0;
+    transform: translateX(-45%);
+  }
+  18% {
+    opacity: 0.85;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(110%);
+  }
+}
+
+html.reveal-on [data-reveal].is-theater-entering {
+  transition: none !important;
+  opacity: 1 !important;
+  perspective: 1200px;
+}
+
+.art-view > .game-panel[data-reveal="deal"],
+.art-view > .game-panel[data-reveal="deal"] .panel-grid {
+  perspective: 1400px;
+  transform-style: preserve-3d;
+}
+
+.art-view > .game-panel[data-reveal="deal"] .panel-grid > * {
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+}
+
+html.reveal-on [data-reveal].is-theater-entering .reveal-item,
+html.reveal-on [data-reveal].is-theater-entering .game-tag,
+html.reveal-on [data-reveal].is-theater-entering .plaque,
+html.reveal-on [data-reveal].is-theater-entering .panel-grid > *,
+html.reveal-on [data-reveal].is-theater-entering .panel-media,
+html.reveal-on [data-reveal].is-theater-entering .heraldic-plate,
+html.reveal-on [data-reveal].is-theater-entering .dossier-meta > div,
+html.reveal-on [data-reveal].is-theater-entering .career-timeline li,
+html.reveal-on [data-reveal].is-theater-entering .interview-cite,
+html.reveal-on [data-reveal].is-theater-entering .book-3d,
+html.reveal-on [data-reveal].is-theater-entering .play-frame-wrap {
+  transition: none !important;
+}
+
+.art-view > .game-panel[data-reveal="lid"] {
+  transform-origin: 50% 0%;
+}
+
+html.reveal-on [data-reveal="lid"]:not(.is-inview):not([data-exit]) {
+  opacity: 0;
+  clip-path: inset(0 0 100% 0);
+  transform: none;
+}
+
+html.reveal-on [data-reveal="lid"][data-exit]:not(.is-inview) {
+  opacity: 0;
+  transform: none;
+}
+
+html.reveal-on [data-reveal="lid"].is-inview {
+  opacity: 1;
+  clip-path: inset(0 0 0 0);
+}
+
+html.reveal-on [data-reveal="lid"] {
+  transition:
+    opacity 0.55s ease,
+    clip-path 0.85s var(--ease-spring);
+}
+
+/* One-shot theaters: quiet re-entry after first enter */
+html.reveal-on [data-reveal][data-entered]:not(.is-inview) {
+  opacity: 0;
+  transform: none !important;
+  filter: none;
+  clip-path: none;
+}
+
+html.reveal-on [data-reveal][data-entered].is-inview {
+  opacity: 1;
+  transform: none !important;
+  clip-path: none;
+}
+
+.art-view .panel-media {
+  gap: 1.25rem;
+}
+
+.art-view .panel-img--contain.panel-img--tall,
+.art-view .panel-img--archive {
+  max-height: min(440px, 68vh);
+  padding: 0;
+  background:
+    radial-gradient(ellipse 80% 70% at 50% 50%, color-mix(in srgb, var(--theme-accent) 8%, transparent), transparent 72%),
+    transparent;
+}
+
+.art-view .panel-img:hover {
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.4);
+}
+
+/* StarCraft command beat — quieter continuation of the championship theater */
+.art-view > .sc-command {
+  margin-top: 0;
+  padding: clamp(1.15rem, 2.8vw, 2.25rem) clamp(1rem, 2.8vw, 2rem);
+  border: 0;
+  border-left: 2px solid color-mix(in srgb, var(--theme-accent) 50%, transparent);
+  border-radius: 0;
+  background-image:
+    radial-gradient(ellipse 70% 80% at 0% 30%, color-mix(in srgb, var(--theme-accent) 12%, transparent), transparent 72%),
+    linear-gradient(90deg, color-mix(in srgb, var(--theme-accent) 8%, transparent), transparent 68%);
+}
+
+.sc-command .section-head {
+  margin-bottom: clamp(1.25rem, 3vw, 1.85rem);
+}
+
+.sc-command-grid {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: clamp(1.25rem, 3vw, 2.25rem);
+  align-items: start;
+}
+
+.sc-command-grid #battle-canvas,
+.sc-command-grid #race-canvas {
+  max-width: 100%;
+}
+
+/* StarCraft → Gaming Archive callout — large, unmistakable bridge */
+.esports-more {
+  max-width: min(1200px, 100%);
+  width: 100%;
+  margin: clamp(2rem, 5vw, 3.5rem) auto 0;
+  padding: clamp(1.75rem, 4.5vw, 2.75rem) clamp(1.35rem, 3.5vw, 2.5rem);
+  display: grid;
+  gap: 0.85rem;
+  justify-items: start;
+  border: 1px solid color-mix(in srgb, var(--theme-accent) 55%, var(--border));
+  border-left: 4px solid var(--theme-accent);
+  border-radius: var(--r-panel);
+  background:
+    radial-gradient(ellipse 70% 90% at 0% 40%, color-mix(in srgb, var(--theme-accent) 18%, transparent), transparent 70%),
+    linear-gradient(135deg, color-mix(in srgb, var(--theme-accent) 10%, var(--surface)), var(--surface) 55%);
+  box-shadow:
+    0 24px 64px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 color-mix(in srgb, var(--theme-accent) 18%, transparent);
+}
+
+.esports-more-kicker {
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--theme-accent);
+}
+
+.esports-more h3 {
+  margin: 0;
+  font-family: var(--display);
+  font-size: clamp(1.55rem, 3.6vw, 2.15rem);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  max-width: 22ch;
+}
+
+.esports-more-copy {
+  margin: 0;
+  max-width: 48rem;
+  color: color-mix(in srgb, var(--text) 88%, var(--muted));
+  font-size: clamp(1rem, 1.7vw, 1.12rem);
+  line-height: 1.6;
+}
+
+.esports-more-theaters {
+  list-style: none;
+  margin: 0.35rem 0 0.5rem;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem 0.15rem;
+}
+
+.esports-more-theaters li {
+  margin: 0;
+  padding: 0.35rem 0.85rem;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--text) 85%, var(--theme-accent));
+  border-right: 1px solid color-mix(in srgb, var(--theme-accent) 35%, var(--border));
+}
+
+.esports-more-theaters li:last-child {
+  border-right: 0;
+}
+
+.esports-more .btn {
+  margin-top: 0.35rem;
+  min-height: 3rem;
+  padding-inline: 1.5rem;
+  font-size: 1rem;
+}
+
+@media (max-width: 640px) {
+  .esports-more-theaters li {
+    border-right: 0;
+    border-bottom: 1px solid color-mix(in srgb, var(--theme-accent) 28%, var(--border));
+    padding-inline: 0;
+    padding-block: 0.25rem 0.35rem;
+    width: 100%;
+  }
+
+  .esports-more-theaters {
+    flex-direction: column;
+    gap: 0;
+    width: 100%;
+  }
+}
+
+/* Poker — ambient photo plane + felt washes (match lower-third language) */
+.art-view.section-poker .section-head,
+.art-view.section-poker .poker-grid {
+  max-width: min(1200px, 100%);
+}
+
+.art-view .poker-photo {
+  width: 100%;
+  max-width: 100%;
+  justify-self: stretch;
+  border-radius: 0;
+  box-shadow: none;
+  background: transparent;
+  max-height: min(640px, 70vh);
+  isolation: isolate;
+}
+
+.art-view .poker-photo::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(to top, rgba(10, 10, 10, 0.78) 0%, transparent 32%),
+    radial-gradient(ellipse 95% 85% at 50% 42%, transparent 55%, rgba(10, 10, 10, 0.42) 100%);
+  z-index: 1;
+}
+
+.art-view .poker-photo-caption {
+  z-index: 2;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.55));
+  padding: 0.85rem 1rem;
+}
+
+.art-view .poker-photo:hover {
+  box-shadow: none;
+}
+
+.art-view .felt-card {
+  border-radius: 0;
+  background: linear-gradient(90deg, rgba(13, 40, 24, 0.55), transparent 88%);
+  border-left: 3px solid var(--gold);
+  box-shadow: none;
+  padding: 1.15rem 1.4rem;
+}
+
+.art-view .felt-card:hover {
+  transform: none;
+  box-shadow: none;
+  background: linear-gradient(90deg, rgba(13, 40, 24, 0.7), transparent 90%);
+  border-left-color: #f0d060;
+}
+
+.art-view .poker-cards .felt-card[data-swap-img]:hover,
+.art-view .poker-cards .felt-card[data-swap-img]:focus-visible,
+.art-view .poker-grid [data-swap-img].is-selected {
+  transform: none;
+  box-shadow: none;
+  background: linear-gradient(90deg, rgba(13, 40, 24, 0.78), transparent 88%);
+  border-left-width: 4px;
+  border-left-color: #f0d060;
+}
+
+/* Book — cover as gallery object on atmosphere */
+.art-view.section-book {
+  padding-top: clamp(3rem, 7vw, 5.25rem);
+  padding-bottom: clamp(3rem, 7vw, 5.25rem);
+  overflow-x: clip;
+}
+
+.art-view .book-layout {
+  max-width: min(1100px, 100%);
+  gap: clamp(2.25rem, 6vw, 4.5rem);
+}
+
+.art-view .book-showcase {
+  position: relative;
+  min-height: min(420px, 70vw);
+  overflow: hidden;
+}
+
+.art-view .book-showcase::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 52%;
+  width: min(380px, 88%);
+  height: min(380px, 88%);
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--gold) 16%, transparent) 0%,
+    color-mix(in srgb, var(--gold) 4%, transparent) 42%,
+    transparent 70%
+  );
+  pointer-events: none;
+  z-index: 0;
+}
+
+.art-view .book-3d {
+  width: min(300px, 70vw);
+  z-index: 1;
+}
+
+.art-view .book-copy {
+  border-left: 2px solid color-mix(in srgb, var(--gold) 45%, transparent);
+  padding-left: clamp(1.1rem, 2.8vw, 1.75rem);
 }
 
 /* Play 2HH — native table is 1000×665; we crop host chrome + scale-to-fit */
@@ -3368,14 +4288,12 @@ kbd {
 .play-panel {
   max-width: 640px;
   margin: 0 auto;
-  padding: 2rem 1.5rem;
+  padding: 1.25rem 0;
   text-align: center;
-  background: var(--surface);
-  border: 1px solid color-mix(in srgb, #38bdf8 25%, var(--border));
-  border-radius: 8px;
-  box-shadow:
-    0 20px 60px rgba(0, 0, 0, 0.35),
-    0 0 40px rgba(56, 189, 248, 0.06);
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
 }
 
 .play-panel-wide {
@@ -3394,8 +4312,7 @@ kbd {
   min-height: 280px;
   max-height: min(78svh, 720px);
   margin: 0 auto 1.25rem;
-  border: 1px solid color-mix(in srgb, #38bdf8 30%, var(--border));
-  border-radius: 6px;
+  border-radius: var(--r-media);
   overflow: hidden;
   background: #071018;
   box-shadow:
@@ -3608,6 +4525,7 @@ body.play-2hh-immersive .play-ctas {
   margin: 0 auto 1.5rem;
   object-fit: contain;
   object-position: center;
+  filter: drop-shadow(0 12px 28px rgba(0, 0, 0, 0.55));
 }
 
 @media (max-width: 768px) {
@@ -3683,7 +4601,7 @@ body.play-2hh-immersive .play-ctas {
   height: min(70vh, 560px);
   margin: 0 auto 1.25rem;
   overflow: hidden;
-  border: 1px solid color-mix(in srgb, #38bdf8 30%, var(--border));
+  border-radius: var(--r-panel);
   box-shadow:
     0 20px 60px rgba(0, 0, 0, 0.35),
     0 0 40px rgba(56, 189, 248, 0.06);
@@ -3788,10 +4706,9 @@ body.play-2hh-immersive .play-ctas {
 .media-kit {
   margin: 0 auto 2.75rem;
   max-width: 40rem;
-  padding: 1.5rem 1.35rem 1.6rem;
+  padding: 1.75rem 0 0;
   text-align: left;
-  border: 1px solid color-mix(in srgb, var(--theme-accent) 28%, var(--border));
-  background: color-mix(in srgb, var(--theme-accent) 6%, rgba(10, 10, 12, 0.55));
+  border-top: 1px solid var(--border);
 }
 
 .media-kit .eyebrow-badge {
@@ -4016,6 +4933,23 @@ body.play-2hh-immersive .back-top {
   font-size: 0.78rem;
 }
 
+.footer-credit {
+  margin-top: 0.85rem;
+  font-size: 0.72rem;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.footer-credit a {
+  color: var(--muted);
+  border-bottom: 1px solid transparent;
+}
+
+.footer-credit a:hover {
+  color: var(--gold);
+  border-bottom-color: var(--gold);
+}
+
 /* ========== Responsive breakpoints ========== */
 
 /* Narrow desktop: keep aside readable, prevent prose crush */
@@ -4033,7 +4967,6 @@ body.play-2hh-immersive .back-top {
 
 /* Large desktop */
 @media (min-width: 1400px) {
-  .hero-gate,
   .section,
   .section-poker .section-head,
   .poker-grid,
@@ -4053,7 +4986,6 @@ body.play-2hh-immersive .back-top {
     --pad-x: clamp(1.5rem, 4vw, 2.5rem);
   }
 
-  .hero-gate,
   .section,
   .section-poker .section-head,
   .poker-grid,
@@ -4061,8 +4993,21 @@ body.play-2hh-immersive .back-top {
     max-width: 1320px;
   }
 
+  .art-view > .game-panel,
+  .art-view > .poker-grid,
+  .art-view > .book-layout,
+  .art-view > .press-fold,
+  .art-view.section-poker .section-head,
+  .art-view.section-poker .poker-grid {
+    max-width: min(1320px, 100%);
+  }
+
   .play-panel-wide {
     max-width: min(1240px, 100%);
+  }
+
+  .hero-photo[data-hero-scene="champ"] img {
+    object-position: 52% 38%;
   }
 }
 
@@ -4071,11 +5016,21 @@ body.play-2hh-immersive .back-top {
   .panel-grid,
   .poker-grid,
   .about-layout,
-  .book-layout {
+  .book-layout,
+  .sc-command-grid {
     grid-template-columns: 1fr;
   }
 
   .book-showcase {
+    order: -1;
+  }
+
+  /* Art views — visual plane first, then story */
+  .art-view .panel-media {
+    order: -1;
+  }
+
+  .art-view .panel-media > picture {
     order: -1;
   }
 
@@ -4095,6 +5050,7 @@ body.play-2hh-immersive .back-top {
 
   .about-portrait img {
     max-height: 300px;
+    object-position: 50% 36%;
   }
 
   .about-timeline {
@@ -4114,55 +5070,74 @@ body.play-2hh-immersive .back-top {
 
   .hero {
     min-height: calc(100svh - var(--header-h));
-    justify-content: center;
-    padding-top: clamp(1rem, 3vw, 1.5rem);
-    padding-bottom: clamp(2.5rem, 6vw, 3.5rem);
+    justify-content: flex-start;
+    height: auto;
+    padding-top: clamp(1rem, 2.5vw, 1.5rem);
+    padding-bottom: clamp(2.5rem, 6vw, 3.25rem);
   }
 
-  /* Keep 3 columns; size to remaining viewport under two-row header */
-  .hero-panels {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 0.55rem;
+  .hero-gate {
+    gap: clamp(0.5rem, 1.4vw, 0.85rem);
   }
 
-  .hero-panel {
-    min-height: clamp(140px, 32svh, 260px);
-    max-height: clamp(160px, 38svh, 300px);
+  .hero-pillar {
+    padding: 0.3rem 0.1rem 0.4rem;
   }
 
-  .hero-panel-label {
-    font-size: clamp(0.52rem, 1.5vw, 0.62rem);
-    letter-spacing: 0.08em;
-    padding: 0.5rem 0.35rem;
+  .hero-photo-stack {
+    opacity: 0.92;
   }
 
-  .hero-panel-media--logo img,
-  .hero-panel[data-panel="media"] .hero-panel-media--logo img {
-    max-height: min(20svh, 150px);
+  .hero-emblem img {
+    max-width: min(40vw, 200px);
+    max-height: min(100%, 22vh);
   }
 
-  .brand-callsign {
-    font-size: clamp(1.85rem, 8vw, 2.85rem);
-  }
-
-  .hero-tagline {
-    font-size: 0.62rem;
-    letter-spacing: 0.06em;
-    max-width: 92vw;
-  }
-
-  .scroll-cue {
-    display: none;
-  }
-
-  .lower-third {
-    grid-column: auto;
+  .hero-photo[data-hero-scene="champ"] img {
+    object-position: 48% 38%;
   }
 
   .poker-photo {
-    min-height: 220px;
-    max-height: 360px;
-    aspect-ratio: 4 / 5;
+    min-height: 280px;
+    max-height: min(680px, 72vh);
+    height: auto;
+    aspect-ratio: 2 / 3;
+  }
+
+  .poker-photo img:not(.is-contain) {
+    object-position: 50% 26%;
+  }
+
+  /* Art views — keep gallery language on tablet; slightly tighter vertical rhythm */
+  .art-view > .game-panel,
+  .art-view > .sc-command {
+    padding: clamp(1.1rem, 3vw, 1.75rem) clamp(0.85rem, 2.5vw, 1.35rem);
+  }
+
+  .art-view .panel-img--contain.panel-img--tall,
+  .art-view .panel-img--archive {
+    max-height: min(420px, 56vh);
+    padding: 0;
+    width: 100%;
+  }
+
+  .art-view .poker-photo {
+    width: 100%;
+    min-height: 280px;
+    max-height: min(680px, 72vh);
+    height: auto;
+    aspect-ratio: 2 / 3;
+  }
+
+  .art-view .book-showcase {
+    min-height: 0;
+  }
+
+  .art-view .book-copy {
+    border-left: 0;
+    border-top: 2px solid color-mix(in srgb, var(--gold) 40%, transparent);
+    padding-left: 0;
+    padding-top: 1.25rem;
   }
 }
 
@@ -4170,6 +5145,32 @@ body.play-2hh-immersive .back-top {
 @media (max-width: 768px) {
   :root {
     --header-h: 56px;
+  }
+
+  .hero-trio {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.45rem;
+  }
+
+  .pillar-header {
+    display: none;
+  }
+
+  .pillar-title-full {
+    display: none;
+  }
+
+  .pillar-title-short {
+    display: inline;
+  }
+
+  .hero-emblem-slot {
+    min-height: 3.75rem;
+  }
+
+  .hero-emblem img {
+    max-width: min(42vw, 180px);
+    max-height: min(100%, 20vh);
   }
 
   .brand-text {
@@ -4239,6 +5240,7 @@ body.play-2hh-immersive .back-top {
 
   .about-portrait img {
     max-height: min(300px, 42vh);
+    object-position: 50% 36%;
   }
 
   .about-timeline,
@@ -4248,18 +5250,40 @@ body.play-2hh-immersive .back-top {
   }
 
   .about-roles {
-    gap: 0.4rem;
+    gap: 0;
   }
 
   .about-roles li {
     white-space: normal;
     line-height: 1.3;
+    padding-right: 0.65rem;
+  }
+
+  /* Art views — phone: full-width plane, archive leads, keep wash + rule */
+  .art-view > .game-panel,
+  .art-view > .sc-command {
+    padding: 1rem 0.15rem 1.15rem 0.7rem;
+  }
+
+  .art-view .panel-img--contain.panel-img--tall,
+  .art-view .panel-img--archive {
+    max-height: min(380px, 48vh);
+    width: 100%;
+  }
+
+  .art-view .felt-card {
+    padding: 1rem 1.1rem;
+  }
+
+  .art-view .book-3d {
+    width: min(240px, 68vw);
+    transform: rotateY(-14deg) rotateX(4deg);
   }
 
   .about-fact,
   .about-credentials li,
   .about-book {
-    padding: 0.8rem 0.85rem;
+    padding: 0.1rem 0 0.1rem 0.8rem;
   }
 
   .about-prose {
@@ -4281,7 +5305,7 @@ body.play-2hh-immersive .back-top {
   }
 
   .brand-text {
-    font-size: 0.82rem;
+    display: none;
   }
 
   .command-nav a {
@@ -4300,16 +5324,10 @@ body.play-2hh-immersive .back-top {
   }
 }
 
-/* Keep one compact header row — nav scrolls, socials stay icon-only */
+/* Compact header — socials live in Contact / footer below this width */
 @media (max-width: 1100px) {
-  .nav-social .nav-label {
+  .nav-social {
     display: none;
-  }
-
-  .nav-social-link {
-    padding: 0.35rem;
-    min-width: 36px;
-    gap: 0;
   }
 }
 
@@ -4342,33 +5360,12 @@ body.play-2hh-immersive .back-top {
     flex: 1 1 auto;
     min-width: 0;
   }
-
-  .nav-social {
-    gap: 0.15rem;
-  }
-
-  .nav-social-link {
-    padding: 0.3rem;
-    min-height: 36px;
-    min-width: 34px;
-  }
-
-  .nav-social-icon {
-    width: 0.85rem;
-    height: 0.85rem;
-  }
 }
 
-/* Phone — 3 columns with readable short labels */
+/* Phone — 3 columns with short labels; brand stays visible */
 @media (max-width: 480px) {
   .brand-text {
-    display: none;
-  }
-
-  .nav-social-link {
-    padding: 0.28rem;
-    min-width: 32px;
-    min-height: 34px;
+    font-size: 0.82rem;
   }
 
   .back-top-label {
@@ -4376,7 +5373,7 @@ body.play-2hh-immersive .back-top {
   }
 
   .media-kit {
-    padding: 1.2rem 1rem 1.35rem;
+    padding: 1.35rem 0 0;
   }
 
   .hotkey-help-list > div {
@@ -4384,47 +5381,44 @@ body.play-2hh-immersive .back-top {
   }
 
   .hero {
-    padding-bottom: calc(1.75rem + var(--safe-bottom));
+    padding-bottom: calc(2rem + var(--safe-bottom));
   }
 
-  .hero-panels {
-    gap: 0.35rem;
+  .hero-name {
+    font-size: clamp(1.2rem, 4.5vw, 1.45rem);
   }
 
-  .hero-panel {
-    min-height: clamp(128px, 28svh, 200px);
-    max-height: clamp(140px, 34svh, 240px);
+  .pillar-title {
+    font-size: 0.82rem;
   }
 
-  .hero-panel-label {
-    font-size: 0.58rem;
-    letter-spacing: 0.06em;
-    padding: 0.4rem 0.2rem;
+  .hero-brand-text {
+    font-size: clamp(1.25rem, 5.5vw, 1.55rem);
+    letter-spacing: 0.12em;
   }
 
-  .hero-panel-label-full {
-    display: none;
+  .hero-brand-mark {
+    font-size: 0.78rem;
+    padding: 0.3rem 0.45rem;
   }
 
-  .hero-panel-label-short {
-    display: inline;
+  .art-view .poker-photo-caption {
+    padding: 0.7rem 0.85rem;
+    font-size: 0.64rem;
   }
 
-  .hero-panel-media {
-    padding: 0.3rem;
+  .hero-photo[data-hero-scene="champ"] img {
+    object-position: 46% 36%;
   }
 
-  .hero-panel-media--logo img,
-  .hero-panel[data-panel="media"] .hero-panel-media--logo img {
-    max-height: min(16svh, 110px);
+  .hero-emblem img {
+    max-width: min(44vw, 11rem);
+    max-height: min(100%, 18vh);
   }
 
-  .hero-tagline {
-    display: none;
-  }
-
-  .brand-callsign {
-    font-size: clamp(1.7rem, 9vw, 2.4rem);
+  .hero-proof {
+    font-size: 0.88rem;
+    letter-spacing: 0.05em;
   }
 
   .eyebrow,
@@ -4442,6 +5436,12 @@ body.play-2hh-immersive .back-top {
     max-height: 220px;
   }
 
+  .panel-img--archive,
+  .panel-img--screenshot,
+  .panel-img--contain {
+    max-height: min(280px, 42vh);
+  }
+
   #section-indicator {
     display: none;
   }
@@ -4449,21 +5449,16 @@ body.play-2hh-immersive .back-top {
 
 /* Very short viewports (foldables / landscape phones) */
 @media (max-height: 520px) {
-  .hero-tagline {
+  .hero-proof {
     display: none;
   }
 
-  .hero-brand {
-    gap: 0.1rem;
+  .hero-pillar {
+    padding: 0.25rem 0.1rem 0.35rem;
   }
 
-  .brand-legal {
-    font-size: 0.85rem;
-  }
-
-  .hero-panel {
-    min-height: clamp(100px, 36svh, 180px);
-    max-height: clamp(110px, 42svh, 200px);
+  .pillar-body {
+    display: none;
   }
 }
 
@@ -4476,25 +5471,28 @@ body.play-2hh-immersive .back-top {
   }
 
   .hero-gate {
-    gap: 0.5rem;
+    gap: 0.45rem;
   }
 
-  .hero-panel {
-    min-height: 0;
-    max-height: min(52svh, 180px);
+  .hero-trio {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.4rem;
   }
 
-  .hero-panel-label {
-    padding: 0.3rem;
-    font-size: 0.5rem;
+  .hero-emblem-slot {
+    min-height: 3rem;
   }
 
-  .hero-panel-media--logo img,
-  .hero-panel[data-panel="media"] .hero-panel-media--logo img {
-    max-height: 72px;
+  .hero-emblem img {
+    max-width: 6.5rem;
+    max-height: 5.5rem;
   }
 
-  .scroll-cue {
+  .hero-photo[data-hero-scene="champ"] img {
+    object-position: 50% 34%;
+  }
+
+  .pillar-body {
     display: none;
   }
 
@@ -4504,6 +5502,7 @@ body.play-2hh-immersive .back-top {
 
   .about-portrait img {
     max-height: 180px;
+    object-position: 50% 34%;
   }
 }
 
@@ -4512,27 +5511,36 @@ body.play-2hh-immersive .back-top {
   .command-nav a:hover,
   .nav-social-link:hover,
   .btn:hover,
-  .hero-panel:hover,
-  .hero-panel:hover .hero-panel-media img,
   .felt-card:hover,
   .panel-img:hover,
   .stat-list li:hover,
   .poker-photo:hover img,
   .about-portrait:hover img,
-  .logo-inline:hover {
+  .logo-inline:hover,
+  .art-view .panel-img:hover {
     transform: none;
+  }
+
+  .art-view .panel-img:hover {
+    box-shadow: none;
+  }
+
+  .book-showcase:hover .book-3d,
+  .art-view .book-showcase:hover .book-3d {
+    transform: rotateY(-24deg) rotateX(6deg);
   }
 
   .command-nav a:active,
   .nav-social-link:active,
   .btn:active,
-  .hero-panel:active,
   .tablist [role="tab"]:active {
     transform: scale(0.98);
   }
+}
 
-  .hero-panel:active {
-    border-color: color-mix(in srgb, var(--gold) 65%, var(--violet));
+@media (max-width: 768px) {
+  .art-view .book-showcase:hover .book-3d {
+    transform: rotateY(-14deg) rotateX(4deg);
   }
 }
 
@@ -4555,12 +5563,22 @@ body.play-2hh-immersive .back-top {
     pointer-events: auto !important;
   }
 
+  .hero-emblem {
+    transform: none !important;
+  }
+
   html.reveal-on [data-reveal="float"].is-inview:not([data-parallax]),
   html.reveal-on [data-reveal="warp"].is-inview .panel-media,
   html.reveal-on [data-reveal="deal"].is-inview .panel-media,
   html.reveal-on [data-reveal="drop"].is-inview .heraldic-plate,
-  html.reveal-on [data-reveal="scan"].is-inview .dossier {
+  html.reveal-on [data-reveal="scan"].is-inview .dossier-meta div {
     animation: none !important;
+  }
+
+  html.reveal-on [data-reveal="lid"],
+  .theater-scanline {
+    clip-path: none !important;
+    opacity: 1 !important;
   }
 
   .scroll-progress-bar {
@@ -4571,20 +5589,18 @@ body.play-2hh-immersive .back-top {
     transform: none !important;
   }
 
-  .hero-fog::before,
-  .hero-fog::after,
-  .badge-dot,
-  .scroll-cue-chevron {
+  .badge-dot {
     animation: none !important;
-  }
-
-  .hero-panel:hover,
-  .hero-panel:focus-visible {
-    transform: none;
+    box-shadow: none !important;
   }
 }
 
-/* Print: strip HUD chrome */
+@media (prefers-reduced-motion: reduce) {
+  .art-view > .game-panel[data-reveal="deal"].is-foil-sweep::after {
+    animation: none !important;
+    opacity: 0 !important;
+  }
+}
 @media print {
   #webgl-bg,
   #section-indicator,
