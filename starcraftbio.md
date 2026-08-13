@@ -1,14 +1,15 @@
 # StarCraft Brood War’s First World Champion: Leader by Example
 
-Source: `D22-soso Wayne Chiang StarCraft bio.pdf` (2026).
+Source: `D22-soso Wayne Chiang StarCraft bio.pdf` (2026). For the broader RTS King
+narrative (C&C → WC2 → Brood War → MTG), prefer `rts-king.md` / `A Esports Real Time Strategy King .pdf` where dates conflict.
 
 ## The Dawn of Esports
 
 Long before sold-out stadiums in Seoul, multi-million dollar streaming contracts, or even the ability to type "Zerg Rush" into Google, the digital frontier was a wild, uncharted landscape. Defining greatness in this era required true pioneers. Among them was Wayne Chiang, initially known online as "SoSOWAC."
 
-Chiang’s competitive journey began in 1996, dominating 1v1 and team play on Case’s Ladder in *Command & Conquer: Tiberian Dawn* (1996) and *Warcraft II: Tides of Darkness* (1997), ranking #1. Planning to retire from competitive gaming after Warcraft II, Chiang was lured back on March 31, 1998, when his teammate "SuperPeon" mailed him a copy of Blizzard Entertainment’s newly released *StarCraft*.
+Chiang’s competitive journey began in 1996, dominating 1v1 and team play on Case’s Ladder in *Command & Conquer: Tiberian Dawn* (1996) and *Warcraft II: Tides of Darkness* (1997)—Top 3 1v1 and #1 teams with Clan C4L on Kali. Planning to retire from competitive gaming after Warcraft II, Chiang was lured back on March 31, 1998, when his teammate "SuperPeon" mailed him a copy of Blizzard Entertainment’s newly released *StarCraft*.
 
-Esports would never be the same. Chiang rapidly claimed the #1 spot on Case’s Ladder in both 1v1 and team modes. He achieved and maintained top 10 ladder rankings on Battle.net from seasons 1 to 4. In April 1998, he entered and won the first StarCraft tournament ever — a 20-player event taking $250 at Neutral Ground Mountain View, a legendary Magic: The Gathering hotspot nestled in Silicon Valley near Google and Apple headquarters. Chiang defeated his friend and future Chess.com co-founder, Jay “Gadianton” Severson, followed by two $10 grudge-match victories.
+Esports would never be the same. Chiang rapidly claimed the #1 spot on Case’s Ladder in both 1v1 and team modes. He maintained Top 20 Battle.net rankings from April 1998 through December 1999. In April 1998, he entered and won the first StarCraft tournament ever — a 20-player event taking $250 at Neutral Ground Mountain View, a legendary Magic: The Gathering hotspot nestled in Silicon Valley near Google and Apple headquarters. Chiang defeated his friend and future Chess.com co-founder, Jay “Gadianton” Severson, followed by two $10 grudge-match victories.
 
 ## The First Caster & The Architect of GX StarCraft
 
@@ -38,12 +39,12 @@ In the finals on Showdown against Crexis (Chris Low), after losing the cliff war
 | April 1998 | StarCraft Case’s Ladder 1v1 & Teams | #1 Rank |
 | April 1998 | Neutral Ground Mountain View Tournament | 1st Place ($250) |
 | October 1998 | PGL Season 3 | 1st StarCraft Caster |
-| January 1999 | Battle.net vs. Kali (#2 Seed Match vs. Guillaume Patry) | 2–3 Loss |
+| February 1999 | Battle.net vs. Kali (#2 Seed Match vs. Guillaume Patry) | — |
 | April 1999 | Battle.net Brood War Season 1 Tournament | World Champion ($2,500) |
 | May 1999 | PGL Season 4 | 2nd Place ($7,000) |
 | June 1999 | USA vs. Canada Showcase | MVP (3–0) |
-| July 1999 | Sports Seoul Brood War Tournament | 5th–8th Place ($850) |
-| August 1999 | StarCraft World Champions Invitational | 3rd Place ($1,500) |
+| July 1999 | Sports Seoul Brood War Tournament | #5 (~$850) |
+| July 1999 | StarCraft World Champions Invitational | 3rd Place ($1,500) |
 | September 1999 | Battle.net World Championship Finals | 3rd Place ($1,000) |
 
 ### Interviews

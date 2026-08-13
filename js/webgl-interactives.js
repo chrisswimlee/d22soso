@@ -53,20 +53,20 @@ function cardFaceTexture(rank, suit) {
   ctx.fillStyle = ink;
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
-  ctx.font = "700 54px Inter, system-ui, sans-serif";
+  ctx.font = "700 54px Space Grotesk, IBM Plex Sans, system-ui, sans-serif";
   ctx.fillText(rank, 48, 52);
-  ctx.font = "48px Inter, system-ui, sans-serif";
+  ctx.font = "48px Space Grotesk, IBM Plex Sans, system-ui, sans-serif";
   ctx.fillText(suit, 48, 104);
-  ctx.font = "120px Inter, system-ui, sans-serif";
+  ctx.font = "120px Space Grotesk, IBM Plex Sans, system-ui, sans-serif";
   ctx.globalAlpha = 0.92;
   ctx.fillText(suit, 128, 190);
   ctx.globalAlpha = 1;
   ctx.save();
   ctx.translate(208, 308);
   ctx.rotate(Math.PI);
-  ctx.font = "700 54px Inter, system-ui, sans-serif";
+  ctx.font = "700 54px Space Grotesk, IBM Plex Sans, system-ui, sans-serif";
   ctx.fillText(rank, 0, 0);
-  ctx.font = "48px Inter, system-ui, sans-serif";
+  ctx.font = "48px Space Grotesk, IBM Plex Sans, system-ui, sans-serif";
   ctx.fillText(suit, 0, 52);
   ctx.restore();
 
@@ -96,7 +96,7 @@ function cardBackTexture(tint) {
     ctx.stroke();
   }
   ctx.fillStyle = "rgba(212,175,55,0.85)";
-  ctx.font = "700 36px JetBrains Mono, monospace";
+  ctx.font = "700 36px IBM Plex Mono, monospace";
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   ctx.fillText("D22", 128, 180);
@@ -128,14 +128,14 @@ function makeCardMesh(rank, suit, opts) {
 function makeFeltTable(radius, feltColor, railColor) {
   const group = new THREE.Group();
   const felt = new THREE.Mesh(
-    new THREE.CircleGeometry(radius, 64),
+    new THREE.CircleGeometry(radius, 32),
     new THREE.MeshBasicMaterial({ color: feltColor })
   );
   felt.rotation.x = -Math.PI / 2;
   group.add(felt);
 
   const rail = new THREE.Mesh(
-    new THREE.RingGeometry(radius * 0.92, radius * 1.06, 64),
+    new THREE.RingGeometry(radius * 0.92, radius * 1.06, 32),
     new THREE.MeshBasicMaterial({
       color: railColor,
       transparent: true,
@@ -149,7 +149,7 @@ function makeFeltTable(radius, feltColor, railColor) {
   group.add(rail);
 
   const inner = new THREE.Mesh(
-    new THREE.RingGeometry(radius * 0.55, radius * 0.58, 64),
+    new THREE.RingGeometry(radius * 0.55, radius * 0.58, 32),
     new THREE.MeshBasicMaterial({
       color: 0xd4af37,
       transparent: true,
@@ -184,7 +184,7 @@ function makeHudLabel(width, height, color) {
     ctx.strokeRect(4, 16, 632, 64);
     ctx.globalAlpha = 1;
     ctx.fillStyle = color;
-    ctx.font = "600 28px JetBrains Mono, monospace";
+    ctx.font = "600 28px IBM Plex Mono, monospace";
     ctx.textAlign = "left";
     ctx.textBaseline = "middle";
     ctx.fillText(text, 28, 48);
@@ -199,7 +199,7 @@ function makeZoneLabel(text, color) {
   canvas.height = 64;
   const ctx = canvas.getContext("2d");
   ctx.fillStyle = color;
-  ctx.font = "700 28px JetBrains Mono, monospace";
+  ctx.font = "700 28px IBM Plex Mono, monospace";
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   ctx.globalAlpha = 0.9;
@@ -326,7 +326,7 @@ function initRaceRoll(canvas) {
   function setLabel(text) {
     labelCtx.clearRect(0, 0, 512, 64);
     labelCtx.fillStyle = "#d4af37";
-    labelCtx.font = "600 22px JetBrains Mono, monospace";
+    labelCtx.font = "600 22px IBM Plex Mono, monospace";
     labelCtx.textAlign = "center";
     labelCtx.textBaseline = "middle";
     labelCtx.fillText(text, 256, 32);
@@ -565,12 +565,12 @@ function initBattleMap(canvas) {
       new THREE.LineBasicMaterial({ color: p.color, transparent: true, opacity: 0.95 })
     );
     const tip = new THREE.Mesh(
-      new THREE.SphereGeometry(0.14, 14, 14),
+      new THREE.SphereGeometry(0.14, 8, 8),
       new THREE.MeshBasicMaterial({ color: p.color })
     );
     tip.position.set(p.from[0], 0.16, p.from[1]);
     const glow = new THREE.Mesh(
-      new THREE.SphereGeometry(0.28, 12, 12),
+      new THREE.SphereGeometry(0.28, 8, 8),
       new THREE.MeshBasicMaterial({ color: p.color, transparent: true, opacity: 0.22 })
     );
     glow.position.copy(tip.position);
@@ -587,10 +587,10 @@ function initBattleMap(canvas) {
     cctx.fillStyle = "rgba(8, 12, 18, 0.55)";
     cctx.fillRect(0, 0, 720, 56);
     cctx.fillStyle = "#d4af37";
-    cctx.font = "600 17px JetBrains Mono, monospace";
+    cctx.font = "600 17px IBM Plex Mono, monospace";
     cctx.fillText("LOST TEMPLE // SEMI-FINAL // ~38:00 // vs GRRRR…", 14, 24);
     cctx.fillStyle = "#a78bfa";
-    cctx.font = "500 13px JetBrains Mono, monospace";
+    cctx.font = "500 13px IBM Plex Mono, monospace";
     cctx.fillText(phase, 14, 44);
   }
   paintCaption("THREE-PRONG ASSAULT — STANDBY");
@@ -1212,17 +1212,5 @@ function initBadugi(canvas) {
   });
   window.addEventListener("resize", fit);
 }
-
-/* Compatibility shim — same surface as legacy D22Canvas */
-export const D22Canvas = {
-  initFog() {
-    /* fog handled by webgl-scene */
-  },
-  initMinimap() {},
-  initRaceRoll,
-  initBattleMap,
-  init2HH,
-  initBadugi,
-};
 
 export { initRaceRoll, initBattleMap, init2HH, initBadugi };

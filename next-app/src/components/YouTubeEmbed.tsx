@@ -41,7 +41,7 @@ export default function YouTubeEmbed({ videoId, title, caption }: YouTubeEmbedPr
             <img
               src={`https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`}
               alt=""
-              className="absolute inset-0 h-full w-full object-cover opacity-70 transition-opacity duration-300 group-hover:opacity-90"
+              className="absolute inset-0 h-full w-full object-cover object-center opacity-70 transition-opacity duration-300 group-hover:opacity-90"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/20 to-transparent" />
             <span className="absolute left-1/2 top-1/2 flex h-16 w-16 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-white/15 backdrop-blur-md transition-transform duration-300 group-hover:scale-110">

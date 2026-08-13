@@ -53,7 +53,7 @@ gen() {
 }
 
 echo "== Photos =="
-gen champ-trophy   "$SRC/AAA Wayne Chiang Starcraft World Champ.JPG"                              jpg 640 1080
+gen champ-trophy   "$SRC/AAA Wayne Chiang Starcraft World Champ.JPG"                              jpg 640 1080 1600 2200
 gen champ-pgl      "$SRC/AAA Wayne Chiang Starcraft World Champ and PGL 2nd.JPG"                  jpg 640 1080
 gen champ-closeup  "$SRC/AAA Starcraft World Champ Close Up.JPG"                                  jpg 640 1080
 gen wsop-boxer     "$SRC/Slayers Boxer D22-soso WSOP 2025.jpg"                                    jpg 720 1200
@@ -65,7 +65,10 @@ gen weissman       "$SRC/wayne chiang brian weissman.jpg"                       
 gen hearthstone-35 "$SRC/Heartsthone 35.jpg"                                                      jpg 720
 gen latb-logo      "$SRC/live-at-the-bike-logo.jpg"                                               jpg 400
 gen blackjack      "$SRC/how-to-play-blackjack-lead.jpg"                                          jpg 900
-gen twohh-logo     "$SRC/2hh LOGO OFFICIAL TRADEMARK APPLIED.png"                                 png 500
+gen wsop-logo      "$SRC/wsop-logo-float.png"                                                     png 600
+# Knocked-out float mark (not the trademark plate). Keep alpha — do not
+# point this back at "2hh LOGO OFFICIAL TRADEMARK APPLIED.png".
+gen twohh-logo     "$SRC/2hh-logo-float.png"                                                      png 500
 gen badugi-play    "$SRC/Badugi Play 4.png"                                                       png 900
 
 echo "== Theme backgrounds (resize + AVIF/WebP + compressed JPG) =="

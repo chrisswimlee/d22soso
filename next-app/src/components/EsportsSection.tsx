@@ -17,7 +17,7 @@ const timeline: TimelineEntry[] = [
     date: "Apr 1998",
     title: "Case's Ladder #1 — 1v1 & Teams",
     description:
-      "Hit #1 shortly after StarCraft's release, after SuperPeon mailed him the game — and held top-10 Battle.net ranks through seasons 1–4.",
+      "Hit #1 immediately after StarCraft's release and held Top 20 Battle.net ranks from April 1998 through December 1999.",
     Icon: Swords,
   },
   {
@@ -36,9 +36,9 @@ const timeline: TimelineEntry[] = [
     Icon: Mic,
   },
   {
-    date: "Jan 1999",
+    date: "Feb 1999",
     title: "B.net vs. Kali — #2 Seed",
-    description: "Seeded #2; fell 2–3 to rival Guillaume “Grrrr…” Patry.",
+    description: "Seeded #2 vs rival Guillaume “Grrrr…” Patry.",
     Icon: Medal,
   },
   {
@@ -63,12 +63,12 @@ const timeline: TimelineEntry[] = [
   },
   {
     date: "Jul 1999",
-    title: "Sports Seoul Brood War — 5th–8th",
-    description: "Placed 5th–8th ($850) as the scene’s center of gravity shifted toward South Korea.",
+    title: "Sports Seoul Brood War — #5",
+    description: "Placed #5 (~$850) as the scene’s center of gravity shifted toward South Korea.",
     Icon: Medal,
   },
   {
-    date: "Aug 1999",
+    date: "Jul 1999",
     title: "World Champions Invitational #3",
     description: "Placed 3rd at the StarCraft World Champions Invitational ($1,500).",
     Icon: Medal,

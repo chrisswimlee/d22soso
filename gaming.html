@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#0a0a0a" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>Gaming Archive — Wayne "D22-soso" Chiang</title>
+  <meta name="description" content="Beyond Brood War: Command &amp; Conquer, Warcraft, Magic: The Gathering, Cube Draft, and Hearthstone — Wayne D22-soso Chiang’s competitive gaming archive." />
+  <link rel="canonical" href="https://d22soso.com/gaming.html" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://d22soso.com/gaming.html" />
+  <meta property="og:site_name" content="D22-soso" />
+  <meta property="og:title" content="Gaming Archive — Wayne &quot;D22-soso&quot; Chiang" />
+  <meta property="og:description" content="C&amp;C, Warcraft, Magic, Cube Draft, and Hearthstone — the theaters beyond StarCraft’s first official world title." />
+  <meta property="og:image" content="https://d22soso.com/assets/img/champ-trophy-1080.jpg" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Gaming Archive — Wayne &quot;D22-soso&quot; Chiang" />
+  <meta name="twitter:description" content="C&amp;C, Warcraft, Magic, Cube Draft, and Hearthstone — the theaters beyond Brood War." />
+  <meta name="twitter:image" content="https://d22soso.com/assets/img/champ-trophy-1080.jpg" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%230a0a0a'/%3E%3Crect x='5' y='5' width='54' height='54' rx='9' fill='none' stroke='%238b5cf6' stroke-width='3'/%3E%3Ctext x='32' y='42' font-family='monospace' font-size='22' font-weight='700' fill='%238b5cf6' text-anchor='middle'%3ED22%3C/text%3E%3C/svg%3E" />
+  <style>
+    html { background: #0a0a0a; color-scheme: dark; }
+  </style>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" /></noscript>
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "./vendor/three/three.module.js",
+      "gsap": "./vendor/gsap/index.js"
+    }
+  }
+  </script>
+  <link rel="modulepreload" href="./vendor/gsap/index.js" />
+  <link rel="modulepreload" href="./vendor/gsap/gsap-core.js" />
+  <link rel="modulepreload" href="./vendor/gsap/CSSPlugin.js" />
+  <link rel="modulepreload" href="script.js" />
+  <link rel="modulepreload" href="js/pref.js" />
+  <link rel="modulepreload" href="js/theme-nav.js" />
+  <link rel="modulepreload" href="js/motion.js" />
+  <link rel="modulepreload" href="js/widgets.js" />
+  <link rel="modulepreload" href="js/webgl-boot.js" />
+</head>
+<body data-theme="cnc" data-bg="cnc" data-page="gaming">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div id="bg-stage" aria-hidden="true">
+    <div class="bg-layer is-active" data-bg="cnc"></div>
+    <div class="bg-layer" data-bg="cnc-v2"></div>
+    <div class="bg-layer" data-bg="cnc-v3"></div>
+    <div class="bg-layer" data-bg="warcraft"></div>
+    <div class="bg-layer" data-bg="warcraft-v2"></div>
+    <div class="bg-layer" data-bg="warcraft-v3"></div>
+    <div class="bg-layer" data-bg="mtg"></div>
+    <div class="bg-layer" data-bg="mtg-v2"></div>
+    <div class="bg-layer" data-bg="mtg-v3"></div>
+    <div class="bg-layer" data-bg="hearthstone"></div>
+    <div class="bg-layer" data-bg="hearthstone-v2"></div>
+    <div class="bg-layer" data-bg="hearthstone-v3"></div>
+    <div class="bg-layer" data-bg="starcraft"></div>
+    <div class="bg-layer" data-bg="contact"></div>
+    <canvas id="webgl-bg" aria-hidden="true"></canvas>
+  </div>
+  <div class="scroll-progress" aria-hidden="true"><span class="scroll-progress-bar"></span></div>
+  <div id="section-indicator" class="section-indicator" aria-live="polite">
+    <span class="si-dot" aria-hidden="true"></span>
+    <span class="si-text mono"><span class="si-label">Gaming Archive</span></span>
+  </div>
+
+  <header class="site-header">
+    <a class="brand" href="index.html" title="Back to portfolio home">
+      <span class="brand-mark" aria-hidden="true">D22</span>
+      <span class="brand-text">D22-soso</span>
+    </a>
+    <div class="header-tools">
+      <nav class="command-nav command-nav--gaming" aria-label="Gaming theaters">
+        <a href="#gaming-archive" data-hotkey="1" title="Archive intro"><span class="hk">1</span><span class="nav-label">Archive</span></a>
+        <a href="#game-cnc" data-hotkey="2" title="Command &amp; Conquer"><span class="hk">2</span><span class="nav-label">C&amp;C</span></a>
+        <a href="#game-warcraft" data-hotkey="3" title="Warcraft II / III"><span class="hk">3</span><span class="nav-label">WC</span></a>
+        <a href="#game-mtg" data-hotkey="4" title="Magic: The Gathering"><span class="hk">4</span><span class="nav-label">MTG</span></a>
+        <a href="#game-cube" data-hotkey="5" title="Cube Draft"><span class="hk">5</span><span class="nav-label">Cube</span></a>
+        <a href="#game-hearthstone" data-hotkey="6" title="Hearthstone"><span class="hk">6</span><span class="nav-label">HS</span></a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main" tabindex="-1">
+    <section id="gaming-archive" class="section art-view gaming-archive-head" data-node="gaming-archive" data-bg="cnc" data-theme="cnc">
+      <header class="section-head" data-reveal="fade">
+        <p class="eyebrow-badge mono"><span class="badge-dot" aria-hidden="true"></span>ARCHIVE // BEYOND BROOD WAR</p>
+        <h1>Gaming Archive</h1>
+        <p class="lede">Before and after the first official Brood War world title: Kali ladders, parchment banners, Pro Tour floors, Cube Draft, and Legend ranks. Click a theater to cycle its material dialect.</p>
+        <div class="cta-row" style="margin-top:1.25rem">
+          <a class="btn btn-gold btn-arrow" href="index.html#esports">StarCraft World Championship <span class="arrow" aria-hidden="true">→</span></a>
+          <a class="btn btn-primary" href="index.html">Back to portfolio</a>
+        </div>
+      </header>
+    </section>
+
+    <!-- C&C -->
+    <section id="game-cnc" class="section game-section art-view" data-node="esports-cnc" data-bg="cnc" data-theme="cnc" data-base-theme="cnc" data-variant="0">
+      <article class="game-panel theme-panel" data-theme="cnc" data-reveal="scan" tabindex="0" aria-label="Command and Conquer theme — click to cycle variants">
+        <span class="theater-scanline" aria-hidden="true"></span>
+        <p class="game-tag mono"><span class="badge-dot" aria-hidden="true"></span>THEATER 02 // COMMAND &amp; CONQUER</p>
+        <div class="theme-pips" aria-hidden="true">
+          <span class="theme-pip is-active" data-pip="0" title="Phosphor CRT"></span>
+          <span class="theme-pip" data-pip="1" title="Nod Crimson"></span>
+          <span class="theme-pip" data-pip="2" title="GDI Brass"></span>
+        </div>
+        <div class="panel-grid">
+          <div>
+            <h3>Command &amp; Conquer: Tiberian Dawn</h3>
+            <p class="plaque mono">Case’s Ladder · 1v1 &amp; Teams · #1 · 1996</p>
+            <p>
+              Through Kali, <strong>SoSOWAC</strong> shot up Case’s Ladder—mentored by co-owner Bill “Bill1” Macaitis—
+              defining C&amp;C gameplay and the metagame. Captaining Team Synergy, he held #1 on the Case’s Team Ladder
+              while they were active.
+            </p>
+            <blockquote class="transmission">
+              Before official world titles were staged, Kali plus Case’s Ladder was the contract—and the war room was a CRT.
+            </blockquote>
+          </div>
+          <div class="panel-media dossier">
+            <dl class="dossier-meta mono">
+              <div><dt>DATE</dt><dd>1996</dd></div>
+              <div><dt>NETWORK</dt><dd>Kali · Case’s Ladder</dd></div>
+              <div><dt>OUTCOME</dt><dd>#1 · Team Synergy</dd></div>
+              <div><dt>MENTOR</dt><dd>Bill “Bill1” Macaitis</dd></div>
+            </dl>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <!-- Warcraft -->
+    <section id="game-warcraft" class="section game-section art-view" data-node="esports-warcraft" data-bg="warcraft" data-theme="warcraft" data-base-theme="warcraft" data-variant="0">
+      <article class="game-panel theme-panel" data-theme="warcraft" data-reveal="drop" tabindex="0" aria-label="Warcraft theme — click to cycle variants">
+        <p class="game-tag mono"><span class="badge-dot" aria-hidden="true"></span>THEATER 03 // WARCRAFT II / III</p>
+        <div class="theme-pips" aria-hidden="true">
+          <span class="theme-pip is-active" data-pip="0" title="Parchment Night"></span>
+          <span class="theme-pip" data-pip="1" title="Alliance Banner"></span>
+          <span class="theme-pip" data-pip="2" title="Horde Ember"></span>
+        </div>
+        <div class="panel-grid">
+          <div>
+            <h3>Warcraft II / III</h3>
+            <p class="plaque mono">Top 3 1v1 · Teams #1 · Kali · 1997</p>
+            <p>
+              On Kali’s circuit with Clan C4L, Chiang hit Top 3 in 1v1 and held the #1 team spot—where he first met rival
+              and future teammate Jay “Gadianton” Severson (later Chess.com co-founder). In 2004, the same DNA resurfaced
+              on Warcraft III Battle.net US West—FFA #1 and Arranged Teams #2.
+            </p>
+            <ul class="stat-list mono">
+              <li><span>1997</span> Warcraft II Tides of Darkness — Top 3 1v1 · Team Ladder #1</li>
+              <li><span>2004</span> Warcraft III US West FFA #1 / AT #2</li>
+            </ul>
+          </div>
+          <div class="panel-media heraldry">
+            <div class="heraldic-plate">
+              <span class="mono">#1</span>
+              <strong>Warcraft II</strong>
+              <em>Kali · Teams · Top 3 1v1 · 1997</em>
+            </div>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <!-- MTG -->
+    <section id="game-mtg" class="section game-section art-view" data-node="esports-mtg" data-bg="mtg" data-theme="mtg" data-base-theme="mtg" data-variant="0">
+      <article class="game-panel theme-panel" data-theme="mtg" data-reveal="deal" tabindex="0" aria-label="Magic the Gathering theme — click to cycle variants">
+        <p class="game-tag mono"><span class="badge-dot" aria-hidden="true"></span>THEATER 04 // MAGIC: THE GATHERING</p>
+        <div class="theme-pips" aria-hidden="true">
+          <span class="theme-pip is-active" data-pip="0" title="Lacquer Magenta"></span>
+          <span class="theme-pip" data-pip="1" title="Swamp Ink"></span>
+          <span class="theme-pip" data-pip="2" title="Plains Gold"></span>
+        </div>
+        <div class="panel-grid">
+          <div>
+            <h3>Magic: The Gathering</h3>
+            <p class="plaque mono">Pro Tour · New York 2001 · Boston 2002</p>
+            <p>
+              Concurrent with RTS dominance—and after Weissman sessions at Palo Alto’s Round Table Pizza sharpened card
+              advantage, tempo, and resource efficiency—Chiang treated Magic as a side game that still produced consistent
+              PTQ Top 8s. After stepping away from competitive RTS he qualified for three Pro Tours and attended New York
+              2001 and Boston 2002.
+            </p>
+            <blockquote class="transmission">
+              Chiang’s esports finale on paper: the same refusal to play someone else’s meta, carried from Case’s Ladder to the Pro Tour floor.
+            </blockquote>
+            <p class="hint mono">
+              <a href="#game-cube">Continue → Cube Draft subsection</a>
+            </p>
+          </div>
+          <div class="panel-media dossier">
+            <dl class="dossier-meta mono">
+              <div><dt>ORIGINS</dt><dd>Weissman · Round Table Pizza</dd></div>
+              <div><dt>PRO TOUR</dt><dd>NY ’01 · Boston ’02</dd></div>
+              <div><dt>QUALIFIED</dt><dd>3 events · PTQ Top 8s</dd></div>
+              <div><dt>NEXT</dt><dd><a href="#game-cube">Cube Draft →</a></dd></div>
+            </dl>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <!-- Cube Draft — subsection under Magic: The Gathering -->
+    <section
+      id="game-cube"
+      class="section game-section game-subsection art-view"
+      data-node="esports-cube"
+      data-bg="mtg"
+      data-theme="mtg"
+      data-base-theme="mtg"
+      data-variant="0"
+    >
+      <article class="game-panel theme-panel" data-theme="mtg" data-reveal="lid" tabindex="0" aria-label="Cube Draft theme — click to cycle Magic variants">
+        <p class="game-tag mono">
+          <span class="badge-dot" aria-hidden="true"></span>THEATER 04 // SUBSECTION · CUBE DRAFT
+        </p>
+        <div class="theme-pips" aria-hidden="true">
+          <span class="theme-pip is-active" data-pip="0" title="Lacquer Magenta"></span>
+          <span class="theme-pip" data-pip="1" title="Swamp Ink"></span>
+          <span class="theme-pip" data-pip="2" title="Plains Gold"></span>
+        </div>
+        <div class="panel-grid">
+          <div>
+            <h3>Cube Draft</h3>
+            <p class="plaque mono">Format origin · curated draft · “The Cube”</p>
+            <p>
+              While Magic was still a side game, Chiang built early custom draft pools—“The Cube”—for dynamic,
+              cost-effective limited play. That idea became Cube Draft, a Magic Online staple and one of the format’s
+              most beloved environments. Public credit from Brian Weissman and Tom Martell for the majority of the idea.
+            </p>
+            <blockquote class="transmission">
+              Kind words from Magic legends Brian Weissman and Tom Martell—crediting him for lugging the original
+              Super Monster Storage Box affectionately called “The Cube.”
+            </blockquote>
+            <aside class="interview-cite">
+              <a
+                class="interview-cite-thumb"
+                href="https://youtu.be/MNjLKeA-08A?si=0kQD6O58WkGdh8jQ"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Watch the full Cube Draft interview on YouTube"
+              >
+                <img
+                  src="https://img.youtube.com/vi/MNjLKeA-08A/hqdefault.jpg"
+                  alt="Cube Draft interview thumbnail — Wayne Chiang"
+                  width="480"
+                  height="360"
+                  loading="lazy"
+                  decoding="async"
+                />
+                <span class="interview-cite-play" aria-hidden="true"></span>
+              </a>
+              <div class="interview-cite-body">
+                <p class="interview-cite-kicker mono">Oral history // full interview</p>
+                <p class="interview-cite-summary">
+                  How a Super Monster Storage Box became culture: the origin of Cube Draft, the friendships that carried the idea,
+                  and why Weissman and Martell still point back to Chiang as the one who dragged the format into the light.
+                </p>
+                <a
+                  class="interview-cite-link"
+                  href="https://youtu.be/MNjLKeA-08A?si=0kQD6O58WkGdh8jQ"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >Watch the full interview here <span aria-hidden="true">→</span></a>
+              </div>
+            </aside>
+          </div>
+          <div class="panel-media">
+            <picture>
+              <source type="image/avif" srcset="assets/img/weissman-900.avif" />
+              <source type="image/webp" srcset="assets/img/weissman-900.webp" />
+              <img
+                class="panel-img panel-img--contain"
+                src="assets/img/weissman-900.jpg"
+                alt="Wayne Chiang with Brian Weissman — Cube Draft oral history"
+                width="900"
+                height="506"
+                loading="lazy"
+                decoding="async"
+              />
+            </picture>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <!-- Hearthstone -->
+    <section id="game-hearthstone" class="section game-section art-view" data-node="esports-hearthstone" data-bg="hearthstone" data-theme="hearthstone" data-base-theme="hearthstone" data-variant="0">
+      <article class="game-panel theme-panel" data-theme="hearthstone" data-reveal="float" tabindex="0" aria-label="Hearthstone theme — click to cycle variants">
+        <p class="game-tag mono"><span class="badge-dot" aria-hidden="true"></span>THEATER 05 // HEARTHSTONE</p>
+        <div class="theme-pips" aria-hidden="true">
+          <span class="theme-pip is-active" data-pip="0" title="Tavern Ember"></span>
+          <span class="theme-pip" data-pip="1" title="Frost Legend"></span>
+          <span class="theme-pip" data-pip="2" title="Midnight Inn"></span>
+        </div>
+        <div class="panel-grid">
+          <div>
+            <h3>Hearthstone — High Legend</h3>
+            <p class="plaque mono">Legend · Standard #35 NA · Wild #11 NA</p>
+            <p>Peak Rank #35 Standard NA, #11 Wild NA, and Top 32 in the Wild Open Americas (2018)—the same hand-reading muscle, new battlefield.</p>
+          </div>
+          <div class="panel-media">
+            <picture>
+              <source type="image/avif" srcset="assets/img/hearthstone-35-720.avif" />
+              <source type="image/webp" srcset="assets/img/hearthstone-35-720.webp" />
+              <img
+                class="panel-img panel-img--screenshot"
+                src="assets/img/hearthstone-35-720.jpg"
+                alt="Hearthstone Legend rank screenshot peak 35"
+                width="720"
+                height="404"
+                loading="lazy"
+                decoding="async"
+              />
+            </picture>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <section id="gaming-return" class="section contact" data-node="contact" data-bg="contact">
+      <header class="section-head" data-reveal="fade">
+        <p class="eyebrow-badge mono"><span class="badge-dot" aria-hidden="true"></span>RETURN // MAIN ARCHIVE</p>
+        <h2>Continue the portfolio</h2>
+        <p class="lede">StarCraft championship, poker desk, inventions, and the book live on the main page.</p>
+      </header>
+      <div class="cta-row" data-reveal="jump" style="justify-content:center">
+        <a class="btn btn-gold btn-arrow" href="index.html#esports">Brood War World Champion <span class="arrow" aria-hidden="true">→</span></a>
+        <a class="btn btn-primary btn-arrow" href="index.html#poker">Poker &amp; WSOP <span class="arrow" aria-hidden="true">→</span></a>
+        <a class="btn btn-primary" href="index.html">Home</a>
+      </div>
+      <p class="footer-meta mono" style="margin-top:2.5rem;text-align:center">
+        <a href="index.html">Portfolio</a>
+        ·
+        <a href="index.html#contact">Media kit</a>
+        ·
+        <a href="https://liquipedia.net/starcraft/Soso" target="_blank" rel="noopener noreferrer">Liquipedia — Soso</a>
+      </p>
+      <p class="footer-credit mono" style="text-align:center">
+        Created by
+        <a href="https://chrisswimlee.com" target="_blank" rel="noopener noreferrer">chrisswimlee</a>
+      </p>
+    </section>
+  </main>
+
+  <button type="button" class="back-top" id="back-top" aria-label="Back to top" aria-hidden="true" tabindex="-1">
+    <span class="back-top-chevron" aria-hidden="true">↑</span>
+    <span class="back-top-label mono">Top</span>
+  </button>
+
+  <script type="module" src="script.js"></script>
+</body>
+</html>
