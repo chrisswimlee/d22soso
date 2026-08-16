@@ -9,6 +9,7 @@
   --violet: #8b5cf6;
   --violet-dim: #5b21b6;
   --gold: #d4af37;
+  --gold-text: #e8c44a;
   --gold-dim: #8a7020;
   --teal: #2dd4bf;
   --phosphor: #39ff14;
@@ -482,7 +483,7 @@ a {
 }
 
 a:hover {
-  color: var(--gold);
+  color: var(--gold-text);
 }
 
 .mono {
@@ -491,7 +492,7 @@ a:hover {
 }
 
 .gold {
-  color: var(--gold);
+  color: var(--gold-text);
 }
 
 .accent-gradient,
@@ -791,7 +792,7 @@ html.reveal-on [data-reveal="scan"].is-inview .dossier-meta div {
 
 /* Theme accents — kept distinct across theaters (no shared primary hexes) */
 /* First viewport — gold/stone restraint (no violet chrome) */
-body[data-theme="hero"] { --theme-accent: var(--gold); --theme-accent-2: #8a8680; }
+body[data-theme="hero"] { --theme-accent: var(--gold-text); --theme-accent-2: #8a8680; }
 body[data-theme="starcraft"] { --theme-accent: var(--violet); --theme-accent-2: var(--gold); }
 body[data-theme="starcraft-v2"] { --theme-accent: #2dd4bf; --theme-accent-2: #a8e6ff; }
 body[data-theme="starcraft-v3"] { --theme-accent: #ea580c; --theme-accent-2: #b45309; }
@@ -984,6 +985,10 @@ body[data-theme="hero"] #section-indicator {
 .command-nav::-webkit-scrollbar-thumb {
   background: color-mix(in srgb, var(--theme-accent) 45%, transparent);
   border-radius: 2px;
+}
+
+.command-nav .nav-label-short {
+  display: none;
 }
 
 .command-nav a {
@@ -1296,11 +1301,6 @@ h3 {
   transition: opacity 0.35s ease;
 }
 
-.hero[data-hero-active="wsop"] .hero-photo-stack,
-.hero[data-hero-active="2hh"] .hero-photo-stack {
-  opacity: 1;
-}
-
 .hero-photo {
   position: absolute;
   inset: 0;
@@ -1357,20 +1357,6 @@ h3 {
     );
 }
 
-/* Logo scenes: dark lockup + pillars, open mid-band for the emblem */
-.hero[data-hero-active="wsop"] .hero-scrim,
-.hero[data-hero-active="2hh"] .hero-scrim {
-  background:
-    linear-gradient(
-      180deg,
-      rgba(10, 10, 10, 0.72) 0%,
-      rgba(10, 10, 10, 0.1) 18%,
-      rgba(10, 10, 10, 0.04) 42%,
-      rgba(10, 10, 10, 0.2) 68%,
-      rgba(10, 10, 10, 0.82) 100%
-    );
-}
-
 .hero-gate {
   position: relative;
   z-index: 2;
@@ -1399,8 +1385,11 @@ h3 {
   letter-spacing: 0.12em;
   text-transform: uppercase;
   border: 1px solid color-mix(in srgb, var(--gold) 55%, #8a8680);
-  color: var(--gold);
+  color: var(--gold-text);
   background: color-mix(in srgb, #0a0a0a 55%, transparent);
+  text-shadow:
+    0 1px 2px rgba(10, 10, 10, 0.85),
+    0 2px 16px rgba(10, 10, 10, 0.55);
 }
 
 .hero-brand-text {
@@ -1409,8 +1398,10 @@ h3 {
   letter-spacing: 0.12em;
   text-transform: uppercase;
   font-weight: 700;
-  color: color-mix(in srgb, var(--text) 90%, var(--gold));
-  text-shadow: 0 1px 14px rgba(10, 10, 10, 0.5);
+  color: color-mix(in srgb, var(--text) 90%, var(--gold-text));
+  text-shadow:
+    0 1px 2px rgba(10, 10, 10, 0.85),
+    0 2px 16px rgba(10, 10, 10, 0.55);
 }
 
 .hero-name {
@@ -1421,7 +1412,9 @@ h3 {
   letter-spacing: -0.02em;
   font-weight: 600;
   color: color-mix(in srgb, var(--text) 88%, var(--muted));
-  text-shadow: 0 1px 14px rgba(10, 10, 10, 0.35);
+  text-shadow:
+    0 1px 2px rgba(10, 10, 10, 0.85),
+    0 2px 16px rgba(10, 10, 10, 0.55);
 }
 
 .hero-proof {
@@ -1432,8 +1425,10 @@ h3 {
   letter-spacing: 0.06em;
   text-transform: uppercase;
   font-weight: 700;
-  color: color-mix(in srgb, var(--gold) 78%, var(--text));
-  text-shadow: 0 1px 12px rgba(10, 10, 10, 0.45);
+  color: var(--gold-text);
+  text-shadow:
+    0 1px 2px rgba(10, 10, 10, 0.85),
+    0 2px 16px rgba(10, 10, 10, 0.55);
 }
 
 /* Mid-band between proof line and pillar hairlines — emblems center here */
@@ -1486,17 +1481,21 @@ h3 {
 .hero[data-hero-active="2hh"] .hero-emblem-slot::before {
   content: "";
   position: absolute;
-  inset: 12% 22%;
+  inset: 8% 18%;
   pointer-events: none;
   z-index: 0;
 }
 
 .hero[data-hero-active="wsop"] .hero-emblem-slot::before {
-  background: radial-gradient(ellipse 50% 48% at 50% 50%, rgba(255, 255, 255, 0.08), transparent 70%);
+  background:
+    radial-gradient(ellipse 50% 48% at 50% 50%, rgba(255, 255, 255, 0.08), transparent 70%),
+    radial-gradient(ellipse 58% 55% at 50% 50%, rgba(10, 10, 10, 0.45), transparent 72%);
 }
 
 .hero[data-hero-active="2hh"] .hero-emblem-slot::before {
-  background: radial-gradient(ellipse 50% 48% at 50% 50%, rgba(160, 24, 24, 0.18), transparent 70%);
+  background:
+    radial-gradient(ellipse 50% 48% at 50% 50%, rgba(160, 24, 24, 0.18), transparent 70%),
+    radial-gradient(ellipse 58% 55% at 50% 50%, rgba(10, 10, 10, 0.45), transparent 72%);
 }
 
 .hero-trio {
@@ -1557,7 +1556,10 @@ h3 {
   font-size: 0.62rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: color-mix(in srgb, var(--gold) 70%, var(--muted));
+  color: var(--gold-text);
+  text-shadow:
+    0 1px 2px rgba(10, 10, 10, 0.85),
+    0 2px 16px rgba(10, 10, 10, 0.55);
 }
 
 .pillar-title {
@@ -1570,6 +1572,9 @@ h3 {
   letter-spacing: -0.015em;
   font-weight: 600;
   color: var(--text);
+  text-shadow:
+    0 1px 2px rgba(10, 10, 10, 0.85),
+    0 2px 16px rgba(10, 10, 10, 0.55);
   transition: color 0.25s ease;
 }
 
@@ -1638,14 +1643,17 @@ h3 {
   letter-spacing: 0.16em;
   text-transform: uppercase;
   text-decoration: none;
-  color: var(--gold);
+  color: var(--gold-text);
   border-bottom: 1px solid color-mix(in srgb, var(--gold) 45%, transparent);
+  text-shadow:
+    0 1px 2px rgba(10, 10, 10, 0.85),
+    0 2px 16px rgba(10, 10, 10, 0.55);
   transition: color 0.2s, border-color 0.2s, background 0.2s;
 }
 
 .hero-cta:hover,
 .hero-cta:focus-visible {
-  color: color-mix(in srgb, var(--gold) 85%, #fff);
+  color: color-mix(in srgb, var(--gold-text) 85%, #fff);
   border-bottom-color: var(--gold);
   background: rgba(212, 175, 55, 0.08);
   outline: none;
@@ -2269,6 +2277,10 @@ kbd {
   color: var(--muted);
 }
 
+.about-timeline .career-timeline + .about-aside-label {
+  margin-top: 1.75rem;
+}
+
 .career-timeline {
   list-style: none;
   margin: 0;
@@ -2295,6 +2307,11 @@ kbd {
 }
 
 .career-timeline li:last-child {
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.55rem;
+}
+
+.about-timeline .career-timeline:last-of-type li:last-child {
   border-bottom: none;
   padding-bottom: 0;
 }
@@ -3436,7 +3453,8 @@ kbd {
 }
 
 /* Press fold — collapsed under poker so first viewport stays broadcast desk */
-.press-fold {
+.press-fold,
+.archive-fold {
   margin: 2.5rem auto 0;
   max-width: min(1200px, 100%);
   width: 100%;
@@ -3444,7 +3462,12 @@ kbd {
   border-top: 1px solid var(--border);
 }
 
-.press-fold-summary {
+.archive-fold {
+  margin: 1.35rem 0 0;
+}
+
+.press-fold-summary,
+.archive-fold-summary {
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
@@ -3459,25 +3482,34 @@ kbd {
   user-select: none;
 }
 
-.press-fold-summary::-webkit-details-marker {
+.press-fold-summary::-webkit-details-marker,
+.archive-fold-summary::-webkit-details-marker {
   display: none;
 }
 
-.press-fold-summary::after {
+.press-fold-summary::after,
+.archive-fold-summary::after {
   content: "▾";
   margin-left: 0.35rem;
   opacity: 0.7;
   transition: transform 0.2s ease;
 }
 
-.press-fold[open] .press-fold-summary::after {
+.press-fold[open] .press-fold-summary::after,
+.archive-fold[open] .archive-fold-summary::after {
   transform: rotate(-180deg);
 }
 
 .press-fold-summary:hover,
-.press-fold-summary:focus-visible {
-  color: color-mix(in srgb, var(--muted) 70%, var(--gold));
+.press-fold-summary:focus-visible,
+.archive-fold-summary:hover,
+.archive-fold-summary:focus-visible {
+  color: color-mix(in srgb, var(--muted) 70%, var(--gold-text));
   outline: none;
+}
+
+.archive-fold-body {
+  padding: 0 0 0.35rem;
 }
 
 .press-strip {
@@ -4142,6 +4174,12 @@ html.reveal-on [data-reveal][data-entered].is-inview {
   min-height: 3rem;
   padding-inline: 1.5rem;
   font-size: 1rem;
+}
+
+.esports-more .stat-list {
+  width: 100%;
+  max-width: 40rem;
+  margin-block: 0.15rem 0;
 }
 
 @media (max-width: 640px) {
@@ -5305,12 +5343,20 @@ body.play-2hh-immersive .back-top {
   }
 
   .brand-text {
+    font-size: 0.78rem;
+  }
+
+  .command-nav .nav-label-full {
     display: none;
   }
 
+  .command-nav .nav-label-short {
+    display: inline;
+  }
+
   .command-nav a {
-    padding: 0.5rem 0.65rem;
-    font-size: 0.7rem;
+    padding: 0.5rem 0.5rem;
+    font-size: 0.68rem;
   }
 
   .btn {

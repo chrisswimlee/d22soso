@@ -19,7 +19,8 @@ In 2015, Chiang redefined casino Texas Hold’em by giving players dual agency�
     - Los Angeles, CA: Commerce Casino, Hustler Casino
     - San Antonio, TX: Poker at The Office
     - Las Vegas, NV: Circa Las Vegas
-    - Plus two additional Washington locations.
+    - SeaTac, WA: Silver Dollar Casino — 19222 International Blvd, SeaTac, WA 98188
+    - Future Washington location
 
 ### How to Play (5 Simple Steps)
 

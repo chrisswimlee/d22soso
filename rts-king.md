@@ -20,7 +20,7 @@ At the center of this transformation was Wayne Chiang, known online as SoSOWAC (
 
 On March 31, 1998, Blizzard Entertainment released *StarCraft*, permanently changing competitive gaming. Chiang immediately captured the #1 spot on Case’s Ladder in both 1v1 and team divisions, winning the inaugural local StarCraft tournament at Neutral Ground in Mountain View, California against his longtime rival Jay Severson.
 
-Transitioning into community building, Chiang joined forces with esports figures Dennis “Thresh” Fong and Bob “Calbear” Colayco at Gamers.com running GX StarCraft. Adopting the tag D22-soso, Chiang served as StarCraft’s first tournament caster during PGL Season 3, covering the international tournaments, authored battle reports immediately after tournament and ladder matches analyzing top-tier ladder play, and pioneered community media concepts like *Pimpest Plays*—the structural blueprint for modern esports highlight reels.
+Transitioning into community building, Chiang joined forces with esports figures Dennis “Thresh” Fong and Bob “Calbear” Colayco at Gamers.com running GX StarCraft. Adopting the tag D22-soso, Chiang served as StarCraft’s first tournament caster during PGL Season 3, blogging the international tournaments, authored battle reports immediately after tournament and ladder matches analyzing top-tier ladder play, and pioneered community media concepts like *Pimpest Plays*—the structural blueprint for modern esports highlight reels.
 
 ### 1999 Brood War Season 1 Ladder Tournament
 
@@ -46,15 +46,25 @@ D22-soso was crowned the first *StarCraft: Brood War* World Champion playing Ran
 
 Oral history: [Zombie Grub GLHF interview](https://www.youtube.com/watch?v=CHd4-eZx2Do) · [Liquipedia — Soso](https://liquipedia.net/starcraft/Soso)
 
-## 2001–2002 — Magic: The Gathering — Chiang’s Esports Finale
+## 2001–2002 — Magic: The Gathering — Chiang’s Pure Esports Finale
 
-Concurrently with real-time strategy dominance, Chiang engaged in high-level play in *Magic: The Gathering*. Early encounters with Pro Tour titan Brian Weissman at Palo Alto hotspot Round Table Pizza helped sharpen Chiang’s understanding of card advantage, resource efficiency, and tempo.
+Concurrently with real-time strategy dominance since 1996, Chiang engaged in high-level play in *Magic: The Gathering*. Early encounters with Pro Tour titan Brian Weissman at Palo Alto hotspot Round Table Pizza helped sharpen Chiang’s understanding of card advantage, resource efficiency, and tempo.
 
 Although Chiang treated Magic primarily as a side game, he consistently made Top 8 appearances at PTQs and developed early custom formats like “The Cube,” which is now the modern Cube Draft format—dynamic, cost-effective draft environments.
 
-After moving on from competitive real-time strategy, Wayne Chiang qualified for three Magic: The Gathering Pro Tours, attending Pro Tour New York 2001 and Pro Tour Boston 2002. The Cube would eventually become one of the most beloved *Magic: The Gathering* formats of all time and a staple on Magic Online.
+After moving on from competitive real-time strategy, Wayne Chiang qualified for three Magic: The Gathering Pro Tours, attending Pro Tour New York 2001 and Pro Tour Boston 2002. The Cube would eventually become popularized as one of the most beloved *Magic: The Gathering* formats of all time and a staple on Magic Online.
 
 Cube oral history: [Magic: The Gathering History — The Cube](https://www.youtube.com/watch?v=MNjLKeA-08A)
+
+## 2002 and beyond — Casual Competitor
+
+- Warcraft III — #2 rank Arranged Teams US West
+- Warcraft III — #1 rank FFA US West
+- Clash Royale — Challenger
+- League of Legends — Diamond 5
+- Hearthstone — #35 rank Standard
+- Hearthstone — #11 rank Wild
+- Once Upon a Galaxy — #1 rank
 
 ## Competitive Career Timeline (1996–1999)
 

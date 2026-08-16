@@ -46,8 +46,9 @@ Single source of truth for the public portfolio. Confidence tiers:
 | Sep 1999 | Brood War Tournament World Championships — 3rd ($1,000); Grrrr... won event | PUBLIC-VERIFIED |
 | Pre–Pro Tour | Consistent PTQ Top 8s; early custom format “The Cube” → Cube Draft | FIRST-PARTY (`rts-king.md`) |
 | 2001–02 | MTG Pro Tour NY ’01, Boston ’02 (qualified for 3) | FIRST-PARTY |
-| 2004 | Warcraft 3 US West FFA #1 / AT #2 | FIRST-PARTY |
-| 2015– | Hearthstone: #35 Standard NA, #11 Wild NA, Top 32 Wild Open Americas 2018 | FIRST-PARTY |
+| 2004 | Warcraft 3 US West FFA #1 / AT #2 | FIRST-PARTY (`rts-king.md`) |
+| 2002+ | Casual competitor: Clash Royale Challenger; League of Legends Diamond 5; Once Upon a Galaxy #1 | FIRST-PARTY (`rts-king.md`) |
+| 2015– | Hearthstone: #35 Standard NA, #11 Wild NA, Top 32 Wild Open Americas 2018 | FIRST-PARTY (`rts-king.md`) |
 
 **Title framing (publishable):** First official Blizzard StarCraft: Brood War Season 1 Ladder Tournament World Champion; played Random. Do **not** claim he won the September 1999 World Championships (he placed 3rd; Patry won).
 
@@ -68,7 +69,7 @@ Single source of truth for the public portfolio. Confidence tiers:
 - WSGC certified; approval submission #3192; proprietary side bets Flounder 4, Nessie 9, 888 Flop Bonus, Community Bonus [PUBLIC-VERIFIED / FIRST-PARTY (`inventor-author.md`)].
 - Live demo: play2hh.com [FIRST-PARTY].
 - Live at Great American Casino Tukwila via Maverick Gaming [PUBLIC-VERIFIED / FIRST-PARTY].
-- Expanding to Commerce Casino & Hustler Casino (LA), Poker at The Office (San Antonio), Circa Las Vegas, plus two additional Washington locations [FIRST-PARTY (`inventor-author.md`)].
+- Expanding to Commerce Casino & Hustler Casino (LA), Poker at The Office (San Antonio), Circa Las Vegas, Silver Dollar Casino SeaTac (19222 International Blvd, SeaTac, WA 98188), and a future Washington location [FIRST-PARTY (`inventor-author.md`)].
 - Licensing rate sheet → CONFIDENTIAL (local only).
 
 ### Badugi Chase™
@@ -111,7 +112,8 @@ Single source of truth for the public portfolio. Confidence tiers:
 4. UCLA: interviewed twice ≠ alumni claim.
 5. Spec errors to avoid: Neutral Ground was StarCraft (at an MTG venue); do **not** claim September 1999 World Championships win (3rd; Patry won).
 6. `A Esports Real Time Strategy King .pdf` / `rts-king.md` (2026) supersedes older first-party dates for B.net vs Kali (Feb), Sports Seoul (#5), World Champions Invitational (Jul), and Battle.net “Top 20 Apr 1998–Dec 1999.”
-7. `D22-soso inventor and Author.pdf` / `inventor-author.md` (2026) is the public copy for 2HH, Badugi Chase, and *Betting on Yourself*. Do not lead with house-edge percentages or the WEB framework on-site.
+7. `D22-soso inventor and Author.pdf` / `inventor-author.md` (2026) is the public copy for 2HH, Badugi Chase, and *Betting on Yourself*. Do not lead with house-edge percentages or the WEB framework on-site. Named Washington expansion: Silver Dollar Casino SeaTac + future Washington location (PDF typos “Futrure Washiington” / “Seatac” normalized on publish).
+8. `rts-king.md` (2026) casual-competitor addendum: Warcraft III US West, Clash Royale Challenger, League of Legends Diamond 5, Hearthstone Legend ranks, Once Upon a Galaxy #1 (PDF typo “Galazy” normalized).
 
 ---
 

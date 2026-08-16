@@ -5,16 +5,17 @@ A **documentary command archive** that feels like a video game: WebGL fog, Rando
 
 ## Shell
 - BG `#0a0a0a`, surfaces `#0f0f0f` / `#121212`
-- Accents: electric violet `#8b5cf6`, gold `#d4af37`, Protoss teal `#2dd4bf`
+- Accents: electric violet `#8b5cf6`, gold `#d4af37` (rules / fills / material), gold-text `#e8c44a` (type / chrome). No `--gold-dim` or gold+muted mixes on type smaller than 14px. Hero gold type gets a two-stop dark text-shadow so AA holds on the trophy plane.
 - Type: Space Grotesk (brand + display) · IBM Plex Sans (body) · IBM Plex Mono (data/hotkeys)
 - Nav: minimap + command-card hotkeys
 - Blockquotes = advisor transmissions; no raw URLs
 - Hero budget: brand lockup leads (D22-soso > name) + one proof line + three hairline pillars (Esports / WSOP / 2HH) + one CTA (“Enter archive”). No logo strip, no dual SCROLL cue. Championship photo is the dominant plane (`object-fit: cover`, near-full opacity, light scrim)
 - First viewport uses executive restraint (`data-theme="hero"` gold chrome; no violet glow, glitch, rainbow progress, or floating section indicator)
-- Trio pillars preview WSOP / 2HH in the mid-band between the proof line and the pillar hairlines (small fade + scale). Championship photo remains the default plane. No mid-page teleports from the hero (navigation is scroll + command nav)
+- Trio pillars preview WSOP / 2HH in the mid-band between the proof line and the pillar hairlines (small fade + scale). Championship photo stays fully present during the preview — emblems overlay the reserved gap; the plane does not fade to black. No mid-page teleports from the hero (navigation is scroll + command nav)
 - Chrome after hero: section indicator is the section name + hairline only (no “NOW VIEWING”, no pill, no glow pulse); scroll progress is a single muted gold hairline
-- Phone chrome: header is brand + command nav. Socials live in Contact / footer below ~1100px
+- Phone chrome: header is brand + command nav. Socials live in Contact / footer below ~1100px. Wordmark stays readable at 359px — shorten nav labels before killing the brand.
 - StarCraft is two rooms: championship archive (`#esports`), then command systems (`#sc-command` — Lost Temple map + Random race roll)
+- Championship archive first viewport is proof + one interview + photo. Lore (throwback, Game 5 transmission, stat list, GX StarCraft) lives in a collapsed fold — same pattern as poker press.
 - Poker press (“As heard on”) lives in a collapsed fold under the felt plane — not in the first poker viewport
 - Motion: signature systems stay loud; chrome dots/pips are static (no infinite pulse)
 

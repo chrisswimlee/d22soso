@@ -44,7 +44,7 @@ export function initWidgets() {
     active = key;
     hero.dataset.heroActive = key;
     if (stack) stack.dataset.heroActive = key;
-    if (champPhoto) champPhoto.classList.toggle("is-active", key === "champ");
+    if (champPhoto) champPhoto.classList.add("is-active");
     emblems.forEach((el) => {
       el.classList.toggle("is-active", el.dataset.heroScene === key);
     });
