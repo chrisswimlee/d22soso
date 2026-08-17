@@ -723,7 +723,7 @@ syncPlayChrome();
     const mm = String(d.getMonth() + 1).padStart(2, "0");
     const dd = String(d.getDate()).padStart(2, "0");
     const subject = "website bug " + yyyy + "-" + mm + "-" + dd;
-    return "mailto:playbadugi@gmail.com?subject=" + encodeURIComponent(subject);
+    return "mailto:chris.suyoung.lee@gmail.com?subject=" + encodeURIComponent(subject);
   }
 
   feedback.setAttribute("href", feedbackMailto());
