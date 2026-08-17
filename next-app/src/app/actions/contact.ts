@@ -105,7 +105,7 @@ export async function submitInquiry(
   // Attempt email delivery first, but never let a failure lose the inquiry.
   try {
     const apiKey = process.env.RESEND_API_KEY;
-    const toEmail = process.env.CONTACT_TO_EMAIL ?? "playbadugi@gmail.com";
+    const toEmail = process.env.CONTACT_TO_EMAIL ?? "2handholdem@gmail.com";
     const fromEmail = process.env.CONTACT_FROM_EMAIL ?? "Licensing <onboarding@resend.dev>";
 
     if (apiKey) {

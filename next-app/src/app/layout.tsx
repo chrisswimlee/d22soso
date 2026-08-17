@@ -152,7 +152,20 @@ export default function RootLayout({
         <footer className="border-t border-gold/10 py-6">
           <div className="mx-auto flex w-full max-w-6xl flex-col gap-2 px-4 text-sm text-slate-500 sm:flex-row sm:items-center sm:justify-between sm:px-6">
             <span>&copy; {new Date().getFullYear()} Wayne Chiang. All rights reserved.</span>
-            <span className="text-slate-600">Esports · Poker · Casino Innovation</span>
+            <span className="text-slate-600">
+              Website created by{" "}
+              <a href="https://chrisswimlee.com" target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-gold-soft hover:underline">
+                chrisswimlee
+              </a>
+              {" · "}
+              <a href="https://chrisswimlee.com" target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-gold-soft hover:underline">
+                chrisswimlee.com
+              </a>
+              {" · "}
+              <a href="mailto:chris.suyoung.lee@gmail.com" className="text-slate-400 hover:text-gold-soft hover:underline">
+                chris.suyoung.lee@gmail.com
+              </a>
+            </span>
           </div>
         </footer>
       </body>

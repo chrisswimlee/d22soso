@@ -11,10 +11,10 @@ export default function ContactSection() {
           Operators and platforms interested in 2 Hand Hold&apos;em or Badugi Chase — send a note
           and we&apos;ll follow up. Prefer email?{" "}
           <a
-            href="mailto:playbadugi@gmail.com?subject=Casino%20Licensing%20Deck%20Request"
+            href="mailto:2handholdem@gmail.com?subject=Casino%20Licensing%20Deck%20Request"
             className="font-medium text-gold-soft hover:underline focus-visible:ring-2 focus-visible:ring-gold/50 focus-visible:outline-none"
           >
-            playbadugi@gmail.com
+            2handholdem@gmail.com
           </a>
         </p>
       </div>

@@ -699,7 +699,7 @@ window.addEventListener("keydown", (e) => {
   const helpClose = document.getElementById("hotkey-help-close");
   const backTop = document.getElementById("back-top");
   const copyBtn = document.getElementById("copy-email");
-  const EMAIL = "playbadugi@gmail.com";
+  const EMAIL = copyBtn?.dataset.email || "2handholdem@gmail.com";
 
   function helpIsOpen() {
     return !!(help && (help.open || help.hasAttribute("open")));
