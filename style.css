@@ -1301,6 +1301,11 @@ h3 {
   transition: opacity 0.35s ease;
 }
 
+.hero[data-hero-active="wsop"] .hero-photo-stack,
+.hero[data-hero-active="2hh"] .hero-photo-stack {
+  opacity: 1;
+}
+
 .hero-photo {
   position: absolute;
   inset: 0;
@@ -1354,6 +1359,20 @@ h3 {
       rgba(10, 10, 10, 0.2) 40%,
       rgba(10, 10, 10, 0.06) 70%,
       rgba(10, 10, 10, 0.12) 100%
+    );
+}
+
+/* Logo scenes: championship plane fades; mid-band opens for the emblem */
+.hero[data-hero-active="wsop"] .hero-scrim,
+.hero[data-hero-active="2hh"] .hero-scrim {
+  background:
+    linear-gradient(
+      180deg,
+      rgba(10, 10, 10, 0.72) 0%,
+      rgba(10, 10, 10, 0.1) 18%,
+      rgba(10, 10, 10, 0.04) 42%,
+      rgba(10, 10, 10, 0.2) 68%,
+      rgba(10, 10, 10, 0.82) 100%
     );
 }
 
@@ -1833,42 +1852,6 @@ kbd {
   border: 1px solid var(--border);
   border-radius: 3px;
   background: var(--surface-2);
-}
-
-.race-console {
-  display: grid;
-  gap: 0.5rem;
-  margin: 0 0 1rem;
-}
-
-.race-console-label {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin: 0;
-  font-size: 0.62rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--muted);
-}
-
-#race-canvas {
-  width: 100%;
-  max-width: min(420px, 42svh);
-  height: auto;
-  aspect-ratio: 420 / 280;
-  border: 1px solid color-mix(in srgb, var(--theme-accent) 22%, transparent);
-  border-radius: var(--r-media);
-  background: #08080c;
-  cursor: pointer;
-  touch-action: manipulation;
-  box-shadow: 0 0 40px color-mix(in srgb, var(--theme-accent) 15%, transparent);
-  transition: border-color 0.25s, box-shadow 0.25s;
-}
-
-#race-canvas:hover {
-  border-color: color-mix(in srgb, var(--theme-accent) 55%, transparent);
-  box-shadow: 0 0 50px color-mix(in srgb, var(--theme-accent) 28%, transparent);
 }
 
 /* Scroll cue removed — hero CTA is the single enter path */
@@ -3169,7 +3152,6 @@ kbd {
   background: #08080c;
 }
 
-#battle-canvas,
 #cards-2hh,
 #cards-badugi {
   width: 100%;
@@ -3198,7 +3180,6 @@ kbd {
     0 0 28px color-mix(in srgb, var(--theme-accent) 14%, transparent);
 }
 
-#battle-canvas:hover,
 #cards-2hh:hover,
 #cards-badugi:hover {
   border-color: color-mix(in srgb, var(--theme-accent) 45%, transparent);
@@ -3610,8 +3591,7 @@ kbd {
   max-width: none;
 }
 
-.art-view > .section-head,
-.art-view > .sc-command > .section-head {
+.art-view > .section-head {
   max-width: min(44rem, 100%);
   width: 100%;
   margin-left: auto;
@@ -3622,8 +3602,7 @@ kbd {
 .art-view > .game-panel,
 .art-view > .poker-grid,
 .art-view > .book-layout,
-.art-view > .press-fold,
-.art-view > .sc-command {
+.art-view > .press-fold {
   max-width: min(1200px, 100%);
   width: 100%;
   margin-left: auto;
@@ -4067,34 +4046,6 @@ html.reveal-on [data-reveal][data-entered].is-inview {
 
 .art-view .panel-img:hover {
   box-shadow: 0 16px 48px rgba(0, 0, 0, 0.4);
-}
-
-/* StarCraft command beat — quieter continuation of the championship theater */
-.art-view > .sc-command {
-  margin-top: 0;
-  padding: clamp(1.15rem, 2.8vw, 2.25rem) clamp(1rem, 2.8vw, 2rem);
-  border: 0;
-  border-left: 2px solid color-mix(in srgb, var(--theme-accent) 50%, transparent);
-  border-radius: 0;
-  background-image:
-    radial-gradient(ellipse 70% 80% at 0% 30%, color-mix(in srgb, var(--theme-accent) 12%, transparent), transparent 72%),
-    linear-gradient(90deg, color-mix(in srgb, var(--theme-accent) 8%, transparent), transparent 68%);
-}
-
-.sc-command .section-head {
-  margin-bottom: clamp(1.25rem, 3vw, 1.85rem);
-}
-
-.sc-command-grid {
-  display: grid;
-  grid-template-columns: 1.1fr 0.9fr;
-  gap: clamp(1.25rem, 3vw, 2.25rem);
-  align-items: start;
-}
-
-.sc-command-grid #battle-canvas,
-.sc-command-grid #race-canvas {
-  max-width: 100%;
 }
 
 /* StarCraft → Gaming Archive callout — large, unmistakable bridge */
@@ -5054,8 +5005,7 @@ body.play-2hh-immersive .back-top {
   .panel-grid,
   .poker-grid,
   .about-layout,
-  .book-layout,
-  .sc-command-grid {
+  .book-layout {
     grid-template-columns: 1fr;
   }
 
@@ -5147,8 +5097,7 @@ body.play-2hh-immersive .back-top {
   }
 
   /* Art views — keep gallery language on tablet; slightly tighter vertical rhythm */
-  .art-view > .game-panel,
-  .art-view > .sc-command {
+  .art-view > .game-panel {
     padding: clamp(1.1rem, 3vw, 1.75rem) clamp(0.85rem, 2.5vw, 1.35rem);
   }
 
@@ -5298,8 +5247,7 @@ body.play-2hh-immersive .back-top {
   }
 
   /* Art views — phone: full-width plane, archive leads, keep wash + rule */
-  .art-view > .game-panel,
-  .art-view > .sc-command {
+  .art-view > .game-panel {
     padding: 1rem 0.15rem 1.15rem 0.7rem;
   }
 

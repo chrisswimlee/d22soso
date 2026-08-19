@@ -25,7 +25,7 @@ Then visit [http://localhost:8080](http://localhost:8080).
 | `js/widgets.js` | Hero preview, about fold, poker gallery, 2HH embed |
 | `js/webgl-boot.js` | Idle / on-viewport Three.js loader |
 | `js/webgl-scene.js` | Shared WebGL fleets + fog-of-war scout |
-| `js/webgl-interactives.js` | Race roll, Lost Temple battle, 2HH / Badugi cards |
+| `js/webgl-interactives.js` | 2HH / Badugi cards |
 | `wayne-chiang-truth-document.md` | Fact source of truth |
 | `design-language.md` | Design constitution |
 | `assets/photos` → photo archive | Imagery |
@@ -33,14 +33,13 @@ Then visit [http://localhost:8080](http://localhost:8080).
 ## Stack
 
 - **Three.js** (WebGL) for background fleets, fog scout, and panel scenes — loaded after first paint, panel canvases only when near the viewport
-- **GSAP** for theater enters, race/battle/card motion
+- **GSAP** for theater enters and card motion
 - Vanilla HTML/CSS orchestration (no build step; vendored ESM via import map)
 
 ## Game controls
 
 - Pointer scouts fog of war (WebGL)
 - Hotkeys `1`–`8` — command nav
-- `R` or click race canvas — Random race roll
 - Innovation canvases — click to split (2HH) or pick (Badugi)
 - Play 2HH in-page at `#play` (embedded table) or [open the full desktop version](https://play2hh.herokuapp.com/)
 
