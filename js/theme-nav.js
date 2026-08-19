@@ -14,7 +14,7 @@ export function measureHeaderHeight() {
   );
 }
 
-export function initThemeNav({ onRaceHotkey } = {}) {
+export function initThemeNav() {
 /* ---------- Dynamic background crossfade ---------- */
 const bgLayers = [...document.querySelectorAll("#bg-stage .bg-layer")];
 let activeBg = document.body.dataset.bg || "starcraft";
@@ -114,10 +114,6 @@ function variantKeyForSection(section) {
 
 function resolveSectionBg(section) {
   if (!section) return "starcraft";
-  if (section.id === "sc-command") {
-    const sc = document.getElementById("esports");
-    if (sc) return resolveSectionBg(sc);
-  }
   if (section.hasAttribute("data-bg-from-tab")) {
     const tabRoot = section.querySelector("[data-tabs]");
     const selected = tabRoot?.querySelector('[role="tab"][aria-selected="true"]');
@@ -165,9 +161,8 @@ function setupGamePanelThemes() {
 
     panel.addEventListener("click", (e) => {
       if (e.target.closest("a, button, input, textarea, select")) return;
-      /* Race / card canvases capture their own input; battle map still cycles theme */
-      const canvas = e.target.closest("canvas");
-      if (canvas && canvas.id !== "battle-canvas") return;
+      /* Card canvases capture their own input */
+      if (e.target.closest("canvas")) return;
       cycleVariant();
     });
 
@@ -186,7 +181,6 @@ const SECTION_LABELS = {
   hero: "D22-soso",
   about: "About",
   esports: "StarCraft",
-  "sc-command": "Command",
   "gaming-archive": "Gaming Archive",
   "gaming-return": "Continue",
   "game-cnc": "Command & Conquer",
@@ -238,14 +232,11 @@ function applySectionScene(section) {
   const next = sceneSectionEls[sceneSectionEls.indexOf(section) + 1];
   if (next) primeBg(resolveSectionBg(next));
   setIndicatorLabel(section.id);
-  const themeHost = section.id === "sc-command"
-    ? document.getElementById("esports") || section
-    : section;
-  const panel = themeHost.querySelector(".game-panel");
-  if (panel && themeHost.dataset.baseTheme) {
-    const keys = GAME_VARIANT_KEYS[themeHost.dataset.baseTheme];
+  const panel = section.querySelector(".game-panel");
+  if (panel && section.dataset.baseTheme) {
+    const keys = GAME_VARIANT_KEYS[section.dataset.baseTheme];
     const idx = keys
-      ? Math.abs(Number(themeHost.dataset.variant || 0)) % keys.length
+      ? Math.abs(Number(section.dataset.variant || 0)) % keys.length
       : 0;
     syncThemePips(panel, idx);
     document.querySelectorAll(".game-panel.is-theme-active").forEach((el) => {
@@ -355,7 +346,6 @@ function resolvePrimaryNavId(sectionId) {
   if (!sectionId || sectionId === "hero") return null;
   if (
     sectionId === "esports" ||
-    sectionId === "sc-command" ||
     sectionId === "gaming-archive" ||
     sectionId === "gaming-return" ||
     sectionId.startsWith("game-")
@@ -688,9 +678,6 @@ window.addEventListener("keydown", (e) => {
     if (href.startsWith("#")) goToHash(href, link);
     else window.location.assign(href);
   }
-  if (e.key === "r" || e.key === "R") {
-    onRaceHotkey?.();
-  }
 });
 
 /* Keyboard help (?), back-to-top, copy email */
@@ -831,7 +818,6 @@ const sceneSections = [
   "hero",
   "poker",
   "esports",
-  "sc-command",
   "gaming-archive",
   "game-cnc",
   "game-warcraft",

@@ -2,9 +2,9 @@
 import { initThemeNav } from "./js/theme-nav.js";
 import { initMotion } from "./js/motion.js";
 import { initWidgets } from "./js/widgets.js";
-import { startWebGL, rollRace } from "./js/webgl-boot.js";
+import { startWebGL } from "./js/webgl-boot.js";
 
-initThemeNav({ onRaceHotkey: rollRace });
+initThemeNav();
 initMotion();
 initWidgets();
 startWebGL();

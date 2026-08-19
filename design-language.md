@@ -1,7 +1,7 @@
 # D22-soso Portfolio — Design Language (Cursor Constitution)
 
 ## North star
-A **documentary command archive** that feels like a video game: WebGL fog, Random race roll, 3D battle map, card physics. Not a neon resume. One strategist, many theaters.
+A **documentary command archive** that feels like a video game: WebGL fog, card physics. Not a neon resume. One strategist, many theaters.
 
 ## Shell
 - BG `#0a0a0a`, surfaces `#0f0f0f` / `#121212`
@@ -11,10 +11,10 @@ A **documentary command archive** that feels like a video game: WebGL fog, Rando
 - Blockquotes = advisor transmissions; no raw URLs
 - Hero budget: brand lockup leads (D22-soso > name) + one proof line + three hairline pillars (Esports / WSOP / 2HH) + one CTA (“Enter archive”). No logo strip, no dual SCROLL cue. Championship photo is the dominant plane (`object-fit: cover`, near-full opacity, light scrim)
 - First viewport uses executive restraint (`data-theme="hero"` gold chrome; no violet glow, glitch, rainbow progress, or floating section indicator)
-- Trio pillars preview WSOP / 2HH in the mid-band between the proof line and the pillar hairlines (small fade + scale). Championship photo stays fully present during the preview — emblems overlay the reserved gap; the plane does not fade to black. No mid-page teleports from the hero (navigation is scroll + command nav)
+- Trio pillars preview WSOP / 2HH in the mid-band between the proof line and the pillar hairlines (small fade + scale). Championship photo fades as those emblems come in; hover-off / StarCraft restores the plane. No mid-page teleports from the hero (navigation is scroll + command nav)
 - Chrome after hero: section indicator is the section name + hairline only (no “NOW VIEWING”, no pill, no glow pulse); scroll progress is a single muted gold hairline
 - Phone chrome: header is brand + command nav. Socials live in Contact / footer below ~1100px. Wordmark stays readable at 359px — shorten nav labels before killing the brand.
-- StarCraft is two rooms: championship archive (`#esports`), then command systems (`#sc-command` — Lost Temple map + Random race roll)
+- StarCraft is one room: championship archive (`#esports`), then the Gaming Archive CTA
 - Championship archive first viewport is proof + one interview + photo. Lore (throwback, Game 5 transmission, stat list, GX StarCraft) lives in a collapsed fold — same pattern as poker press.
 - Poker press (“As heard on”) lives in a collapsed fold under the felt plane — not in the first poker viewport
 - Motion: signature systems stay loud; chrome dots/pips are static (no infinite pulse)
@@ -36,17 +36,15 @@ Two tiers — most theaters are gallery rooms; one archive file remains.
 - Warcraft’s heraldic plate may keep a gold frame — it is the proof object, not a nested card inside a panel.
 
 ## Signature systems (required)
-1. Random race WebGL reveal → tri-race shell (GSAP spin/settle)  
-2. WebGL fog-of-war scout + session persistence  
-3. Themed Three.js background fleets (ScrollTrigger parallax)  
-4. Lost Temple battle-report WebGL map  
-5. Tab themes: starcraft | cnc | warcraft | mtg | hearthstone | poker | 2hh | badugi  
-6. Click-to-cycle game panel dialects (3 variants per esports theater; keys `*-v2` / `*-v3`)  
-7. 2HH 3D card-split (GSAP)  
-8. Badugi 3D triad pick (GSAP)  
-9. Rank plaques (engraved, max 3 proof objects / panel)  
-10. `prefers-reduced-motion` static fallbacks (hide WebGL motion)  
-11. One-shot theater-enter dialects (`warp` / `scan` / `drop` / `deal` / `lid` / `float` / `page` / `chip`) — scout-in clip + unique second beat; mark `data-entered` so re-scroll is a quiet fade only
+1. WebGL fog-of-war scout + session persistence  
+2. Themed Three.js background fleets (ScrollTrigger parallax)  
+3. Tab themes: starcraft | cnc | warcraft | mtg | hearthstone | poker | 2hh | badugi  
+4. Click-to-cycle game panel dialects (3 variants per esports theater; keys `*-v2` / `*-v3`)  
+5. 2HH 3D card-split (GSAP)  
+6. Badugi 3D triad pick (GSAP)  
+7. Rank plaques (engraved, max 3 proof objects / panel)  
+8. `prefers-reduced-motion` static fallbacks (hide WebGL motion)  
+9. One-shot theater-enter dialects (`warp` / `scan` / `drop` / `deal` / `lid` / `float` / `page` / `chip`) — scout-in clip + unique second beat; mark `data-entered` so re-scroll is a quiet fade only
 
 ## Tab dialects
 | Theme | Material |
