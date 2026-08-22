@@ -1,6 +1,7 @@
 /* Page widgets: hero preview, about fold, poker gallery, 2HH embed, contact */
 import { reduced } from "./pref.js";
 import { measureHeaderHeight } from "./theme-nav.js";
+import { initLocateMap } from "./locate-map.js";
 
 export function initWidgets() {
 /* Hero — pillar hover swaps champ plane ↔ WSOP / 2HH emblems in the mid-band */
@@ -578,6 +579,11 @@ function setImmersive(on) {
   syncPlayChrome();
 }
 
+function showPlayFrameFs(show) {
+  if (!playFs) return;
+  playFs.hidden = !show;
+}
+
 function launch2HH() {
   if (!playFrame || !playWrap) return;
   if (!playFrame.getAttribute("src")) {
@@ -587,6 +593,7 @@ function launch2HH() {
   playWrap.classList.add("is-live");
   playSectionEl?.classList.add("is-playing");
   document.body.classList.add("play-2hh-live");
+  showPlayFrameFs(true);
 
   /* Phones / short viewports: lock the table to the full screen immediately */
   if (playNeedsImmersive()) {
@@ -623,6 +630,15 @@ playExitImmersive?.addEventListener("click", () => {
 if (playFs && playWrap && !canFullscreen(playWrap)) {
   playFs.textContent = "Expand table";
 }
+showPlayFrameFs(!!playSectionEl?.classList.contains("is-playing"));
+
+/* Re-center once the live table finishes loading — the frame's content can
+   shift the wrap after the initial launch centering pass */
+playFrame?.addEventListener("load", () => {
+  if (!playWrap?.classList.contains("is-live")) return;
+  syncPlayChrome();
+  if (!playWrap.classList.contains("is-immersive")) centerPlayTable();
+});
 
 playFs?.addEventListener("click", () => {
   launch2HH();
@@ -732,5 +748,7 @@ syncPlayChrome();
     feedback.setAttribute("href", feedbackMailto());
   });
 })();
+
+initLocateMap();
 
 }

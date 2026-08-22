@@ -67,6 +67,7 @@
   <link rel="modulepreload" href="js/theme-nav.js" />
   <link rel="modulepreload" href="js/motion.js" />
   <link rel="modulepreload" href="js/widgets.js" />
+  <link rel="modulepreload" href="js/locate-map.js" />
   <link rel="modulepreload" href="js/webgl-boot.js" />
 </head>
 <body data-theme="hero" data-bg="hero">
@@ -669,16 +670,7 @@
               <p class="game-tagline">Twice the Action. Twice the Fun.</p>
               <p class="plaque mono">U.S. Pat. 11,117,045 · 11,731,032 · 12,005,342 · Assignee 2 HH, LLC</p>
               <p>In 2015, Chiang redefined casino Texas Hold’em by giving players dual agency—managing two hands simultaneously against a single dealer board without slowing down pit operations due to simultaneous play.</p>
-              <p class="panel-subhead mono"><span class="badge-dot" aria-hidden="true"></span>Market Provenance</p>
-              <ul class="stat-list mono">
-                <li><span>Certified</span> Washington State Gambling Commission</li>
-                <li><span>Debut</span> Great American Casino Tukwila · Maverick Gaming</li>
-                <li><span>Los Angeles</span> Commerce Casino · Hustler Casino</li>
-                <li><span>San Antonio</span> Poker at The Office</li>
-                <li><span>Las Vegas</span> Circa Las Vegas</li>
-                <li><span>SeaTac</span> Silver Dollar Casino</li>
-                <li><span>Washington</span> Future location</li>
-              </ul>
+              <p class="hint mono">Certified by the Washington State Gambling Commission.</p>
               <p class="panel-subhead mono"><span class="badge-dot" aria-hidden="true"></span>How to Play — 5 Simple Steps</p>
               <ol class="stat-list play-steps">
                 <li><span>01</span> <span><strong>The Ante</strong> — Place two equal bets in the Hand 1 and Hand 2 Ante circles.</span></li>
@@ -717,20 +709,27 @@
               <p class="game-tagline">The Baby Rainbow.</p>
               <p class="plaque mono">U.S. Pat. 11,810,421 · 12,131,608 · App. 2023/0419777 · Assignee 2 HH, LLC</p>
               <p>Badugi Chase™ bridges the gap between classic draw poker and high-speed casino table games. Designed alongside co-inventor Charles Chang, it introduces The Chase—a communal draft moment of pure tension where a single choice changes the hand.</p>
-              <p class="panel-subhead mono"><span class="badge-dot" aria-hidden="true"></span>How to Play — App Version</p>
+              <p class="panel-subhead mono"><span class="badge-dot" aria-hidden="true"></span>How to Play</p>
               <ol class="stat-list play-steps">
                 <li><span>01</span> <span><strong>Ante &amp; Deal</strong> — Place an Ante bet. Player and dealer each receive 3 cards face-down.</span></li>
                 <li><span>02</span> <span><strong>Raise or Fold</strong> — View your hand and choose to Raise (1×, 2×, or 3× Ante) or Fold.</span></li>
                 <li><span>03</span> <span><strong>The Chase</strong> — 3 community cards are dealt face-up. Select 1 card to complete your 4-card hand; the remaining 2 cards pass to the dealer.</span></li>
                 <li><span>04</span> <span><strong>Showdown</strong> — Dealer reveals their hand. Unmatched suits/ranks form Badugi hands (4-card beats 3-card; lowest top card wins; Aces low).</span></li>
               </ol>
-              <p class="panel-subhead mono"><span class="badge-dot" aria-hidden="true"></span>How to Play — Live Version</p>
-              <ol class="stat-list play-steps">
-                <li><span>01</span> <span><strong>Ante &amp; Deal</strong> — Place an Ante bet. Player receives 3 cards face-down; dealer receives 5 cards face-down.</span></li>
-                <li><span>02</span> <span><strong>Raise or Fold</strong> — View your hand and choose to Raise (1×, 2×, or 3× Ante) or Fold.</span></li>
-                <li><span>03</span> <span><strong>The Chase</strong> — 3 community cards are dealt face-up. Select 1 card to complete your 4-card hand; discard the remaining 2 cards.</span></li>
-                <li><span>04</span> <span><strong>Showdown</strong> — Dealer reveals their hand. Unmatched suits/ranks form Badugi hands (4-card beats 3-card; lowest top card wins; Aces low).</span></li>
-              </ol>
+              <details class="archive-fold">
+                <summary class="archive-fold-summary mono">
+                  <span class="badge-dot" aria-hidden="true"></span>
+                  Live Version ruleset
+                </summary>
+                <div class="archive-fold-body">
+                  <ol class="stat-list play-steps">
+                    <li><span>01</span> <span><strong>Ante &amp; Deal</strong> — Place an Ante bet. Player receives 3 cards face-down; dealer receives 5 cards face-down.</span></li>
+                    <li><span>02</span> <span><strong>Raise or Fold</strong> — View your hand and choose to Raise (1×, 2×, or 3× Ante) or Fold.</span></li>
+                    <li><span>03</span> <span><strong>The Chase</strong> — 3 community cards are dealt face-up. Select 1 card to complete your 4-card hand; discard the remaining 2 cards.</span></li>
+                    <li><span>04</span> <span><strong>Showdown</strong> — Dealer reveals their hand. Unmatched suits/ranks form Badugi hands (4-card beats 3-card; lowest top card wins; Aces low).</span></li>
+                  </ol>
+                </div>
+              </details>
               <p class="panel-subhead mono"><span class="badge-dot" aria-hidden="true"></span>Qualifying 4-Card Badugi — Ante Bonus</p>
               <ul class="stat-list payout-list mono">
                 <li><span>4-High</span> 25 : 1</li>
@@ -782,6 +781,9 @@
           <button type="button" class="play-immersive-exit btn btn-primary" id="play-2hh-exit-immersive" hidden>
             Exit table
           </button>
+          <button type="button" class="play-frame-fs btn btn-primary" id="play-2hh-fs" hidden>
+            Enter fullscreen table
+          </button>
           <div class="play-frame-overlay" id="play-2hh-overlay">
             <picture>
               <source type="image/avif" srcset="assets/img/twohh-logo-500.avif" />
@@ -807,15 +809,7 @@
           <button type="button" class="btn btn-primary play-center-btn" id="play-2hh-center">
             Center / lock table
           </button>
-          <a
-            class="btn btn-gold"
-            href="https://play2hh.herokuapp.com/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >Open full-table desktop version</a>
-          <button type="button" class="btn btn-primary" id="play-2hh-fs">Enter fullscreen table</button>
           <a class="btn btn-primary btn-arrow" href="#locate">Find a live table <span class="arrow" aria-hidden="true">→</span></a>
-          <span class="btn btn-soon" aria-disabled="true">2HH iOS app — coming soon</span>
         </div>
         <p class="play-credit mono">Credits</p>
         <p class="play-credit-line">
@@ -824,6 +818,12 @@
             target="_blank"
             rel="noopener noreferrer"
           >2 Hand Holdem created by StarCraft: Brood War World Champion Wayne “D22-soso” Chiang</a>
+          ·
+          <a
+            href="https://play2hh.herokuapp.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >Open full-table desktop version</a>
         </p>
       </div>
     </section>
@@ -837,17 +837,111 @@
       </header>
 
       <div class="locate-map-wrap" data-reveal="jump">
-        <iframe
-          title="2 Hand Hold’em locations"
-          src="https://www.google.com/maps/d/embed?mid=1jkuOr8dbWp_1eP_5JAC2VYsHcoKf-Uc"
-          loading="lazy"
-          referrerpolicy="no-referrer-when-downgrade"
-          allowfullscreen
-        ></iframe>
+        <div class="locate-plane" role="group" aria-label="Archive map of live 2 Hand Hold’em venues — each pin opens Google Maps">
+          <svg class="locate-plane-svg" viewBox="0 0 1000 620" aria-hidden="true" focusable="false">
+            <g class="locate-graticule">
+              <line x1="86.2" y1="0" x2="86.2" y2="620" />
+              <line x1="258.6" y1="0" x2="258.6" y2="620" />
+              <line x1="431" y1="0" x2="431" y2="620" />
+              <line x1="603.4" y1="0" x2="603.4" y2="620" />
+              <line x1="775.9" y1="0" x2="775.9" y2="620" />
+              <line x1="948.3" y1="0" x2="948.3" y2="620" />
+              <line x1="0" y1="119.2" x2="1000" y2="119.2" />
+              <line x1="0" y1="238.5" x2="1000" y2="238.5" />
+              <line x1="0" y1="357.7" x2="1000" y2="357.7" />
+              <line x1="0" y1="476.9" x2="1000" y2="476.9" />
+              <line x1="0" y1="596.2" x2="1000" y2="596.2" />
+            </g>
+            <path
+              class="locate-conus"
+              d="M 4.3 38.2 L 34.5 23.8 L 258.6 23.8 L 517.2 23.8 L 620.7 47.7 L 706.9 83.5 L 793.1 155 L 844.8 131.2 L 931 119.2 L 1000 71.5 L 948.3 166.9 L 939.7 202.7 L 879.3 238.5 L 844.8 274.6 L 827.6 345.4 L 758.6 428.5 L 767.2 583.1 L 750 535.4 L 706.9 476.9 L 620.7 488.8 L 534.5 488.8 L 482.8 559.2 L 439.7 559.2 L 318.9 433.8 L 241.4 445.8 L 175.9 419.2 L 136.2 419.2 L 77.6 369.2 L 51.7 291.2 L 13.8 226.9 L 17.2 166.9 Z"
+            />
+          </svg>
+          <p class="locate-plane-tag mono" aria-hidden="true">CONUS // LIVE TABLES</p>
+          <!-- Fallback pins — replaced at runtime from the published My Maps KML -->
+          <a
+            class="locate-pin"
+            style="--pin-x: 17%; --pin-y: 53.2%"
+            href="https://www.google.com/maps/search/?api=1&amp;query=Circa+Resort+%26+Casino"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Circa Resort &amp; Casino, Las Vegas — open in Google Maps"
+          >
+            <span class="locate-pin-dot" aria-hidden="true"></span>
+            <span class="locate-pin-label mono">Circa</span>
+          </a>
+          <a
+            class="locate-pin"
+            style="--pin-x: 16.6%; --pin-y: 55.1%"
+            href="https://www.google.com/maps/search/?api=1&amp;query=The+Venetian+Las+Vegas"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="The Venetian Las Vegas — open in Google Maps"
+          >
+            <span class="locate-pin-dot" aria-hidden="true"></span>
+            <span class="locate-pin-label mono">Venetian</span>
+          </a>
+          <a
+            class="locate-pin"
+            style="--pin-x: 11.8%; --pin-y: 61.5%"
+            href="https://www.google.com/maps/search/?api=1&amp;query=The+Commerce+Casino+%26+Hotel"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="The Commerce Casino &amp; Hotel, Los Angeles — open in Google Maps"
+          >
+            <span class="locate-pin-dot" aria-hidden="true"></span>
+            <span class="locate-pin-label mono">Commerce</span>
+          </a>
+          <a
+            class="locate-pin"
+            style="--pin-x: 11.5%; --pin-y: 65%"
+            href="https://www.google.com/maps/search/?api=1&amp;query=Hustler+Casino"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Hustler Casino, Los Angeles — open in Google Maps"
+          >
+            <span class="locate-pin-dot" aria-hidden="true"></span>
+            <span class="locate-pin-label mono">Hustler</span>
+          </a>
+          <a
+            class="locate-pin"
+            style="--pin-x: 45.7%; --pin-y: 79.2%"
+            href="https://www.google.com/maps/search/?api=1&amp;query=The+Office+Card+House"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="The Office Card House, San Antonio — open in Google Maps"
+          >
+            <span class="locate-pin-dot" aria-hidden="true"></span>
+            <span class="locate-pin-label mono">The Office</span>
+          </a>
+          <a
+            class="locate-pin"
+            style="--pin-x: 9.9%; --pin-y: 13.2%"
+            href="https://www.google.com/maps/search/?api=1&amp;query=Desert+Bluffs+Poker+Room"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Desert Bluffs Poker Room, Washington — open in Google Maps"
+          >
+            <span class="locate-pin-dot" aria-hidden="true"></span>
+            <span class="locate-pin-label mono">Desert Bluffs</span>
+          </a>
+        </div>
       </div>
 
+      <ul class="stat-list mono locate-venues" data-reveal="fade">
+        <li data-locate-static="certified"><span>Certified</span> Washington State Gambling Commission</li>
+        <li><span>Las Vegas</span> Circa Resort &amp; Casino</li>
+        <li><span>Las Vegas</span> The Venetian Las Vegas</li>
+        <li><span>Los Angeles</span> The Commerce Casino &amp; Hotel</li>
+        <li><span>Los Angeles</span> Hustler Casino</li>
+        <li><span>San Antonio</span> The Office Card House</li>
+        <li><span>Washington</span> Desert Bluffs Poker Room</li>
+      </ul>
+
       <p class="hint mono locate-hint" data-reveal="fade">
-        Certified by the Washington State Gambling Commission. Debuted live at Great American Casino Tukwila (Maverick Gaming). Expanding to Commerce Casino and Hustler Casino (Los Angeles), Poker at The Office (San Antonio), Circa Las Vegas, Silver Dollar Casino SeaTac (19222 International Blvd, SeaTac, WA 98188), and a future Washington location.
+        Certified by the Washington State Gambling Commission. Pins mirror the published
+        <a href="https://www.google.com/maps/d/viewer?mid=1jkuOr8dbWp_1eP_5JAC2VYsHcoKf-Uc" target="_blank" rel="noopener noreferrer">Google My Maps venue list</a>
+        — new U.S. locations appear here when that map is updated.
       </p>
 
       <div class="cta-row locate-ctas" data-reveal="fade">
@@ -857,7 +951,6 @@
           target="_blank"
           rel="noopener noreferrer"
         >Open full map <span class="arrow" aria-hidden="true">→</span></a>
-        <a class="btn btn-primary btn-arrow" href="#play">Play online <span class="arrow" aria-hidden="true">→</span></a>
       </div>
     </section>
 
@@ -1099,11 +1192,17 @@
           <a class="btn btn-gold btn-arrow" href="assets/media-kit/d22soso-media-kit.zip" download>
             Download full kit <span class="arrow" aria-hidden="true">→</span>
           </a>
-          <a class="btn btn-primary" href="assets/media-kit/wayne-chiang-bio-short.txt" download>Short bio</a>
-          <a class="btn btn-primary" href="assets/media-kit/wayne-chiang-bio-long.txt" download>Long bio</a>
-          <a class="btn btn-primary" href="assets/media-kit/fact-sheet.txt" download>Fact sheet</a>
         </div>
         <ul class="media-kit-assets mono">
+          <li>
+            <a href="assets/media-kit/wayne-chiang-bio-short.txt" download>Short bio</a>
+          </li>
+          <li>
+            <a href="assets/media-kit/wayne-chiang-bio-long.txt" download>Long bio</a>
+          </li>
+          <li>
+            <a href="assets/media-kit/fact-sheet.txt" download>Fact sheet</a>
+          </li>
           <li>
             <a href="assets/media-kit/headshot-trophy.jpg" download>Headshot — trophy</a>
           </li>
@@ -1116,73 +1215,18 @@
         </ul>
       </aside>
 
-      <div class="contact-actions" data-reveal="jump">
-        <a
-          class="btn btn-gold btn-lg btn-arrow"
-          href="https://www.linkedin.com/in/d22sosowaynechiang"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          LinkedIn <span class="arrow" aria-hidden="true">→</span>
-          <span class="mono contact-ig">d22sosowaynechiang</span>
-        </a>
-        <a
-          class="btn btn-primary btn-lg btn-arrow"
-          href="https://liquipedia.net/starcraft/Soso"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Liquipedia <span class="arrow" aria-hidden="true">→</span>
-          <span class="mono contact-ig">Soso</span>
-        </a>
-        <a
-          class="btn btn-gold btn-lg btn-arrow"
-          href="https://x.com/D22_soso"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Follow on X <span class="arrow" aria-hidden="true">→</span>
-          <span class="mono contact-ig">@D22_soso</span>
-        </a>
-        <a
-          class="btn btn-ig btn-lg btn-arrow"
-          href="https://www.instagram.com/D22_soso/"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Follow on Instagram <span class="arrow" aria-hidden="true">→</span>
-          <span class="mono contact-ig">@D22_soso</span>
-        </a>
-        <a
-          class="btn btn-primary btn-lg btn-arrow"
-          href="https://www.youtube.com/@WayneChiangPoker"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          YouTube <span class="arrow" aria-hidden="true">→</span>
-          <span class="mono contact-ig">Wayne Chiang Poker</span>
-        </a>
-        <a
-          class="btn btn-gold btn-lg btn-arrow"
-          id="feedback-email"
-          href="mailto:chris.suyoung.lee@gmail.com?subject=website%20bug"
-        >
-          Submit feedback <span class="arrow" aria-hidden="true">→</span>
-          <br class="break-sm" />
-          <span class="mono contact-email">website bug report</span>
-        </a>
-      </div>
-      <p class="footer-meta mono">
+      <p class="contact-socials mono" data-reveal="jump">
         <a href="https://www.linkedin.com/in/d22sosowaynechiang" target="_blank" rel="noopener noreferrer">LinkedIn</a>
         ·
-        <a href="https://liquipedia.net/starcraft/Soso" target="_blank" rel="noopener noreferrer">Liquipedia — Soso</a>
+        <a href="https://liquipedia.net/starcraft/Soso" target="_blank" rel="noopener noreferrer">Liquipedia</a>
         ·
-        <a href="https://x.com/D22_soso" target="_blank" rel="noopener noreferrer">X @D22_soso</a>
+        <a href="https://x.com/D22_soso" target="_blank" rel="noopener noreferrer">X</a>
         ·
-        <a class="ig-inline" href="https://www.instagram.com/D22_soso/" target="_blank" rel="noopener noreferrer">Instagram @D22_soso</a>
+        <a class="ig-inline" href="https://www.instagram.com/D22_soso/" target="_blank" rel="noopener noreferrer">Instagram</a>
         ·
         <a href="https://www.youtube.com/@WayneChiangPoker" target="_blank" rel="noopener noreferrer">YouTube</a>
-        ·
+      </p>
+      <p class="footer-meta mono">
         <a href="#contact">Media kit</a>
         ·
         <a href="https://www.instagram.com/p/Cr2A8JJrgVa/?img_index=1" target="_blank" rel="noopener noreferrer">2 Hand Holdem created by StarCraft: Brood War World Champion Wayne “D22-soso” Chiang</a>
@@ -1195,6 +1239,8 @@
         <a href="https://chrisswimlee.com" target="_blank" rel="noopener noreferrer">chrisswimlee.com</a>
         ·
         <a href="mailto:chris.suyoung.lee@gmail.com">chris.suyoung.lee@gmail.com</a>
+        ·
+        <a id="feedback-email" href="mailto:chris.suyoung.lee@gmail.com?subject=website%20bug">Submit feedback</a>
       </p>
     </section>
   </main>

@@ -10,7 +10,10 @@
   --violet-dim: #5b21b6;
   --gold: #d4af37;
   --gold-text: #e8c44a;
-  --gold-dim: #8a7020;
+  /* Two-stop dark shadow so accent type <14px clears AA on photos / washes */
+  --gold-type-shadow:
+    0 1px 2px rgba(10, 10, 10, 0.85),
+    0 2px 16px rgba(10, 10, 10, 0.55);
   --teal: #2dd4bf;
   --phosphor: #39ff14;
   --ember: #f59e0b;
@@ -1220,6 +1223,7 @@ html.reveal-on .section-head:not(.is-inview) h2::after {
   text-transform: uppercase;
   color: var(--theme-accent);
   margin: 0 0 0.75rem;
+  text-shadow: var(--gold-type-shadow);
 }
 
 h1, h2, h3 {
@@ -1406,9 +1410,7 @@ h3 {
   border: 1px solid color-mix(in srgb, var(--gold) 55%, #8a8680);
   color: var(--gold-text);
   background: color-mix(in srgb, #0a0a0a 55%, transparent);
-  text-shadow:
-    0 1px 2px rgba(10, 10, 10, 0.85),
-    0 2px 16px rgba(10, 10, 10, 0.55);
+  text-shadow: var(--gold-type-shadow);
 }
 
 .hero-brand-text {
@@ -1418,9 +1420,7 @@ h3 {
   text-transform: uppercase;
   font-weight: 700;
   color: color-mix(in srgb, var(--text) 90%, var(--gold-text));
-  text-shadow:
-    0 1px 2px rgba(10, 10, 10, 0.85),
-    0 2px 16px rgba(10, 10, 10, 0.55);
+  text-shadow: var(--gold-type-shadow);
 }
 
 .hero-name {
@@ -1431,9 +1431,7 @@ h3 {
   letter-spacing: -0.02em;
   font-weight: 600;
   color: color-mix(in srgb, var(--text) 88%, var(--muted));
-  text-shadow:
-    0 1px 2px rgba(10, 10, 10, 0.85),
-    0 2px 16px rgba(10, 10, 10, 0.55);
+  text-shadow: var(--gold-type-shadow);
 }
 
 .hero-proof {
@@ -1445,9 +1443,7 @@ h3 {
   text-transform: uppercase;
   font-weight: 700;
   color: var(--gold-text);
-  text-shadow:
-    0 1px 2px rgba(10, 10, 10, 0.85),
-    0 2px 16px rgba(10, 10, 10, 0.55);
+  text-shadow: var(--gold-type-shadow);
 }
 
 /* Mid-band between proof line and pillar hairlines — emblems center here */
@@ -1576,9 +1572,7 @@ h3 {
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--gold-text);
-  text-shadow:
-    0 1px 2px rgba(10, 10, 10, 0.85),
-    0 2px 16px rgba(10, 10, 10, 0.55);
+  text-shadow: var(--gold-type-shadow);
 }
 
 .pillar-title {
@@ -1591,9 +1585,7 @@ h3 {
   letter-spacing: -0.015em;
   font-weight: 600;
   color: var(--text);
-  text-shadow:
-    0 1px 2px rgba(10, 10, 10, 0.85),
-    0 2px 16px rgba(10, 10, 10, 0.55);
+  text-shadow: var(--gold-type-shadow);
   transition: color 0.25s ease;
 }
 
@@ -1664,9 +1656,7 @@ h3 {
   text-decoration: none;
   color: var(--gold-text);
   border-bottom: 1px solid color-mix(in srgb, var(--gold) 45%, transparent);
-  text-shadow:
-    0 1px 2px rgba(10, 10, 10, 0.85),
-    0 2px 16px rgba(10, 10, 10, 0.55);
+  text-shadow: var(--gold-type-shadow);
   transition: color 0.2s, border-color 0.2s, background 0.2s;
 }
 
@@ -1688,6 +1678,7 @@ h3 {
   text-transform: uppercase;
   letter-spacing: 0.14em;
   color: var(--theme-accent);
+  text-shadow: var(--gold-type-shadow);
 }
 
 .badge-dot {
@@ -1740,7 +1731,7 @@ h3 {
 }
 
 /* Shine sweep on hover */
-.btn:not(.btn-soon)::after {
+.btn::after {
   content: "";
   position: absolute;
   top: 0;
@@ -1753,8 +1744,8 @@ h3 {
   pointer-events: none;
 }
 
-.btn:not(.btn-soon):hover::after,
-.btn:not(.btn-soon):focus-visible::after {
+.btn:hover::after,
+.btn:focus-visible::after {
   left: 145%;
 }
 
@@ -2028,7 +2019,8 @@ kbd {
   font-size: clamp(0.72rem, 1.4vw, 0.8rem) !important;
   font-weight: 600;
   letter-spacing: 0.03em;
-  color: var(--gold) !important;
+  color: var(--gold-text) !important;
+  text-shadow: var(--gold-type-shadow);
   max-width: none !important;
   line-height: 1.4 !important;
 }
@@ -2237,7 +2229,8 @@ kbd {
   font-size: clamp(0.62rem, 1.4vw, 0.68rem);
   letter-spacing: 0.04em;
   background: linear-gradient(transparent, rgba(0, 0, 0, 0.9));
-  color: var(--gold);
+  color: var(--gold-text);
+  text-shadow: var(--gold-type-shadow);
 }
 
 .about-timeline {
@@ -2449,9 +2442,10 @@ kbd {
   border-radius: var(--r-control);
   font-size: 0.9rem;
   font-weight: 600;
-  color: var(--gold);
-  border: 1px solid var(--gold-dim);
+  color: var(--gold-text);
+  border: 1px solid color-mix(in srgb, var(--gold) 55%, transparent);
   background: linear-gradient(180deg, rgba(212, 175, 55, 0.16), rgba(212, 175, 55, 0.02));
+  text-shadow: var(--gold-type-shadow);
 }
 
 .book-points li > span:last-child {
@@ -2566,6 +2560,7 @@ kbd {
   text-transform: uppercase;
   letter-spacing: 0.16em;
   color: var(--theme-accent);
+  text-shadow: var(--gold-type-shadow);
 }
 
 .theme-pips {
@@ -2854,6 +2849,7 @@ kbd {
   text-transform: uppercase;
   letter-spacing: 0.16em;
   color: var(--theme-accent);
+  text-shadow: var(--gold-type-shadow);
 }
 
 .play-steps {
@@ -2966,6 +2962,7 @@ kbd {
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: color-mix(in srgb, var(--theme-accent) 75%, var(--muted));
+  text-shadow: var(--gold-type-shadow);
 }
 
 .interview-cite-summary {
@@ -3011,7 +3008,7 @@ kbd {
   padding: 0 0 0.4rem;
   font-size: 0.72rem;
   letter-spacing: 0.04em;
-  color: var(--gold);
+  color: var(--gold-text);
   border-bottom: 1px solid color-mix(in srgb, var(--gold) 32%, transparent);
   max-width: 100%;
   overflow-wrap: anywhere;
@@ -3019,7 +3016,7 @@ kbd {
 }
 
 .plaque:hover {
-  color: color-mix(in srgb, var(--gold) 80%, #fff);
+  color: color-mix(in srgb, var(--gold-text) 80%, #fff);
   border-bottom-color: color-mix(in srgb, var(--gold) 65%, transparent);
 }
 
@@ -3336,9 +3333,10 @@ kbd {
 .lt-label {
   display: block;
   font-size: 0.7rem;
-  color: var(--gold);
+  color: var(--gold-text);
   letter-spacing: 0.08em;
   margin-bottom: 0.35rem;
+  text-shadow: var(--gold-type-shadow);
 }
 
 .lower-third strong {
@@ -3412,7 +3410,8 @@ kbd {
   bottom: 0;
   padding: 0.6rem 0.85rem;
   font-size: 0.68rem;
-  color: var(--gold);
+  color: var(--gold-text);
+  text-shadow: var(--gold-type-shadow);
   background: linear-gradient(transparent, rgba(0, 0, 0, 0.9));
   pointer-events: none;
 }
@@ -3447,6 +3446,11 @@ kbd {
   margin: 1.35rem 0 0;
 }
 
+.theme-panel .archive-fold {
+  margin-top: 1rem;
+  max-width: none;
+}
+
 .press-fold-summary,
 .archive-fold-summary {
   display: inline-flex;
@@ -3461,6 +3465,7 @@ kbd {
   cursor: pointer;
   list-style: none;
   user-select: none;
+  text-shadow: var(--gold-type-shadow);
 }
 
 .press-fold-summary::-webkit-details-marker,
@@ -3527,7 +3532,8 @@ kbd {
 .press-outlet {
   font-size: 0.68rem;
   letter-spacing: 0.1em;
-  color: var(--gold);
+  color: var(--gold-text);
+  text-shadow: var(--gold-type-shadow);
 }
 
 .press-title {
@@ -4077,6 +4083,7 @@ html.reveal-on [data-reveal][data-entered].is-inview {
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--theme-accent);
+  text-shadow: var(--gold-type-shadow);
 }
 
 .esports-more h3 {
@@ -4377,37 +4384,18 @@ html.reveal-on [data-reveal][data-entered].is-inview {
   max-width: min(100%, 1120px);
 }
 
-/* Keep play CTAs as a compact single row so the table keeps height */
+/* Keep play CTAs compact — launch secondary + optional center lock only */
 @media (max-width: 768px) {
   .section-play.is-playing .play-ctas {
-    flex-direction: row;
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    gap: 0.4rem;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.55rem;
   }
 
-  .section-play.is-playing .play-ctas::-webkit-scrollbar {
-    display: none;
-  }
-
-  .section-play.is-playing .play-ctas .btn,
-  .section-play.is-playing .play-ctas .btn-soon {
+  .section-play.is-playing .play-ctas .btn {
     width: auto;
-    flex: 0 0 auto;
-    min-height: 40px;
-    padding: 0.45rem 0.7rem;
-    font-size: 0.72rem;
+    flex: 0 1 auto;
   }
-}
-
-.play-center-btn {
-  display: none;
-}
-
-.section-play.is-playing .play-center-btn {
-  display: inline-flex;
 }
 
 body.play-2hh-live #section-indicator,
@@ -4465,7 +4453,23 @@ body.play-2hh-immersive .play-ctas {
   box-shadow: 0 8px 28px rgba(0, 0, 0, 0.55);
 }
 
-.play-immersive-exit[hidden] {
+.play-frame-fs {
+  position: absolute;
+  top: max(0.75rem, var(--safe-top));
+  right: max(0.75rem, var(--safe-right));
+  z-index: 5;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.55);
+  min-height: 40px;
+  padding: 0.45rem 0.85rem;
+  font-size: 0.78rem;
+}
+
+.play-frame-wrap.is-immersive .play-frame-fs {
+  display: none !important;
+}
+
+.play-immersive-exit[hidden],
+.play-frame-fs[hidden] {
   display: none !important;
 }
 
@@ -4482,6 +4486,14 @@ body.play-2hh-immersive .play-ctas {
   pointer-events: auto;
 }
 
+.play-center-btn {
+  display: none;
+}
+
+.section-play.is-playing .play-center-btn {
+  display: inline-flex;
+}
+
 .play-frame-overlay {
   position: absolute;
   inset: 0;
@@ -4491,8 +4503,8 @@ body.play-2hh-immersive .play-ctas {
   gap: 1rem;
   padding: 1.5rem;
   background:
-    radial-gradient(ellipse at 50% 40%, rgba(56, 189, 248, 0.12), transparent 55%),
-    rgba(7, 12, 18, 0.92);
+    radial-gradient(ellipse at 50% 40%, rgba(26, 92, 58, 0.4), transparent 55%),
+    rgba(7, 14, 10, 0.92);
   transition: opacity 0.35s ease, visibility 0.35s ease;
 }
 
@@ -4529,22 +4541,6 @@ body.play-2hh-immersive .play-ctas {
   margin-bottom: 1.5rem;
 }
 
-.btn-soon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 48px;
-  padding: 0.9rem 1.35rem;
-  border: 1px dashed var(--border);
-  border-radius: 3px;
-  color: var(--muted);
-  font-weight: 600;
-  font-size: 0.9rem;
-  cursor: default;
-  user-select: none;
-  background: rgba(255, 255, 255, 0.02);
-}
-
 .play-credit {
   margin: 0 0 0.35rem;
   font-size: 0.7rem;
@@ -4569,7 +4565,7 @@ body.play-2hh-immersive .play-ctas {
   border-bottom-color: var(--gold);
 }
 
-/* Locate 2HH — Google My Maps venue finder */
+/* Locate 2HH — authored archive plane with deep-link venue pins */
 .section-locate {
   max-width: none;
   background: transparent;
@@ -4587,21 +4583,118 @@ body.play-2hh-immersive .play-ctas {
   position: relative;
   width: 100%;
   max-width: min(1100px, 100%);
-  height: min(70vh, 560px);
   margin: 0 auto 1.25rem;
   overflow: hidden;
   border-radius: var(--r-panel);
-  box-shadow:
-    0 20px 60px rgba(0, 0, 0, 0.35),
-    0 0 40px rgba(56, 189, 248, 0.06);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
   background: var(--surface);
 }
 
-.locate-map-wrap iframe {
-  display: block;
+.locate-plane {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1000 / 620;
+  background:
+    radial-gradient(ellipse at 50% 30%, rgba(212, 175, 55, 0.05), transparent 60%),
+    radial-gradient(ellipse at 50% 120%, rgba(13, 40, 24, 0.5), transparent 65%),
+    var(--surface);
+}
+
+.locate-plane-svg {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
-  border: 0;
+}
+
+.locate-graticule line {
+  stroke: rgba(232, 230, 227, 0.05);
+  stroke-width: 1;
+}
+
+.locate-conus {
+  fill: #151915;
+  stroke: rgba(212, 175, 55, 0.28);
+  stroke-width: 1.5;
+}
+
+.locate-plane-tag {
+  position: absolute;
+  top: 0.75rem;
+  left: 0.9rem;
+  margin: 0;
+  font-size: 0.62rem;
+  letter-spacing: 0.16em;
+  color: var(--gold-text);
+  opacity: 0.75;
+  text-shadow: var(--gold-type-shadow);
+}
+
+/* Venue pins — site gold on the archive plane, deep-link out to Google Maps */
+.locate-pin {
+  position: absolute;
+  left: var(--pin-x);
+  top: var(--pin-y);
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  transform: translate(0, -50%);
+  text-decoration: none;
+  color: inherit;
+}
+
+.locate-pin-dot {
+  width: 10px;
+  height: 10px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--gold);
+  box-shadow:
+    0 0 0 3px rgba(212, 175, 55, 0.22),
+    0 0 12px rgba(212, 175, 55, 0.35);
+  transition: transform 0.2s var(--ease-spring), box-shadow 0.2s;
+}
+
+.locate-pin-label {
+  padding: 0.15rem 0.4rem;
+  font-size: 0.62rem;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+  color: var(--gold-text);
+  text-shadow: var(--gold-type-shadow);
+  background: rgba(10, 10, 10, 0.62);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  border-radius: var(--r-control);
+}
+
+.locate-pin--east {
+  flex-direction: row-reverse;
+  transform: translate(-100%, -50%);
+}
+
+.locate-pin:hover .locate-pin-dot,
+.locate-pin:focus-visible .locate-pin-dot {
+  transform: scale(1.35);
+  box-shadow:
+    0 0 0 4px rgba(212, 175, 55, 0.3),
+    0 0 18px rgba(212, 175, 55, 0.55);
+}
+
+.locate-pin:focus-visible {
+  outline: 2px solid var(--gold-text);
+  outline-offset: 3px;
+  border-radius: var(--r-control);
+}
+
+.locate-pin--future .locate-pin-dot {
+  background: transparent;
+  border: 1.5px dashed var(--gold);
+  box-shadow: none;
+}
+
+.locate-pin--future .locate-pin-label {
+  border-style: dashed;
 }
 
 .locate-hint {
@@ -4610,15 +4703,14 @@ body.play-2hh-immersive .play-ctas {
   text-align: center;
 }
 
+.locate-venues {
+  max-width: 36rem;
+  margin: 0 auto 1.25rem;
+}
+
 .locate-ctas {
   justify-content: center;
   margin-bottom: 1.5rem;
-}
-
-@media (max-width: 768px) {
-  .locate-map-wrap {
-    height: min(55vh, 420px);
-  }
 }
 
 .footer-meta a {
@@ -4747,13 +4839,30 @@ body.play-2hh-immersive .play-ctas {
   border-bottom-color: var(--theme-accent);
 }
 
-.contact-actions {
+.contact-socials {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 1rem;
-  margin: 0 auto;
-  max-width: 56rem;
+  gap: 0.35rem 0.65rem;
+  margin: 0 auto 2rem;
+  max-width: 40rem;
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  text-align: center;
+}
+
+.contact-socials a {
+  color: var(--muted);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: color 0.2s, border-color 0.2s;
+}
+
+.contact-socials a:hover,
+.contact-socials a:focus-visible {
+  color: var(--gold);
+  border-bottom-color: var(--gold);
 }
 
 .contact .btn-lg {
@@ -4763,7 +4872,6 @@ body.play-2hh-immersive .play-ctas {
   flex: 1 1 18rem;
 }
 
-.contact-email,
 .contact-ig {
   font-size: 0.82rem;
   font-weight: 500;
@@ -4906,20 +5014,11 @@ body.play-2hh-immersive .play-ctas {
   letter-spacing: 0.04em;
 }
 
-body.play-2hh-immersive .back-top {
-  visibility: hidden;
-  pointer-events: none;
-}
-
 .footer-meta {
   margin-top: 2.5rem;
   font-size: 0.72rem;
   color: var(--muted);
   line-height: 1.7;
-}
-
-.footer-meta .ig-inline {
-  font-size: 0.78rem;
 }
 
 .footer-credit {
@@ -5191,8 +5290,7 @@ body.play-2hh-immersive .back-top {
     flex-direction: column;
   }
 
-  .cta-row .btn,
-  .play-ctas .btn-soon {
+  .cta-row .btn {
     width: 100%;
   }
 
