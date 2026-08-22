@@ -558,12 +558,6 @@ function goToHash(href, pulseEl, opts) {
   if (!target) target = document.getElementById(rawId);
   if (!target) return false;
 
-  /* Leave CSS-immersive table before jumping elsewhere */
-  const immersiveWrap = document.getElementById("play-2hh-wrap");
-  if (immersiveWrap?.classList.contains("is-immersive") && typeof setImmersive === "function") {
-    setImmersive(false);
-  }
-
   /* Keep scroll-margin in sync with the live (possibly wrapped) header */
   measureHeaderHeight();
 

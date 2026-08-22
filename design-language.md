@@ -5,7 +5,7 @@ A **documentary command archive** that feels like a video game: WebGL fog, card 
 
 ## Shell
 - BG `#0a0a0a`, surfaces `#0f0f0f` / `#121212`
-- Accents: electric violet `#8b5cf6`, gold `#d4af37` (rules / fills / material), gold-text `#e8c44a` (type / chrome). No `--gold-dim` or gold+muted mixes on type smaller than 14px. Hero gold type gets a two-stop dark text-shadow so AA holds on the trophy plane.
+- Accents: electric violet `#8b5cf6`, gold `#d4af37` (rules / fills / material), gold-text `#e8c44a` (type / chrome). No `--gold-dim` or gold+muted mixes on type smaller than 14px. Hero and mid-page accent type under 14px get a two-stop dark text-shadow (`--gold-type-shadow`) — or a hairline plate (`.plaque`) — so AA holds on trophy planes, photo washes, and felt.
 - Type: Space Grotesk (brand + display) · IBM Plex Sans (body) · IBM Plex Mono (data/hotkeys)
 - Nav: minimap + command-card hotkeys
 - Blockquotes = advisor transmissions; no raw URLs
