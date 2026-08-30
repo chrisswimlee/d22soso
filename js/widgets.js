@@ -705,6 +705,7 @@ document.addEventListener("webkitfullscreenchange", onFullscreenChange);
 
 document.addEventListener("keydown", (e) => {
   if (e.key !== "Escape" || !playWrap?.classList.contains("is-immersive")) return;
+  if (document.querySelector("dialog[open]")) return;
   const fsEl = document.fullscreenElement || document.webkitFullscreenElement;
   if (fsEl && (fsEl === playWrap || playWrap.contains(fsEl))) {
     const exit = document.exitFullscreen || document.webkitExitFullscreen;
@@ -728,24 +729,117 @@ document.querySelectorAll('.site-nav a[href^="#"], a[href^="#"]').forEach((a) =>
 syncPlayChrome();
 }
 
-/* Contact — feedback mailto with “website bug” + today’s date */
-(function () {
-  const feedback = document.getElementById("feedback-email");
-  if (!feedback) return;
+/* Site feedback — mailto with date, version, and optional bug report */
+(function initFeedback() {
+  const FEEDBACK_TO = "200percentooak@gmail.com";
+  const SITE_VERSION =
+    document.querySelector('meta[name="d22soso-version"]')?.getAttribute("content")?.trim() ||
+    "2026.08.28";
 
-  function feedbackMailto() {
+  const trigger = document.getElementById("feedback-open");
+  const dialog = document.getElementById("feedback-dialog");
+  const form = document.getElementById("feedback-form");
+  const cancel = document.getElementById("feedback-cancel");
+  const dateEl = document.getElementById("feedback-date");
+  const versionEl = document.getElementById("feedback-version");
+  const messageEl = document.getElementById("feedback-message");
+  if (!trigger && !dialog) return;
+
+  function todayStamp() {
     const d = new Date();
     const yyyy = d.getFullYear();
     const mm = String(d.getMonth() + 1).padStart(2, "0");
     const dd = String(d.getDate()).padStart(2, "0");
-    const subject = "website bug " + yyyy + "-" + mm + "-" + dd;
-    return "mailto:chris.suyoung.lee@gmail.com?subject=" + encodeURIComponent(subject);
+    return yyyy + "-" + mm + "-" + dd;
   }
 
-  feedback.setAttribute("href", feedbackMailto());
-  feedback.addEventListener("click", () => {
-    /* Refresh date at click time in case the page stayed open overnight */
-    feedback.setAttribute("href", feedbackMailto());
+  function buildMailto(kind, message) {
+    const date = todayStamp();
+    const label = kind === "bug" ? "bug" : "feedback";
+    const subject = "d22soso " + label + " · " + date + " · v" + SITE_VERSION;
+    const body = [
+      "Date: " + date,
+      "Version: " + SITE_VERSION,
+      "Page: " + (location.href || ""),
+      "Type: " + (kind === "bug" ? "Bug" : "Feedback"),
+      "",
+      (message || "").trim() || "(no description)",
+    ].join("\n");
+    return (
+      "mailto:" +
+      FEEDBACK_TO +
+      "?subject=" +
+      encodeURIComponent(subject) +
+      "&body=" +
+      encodeURIComponent(body)
+    );
+  }
+
+  function syncFallbackHref() {
+    if (!trigger) return;
+    trigger.setAttribute("href", buildMailto("feedback", ""));
+  }
+
+  function fillMeta() {
+    if (dateEl) dateEl.textContent = todayStamp();
+    if (versionEl) versionEl.textContent = SITE_VERSION;
+  }
+
+  function openDialog() {
+    if (!dialog) return;
+    fillMeta();
+    try {
+      if (typeof dialog.showModal === "function") dialog.showModal();
+      else dialog.setAttribute("open", "");
+    } catch (_) {
+      dialog.setAttribute("open", "");
+    }
+    messageEl?.focus({ preventScroll: true });
+  }
+
+  function closeDialog() {
+    if (!dialog) return;
+    try {
+      if (typeof dialog.close === "function" && dialog.open) dialog.close();
+      else dialog.removeAttribute("open");
+    } catch (_) {
+      dialog.removeAttribute("open");
+    }
+  }
+
+  syncFallbackHref();
+  fillMeta();
+
+  trigger?.addEventListener("click", (e) => {
+    syncFallbackHref();
+    if (dialog && typeof dialog.showModal === "function") {
+      e.preventDefault();
+      openDialog();
+    }
+  });
+
+  cancel?.addEventListener("click", () => closeDialog());
+
+  dialog?.addEventListener("click", (e) => {
+    if (e.target === dialog) closeDialog();
+  });
+
+  dialog?.addEventListener("close", () => {
+    trigger?.focus({ preventScroll: true });
+  });
+
+  form?.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const kind =
+      form.querySelector('input[name="feedback-kind"]:checked')?.value || "feedback";
+    const message = (messageEl?.value || "").trim();
+    if (!message) {
+      messageEl?.focus();
+      return;
+    }
+    const href = buildMailto(kind, message);
+    closeDialog();
+    window.location.href = href;
   });
 })();
 
