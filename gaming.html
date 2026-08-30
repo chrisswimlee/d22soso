@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#0a0a0a" />
+  <meta name="d22soso-version" content="2026.08.28" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <title>Gaming Archive — Wayne "D22-soso" Chiang</title>
@@ -13,11 +14,11 @@
   <meta property="og:url" content="https://d22soso.com/gaming.html" />
   <meta property="og:site_name" content="D22-soso" />
   <meta property="og:title" content="Gaming Archive — Wayne &quot;D22-soso&quot; Chiang" />
-  <meta property="og:description" content="C&amp;C, Warcraft, Magic, Cube Draft, and Hearthstone — the theaters beyond StarCraft’s first official world title." />
+  <meta property="og:description" content="C&amp;C, Warcraft, Magic, Cube Draft, and Hearthstone — the games around StarCraft’s first official world title." />
   <meta property="og:image" content="https://d22soso.com/assets/img/champ-trophy-1080.jpg" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Gaming Archive — Wayne &quot;D22-soso&quot; Chiang" />
-  <meta name="twitter:description" content="C&amp;C, Warcraft, Magic, Cube Draft, and Hearthstone — the theaters beyond Brood War." />
+  <meta name="twitter:description" content="C&amp;C, Warcraft, Magic, Cube Draft, and Hearthstone — the games around Brood War." />
   <meta name="twitter:image" content="https://d22soso.com/assets/img/champ-trophy-1080.jpg" />
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%230a0a0a'/%3E%3Crect x='5' y='5' width='54' height='54' rx='9' fill='none' stroke='%238b5cf6' stroke-width='3'/%3E%3Ctext x='32' y='42' font-family='monospace' font-size='22' font-weight='700' fill='%238b5cf6' text-anchor='middle'%3ED22%3C/text%3E%3C/svg%3E" />
   <style>
@@ -69,7 +70,6 @@
   </div>
   <div class="scroll-progress" aria-hidden="true"><span class="scroll-progress-bar"></span></div>
   <div id="section-indicator" class="section-indicator" aria-live="polite">
-    <span class="si-dot" aria-hidden="true"></span>
     <span class="si-text mono"><span class="si-label">Gaming Archive</span></span>
   </div>
 
@@ -79,7 +79,7 @@
       <span class="brand-text">D22-soso</span>
     </a>
     <div class="header-tools">
-      <nav class="command-nav command-nav--gaming" aria-label="Gaming theaters">
+      <nav class="command-nav command-nav--gaming" aria-label="Games">
         <a href="#gaming-archive" data-hotkey="1" title="Archive intro"><span class="hk">1</span><span class="nav-label">Archive</span></a>
         <a href="#game-cnc" data-hotkey="2" title="Command &amp; Conquer"><span class="hk">2</span><span class="nav-label">C&amp;C</span></a>
         <a href="#game-warcraft" data-hotkey="3" title="Warcraft II / III"><span class="hk">3</span><span class="nav-label">WC</span></a>
@@ -93,9 +93,8 @@
   <main id="main" tabindex="-1">
     <section id="gaming-archive" class="section art-view gaming-archive-head" data-node="gaming-archive" data-bg="cnc" data-theme="cnc">
       <header class="section-head" data-reveal="fade">
-        <p class="eyebrow-badge mono"><span class="badge-dot" aria-hidden="true"></span>ARCHIVE // BEYOND BROOD WAR</p>
         <h1>Gaming Archive</h1>
-        <p class="lede">Before and after the first official Brood War world title: Kali ladders, parchment banners, Pro Tour floors, Cube Draft, and Legend ranks. After 2002: Warcraft III ladders, Clash Royale Challenger, League of Legends Diamond, and Once Upon a Galaxy #1. Click a theater to cycle its material dialect.</p>
+        <p class="lede">The games around the 1999 Brood War title: Kali ladders, Cube Draft, two Pro Tours, and later ranks.</p>
         <div class="cta-row" style="margin-top:1.25rem">
           <a class="btn btn-gold btn-arrow" href="index.html#esports">StarCraft World Championship <span class="arrow" aria-hidden="true">→</span></a>
           <a class="btn btn-primary" href="index.html">Back to portfolio</a>
@@ -105,34 +104,22 @@
 
     <!-- C&C -->
     <section id="game-cnc" class="section game-section art-view" data-node="esports-cnc" data-bg="cnc" data-theme="cnc" data-base-theme="cnc" data-variant="0">
-      <article class="game-panel theme-panel" data-theme="cnc" data-reveal="scan" tabindex="0" aria-label="Command and Conquer theme — click to cycle variants">
+      <article class="game-panel theme-panel" data-theme="cnc" data-reveal="scan" tabindex="0" aria-label="Command and Conquer theme — cycle atmosphere with the pips or Enter">
         <span class="theater-scanline" aria-hidden="true"></span>
         <p class="game-tag mono"><span class="badge-dot" aria-hidden="true"></span>THEATER 02 // COMMAND &amp; CONQUER</p>
-        <div class="theme-pips" aria-hidden="true">
-          <span class="theme-pip is-active" data-pip="0" title="Phosphor CRT"></span>
-          <span class="theme-pip" data-pip="1" title="Nod Crimson"></span>
-          <span class="theme-pip" data-pip="2" title="GDI Brass"></span>
+        <div class="theme-pips" role="group" aria-label="Command and Conquer atmosphere">
+          <button type="button" class="theme-pip is-active" data-pip="0" aria-pressed="true" aria-label="Phosphor CRT"></button>
+          <button type="button" class="theme-pip" data-pip="1" aria-pressed="false" aria-label="Nod Crimson"></button>
+          <button type="button" class="theme-pip" data-pip="2" aria-pressed="false" aria-label="GDI Brass"></button>
         </div>
-        <div class="panel-grid">
+        <div class="panel-grid panel-grid--copy">
           <div>
             <h3>Command &amp; Conquer: Tiberian Dawn</h3>
             <p class="plaque mono">Case’s Ladder · 1v1 &amp; Teams · #1 · 1996</p>
             <p>
-              Through Kali, <strong>SoSOWAC</strong> shot up Case’s Ladder—mentored by co-owner Bill “Bill1” Macaitis—
-              defining C&amp;C gameplay and the metagame. Captaining Team Synergy, he held #1 on the Case’s Team Ladder
-              while they were active.
+              Kali, 1996. Mentored by Bill “Bill1” Macaitis, <strong>SoSOWAC</strong> took Case’s Ladder #1
+              in 1v1 and teams. Captain of Team Synergy while they were active.
             </p>
-            <blockquote class="transmission">
-              Before official world titles were staged, Kali plus Case’s Ladder was the contract—and the war room was a CRT.
-            </blockquote>
-          </div>
-          <div class="panel-media dossier">
-            <dl class="dossier-meta mono">
-              <div><dt>DATE</dt><dd>1996</dd></div>
-              <div><dt>NETWORK</dt><dd>Kali · Case’s Ladder</dd></div>
-              <div><dt>OUTCOME</dt><dd>#1 · Team Synergy</dd></div>
-              <div><dt>MENTOR</dt><dd>Bill “Bill1” Macaitis</dd></div>
-            </dl>
           </div>
         </div>
       </article>
@@ -140,33 +127,21 @@
 
     <!-- Warcraft -->
     <section id="game-warcraft" class="section game-section art-view" data-node="esports-warcraft" data-bg="warcraft" data-theme="warcraft" data-base-theme="warcraft" data-variant="0">
-      <article class="game-panel theme-panel" data-theme="warcraft" data-reveal="drop" tabindex="0" aria-label="Warcraft theme — click to cycle variants">
+      <article class="game-panel theme-panel" data-theme="warcraft" data-reveal="drop" tabindex="0" aria-label="Warcraft theme — cycle atmosphere with the pips or Enter">
         <p class="game-tag mono"><span class="badge-dot" aria-hidden="true"></span>THEATER 03 // WARCRAFT II / III</p>
-        <div class="theme-pips" aria-hidden="true">
-          <span class="theme-pip is-active" data-pip="0" title="Parchment Night"></span>
-          <span class="theme-pip" data-pip="1" title="Alliance Banner"></span>
-          <span class="theme-pip" data-pip="2" title="Horde Ember"></span>
+        <div class="theme-pips" role="group" aria-label="Warcraft atmosphere">
+          <button type="button" class="theme-pip is-active" data-pip="0" aria-pressed="true" aria-label="Parchment Night"></button>
+          <button type="button" class="theme-pip" data-pip="1" aria-pressed="false" aria-label="Alliance Banner"></button>
+          <button type="button" class="theme-pip" data-pip="2" aria-pressed="false" aria-label="Horde Ember"></button>
         </div>
-        <div class="panel-grid">
+        <div class="panel-grid panel-grid--copy">
           <div>
             <h3>Warcraft II / III</h3>
             <p class="plaque mono">Top 3 1v1 · Teams #1 · Kali · 1997</p>
             <p>
-              On Kali’s circuit with Clan C4L, Chiang hit Top 3 in 1v1 and held the #1 team spot—where he first met rival
-              and future teammate Jay “Gadianton” Severson (later Chess.com co-founder). In 2004, the same DNA resurfaced
-              on Warcraft III Battle.net US West—FFA #1 and Arranged Teams #2.
+              Kali, 1997. Clan C4L: Top 3 in 1v1, #1 teams. First met Jay “Gadianton” Severson there —
+              later a teammate, later Chess.com. 2004: Warcraft III US West FFA #1, Arranged Teams #2.
             </p>
-            <ul class="stat-list mono">
-              <li><span>1997</span> Warcraft II Tides of Darkness — Top 3 1v1 · Team Ladder #1</li>
-              <li><span>2004</span> Warcraft III US West FFA #1 / AT #2</li>
-            </ul>
-          </div>
-          <div class="panel-media heraldry">
-            <div class="heraldic-plate">
-              <span class="mono">#1</span>
-              <strong>Warcraft II</strong>
-              <em>Kali · Teams · Top 3 1v1 · 1997</em>
-            </div>
           </div>
         </div>
       </article>
@@ -174,37 +149,24 @@
 
     <!-- MTG -->
     <section id="game-mtg" class="section game-section art-view" data-node="esports-mtg" data-bg="mtg" data-theme="mtg" data-base-theme="mtg" data-variant="0">
-      <article class="game-panel theme-panel" data-theme="mtg" data-reveal="deal" tabindex="0" aria-label="Magic the Gathering theme — click to cycle variants">
+      <article class="game-panel theme-panel" data-theme="mtg" data-reveal="deal" tabindex="0" aria-label="Magic the Gathering theme — cycle atmosphere with the pips or Enter">
         <p class="game-tag mono"><span class="badge-dot" aria-hidden="true"></span>THEATER 04 // MAGIC: THE GATHERING</p>
-        <div class="theme-pips" aria-hidden="true">
-          <span class="theme-pip is-active" data-pip="0" title="Lacquer Magenta"></span>
-          <span class="theme-pip" data-pip="1" title="Swamp Ink"></span>
-          <span class="theme-pip" data-pip="2" title="Plains Gold"></span>
+        <div class="theme-pips" role="group" aria-label="Magic atmosphere">
+          <button type="button" class="theme-pip is-active" data-pip="0" aria-pressed="true" aria-label="Lacquer Magenta"></button>
+          <button type="button" class="theme-pip" data-pip="1" aria-pressed="false" aria-label="Swamp Ink"></button>
+          <button type="button" class="theme-pip" data-pip="2" aria-pressed="false" aria-label="Plains Gold"></button>
         </div>
-        <div class="panel-grid">
+        <div class="panel-grid panel-grid--copy">
           <div>
             <h3>Magic: The Gathering</h3>
             <p class="plaque mono">Pro Tour · New York 2001 · Boston 2002</p>
             <p>
-              Concurrent with RTS dominance since 1996—and after Weissman sessions at Palo Alto’s Round Table Pizza
-              sharpened card advantage, tempo, and resource efficiency—Chiang treated Magic as a side game that still
-              produced consistent PTQ Top 8s. After stepping away from competitive RTS he qualified for three Pro Tours
-              and attended New York 2001 and Boston 2002.
+              A side game since 1996, after Weissman sessions at Palo Alto’s Round Table Pizza.
+              Consistent PTQ Top 8s. After RTS: three Pro Tour qualifications — New York 2001, Boston 2002.
             </p>
-            <blockquote class="transmission">
-              Chiang’s Pure Esports Finale on paper: the same refusal to play someone else’s meta, carried from Case’s Ladder to the Pro Tour floor.
-            </blockquote>
             <p class="hint mono">
-              <a href="#game-cube">Continue → Cube Draft subsection</a>
+              <a href="#game-cube">Cube Draft</a>
             </p>
-          </div>
-          <div class="panel-media dossier">
-            <dl class="dossier-meta mono">
-              <div><dt>ORIGINS</dt><dd>Weissman · Round Table Pizza</dd></div>
-              <div><dt>PRO TOUR</dt><dd>NY ’01 · Boston ’02</dd></div>
-              <div><dt>QUALIFIED</dt><dd>3 events · PTQ Top 8s</dd></div>
-              <div><dt>NEXT</dt><dd><a href="#game-cube">Cube Draft →</a></dd></div>
-            </dl>
           </div>
         </div>
       </article>
@@ -220,29 +182,23 @@
       data-base-theme="mtg"
       data-variant="0"
     >
-      <article class="game-panel theme-panel" data-theme="mtg" data-reveal="lid" tabindex="0" aria-label="Cube Draft theme — click to cycle Magic variants">
+      <article class="game-panel theme-panel" data-theme="mtg" data-reveal="lid" tabindex="0" aria-label="Cube Draft theme — cycle atmosphere with the pips or Enter">
         <p class="game-tag mono">
-          <span class="badge-dot" aria-hidden="true"></span>THEATER 04 // SUBSECTION · CUBE DRAFT
+          <span class="badge-dot" aria-hidden="true"></span>THEATER 04 // CUBE DRAFT
         </p>
-        <div class="theme-pips" aria-hidden="true">
-          <span class="theme-pip is-active" data-pip="0" title="Lacquer Magenta"></span>
-          <span class="theme-pip" data-pip="1" title="Swamp Ink"></span>
-          <span class="theme-pip" data-pip="2" title="Plains Gold"></span>
+        <div class="theme-pips" role="group" aria-label="Cube Draft atmosphere">
+          <button type="button" class="theme-pip is-active" data-pip="0" aria-pressed="true" aria-label="Lacquer Magenta"></button>
+          <button type="button" class="theme-pip" data-pip="1" aria-pressed="false" aria-label="Swamp Ink"></button>
+          <button type="button" class="theme-pip" data-pip="2" aria-pressed="false" aria-label="Plains Gold"></button>
         </div>
         <div class="panel-grid">
           <div>
             <h3>Cube Draft</h3>
             <p class="plaque mono">Format origin · curated draft · “The Cube”</p>
             <p>
-              While Magic was still a side game, Chiang built early custom draft pools—“The Cube”—now the modern Cube
-              Draft format, made for dynamic, cost-effective limited play. That idea became popularized as a Magic Online
-              staple and one of the most beloved Magic: The Gathering formats of all time. Public credit from Brian
-              Weissman and Tom Martell for the majority of the idea.
+              Early custom draft pools he called “The Cube” — now Cube Draft.
+              Brian Weissman and Tom Martell have given public credit for most of the idea.
             </p>
-            <blockquote class="transmission">
-              Kind words from Magic legends Brian Weissman and Tom Martell—crediting him for lugging the original
-              Super Monster Storage Box affectionately called “The Cube.”
-            </blockquote>
             <aside class="interview-cite">
               <a
                 class="interview-cite-thumb"
@@ -262,10 +218,9 @@
                 <span class="interview-cite-play" aria-hidden="true"></span>
               </a>
               <div class="interview-cite-body">
-                <p class="interview-cite-kicker mono">Oral history // full interview</p>
+                <p class="interview-cite-kicker mono">Cube Draft interview</p>
                 <p class="interview-cite-summary">
-                  How a Super Monster Storage Box became culture: the origin of Cube Draft, the friendships that carried the idea,
-                  and why Weissman and Martell still point back to Chiang as the one who dragged the format into the light.
+                  Weissman and Martell on the Super Monster Storage Box he called “The Cube.”
                 </p>
                 <a
                   class="interview-cite-link"
@@ -297,18 +252,18 @@
 
     <!-- Hearthstone -->
     <section id="game-hearthstone" class="section game-section art-view" data-node="esports-hearthstone" data-bg="hearthstone" data-theme="hearthstone" data-base-theme="hearthstone" data-variant="0">
-      <article class="game-panel theme-panel" data-theme="hearthstone" data-reveal="float" tabindex="0" aria-label="Hearthstone theme — click to cycle variants">
+      <article class="game-panel theme-panel" data-theme="hearthstone" data-reveal="float" tabindex="0" aria-label="Hearthstone theme — cycle atmosphere with the pips or Enter">
         <p class="game-tag mono"><span class="badge-dot" aria-hidden="true"></span>THEATER 05 // HEARTHSTONE</p>
-        <div class="theme-pips" aria-hidden="true">
-          <span class="theme-pip is-active" data-pip="0" title="Tavern Ember"></span>
-          <span class="theme-pip" data-pip="1" title="Frost Legend"></span>
-          <span class="theme-pip" data-pip="2" title="Midnight Inn"></span>
+        <div class="theme-pips" role="group" aria-label="Hearthstone atmosphere">
+          <button type="button" class="theme-pip is-active" data-pip="0" aria-pressed="true" aria-label="Tavern Ember"></button>
+          <button type="button" class="theme-pip" data-pip="1" aria-pressed="false" aria-label="Frost Legend"></button>
+          <button type="button" class="theme-pip" data-pip="2" aria-pressed="false" aria-label="Midnight Inn"></button>
         </div>
         <div class="panel-grid">
           <div>
             <h3>Hearthstone — High Legend</h3>
             <p class="plaque mono">Legend · Standard #35 NA · Wild #11 NA</p>
-            <p>Peak Rank #35 Standard NA, #11 Wild NA, and Top 32 in the Wild Open Americas (2018)—the same hand-reading muscle, new battlefield.</p>
+            <p>Peak Rank #35 Standard NA, #11 Wild NA, and Top 32 in the Wild Open Americas (2018).</p>
           </div>
           <div class="panel-media">
             <picture>
@@ -329,10 +284,9 @@
       </article>
 
       <aside class="esports-more" data-reveal="jump" aria-labelledby="casual-heading">
-        <p class="esports-more-kicker mono"><span class="badge-dot" aria-hidden="true"></span>2002 AND BEYOND // CASUAL COMPETITOR</p>
         <h3 id="casual-heading">Casual competitor</h3>
         <p class="esports-more-copy">
-          After stepping back from full-time real-time strategy, Chiang kept a competitive footprint across ladders and queues.
+          After Brood War: later ladders and queues.
         </p>
         <ul class="stat-list mono">
           <li><span>Warcraft III</span> US West FFA #1 · Arranged Teams #2</li>
@@ -346,9 +300,8 @@
 
     <section id="gaming-return" class="section contact" data-node="contact" data-bg="contact">
       <header class="section-head" data-reveal="fade">
-        <p class="eyebrow-badge mono"><span class="badge-dot" aria-hidden="true"></span>RETURN // MAIN ARCHIVE</p>
-        <h2>Continue the portfolio</h2>
-        <p class="lede">StarCraft championship, poker desk, inventions, and the book live on the main page.</p>
+        <h2>On the main page</h2>
+        <p class="lede">StarCraft championship, poker, inventions, and the book.</p>
       </header>
       <div class="cta-row" data-reveal="jump" style="justify-content:center">
         <a class="btn btn-gold btn-arrow" href="index.html#esports">Brood War World Champion <span class="arrow" aria-hidden="true">→</span></a>
@@ -360,6 +313,10 @@
         ·
         <a href="index.html#contact">Media kit</a>
         ·
+        <a href="app/privacy/">App privacy</a>
+        ·
+        <a href="app/terms/">App terms</a>
+        ·
         <a href="https://liquipedia.net/starcraft/Soso" target="_blank" rel="noopener noreferrer">Liquipedia — Soso</a>
       </p>
       <p class="footer-credit mono" style="text-align:center">
@@ -369,6 +326,8 @@
         <a href="https://chrisswimlee.com" target="_blank" rel="noopener noreferrer">chrisswimlee.com</a>
         ·
         <a href="mailto:chris.suyoung.lee@gmail.com">chris.suyoung.lee@gmail.com</a>
+        ·
+        <a id="feedback-open" href="mailto:200percentooak@gmail.com?subject=d22soso%20feedback">Submit feedback</a>
       </p>
     </section>
   </main>
@@ -377,6 +336,50 @@
     <span class="back-top-chevron" aria-hidden="true">↑</span>
     <span class="back-top-label mono">Top</span>
   </button>
+
+  <dialog class="feedback-dialog" id="feedback-dialog" aria-labelledby="feedback-title">
+    <form class="feedback-panel" id="feedback-form">
+      <header class="feedback-head">
+        <h2 id="feedback-title">Submit feedback</h2>
+        <p class="feedback-lede">Date and site version are attached automatically. Switch to Bug to report a defect.</p>
+      </header>
+      <dl class="feedback-meta mono">
+        <div>
+          <dt>Date</dt>
+          <dd id="feedback-date">—</dd>
+        </div>
+        <div>
+          <dt>Version</dt>
+          <dd id="feedback-version">—</dd>
+        </div>
+      </dl>
+      <fieldset class="feedback-kind">
+        <legend class="sr-only">Report type</legend>
+        <label>
+          <input type="radio" name="feedback-kind" value="feedback" checked />
+          <span>Feedback</span>
+        </label>
+        <label>
+          <input type="radio" name="feedback-kind" value="bug" />
+          <span>Bug</span>
+        </label>
+      </fieldset>
+      <label class="feedback-message-label" for="feedback-message">What happened?</label>
+      <textarea
+        id="feedback-message"
+        name="message"
+        rows="6"
+        maxlength="1200"
+        required
+        placeholder="Describe the issue or idea — what you expected, and what you saw."
+      ></textarea>
+      <div class="feedback-actions">
+        <button type="submit" class="btn btn-gold">Send report</button>
+        <button type="button" class="btn btn-primary" id="feedback-cancel">Cancel</button>
+      </div>
+      <p class="feedback-hint mono">Opens your mail app with date, version, and this note.</p>
+    </form>
+  </dialog>
 
   <script type="module" src="script.js"></script>
 </body>

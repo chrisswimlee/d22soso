@@ -9,11 +9,11 @@ A **documentary command archive** that feels like a video game: WebGL fog, card 
 - Type: Space Grotesk (brand + display) · IBM Plex Sans (body) · IBM Plex Mono (data/hotkeys)
 - Nav: minimap + command-card hotkeys
 - Blockquotes = advisor transmissions; no raw URLs
-- Hero budget: brand lockup leads (D22-soso > name) + one proof line + three hairline pillars (Esports / WSOP / 2HH) + one CTA (“Enter archive”). No logo strip, no dual SCROLL cue. Championship photo is the dominant plane (`object-fit: cover`, near-full opacity, light scrim)
+- Hero budget: brand lockup leads (D22-soso > name) + one proof line + three hairline pillars (`1999 · Random` / `WSOP Talent` / `U.S. patented`) + one CTA (“See poker”). No logo strip, no dual SCROLL cue. Championship photo is the dominant plane (`object-fit: cover`, near-full opacity, light scrim)
 - First viewport uses executive restraint (`data-theme="hero"` gold chrome; no violet glow, glitch, rainbow progress, or floating section indicator)
 - Trio pillars preview WSOP / 2HH in the mid-band between the proof line and the pillar hairlines (small fade + scale). Championship photo fades as those emblems come in; hover-off / StarCraft restores the plane. No mid-page teleports from the hero (navigation is scroll + command nav)
 - Chrome after hero: section indicator is the section name + hairline only (no “NOW VIEWING”, no pill, no glow pulse); scroll progress is a single muted gold hairline
-- Phone chrome: header is brand + command nav. Socials live in Contact / footer below ~1100px. Wordmark stays readable at 359px — shorten nav labels before killing the brand.
+- Phone chrome: header is brand + command nav. Socials live in Contact / footer below ~1100px. Wordmark stays readable at 359px — shorten nav labels from ~430px (`IP` not `Inventions`) before killing the brand.
 - StarCraft is one room: championship archive (`#esports`), then the Gaming Archive CTA
 - Championship archive first viewport is proof + one interview + photo. Lore (throwback, Game 5 transmission, stat list, GX StarCraft) lives in a collapsed fold — same pattern as poker press.
 - Poker press (“As heard on”) lives in a collapsed fold under the felt plane — not in the first poker viewport
@@ -26,7 +26,7 @@ Two tiers — most theaters are gallery rooms; one archive file remains.
 
 **Dossier frame:** Innovation tabs only (`.tablist-wrap`). Patents belong in a file. Play iframe is cropped media (`--r-media`), not a panel. About prose uses a left hairline; the career timeline is a vertical spine of bottom rules — neither is a boxed card.
 
-- Rank plaques, eyebrow labels, and theater tags are type + colour + a single rule, not chips.
+- Rank plaques stay. Eyebrow `//` labels and badge-dots are **theater-scoped** (`.game-tag` on StarCraft / gaming rooms) — not a page template. Poker, book, about, play, locate, and contact open with a title and one hairline only. No dossier costume on those rooms.
 - Proof groups (`.about-fact`, `.about-credentials`, `.about-book`, `.interview-cite`) use a left hairline.
 - Row lists (`.stat-list`, `.career-timeline`, `.dossier-meta`) use bottom rules only.
 - Material is a container cue on its own: felt, phosphor, and lacquer gradients replace a border rather than sit under one.
@@ -39,7 +39,7 @@ Two tiers — most theaters are gallery rooms; one archive file remains.
 1. WebGL fog-of-war scout + session persistence  
 2. Themed Three.js background fleets (ScrollTrigger parallax)  
 3. Tab themes: starcraft | cnc | warcraft | mtg | hearthstone | poker | 2hh | badugi  
-4. Click-to-cycle game panel dialects (3 variants per esports theater; keys `*-v2` / `*-v3`)  
+4. Game panel dialects (3 variants per esports theater; keys `*-v2` / `*-v3`) — cycle from theme pips, keyboard Enter/Space, or desktop click. Full-panel tap on phone does not cycle.  
 5. 2HH 3D card-split (GSAP)  
 6. Badugi 3D triad pick (GSAP)  
 7. Rank plaques (engraved, max 3 proof objects / panel)  
@@ -58,8 +58,8 @@ Two tiers — most theaters are gallery rooms; one archive file remains.
 | 2hh | Dual-hand cool/warm split |
 | badugi | Ice lowball, triad geometry |
 
-## Game panel variants (click to cycle)
-Each esports `.game-panel` cycles `0 → 1 → 2 → 0`. Variants are **material dialects** (texture + atmosphere + panel treatment), not recolors. WebGL fleets map `*-v2` / `*-v3` back to the base key. No Blizzard/Westwood HUD theft.
+## Game panel variants (pips / keyboard; desktop click)
+Each esports `.game-panel` cycles `0 → 1 → 2 → 0` from the theme pips, Enter/Space, or a fine-pointer click on the panel. Phone taps on copy do not cycle. Variants are **material dialects** (texture + atmosphere + panel treatment), not recolors. WebGL fleets map `*-v2` / `*-v3` back to the base key. No Blizzard/Westwood HUD theft. Rooms without a people photo (C&C, Warcraft) keep a quiet `#0a0a0a` wash — stock atmosphere stays veiled.
 
 | Theater | v0 | v1 | v2 |
 |---------|----|----|----|
@@ -76,6 +76,7 @@ No Zerg-rush memes, RGB gamer chrome, Blizzard HUD theft, badge dumps, confident
 No hero identity-card teleports that jump mid-page before the visitor orients.
 No neon / violet-glow treatment on the first-viewport triptych.
 No floating HUD pills or rainbow progress on the hero.
+No dossier costume (`LABEL // LABEL` + badge-dot) on poker / book / about / play / locate / contact.
 No box inside a box: if the parent is already framed, the child gets a rule or a tint.
 No replaying loud theater enters (CRT boot / lid / deal / foil) on every scroll pass — one-shot only.
 

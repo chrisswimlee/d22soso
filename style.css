@@ -120,6 +120,18 @@ body {
   outline-offset: 2px;
 }
 
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 /* Fixed theme stage — opacity-crossfaded on scroll (GPU-friendly) */
 #bg-stage {
   position: fixed;
@@ -261,90 +273,90 @@ body {
     linear-gradient(165deg, #0a0614 0%, #160e28 50%, #0a0a10 100%);
 }
 
-/* C&C — Phosphor CRT: green CRT war room */
+/* C&C — Phosphor CRT: quiet archive, stock photo veiled */
 .bg-layer[data-bg="cnc"] {
   background:
-    radial-gradient(ellipse 90% 70% at 50% 45%, transparent 0%, rgba(2, 5, 2, 0.55) 55%, rgba(2, 5, 2, 0.92) 100%),
-    linear-gradient(180deg, rgba(2, 5, 2, 0.55) 0%, rgba(10, 18, 8, 0.35) 45%, rgba(2, 5, 2, 0.9) 100%),
+    radial-gradient(ellipse 90% 70% at 50% 45%, rgba(10, 10, 10, 0.72) 0%, rgba(10, 10, 10, 0.94) 70%, #0a0a0a 100%),
+    linear-gradient(180deg, rgba(10, 10, 10, 0.7) 0%, rgba(10, 18, 8, 0.55) 45%, #0a0a0a 100%),
     repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.18) 0 1px, transparent 1px 3px),
-    radial-gradient(ellipse 70% 50% at 25% 25%, rgba(57, 255, 20, 0.2), transparent 55%),
+    radial-gradient(ellipse 70% 50% at 25% 25%, rgba(57, 255, 20, 0.1), transparent 55%),
     image-set(
       url("assets/img/bg-cnc.avif") type("image/avif"),
       url("assets/img/bg-cnc.webp") type("image/webp"),
       url("assets/img/bg-cnc.jpg") type("image/jpeg")) 50% 48% / cover no-repeat,
-    linear-gradient(180deg, #020502 0%, #0a1208 100%);
+    linear-gradient(180deg, #0a0a0a 0%, #0a0a0a 100%);
 }
 
-/* C&C — Nod Crimson: IR stealth corridor */
+/* C&C — Nod Crimson: quiet archive, stock photo veiled */
 .bg-layer[data-bg="cnc-v2"] {
   background:
-    radial-gradient(ellipse 90% 70% at 50% 45%, transparent 0%, rgba(6, 2, 3, 0.6) 55%, rgba(10, 12, 14, 0.94) 100%),
-    linear-gradient(180deg, rgba(6, 2, 3, 0.55) 0%, rgba(16, 8, 8, 0.4) 45%, rgba(10, 12, 14, 0.92) 100%),
+    radial-gradient(ellipse 90% 70% at 50% 45%, rgba(10, 10, 10, 0.74) 0%, rgba(10, 10, 10, 0.95) 70%, #0a0a0a 100%),
+    linear-gradient(180deg, rgba(10, 10, 10, 0.7) 0%, rgba(16, 8, 8, 0.55) 45%, #0a0a0a 100%),
     repeating-linear-gradient(0deg, transparent 0 2px, rgba(180, 35, 24, 0.04) 2px 4px),
-    radial-gradient(ellipse 65% 55% at 18% 20%, rgba(180, 35, 24, 0.28), transparent 58%),
+    radial-gradient(ellipse 65% 55% at 18% 20%, rgba(180, 35, 24, 0.14), transparent 58%),
     image-set(
       url("assets/img/bg-cnc-v2.avif") type("image/avif"),
       url("assets/img/bg-cnc-v2.webp") type("image/webp"),
       url("assets/img/bg-cnc-v2.jpg") type("image/jpeg")) 50% 48% / cover no-repeat,
-    linear-gradient(180deg, #060203 0%, #100808 48%, #0a0c0e 100%);
+    linear-gradient(180deg, #0a0a0a 0%, #0a0a0a 100%);
 }
 
-/* C&C — GDI Brass: military map room */
+/* C&C — GDI Brass: quiet archive, stock photo veiled */
 .bg-layer[data-bg="cnc-v3"] {
   background:
-    radial-gradient(ellipse 90% 70% at 50% 45%, transparent 0%, rgba(5, 7, 10, 0.58) 55%, rgba(10, 12, 14, 0.94) 100%),
-    linear-gradient(180deg, rgba(5, 7, 10, 0.55) 0%, rgba(12, 16, 20, 0.4) 45%, rgba(10, 12, 14, 0.92) 100%),
-    repeating-linear-gradient(90deg, transparent 0 47px, rgba(109, 127, 140, 0.05) 47px 48px),
-    repeating-linear-gradient(0deg, transparent 0 47px, rgba(196, 160, 53, 0.04) 47px 48px),
-    radial-gradient(ellipse 60% 45% at 72% 18%, rgba(196, 160, 53, 0.18), transparent 55%),
+    radial-gradient(ellipse 90% 70% at 50% 45%, rgba(10, 10, 10, 0.74) 0%, rgba(10, 10, 10, 0.95) 70%, #0a0a0a 100%),
+    linear-gradient(180deg, rgba(10, 10, 10, 0.7) 0%, rgba(12, 16, 20, 0.55) 45%, #0a0a0a 100%),
+    repeating-linear-gradient(90deg, transparent 0 47px, rgba(109, 127, 140, 0.04) 47px 48px),
+    repeating-linear-gradient(0deg, transparent 0 47px, rgba(196, 160, 53, 0.03) 47px 48px),
+    radial-gradient(ellipse 60% 45% at 72% 18%, rgba(196, 160, 53, 0.1), transparent 55%),
     image-set(
       url("assets/img/bg-cnc-v3.avif") type("image/avif"),
       url("assets/img/bg-cnc-v3.webp") type("image/webp"),
       url("assets/img/bg-cnc-v3.jpg") type("image/jpeg")) 50% 48% / cover no-repeat,
-    linear-gradient(180deg, #05070a 0%, #0c1014 50%, #0a0c0e 100%);
+    linear-gradient(180deg, #0a0a0a 0%, #0a0a0a 100%);
 }
 
-/* Warcraft — Parchment Night: candlelit keep */
+/* Warcraft — Parchment Night: quiet archive, stock photo veiled */
 .bg-layer[data-bg="warcraft"] {
   background:
-    radial-gradient(ellipse 90% 70% at 50% 40%, transparent 0%, rgba(18, 14, 10, 0.55) 55%, rgba(12, 10, 8, 0.92) 100%),
-    linear-gradient(180deg, rgba(18, 14, 10, 0.55) 0%, rgba(26, 20, 16, 0.35) 45%, rgba(12, 10, 8, 0.9) 100%),
-    radial-gradient(ellipse 70% 55% at 50% 5%, rgba(96, 165, 250, 0.22), transparent 55%),
-    radial-gradient(ellipse 50% 45% at 12% 80%, rgba(251, 191, 36, 0.14), transparent 50%),
+    radial-gradient(ellipse 90% 70% at 50% 40%, rgba(10, 10, 10, 0.72) 0%, rgba(10, 10, 10, 0.94) 70%, #0a0a0a 100%),
+    linear-gradient(180deg, rgba(10, 10, 10, 0.7) 0%, rgba(26, 20, 16, 0.55) 45%, #0a0a0a 100%),
+    radial-gradient(ellipse 70% 55% at 50% 5%, rgba(96, 165, 250, 0.1), transparent 55%),
+    radial-gradient(ellipse 50% 45% at 12% 80%, rgba(251, 191, 36, 0.08), transparent 50%),
     image-set(
       url("assets/img/bg-warcraft.avif") type("image/avif"),
       url("assets/img/bg-warcraft.webp") type("image/webp"),
       url("assets/img/bg-warcraft.jpg") type("image/jpeg")) 58% 42% / cover no-repeat,
-    linear-gradient(180deg, #120e0a 0%, #1a1410 55%, #0c0a08 100%);
+    linear-gradient(180deg, #0a0a0a 0%, #0a0a0a 100%);
 }
 
-/* Warcraft — Alliance Banner: heraldic hall */
+/* Warcraft — Alliance Banner: quiet archive, stock photo veiled */
 .bg-layer[data-bg="warcraft-v2"] {
   background:
-    radial-gradient(ellipse 90% 70% at 50% 40%, transparent 0%, rgba(10, 16, 28, 0.55) 55%, rgba(8, 10, 14, 0.92) 100%),
-    linear-gradient(180deg, rgba(10, 16, 28, 0.5) 0%, rgba(16, 24, 40, 0.35) 45%, rgba(8, 10, 14, 0.9) 100%),
-    repeating-linear-gradient(0deg, transparent 0 36px, rgba(59, 130, 246, 0.04) 36px 37px),
-    radial-gradient(ellipse 72% 52% at 48% 0%, rgba(59, 130, 246, 0.24), transparent 56%),
-    radial-gradient(ellipse 40% 35% at 85% 80%, rgba(212, 175, 55, 0.14), transparent 50%),
+    radial-gradient(ellipse 90% 70% at 50% 40%, rgba(10, 10, 10, 0.74) 0%, rgba(10, 10, 10, 0.95) 70%, #0a0a0a 100%),
+    linear-gradient(180deg, rgba(10, 10, 10, 0.7) 0%, rgba(16, 24, 40, 0.55) 45%, #0a0a0a 100%),
+    repeating-linear-gradient(0deg, transparent 0 36px, rgba(59, 130, 246, 0.03) 36px 37px),
+    radial-gradient(ellipse 72% 52% at 48% 0%, rgba(59, 130, 246, 0.12), transparent 56%),
+    radial-gradient(ellipse 40% 35% at 85% 80%, rgba(212, 175, 55, 0.08), transparent 50%),
     image-set(
       url("assets/img/bg-warcraft-v2.avif") type("image/avif"),
       url("assets/img/bg-warcraft-v2.webp") type("image/webp"),
       url("assets/img/bg-warcraft-v2.jpg") type("image/jpeg")) 55% 38% / cover no-repeat,
-    linear-gradient(180deg, #0a1220 0%, #121a28 52%, #080a0e 100%);
+    linear-gradient(180deg, #0a0a0a 0%, #0a0a0a 100%);
 }
 
-/* Warcraft — Horde Ember: forge fire */
+/* Warcraft — Horde Ember: quiet archive, stock photo veiled */
 .bg-layer[data-bg="warcraft-v3"] {
   background:
-    radial-gradient(ellipse 90% 70% at 50% 40%, transparent 0%, rgba(18, 4, 4, 0.58) 55%, rgba(8, 6, 4, 0.94) 100%),
-    linear-gradient(180deg, rgba(18, 4, 4, 0.55) 0%, rgba(20, 12, 6, 0.4) 45%, rgba(8, 6, 4, 0.92) 100%),
-    radial-gradient(ellipse 68% 50% at 50% 8%, rgba(185, 28, 28, 0.3), transparent 55%),
-    radial-gradient(ellipse 45% 40% at 15% 80%, rgba(132, 204, 22, 0.12), transparent 50%),
+    radial-gradient(ellipse 90% 70% at 50% 40%, rgba(10, 10, 10, 0.74) 0%, rgba(10, 10, 10, 0.95) 70%, #0a0a0a 100%),
+    linear-gradient(180deg, rgba(10, 10, 10, 0.7) 0%, rgba(20, 12, 6, 0.55) 45%, #0a0a0a 100%),
+    radial-gradient(ellipse 68% 50% at 50% 8%, rgba(185, 28, 28, 0.14), transparent 55%),
+    radial-gradient(ellipse 45% 40% at 15% 80%, rgba(132, 204, 22, 0.06), transparent 50%),
     image-set(
       url("assets/img/bg-warcraft-v3.avif") type("image/avif"),
       url("assets/img/bg-warcraft-v3.webp") type("image/webp"),
       url("assets/img/bg-warcraft-v3.jpg") type("image/jpeg")) center 40% / cover no-repeat,
-    linear-gradient(180deg, #140404 0%, #1a0c08 55%, #0a0604 100%);
+    linear-gradient(180deg, #0a0a0a 0%, #0a0a0a 100%);
 }
 
 /* MTG — Lacquer Magenta: foil satin */
@@ -855,24 +867,11 @@ body[data-theme="hero"] #section-indicator {
   visibility: hidden;
 }
 
-.section-indicator .si-dot {
-  width: 6px;
-  height: 6px;
-  flex-shrink: 0;
-  border-radius: 50%;
-  background: var(--theme-accent);
-  box-shadow: none;
-}
-
 .section-indicator .si-text {
   display: grid;
   line-height: 1.1;
   min-width: 0;
   flex: 1 1 auto;
-}
-
-.section-indicator .si-kicker {
-  display: none;
 }
 
 .section-indicator .si-label {
@@ -975,7 +974,7 @@ body[data-theme="hero"] #section-indicator {
   mask-image: linear-gradient(90deg, #000 0, #000 calc(100% - 1.25rem), transparent 100%);
 }
 
-/* End spacer so item 8 / Comms can fully clear the scroll edge */
+/* End spacer so the last nav item can fully clear the scroll edge */
 .command-nav::after {
   content: "";
   flex: 0 0 1.25rem;
@@ -1001,7 +1000,7 @@ body[data-theme="hero"] #section-indicator {
   align-items: center;
   gap: 0.3rem;
   padding: 0.45rem 0.55rem;
-  min-height: 40px;
+  min-height: 44px;
   font-size: 0.76rem;
   color: var(--muted);
   border: 1px solid transparent;
@@ -1082,7 +1081,7 @@ body[data-theme="hero"] #section-indicator {
   text-transform: uppercase;
   text-decoration: none;
   padding: 0.4rem 0.42rem;
-  min-height: 36px;
+  min-height: 44px;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1144,7 +1143,7 @@ body[data-theme="hero"] #section-indicator {
   opacity: 1;
 }
 
-/* Drop hotkey digits earlier so 1–8 labels fit without clipping Comms */
+/* Drop hotkey digits earlier so 1–8 labels fit without clipping Contact */
 @media (max-width: 1280px) {
   .command-nav .hk {
     display: none;
@@ -1189,33 +1188,27 @@ body[data-theme="hero"] #section-indicator {
   margin-bottom: 1rem;
 }
 
+.section-head h1,
 .section-head h2 {
   position: relative;
   padding-bottom: 0.85rem;
 }
 
+.section-head h1::after,
 .section-head h2::after {
   content: "";
   position: absolute;
   left: 0;
   bottom: 0;
-  width: 3rem;
-  height: 2px;
-  background: linear-gradient(90deg, var(--theme-accent), var(--theme-accent-2));
-  border-radius: 1px;
-  transition: width 0.7s var(--ease-spring) 0.15s;
-}
-
-/* Grow underline when section-head reveals (data-reveal lives on .section-head) */
-html.reveal-on .section-head:not(.is-inview) h2::after {
-  width: 0;
+  width: 2.5rem;
+  height: 1px;
+  background: color-mix(in srgb, var(--theme-accent) 70%, transparent);
 }
 
 .section-play .section-head h2::after,
 .section-locate .section-head h2::after,
 .contact .section-head h2::after {
-  left: 50%;
-  transform: translateX(-50%);
+  display: none;
 }
 
 .eyebrow {
@@ -1532,7 +1525,7 @@ h3 {
   text-align: center;
   gap: 0.35rem;
   min-height: 100%;
-  padding: 0.35rem 0.15rem 0.45rem;
+  padding: clamp(1.25rem, 0.8rem + 2vw, 1.85rem) 0.15rem 0.45rem;
   border: 0;
   border-top: 1px solid color-mix(in srgb, #8a8680 28%, var(--border));
   border-radius: 0;
@@ -1560,7 +1553,7 @@ h3 {
   justify-content: center;
   align-items: center;
   width: 100%;
-  margin: 0.25rem 0 0.35rem;
+  margin: 0 0 0.35rem;
   line-height: 0;
 }
 
@@ -1715,7 +1708,6 @@ h3 {
 
 .btn {
   position: relative;
-  overflow: hidden;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1727,34 +1719,15 @@ h3 {
   border-radius: 3px;
   border: 1px solid transparent;
   touch-action: manipulation;
-  transition: transform 0.25s var(--ease-spring), box-shadow 0.2s, background 0.2s;
-}
-
-/* Shine sweep on hover */
-.btn::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: -130%;
-  width: 55%;
-  height: 100%;
-  background: linear-gradient(105deg, transparent, rgba(255, 255, 255, 0.22), transparent);
-  transform: skewX(-20deg);
-  transition: left 0.55s ease;
-  pointer-events: none;
-}
-
-.btn:hover::after,
-.btn:focus-visible::after {
-  left: 145%;
+  transition: transform 0.2s ease, background 0.2s, border-color 0.2s;
 }
 
 .btn:hover {
-  transform: translateY(-3px) scale(1.02);
+  transform: translateY(-1px);
 }
 
 .btn:active {
-  transform: translateY(-1px) scale(0.99);
+  transform: none;
 }
 
 .btn:focus-visible {
@@ -1773,14 +1746,15 @@ h3 {
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, var(--violet), var(--violet-dim));
+  background: var(--violet);
   color: #fff;
-  box-shadow: 0 0 24px rgba(139, 92, 246, 0.35);
+  box-shadow: none;
 }
 
 .btn-primary:hover {
   color: #fff;
-  box-shadow: 0 6px 32px rgba(139, 92, 246, 0.5);
+  background: color-mix(in srgb, var(--violet) 82%, #fff);
+  box-shadow: none;
 }
 
 .btn-gold {
@@ -2315,20 +2289,16 @@ kbd {
   background: transparent;
 }
 
-.section-book .section-head {
-  max-width: 44rem;
+.section-book .section-head,
+.art-view.section-book > .section-head {
+  max-width: 1000px;
   margin-left: auto;
   margin-right: auto;
-  text-align: center;
-}
-
-.section-book .section-head h2::after {
-  left: 50%;
-  transform: translateX(-50%);
+  text-align: left;
 }
 
 .section-book .lede {
-  margin-left: auto;
+  margin-left: 0;
   margin-right: auto;
 }
 
@@ -2419,11 +2389,7 @@ kbd {
 }
 
 .book-points li {
-  display: grid;
-  grid-template-columns: 2rem 1fr;
-  align-items: start;
-  gap: 0.85rem;
-  font-size: 0.82rem;
+  font-size: 0.95rem;
   color: var(--muted);
   line-height: 1.55;
 }
@@ -2431,25 +2397,6 @@ kbd {
 .book-points li strong {
   color: var(--text);
   font-weight: 600;
-}
-
-.book-points li > span:first-child {
-  display: grid;
-  place-items: center;
-  width: 2rem;
-  height: 2rem;
-  margin-top: 0.05rem;
-  border-radius: var(--r-control);
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--gold-text);
-  border: 1px solid color-mix(in srgb, var(--gold) 55%, transparent);
-  background: linear-gradient(180deg, rgba(212, 175, 55, 0.16), rgba(212, 175, 55, 0.02));
-  text-shadow: var(--gold-type-shadow);
-}
-
-.book-points li > span:last-child {
-  min-width: 0;
 }
 
 .book-ctas {
@@ -2566,23 +2513,45 @@ kbd {
 .theme-pips {
   display: flex;
   align-items: center;
-  gap: 0.4rem;
+  gap: 0.15rem;
   margin: 0 0 1.35rem;
 }
 
 .theme-pip {
+  appearance: none;
+  -webkit-appearance: none;
+  display: inline-grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  margin: 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  cursor: pointer;
+  touch-action: manipulation;
+  color: inherit;
+}
+
+.theme-pip::after {
+  content: "";
   width: 7px;
   height: 7px;
   border-radius: 1px;
   border: 1px solid color-mix(in srgb, var(--theme-accent) 45%, transparent);
   background: transparent;
-  transition: background 0.25s, border-color 0.25s, box-shadow 0.25s;
+  transition: background 0.25s, border-color 0.25s;
 }
 
-.theme-pip.is-active {
+.theme-pip.is-active::after {
   background: var(--theme-accent);
   border-color: var(--theme-accent);
-  box-shadow: none;
+}
+
+.theme-pip:focus-visible {
+  outline: 1px solid var(--theme-accent);
+  outline-offset: 2px;
 }
 
 /* Panel materials scoped to each panel's own data-theme (not body — avoids painting every theater) */
@@ -2825,6 +2794,11 @@ kbd {
   grid-template-columns: 1.15fr 0.85fr;
   gap: clamp(1.5rem, 3vw, 2.25rem);
   align-items: start;
+}
+
+.panel-grid--copy {
+  grid-template-columns: 1fr;
+  max-width: 42rem;
 }
 
 .panel-grid > div > p {
@@ -4618,17 +4592,6 @@ body.play-2hh-immersive .play-ctas {
   stroke-width: 1.5;
 }
 
-.locate-plane-tag {
-  position: absolute;
-  top: 0.75rem;
-  left: 0.9rem;
-  margin: 0;
-  font-size: 0.62rem;
-  letter-spacing: 0.16em;
-  color: var(--gold-text);
-  opacity: 0.75;
-  text-shadow: var(--gold-type-shadow);
-}
 
 /* Venue pins — site gold on the archive plane, deep-link out to Google Maps */
 .locate-pin {
@@ -4939,7 +4902,8 @@ body.play-2hh-immersive .play-ctas {
 }
 
 /* Keyboard help overlay */
-.hotkey-help {
+.hotkey-help,
+.feedback-dialog {
   width: min(28rem, calc(100vw - 2rem));
   max-width: calc(100vw - 2rem);
   margin: auto;
@@ -4948,14 +4912,17 @@ body.play-2hh-immersive .play-ctas {
   background: rgba(10, 10, 12, 0.96);
   color: var(--text);
   box-shadow: none;
+  border-radius: var(--r-panel);
 }
 
-.hotkey-help::backdrop {
+.hotkey-help::backdrop,
+.feedback-dialog::backdrop {
   background: rgba(4, 4, 8, 0.72);
   backdrop-filter: blur(4px);
 }
 
-.hotkey-help-panel {
+.hotkey-help-panel,
+.feedback-panel {
   padding: 1.35rem 1.35rem 1.2rem;
 }
 
@@ -5012,6 +4979,154 @@ body.play-2hh-immersive .play-ctas {
   font-size: 0.68rem;
   color: var(--muted);
   letter-spacing: 0.04em;
+}
+
+.feedback-dialog {
+  width: min(32rem, calc(100vw - 2rem));
+  max-height: calc(100svh - 2rem);
+  overflow: auto;
+}
+
+.feedback-head {
+  margin-bottom: 1rem;
+  padding-bottom: 0.85rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.feedback-head h2 {
+  margin: 0;
+  font-size: 1.35rem;
+}
+
+.feedback-lede {
+  margin: 0.45rem 0 0;
+  color: var(--muted);
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+
+.feedback-meta {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem 1.25rem;
+  margin: 0 0 1.1rem;
+}
+
+.feedback-meta > div {
+  display: grid;
+  gap: 0.15rem;
+}
+
+.feedback-meta dt {
+  margin: 0;
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.feedback-meta dd {
+  margin: 0;
+  color: var(--text);
+  font-size: 0.82rem;
+}
+
+.feedback-kind {
+  display: flex;
+  margin: 0 0 1rem;
+  padding: 0;
+  min-width: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--r-control);
+  overflow: hidden;
+}
+
+.feedback-kind legend {
+  padding: 0;
+}
+
+.feedback-kind label {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  margin: 0;
+  padding: 0.55rem 0.75rem;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+  cursor: pointer;
+  border-right: 1px solid var(--border);
+}
+
+.feedback-kind label:last-of-type {
+  border-right: none;
+}
+
+.feedback-kind input {
+  accent-color: var(--gold);
+}
+
+.feedback-kind label:has(input:checked) {
+  color: var(--gold-text);
+  text-shadow: var(--gold-type-shadow);
+  background: color-mix(in srgb, var(--gold) 10%, transparent);
+}
+
+.feedback-message-label {
+  display: block;
+  margin: 0 0 0.4rem;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+.feedback-dialog textarea {
+  display: block;
+  width: 100%;
+  min-height: 8.5rem;
+  margin: 0 0 1.1rem;
+  padding: 0.7rem 0.8rem;
+  resize: vertical;
+  font-family: var(--font);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-control);
+}
+
+.feedback-dialog textarea::placeholder {
+  color: color-mix(in srgb, var(--muted) 80%, transparent);
+}
+
+.feedback-dialog textarea:focus-visible {
+  outline: none;
+  border-color: color-mix(in srgb, var(--theme-accent) 70%, var(--border));
+}
+
+.feedback-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+}
+
+.feedback-hint {
+  margin: 0.85rem 0 0;
+  font-size: 0.68rem;
+  color: var(--muted);
+  letter-spacing: 0.04em;
+}
+
+@media (max-height: 700px) {
+  .feedback-dialog textarea {
+    min-height: 5.5rem;
+  }
 }
 
 .footer-meta {
@@ -5168,7 +5283,7 @@ body.play-2hh-immersive .play-ctas {
   }
 
   .hero-pillar {
-    padding: 0.3rem 0.1rem 0.4rem;
+    padding: clamp(1.25rem, 0.8rem + 2vw, 1.85rem) 0.1rem 0.4rem;
   }
 
   .hero-photo-stack {
@@ -5270,6 +5385,12 @@ body.play-2hh-immersive .play-ctas {
   .command-nav a {
     padding: 0.45rem 0.55rem;
     font-size: 0.74rem;
+    min-height: 44px;
+  }
+
+  .theme-pip {
+    width: 44px;
+    height: 44px;
   }
 
   .tab-panel {
@@ -5380,10 +5501,21 @@ body.play-2hh-immersive .play-ctas {
   }
 }
 
+/* Phone nav — shorten labels before the brand wraps (real phones are ~375–430) */
+@media (max-width: 430px) {
+  .command-nav .nav-label-full {
+    display: none;
+  }
+
+  .command-nav .nav-label-short {
+    display: inline;
+  }
+}
+
 /* Very narrow phones */
 @media (max-width: 359px) {
   :root {
-    --header-h: 52px;
+    --header-h: 56px;
     --pad-x: 0.7rem;
     --section-y: clamp(2.25rem, 7vw, 3.5rem);
   }
@@ -5392,17 +5524,10 @@ body.play-2hh-immersive .play-ctas {
     font-size: 0.78rem;
   }
 
-  .command-nav .nav-label-full {
-    display: none;
-  }
-
-  .command-nav .nav-label-short {
-    display: inline;
-  }
-
   .command-nav a {
     padding: 0.5rem 0.5rem;
     font-size: 0.68rem;
+    min-height: 44px;
   }
 
   .btn {
@@ -5425,7 +5550,7 @@ body.play-2hh-immersive .play-ctas {
 
 @media (max-width: 900px) {
   :root {
-    --header-h: 52px;
+    --header-h: 56px;
   }
 
   .site-header {
@@ -5546,7 +5671,9 @@ body.play-2hh-immersive .play-ctas {
   }
 
   .hero-pillar {
-    padding: 0.25rem 0.1rem 0.35rem;
+    padding-top: 0.75rem;
+    padding-right: 0.1rem;
+    padding-left: 0.1rem;
   }
 
   .pillar-body {
@@ -5572,7 +5699,13 @@ body.play-2hh-immersive .play-ctas {
   }
 
   .hero-emblem-slot {
-    min-height: 3rem;
+    min-height: 0;
+    height: 0;
+    overflow: hidden;
+  }
+
+  .hero-cta {
+    margin-top: 0.15rem;
   }
 
   .hero-emblem img {
@@ -5693,6 +5826,106 @@ body.play-2hh-immersive .play-ctas {
     opacity: 0 !important;
   }
 }
+/* Legal pages — 2 Hand Hold'em iOS app (no WebGL, readable for App Store review) */
+body[data-page="legal"] {
+  background: var(--bg);
+}
+
+.legal-page {
+  max-width: 42rem;
+  margin: 0 auto;
+  padding: var(--section-y) var(--pad-x) 4rem;
+}
+
+.legal-kicker {
+  margin: 0 0 0.75rem;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--gold-text);
+  text-shadow: var(--gold-type-shadow);
+}
+
+.legal-page h1 {
+  margin: 0 0 0.85rem;
+  font-family: var(--font-display);
+  font-size: clamp(1.65rem, 4vw, 2.15rem);
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--text);
+}
+
+.legal-meta {
+  margin: 0 0 1.75rem;
+  padding-bottom: 1.1rem;
+  border-bottom: 1px solid var(--border);
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.legal-doc {
+  border-left: 2px solid color-mix(in srgb, var(--gold) 45%, transparent);
+  padding-left: clamp(1.1rem, 2.8vw, 1.75rem);
+}
+
+.legal-doc h2 {
+  margin: 1.75rem 0 0.5rem;
+  font-family: var(--font-display);
+  font-size: 1.12rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.legal-doc h2:first-child {
+  margin-top: 0;
+}
+
+.legal-doc p,
+.legal-doc ul,
+.legal-doc ol {
+  margin: 0 0 0.95rem;
+  color: color-mix(in srgb, var(--text) 90%, var(--muted));
+  font-size: clamp(0.95rem, 1.5vw, 1.02rem);
+  line-height: 1.7;
+  max-width: 62ch;
+}
+
+.legal-doc ul,
+.legal-doc ol {
+  padding-left: 1.25rem;
+}
+
+.legal-doc li ul,
+.legal-doc li ol {
+  margin: 0.35rem 0 0.5rem;
+}
+
+.legal-doc li {
+  margin: 0.35rem 0;
+}
+
+.legal-doc a {
+  color: var(--gold-text);
+}
+
+.legal-doc a:hover {
+  color: var(--gold);
+}
+
+.legal-siblings {
+  margin: 2.25rem 0 0;
+  padding-top: 1.1rem;
+  border-top: 1px solid var(--border);
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
 @media print {
   #webgl-bg,
   #section-indicator,

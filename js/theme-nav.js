@@ -124,9 +124,19 @@ function resolveSectionBg(section) {
   return section.dataset.bg || "starcraft";
 }
 
+function isFinePointer() {
+  return typeof matchMedia === "undefined"
+    ? true
+    : matchMedia("(hover: hover) and (pointer: fine)").matches;
+}
+
 function syncThemePips(panel, index) {
-  panel.querySelectorAll(".theme-pip").forEach((pip, i) => {
-    pip.classList.toggle("is-active", i === index);
+  panel.querySelectorAll(".theme-pip").forEach((pip) => {
+    const on = Number(pip.dataset.pip) === index;
+    pip.classList.toggle("is-active", on);
+    if (pip.hasAttribute("aria-pressed")) {
+      pip.setAttribute("aria-pressed", on ? "true" : "false");
+    }
   });
 }
 
@@ -159,10 +169,19 @@ function setupGamePanelThemes() {
       applyVariant(current + 1);
     }
 
+    const pips = panel.querySelector(".theme-pips");
+    pips?.addEventListener("click", (e) => {
+      const pip = e.target.closest("[data-pip]");
+      if (!pip || !pips.contains(pip)) return;
+      e.stopPropagation();
+      const idx = Number(pip.dataset.pip);
+      if (Number.isFinite(idx)) applyVariant(idx);
+    });
+
     panel.addEventListener("click", (e) => {
-      if (e.target.closest("a, button, input, textarea, select")) return;
-      /* Card canvases capture their own input */
-      if (e.target.closest("canvas")) return;
+      if (e.target.closest("a, button, input, textarea, select, canvas, .theme-pips")) return;
+      /* Phone: reading the panel must not swap Unsplash. Desktop click-to-cycle stays. */
+      if (!isFinePointer()) return;
       cycleVariant();
     });
 
@@ -193,7 +212,7 @@ const SECTION_LABELS = {
   innovation: "Table Game Inventions",
   play: "Play 2 Hand Hold'em",
   locate: "Find 2HH Tables",
-  contact: "Comms",
+  contact: "Contact",
 };
 const indicatorLabel = document.querySelector("#section-indicator .si-label");
 
@@ -664,7 +683,8 @@ document.querySelectorAll('a[href^="#"]').forEach((a) => {
 });
 
 window.addEventListener("keydown", (e) => {
-  if (e.target.matches("input, textarea, [contenteditable]")) return;
+  if (e.target.matches("input, textarea, [contenteditable], select")) return;
+  if (document.querySelector("dialog[open]")) return;
   const link = navLinks.find((a) => a.dataset.hotkey === e.key);
   if (link) {
     e.preventDefault();
@@ -722,7 +742,8 @@ window.addEventListener("keydown", (e) => {
   });
 
   window.addEventListener("keydown", (e) => {
-    if (e.target.matches("input, textarea, [contenteditable]")) return;
+    if (e.target.matches("input, textarea, [contenteditable], select")) return;
+    if (document.getElementById("feedback-dialog")?.open) return;
 
     if (e.key === "?" || (e.key === "/" && e.shiftKey)) {
       e.preventDefault();

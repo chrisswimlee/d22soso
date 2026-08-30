@@ -2,13 +2,13 @@
 
 Source: `D22-soso inventor and Author.pdf` (2026). Public copy for the casino IP and author sections. House-edge figures and licensing rates remain first-party / confidential unless this document states them.
 
-Bringing the same mathematical precision, tactical depth, and adrenaline that defined his RTS and Magic: The Gathering careers, Wayne Chiang transitioned into casino game design, securing multiple U.S. patents for proprietary table games.
+Wayne Chiang designs casino table games and holds multiple U.S. patents. The site copy stays in this file so later edits do not re-infect the page with press-release English.
 
 ## 1. 2 Hand Holdem™
 
 **Twice the Action. Twice the Fun.**
 
-In 2015, Chiang redefined casino Texas Hold’em by giving players dual agency—managing two hands simultaneously against a single dealer board without slowing down pit operations due to simultaneous play.
+Two hands, one board. You play both against a single dealer flop — without slowing the pit.
 
 - **Intellectual Property:** Protected by U.S. Patent Nos. 11,117,045, 11,731,032, and 12,005,342 (Assignee: 2 HH, LLC).
 - **Live Demo:** [play2hh.com](https://play2hh.com)
@@ -41,7 +41,7 @@ In 2015, Chiang redefined casino Texas Hold’em by giving players dual agency�
 
 **The Baby Rainbow.**
 
-Badugi Chase™ bridges the gap between classic draw poker and high-speed casino table games. Designed alongside co-inventor Charles Chang, it introduces The Chase—a communal draft moment of pure tension where a single choice changes the hand.
+Three cards, then The Chase: pick one community card to finish a four-card Badugi. Charles Chang, co-inventor.
 
 - **Intellectual Property:** Protected by U.S. Patent Nos. 11,810,421, 12,131,608, and U.S. Patent Application 2023/0419777 (Assignee: 2 HH, LLC).
 
@@ -72,15 +72,7 @@ Badugi Chase™ bridges the gap between classic draw poker and high-speed casino
 
 ## Author & Publication: Betting On Yourself
 
-What if the skills you’ve been sharpening under pressure—through daily grind, hard work, and setbacks—were preparing you for something greater?
-
-In *Betting On Yourself: Winning in Business, Poker, and AI*, Joe Matton (a Fortune 500 executive turned WSOP champion) collaborates with Wayne “D22-soso” Chiang (a pioneer in esports and poker) to uncover the overlooked links between business, poker, and artificial intelligence. Together, they explore how effective risk-taking, solid decision-making, and core leadership principles can empower you to excel in uncertain times.
-
-### Key Themes
-
-- **Navigating AI Transformation:** Cultivate the ability to think clearly under pressure, discern subtle nuances, and act decisively in a fast-changing world.
-- **Strategic Growth:** Drive personal and professional growth through high-stakes risk management and strategic decision frameworks.
-- **Embracing Change:** Turn crossroads, pivots, and rebuilds into opportunities to lead with purpose, courage, clarity, and integrity.
+*Betting On Yourself: Winning in Business, Poker, and AI* — Joe Matton and Wayne “D22-soso” Chiang on risk and decisions across business and poker. Kendall Hunt, December 2025. ISBN 9798319708007.
 
 > Because the most important bet you’ll ever make… is on you.
 
