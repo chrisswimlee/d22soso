@@ -41,7 +41,7 @@
   <main id="main" class="legal-page" tabindex="-1">
     <p class="legal-kicker">2 Hand Hold'em · iOS app</p>
     <h1>Privacy Policy</h1>
-    <p class="legal-meta">Last updated: August 26, 2026</p>
+    <p class="legal-meta">Last updated: September 1, 2026</p>
 
     <article class="legal-doc">
       <p>2 Hand Hold'em ("we," "our," or "the app") is committed to protecting your privacy. This policy describes what data the app collects and how it is used.</p>
@@ -50,7 +50,7 @@
       <p>The app stores the following data locally on your device:</p>
       <ul>
         <li><strong>Chip balance</strong> — Stored securely in the iOS Keychain so it persists across app launches and reinstalls.</li>
-        <li><strong>In-app purchase transaction IDs</strong> — Stored in the Keychain to prevent duplicate chip delivery.</li>
+        <li><strong>In-app purchase transaction IDs</strong> — Stored in the Keychain to prevent duplicate chip delivery. The same IDs (and product IDs, not unsigned chip totals) may sync through iCloud so a purchase on one device is not dropped on another.</li>
         <li><strong>Preferences</strong> — Theme, soundtrack choice, bet size, mute setting, replay capture consent, and Terms of Service acceptance are stored using iOS UserDefaults.</li>
         <li><strong>Daily bonus eligibility</strong> — The calendar day you last claimed the daily bonus is stored in the Keychain (migrated from UserDefaults in older builds).</li>
         <li><strong>Replay capture consent</strong> — Whether you have enabled the optional "Share Last Hand" feature (ReplayKit) is stored locally.</li>
@@ -59,7 +59,7 @@
       <p>None of this data is transmitted to our servers or third parties except as described below.</p>
 
       <h2>iCloud Sync (Optional)</h2>
-      <p>If you are signed in to iCloud, the app may sync your chip balance and progression (including SapphirES, seasons, XP, and challenge progress) using Apple's CloudKit <strong>private</strong> database for your Apple ID. This data stays in your iCloud account; we do not operate a custom backend that reads it. You can disable iCloud for this app in iOS Settings. Sync is best-effort and is skipped when CloudKit is unavailable for the build.</p>
+      <p>If you are signed in to iCloud, the app may sync your chip balance and progression (including SapphirES, seasons, XP, challenge progress, IAP transaction IDs, and unique grant records such as welcome / daily / Daily Split / bust / ad rewards) using Apple's CloudKit <strong>private</strong> database for your Apple ID. This data stays in your iCloud account; we do not operate a custom backend that reads it. You can disable iCloud for this app in iOS Settings. Sync is best-effort and is skipped when CloudKit is unavailable for the build.</p>
 
       <h2>Optional Replay Capture (Share Last Hand)</h2>
       <p>If you tap Share on the table, the app uses Apple's ReplayKit to keep a short rolling buffer of gameplay (about 15 seconds) on your device so you can export a clip. Screen recording is not started when you open the app or tap Play. Nothing is shared unless you explicitly export a clip. You can stop an in-progress recording in Settings.</p>
@@ -78,13 +78,16 @@
       <p>The app uses Apple's built-in diagnostic tools (e.g., MetricKit) for crash and performance monitoring. No personally identifiable information is collected.</p>
 
       <h2>Children</h2>
-      <p>The app is not directed at children under 13. We do not knowingly collect data from children.</p>
+      <p>The app is not directed at children under 13. We do not knowingly collect data from children. The recommended store age rating is 12+ simulated gambling.</p>
 
       <h2>Changes</h2>
       <p>We may update this policy from time to time. The "Last updated" date at the top indicates when it was last revised.</p>
 
       <h2>Contact</h2>
-      <p>Questions: <a href="../../index.html#contact">d22soso.com/#contact</a>, or Support &amp; Contact in the app Settings.</p>
+      <p>For questions about this privacy policy, contact <a href="mailto:2handholdem@gmail.com">2handholdem@gmail.com</a> or use the support URL listed in App Store Connect. You can also reach us at <a href="../../index.html#contact">d22soso.com/#contact</a> or via Support &amp; Contact in the app Settings.</p>
+
+      <h2>Local notifications</h2>
+      <p>If you enable reminders in Settings, the app schedules an on-device daily-bonus notification. No push token is sent to our servers.</p>
     </article>
 
     <p class="legal-siblings">
