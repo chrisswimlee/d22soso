@@ -19,7 +19,7 @@ Then visit [http://localhost:8080](http://localhost:8080).
 | `index.html` | Page structure, import map (Three.js + GSAP → `vendor/`) |
 | `app/privacy/` | 2 Hand Hold'em iOS Privacy Policy (`https://d22soso.com/app/privacy/`) |
 | `app/terms/` | 2 Hand Hold'em iOS Terms of Service (`https://d22soso.com/app/terms/`) |
-| `app/terms.pdf` | Official TOS PDF (July 19, 2026) |
+| `app/terms.pdf` | Official TOS PDF (September 1, 2026) |
 | `TERMS OF SERVICE_ 2 HAND HOLDEM.pdf` | Source PDF for the app Terms |
 | `vendor/` | Self-hosted ESM builds of Three.js + GSAP |
 | `style.css` | Brood War shell + per-tab themes |
