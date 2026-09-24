@@ -65,6 +65,25 @@ function syncThemeColor() {
 syncThemeColor();
 
 let bgSwitchToken = 0;
+let sceneFlashTimer = 0;
+let sceneLandTimer = 0;
+
+function markSceneCrossing() {
+  if (reduced) return;
+  const root = document.documentElement;
+  if (root.classList.contains("is-intro-pending") || root.hasAttribute("data-intro")) return;
+  root.setAttribute("data-scene", "crossing");
+  if (sceneFlashTimer) clearTimeout(sceneFlashTimer);
+  if (sceneLandTimer) clearTimeout(sceneLandTimer);
+  sceneFlashTimer = window.setTimeout(() => {
+    root.setAttribute("data-scene", "landed");
+    sceneLandTimer = window.setTimeout(() => {
+      if (root.getAttribute("data-scene") === "landed") root.removeAttribute("data-scene");
+      sceneLandTimer = 0;
+    }, 720);
+    sceneFlashTimer = 0;
+  }, 380);
+}
 
 function setSceneBg(bgKey, themeKey) {
   const bg = bgKey || "starcraft";
@@ -84,6 +103,7 @@ function setSceneBg(bgKey, themeKey) {
         layer.classList.toggle("is-active", on);
         if (on) layer.classList.add("is-primed");
       });
+      markSceneCrossing();
     };
 
     /* One paint frame after priming avoids empty→image flash on mobile */
@@ -124,12 +144,6 @@ function resolveSectionBg(section) {
   return section.dataset.bg || "starcraft";
 }
 
-function isFinePointer() {
-  return typeof matchMedia === "undefined"
-    ? true
-    : matchMedia("(hover: hover) and (pointer: fine)").matches;
-}
-
 function syncThemePips(panel, index) {
   panel.querySelectorAll(".theme-pip").forEach((pip) => {
     const on = Number(pip.dataset.pip) === index;
@@ -162,6 +176,9 @@ function setupGamePanelThemes() {
       claimSceneSection(section);
       setIndicatorLabel(section.id);
       setSceneBg(key, key);
+      if (!reduced) {
+        import("./motion.js").then((m) => m.themeBeat?.(panel, base));
+      }
     }
 
     function cycleVariant() {
@@ -178,14 +195,8 @@ function setupGamePanelThemes() {
       if (Number.isFinite(idx)) applyVariant(idx);
     });
 
-    panel.addEventListener("click", (e) => {
-      if (e.target.closest("a, button, input, textarea, select, canvas, .theme-pips")) return;
-      /* Phone: reading the panel must not swap Unsplash. Desktop click-to-cycle stays. */
-      if (!isFinePointer()) return;
-      cycleVariant();
-    });
-
     panel.addEventListener("keydown", (e) => {
+      if (e.target.closest(".theme-pips, button")) return;
       if (e.key !== "Enter" && e.key !== " ") return;
       e.preventDefault();
       cycleVariant();
@@ -240,7 +251,7 @@ function setIndicatorLabel(sectionId) {
     indicatorLabel.textContent = next;
     indicatorLabel.classList.remove("is-swapping");
     indicatorFadeTimer = 0;
-  }, 120);
+  }, 160);
 }
 
 function applySectionScene(section) {
@@ -268,6 +279,19 @@ function applySectionScene(section) {
   }
 }
 
+function retriggerListStagger(panel) {
+  if (!panel || panel.hidden || reduced) return;
+  const r = panel.getBoundingClientRect();
+  const vh = window.innerHeight || 0;
+  if (r.bottom < 40 || r.top > vh - 40) {
+    panel.classList.remove("is-list-stagger");
+    return;
+  }
+  panel.classList.remove("is-list-stagger");
+  void panel.offsetWidth;
+  panel.classList.add("is-list-stagger");
+}
+
 /* Tabs */
 function setupTabs(root) {
   const tablist = root.querySelector('[role="tablist"]');
@@ -275,6 +299,7 @@ function setupTabs(root) {
   const tabs = [...tablist.querySelectorAll('[role="tab"]')];
   const panels = tabs.map((t) => document.getElementById(t.getAttribute("aria-controls"))).filter(Boolean);
   const hostSection = root.closest("section[data-node]");
+  let tabArmed = false;
 
   function activate(tab, focus) {
     tabs.forEach((t) => {
@@ -285,6 +310,7 @@ function setupTabs(root) {
     panels.forEach((p) => {
       const on = p.id === tab.getAttribute("aria-controls");
       p.hidden = !on;
+      if (!on) p.classList.remove("is-list-stagger");
     });
     const theme = tab.dataset.theme;
     if (theme && hostSection) {
@@ -298,7 +324,32 @@ function setupTabs(root) {
       syncThemeColor();
     }
     if (focus) tab.focus();
+    const shown = panels.find((p) => !p.hidden);
+    if (shown) {
+      requestAnimationFrame(() => retriggerListStagger(shown));
+      if (!reduced && tabArmed) {
+        shown.classList.remove("is-tab-landed");
+        void shown.offsetWidth;
+        shown.classList.add("is-tab-landed");
+        window.setTimeout(() => shown.classList.remove("is-tab-landed"), 780);
+      }
+    }
+    tabArmed = true;
   }
+
+  panels.forEach((panel) => {
+    if (typeof IntersectionObserver === "undefined") return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (panel.hidden) return;
+        if (entries.some((e) => e.isIntersecting) && !panel.classList.contains("is-list-stagger")) {
+          retriggerListStagger(panel);
+        }
+      },
+      { threshold: 0.12 }
+    );
+    io.observe(panel);
+  });
 
   tabs.forEach((tab) => {
     tab.addEventListener("click", () => activate(tab, false));
@@ -322,34 +373,10 @@ function setupTabs(root) {
 
 document.querySelectorAll("[data-tabs]").forEach(setupTabs);
 
-/* Hotkeys 1-5 nav, R roll — clicks use the same scroll path */
+/* Hotkeys 1–5 (home) / 1–6 (archive) — clicks use the same scroll path */
 const navLinks = [...document.querySelectorAll(".command-nav a[data-hotkey]")];
 const brandLink = document.querySelector(".brand[href]");
 const commandNav = document.querySelector(".command-nav");
-const esportsCluster = document.querySelector("[data-esports-expand]");
-const esportsRootSlot = esportsCluster?.querySelector(".nav-esports-root-slot") || null;
-const esportsRoot = esportsCluster?.querySelector(".nav-esports-root") || null;
-const esportsGames = esportsCluster?.querySelector(".nav-esports-games") || null;
-const esportsGamesTrack =
-  esportsCluster?.querySelector(".nav-esports-games-track") || null;
-const gamesLinks = esportsGames ? [...esportsGames.querySelectorAll("a[href]")] : [];
-const siteHeader = document.querySelector(".site-header");
-let esportsExpandRaf = 0;
-let esportsExpanded = false;
-let cachedEsportsRootW = 96;
-let cachedEsportsGamesW = 280;
-
-function measureHeaderHeight() {
-  if (!siteHeader) return 64;
-  const h = Math.ceil(siteHeader.getBoundingClientRect().height);
-  if (h > 0) {
-    document.documentElement.style.setProperty("--header-h", h + "px");
-    return h;
-  }
-  return (
-    parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--header-h")) || 64
-  );
-}
 
 function scrollNavChipIntoView(link) {
   if (!commandNav || !link || !commandNav.contains(link)) return;
@@ -376,121 +403,10 @@ function resolvePrimaryNavId(sectionId) {
   return sectionId;
 }
 
-function isGamesSection(sectionId) {
-  /* Theater chips live on gaming.html. Home ESPORTS stays a single item. */
-  return (
-    sectionId === "gaming-archive" ||
-    (!!sectionId && sectionId.startsWith("game-"))
-  );
-}
-
 function hrefHashId(href) {
   if (!href) return "";
   const i = href.indexOf("#");
   return i >= 0 ? href.slice(i + 1) : "";
-}
-
-function refreshEsportsWidthCache(opts) {
-  const measureRoot = !opts || opts.root !== false;
-  const measureGames = !opts || opts.games !== false;
-  if (measureRoot && esportsRoot) {
-    cachedEsportsRootW = Math.max(2, Math.ceil(esportsRoot.scrollWidth) + 2);
-  }
-  if (measureGames && esportsGamesTrack) {
-    cachedEsportsGamesW = Math.max(2, Math.ceil(esportsGamesTrack.scrollWidth) + 2);
-  }
-  return { rootW: cachedEsportsRootW, gamesW: cachedEsportsGamesW };
-}
-
-function applyEsportsWidths(inGames, animate) {
-  if (!esportsRootSlot || !esportsGames) return;
-  const rootW = cachedEsportsRootW;
-  const gamesW = cachedEsportsGamesW;
-
-  if (!animate || reduced) {
-    esportsRootSlot.style.maxWidth = inGames ? "0px" : rootW + "px";
-    esportsGames.style.maxWidth = inGames ? gamesW + "px" : "0px";
-    return;
-  }
-
-  if (esportsExpandRaf) cancelAnimationFrame(esportsExpandRaf);
-
-  if (inGames) {
-    /* Start from open root / closed games, then ease to the reverse */
-    esportsRootSlot.style.maxWidth = rootW + "px";
-    esportsGames.style.maxWidth = "0px";
-    esportsExpandRaf = requestAnimationFrame(() => {
-      esportsExpandRaf = requestAnimationFrame(() => {
-        esportsExpandRaf = 0;
-        esportsRootSlot.style.maxWidth = "0px";
-        esportsGames.style.maxWidth = gamesW + "px";
-      });
-    });
-  } else {
-    /* Pin open games width first so max-width can ease open→0 */
-    esportsGames.style.maxWidth = gamesW + "px";
-    esportsRootSlot.style.maxWidth = "0px";
-    esportsExpandRaf = requestAnimationFrame(() => {
-      esportsExpandRaf = requestAnimationFrame(() => {
-        esportsExpandRaf = 0;
-        esportsGames.style.maxWidth = "0px";
-        esportsRootSlot.style.maxWidth = rootW + "px";
-      });
-    });
-  }
-}
-
-function syncEsportsExpand(sectionId) {
-  const inGames = isGamesSection(sectionId);
-  const stateChanged = inGames !== esportsExpanded;
-
-  if (stateChanged) {
-    if (inGames) {
-      /* Still showing ESPORTS — cache its width before clipping it shut */
-      refreshEsportsWidthCache({ root: true, games: true });
-    } else {
-      /* Still showing games — cache track width before clipping; keep root cache */
-      refreshEsportsWidthCache({ root: false, games: true });
-    }
-  }
-
-  if (esportsCluster) {
-    esportsCluster.classList.toggle("is-expanded", inGames);
-  }
-  if (esportsRoot) {
-    esportsRoot.toggleAttribute("inert", inGames);
-    esportsRoot.setAttribute("aria-hidden", inGames ? "true" : "false");
-  }
-  if (esportsGames) {
-    esportsGames.setAttribute("aria-hidden", inGames ? "false" : "true");
-    esportsGames.toggleAttribute("inert", !inGames);
-  }
-
-  if (stateChanged) {
-    esportsExpanded = inGames;
-    applyEsportsWidths(inGames, true);
-  }
-
-  let activeGameLink = null;
-  gamesLinks.forEach((a) => {
-    const id = hrefHashId(a.getAttribute("href") || "");
-    const on = inGames && sectionId === id;
-    a.classList.toggle("is-active", on);
-    if (on) {
-      a.setAttribute("aria-current", "true");
-      activeGameLink = a;
-    } else {
-      a.removeAttribute("aria-current");
-    }
-  });
-  if (activeGameLink) scrollNavChipIntoView(activeGameLink);
-}
-
-/* First paint: lock ESPORTS slot to its real width so collapse has a from-value */
-if (esportsRootSlot && esportsGames) {
-  const { rootW } = refreshEsportsWidthCache();
-  esportsRootSlot.style.maxWidth = rootW + "px";
-  esportsGames.style.maxWidth = "0px";
 }
 
 function markActiveNav(sectionId) {
@@ -511,7 +427,7 @@ function markActiveNav(sectionId) {
       /* Flat theater chips on gaming.html — highlight by section id */
       on = !!(sectionId && hashId === sectionId);
     } else {
-      /* Home: highlight ESPORTS while in StarCraft / command; never expand */
+      /* Home: highlight ESPORTS while in StarCraft / command */
       on = !!(navId && href === "#" + navId);
     }
     a.classList.toggle("is-active", on);
@@ -524,7 +440,6 @@ function markActiveNav(sectionId) {
     }
   });
   if (activePrimary) scrollNavChipIntoView(activePrimary);
-  if (!flatGamingNav && esportsCluster) syncEsportsExpand(sectionId);
 }
 
 function endNavLock() {
@@ -624,7 +539,7 @@ function goToHash(href, pulseEl, opts) {
 
   if (pulseEl) {
     pulseEl.classList.add("pulse");
-    setTimeout(() => pulseEl.classList.remove("pulse"), 260);
+    setTimeout(() => pulseEl.classList.remove("pulse"), 360);
     scrollNavChipIntoView(pulseEl);
   }
 
@@ -656,9 +571,6 @@ navLinks.forEach((a) => {
   a.addEventListener("click", onNavActivate);
 });
 brandLink?.addEventListener("click", onNavActivate);
-gamesLinks.forEach((a) => {
-  a.addEventListener("click", onNavActivate);
-});
 
 /* Start the menu at hotkey 1 — flex overflow can leave first chip scrolled out of view */
 if (commandNav) {

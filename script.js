@@ -1,10 +1,12 @@
-/* Orchestration: chrome, motion, widgets. Three.js boots idle / on-viewport. */
+/* Orchestration: chrome, motion, widgets. Intro owns first-visit WebGL timing. */
 import { initThemeNav } from "./js/theme-nav.js";
 import { initMotion } from "./js/motion.js";
 import { initWidgets } from "./js/widgets.js";
-import { startWebGL } from "./js/webgl-boot.js";
+import { initFlair } from "./js/flair.js";
+import { initIntro } from "./js/intro.js";
 
 initThemeNav();
 initMotion();
 initWidgets();
-startWebGL();
+initFlair();
+initIntro();

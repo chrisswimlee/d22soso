@@ -4,7 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#0a0a0a" />
-  <meta name="d22soso-version" content="2026.08.28" />
+  <meta name="d22soso-version" content="2026.09.10" />
+  <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <title>Wayne "D22-soso" Chiang — StarCraft Brood War World Champion</title>
@@ -21,6 +22,7 @@
   <meta name="twitter:title" content="Wayne &quot;D22-soso&quot; Chiang — StarCraft Brood War World Champion" />
   <meta name="twitter:description" content="First official StarCraft: Brood War Season 1 World Champion (Random). Cube Draft pioneer. Patented casino game inventor. WSOP Talent Manager." />
   <meta name="twitter:image" content="https://d22soso.com/assets/img/champ-trophy-1080.jpg" />
+  <meta name="twitter:image:alt" content="Wayne D22-soso Chiang with StarCraft Brood War world championship trophy" />
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -44,7 +46,37 @@
   <style>
     /* Paints the hero void on the very first frame, before style.css lands */
     html { background: #0a0a0a; color-scheme: dark; }
+    html.is-intro-pending,
+    html.is-intro-pending body { overflow: hidden !important; }
+    html.is-intro-pending .hero-photo-stack { opacity: 0; }
+    html.is-intro-pending:not([data-intro]) .hero-gate,
+    html.is-intro-pending .site-header,
+    html.is-intro-pending .scroll-progress,
+    html.is-intro-pending #section-indicator {
+      visibility: hidden !important;
+      pointer-events: none !important;
+    }
   </style>
+  <script>
+    (function () {
+      try {
+        var reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+        var played = false;
+        try { played = sessionStorage.getItem("d22-intro-played") === "1"; } catch (e) {}
+        var replay = false;
+        try { replay = new URLSearchParams(location.search).get("intro") === "1"; } catch (e) {}
+        var hash = location.hash || "";
+        var deep = hash !== "" && hash !== "#" && hash !== "#hero";
+        if (!reduce && (!played || replay) && !deep) document.documentElement.classList.add("is-intro-pending");
+      } catch (e) {}
+      setTimeout(function () {
+        var r = document.documentElement;
+        if (r.classList.contains("is-intro-pending") && !r.hasAttribute("data-intro")) {
+          r.classList.remove("is-intro-pending");
+        }
+      }, 10000);
+    })();
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png" />
@@ -52,6 +84,7 @@
   <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" />
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
   <noscript><link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" /></noscript>
+  <noscript><style>html.is-intro-pending .hero-gate, html.is-intro-pending .hero-photo-stack, html.is-intro-pending .hero-lockup, html.is-intro-pending .site-header { visibility: visible !important; pointer-events: auto !important; opacity: 1 !important; } html.is-intro-pending, html.is-intro-pending body { overflow: visible !important; } #intro-stage { display: none !important; }</style></noscript>
   <script type="importmap">
   {
     "imports": {
@@ -68,8 +101,11 @@
   <link rel="modulepreload" href="js/theme-nav.js" />
   <link rel="modulepreload" href="js/motion.js" />
   <link rel="modulepreload" href="js/widgets.js" />
+  <link rel="modulepreload" href="js/flair.js" />
   <link rel="modulepreload" href="js/locate-map.js" />
   <link rel="modulepreload" href="js/webgl-boot.js" />
+  <link rel="modulepreload" href="./vendor/three/three.module.js" />
+  <link rel="modulepreload" href="js/intro.js" />
 </head>
 <body data-theme="hero" data-bg="hero">
   <a class="skip-link" href="#main">Skip to content</a>
@@ -80,24 +116,16 @@
     <div class="bg-layer" data-bg="starcraft-v2"></div>
     <div class="bg-layer" data-bg="starcraft-v3"></div>
     <div class="bg-layer" data-bg="about"></div>
-    <div class="bg-layer" data-bg="cnc"></div>
-    <div class="bg-layer" data-bg="cnc-v2"></div>
-    <div class="bg-layer" data-bg="cnc-v3"></div>
-    <div class="bg-layer" data-bg="warcraft"></div>
-    <div class="bg-layer" data-bg="warcraft-v2"></div>
-    <div class="bg-layer" data-bg="warcraft-v3"></div>
-    <div class="bg-layer" data-bg="mtg"></div>
-    <div class="bg-layer" data-bg="mtg-v2"></div>
-    <div class="bg-layer" data-bg="mtg-v3"></div>
-    <div class="bg-layer" data-bg="hearthstone"></div>
-    <div class="bg-layer" data-bg="hearthstone-v2"></div>
-    <div class="bg-layer" data-bg="hearthstone-v3"></div>
     <div class="bg-layer" data-bg="poker"></div>
     <div class="bg-layer" data-bg="book"></div>
     <div class="bg-layer" data-bg="2hh"></div>
     <div class="bg-layer" data-bg="badugi"></div>
     <div class="bg-layer" data-bg="contact"></div>
     <canvas id="webgl-bg" aria-hidden="true"></canvas>
+    <div id="scene-flash" aria-hidden="true"></div>
+  </div>
+  <div id="intro-stage" hidden>
+    <button type="button" class="intro-skip mono" hidden aria-label="Skip intro">Skip</button>
   </div>
   <div class="scroll-progress" aria-hidden="true"><span class="scroll-progress-bar"></span></div>
   <div id="section-indicator" class="section-indicator" aria-live="polite">
@@ -178,10 +206,10 @@
   </header>
 
   <main id="main" tabindex="-1">
-    <!-- HERO — Pillar Triptych: brand lockup + restrained pillars; photo-led -->
-    <section id="hero" class="section hero" data-node="hero" data-bg="hero" data-hero-active="champ">
-      <div class="hero-photo-stack" data-hero-active="champ" aria-hidden="true">
-        <picture class="hero-photo is-active" data-hero-scene="champ">
+    <!-- HERO — name + proof + trio over the championship photo; sky is chrome -->
+    <section id="hero" class="section hero" data-node="hero" data-bg="hero">
+      <div class="hero-photo-stack sky-part" data-sky-part="card" aria-hidden="true">
+        <picture class="hero-photo is-active" data-hero-scene="starcraft">
           <source
             type="image/avif"
             srcset="assets/img/champ-trophy-640.avif 640w, assets/img/champ-trophy-1080.avif 1080w, assets/img/champ-trophy-1600.avif 1600w, assets/img/champ-trophy-2200.avif 2200w"
@@ -201,47 +229,56 @@
             decoding="async"
           />
         </picture>
+        <picture class="hero-photo hero-photo--logo" data-hero-scene="poker">
+          <source type="image/avif" srcset="assets/img/wsop-logo-600.avif?v=2" />
+          <source type="image/webp" srcset="assets/img/wsop-logo-600.webp?v=2" />
+          <img
+            src="assets/img/wsop-logo-600.png?v=2"
+            alt=""
+            width="600"
+            height="600"
+            loading="lazy"
+            decoding="async"
+          />
+        </picture>
+        <picture class="hero-photo hero-photo--logo" data-hero-scene="2hh">
+          <source type="image/avif" srcset="assets/img/twohh-logo-500.avif" />
+          <source type="image/webp" srcset="assets/img/twohh-logo-500.webp" />
+          <img
+            src="assets/img/twohh-logo-500.png"
+            alt=""
+            width="500"
+            height="433"
+            loading="lazy"
+            decoding="async"
+          />
+        </picture>
       </div>
       <div class="hero-scrim" aria-hidden="true"></div>
+      <div class="hero-orbit" aria-hidden="true">
+        <i></i><i></i><i></i><i></i><i></i>
+      </div>
       <div class="hero-gate is-inview" data-reveal="stagger">
-        <p class="hero-brand mono reveal-item">
-          <span class="hero-brand-mark" aria-hidden="true">D22</span>
-          <span class="hero-brand-text">D22-soso</span>
-        </p>
+        <div class="hero-lockup sky-part" data-sky-part="lockup">
         <h1 class="hero-name reveal-item">Wayne Chiang</h1>
-        <p class="hero-proof mono reveal-item">1999 Brood War World Champion · WSOP Talent Manager</p>
-        <div class="hero-emblem-slot" aria-hidden="true">
-          <picture class="hero-emblem" data-hero-scene="wsop">
-            <source type="image/avif" srcset="assets/img/wsop-logo-600.avif?v=2" />
-            <source type="image/webp" srcset="assets/img/wsop-logo-600.webp?v=2" />
-            <img
-              src="assets/img/wsop-logo-600.png?v=2"
-              alt=""
-              width="600"
-              height="600"
-              decoding="async"
-            />
-          </picture>
-          <picture class="hero-emblem" data-hero-scene="2hh">
-            <source type="image/avif" srcset="assets/img/twohh-logo-500.avif" />
-            <source type="image/webp" srcset="assets/img/twohh-logo-500.webp" />
-            <img
-              src="assets/img/twohh-logo-500.png"
-              alt=""
-              width="500"
-              height="433"
-              decoding="async"
-            />
-          </picture>
+        <p class="hero-proof mono reveal-item">
+          <span class="hero-proof-full">1999 Brood War World Champion · WSOP Talent Manager</span>
+          <span class="hero-proof-short">1999 Brood War · WSOP Talent</span>
+        </p>
         </div>
+        <div class="hero-mid" aria-hidden="true"></div>
+        <div class="hero-rest sky-part" data-sky-part="rest">
         <ul class="hero-trio" role="list">
-          <li class="hero-pillar reveal-item" data-hero-scene="champ" tabindex="0">
+          <li class="hero-pillar reveal-item" data-door="starcraft">
+            <a class="hero-pillar-link" href="#esports" data-fleet="starcraft">
+            <span class="door-fx" aria-hidden="true"></span>
+            <span class="pillar-index mono">01</span>
             <picture class="pillar-mark">
-              <source type="image/avif" srcset="assets/img/champ-trophy-640.avif" />
-              <source type="image/webp" srcset="assets/img/champ-trophy-640.webp" />
+              <source type="image/avif" srcset="assets/img/champ-pgl-640.avif" />
+              <source type="image/webp" srcset="assets/img/champ-pgl-640.webp" />
               <img
                 class="pillar-mark-img pillar-mark-img--champ"
-                src="assets/img/champ-trophy-640.jpg"
+                src="assets/img/champ-pgl-1080.jpg"
                 alt=""
                 width="640"
                 height="960"
@@ -251,11 +288,15 @@
             </picture>
             <p class="pillar-header mono">1999 · Random</p>
             <p class="pillar-title">
-              <span class="pillar-title-full">StarCraft Champion Era</span>
+              <span class="pillar-title-full">1999 Brood War</span>
               <span class="pillar-title-short">StarCraft</span>
             </p>
+            </a>
           </li>
-          <li class="hero-pillar reveal-item" data-hero-scene="wsop" tabindex="0">
+          <li class="hero-pillar reveal-item" data-door="poker">
+            <a class="hero-pillar-link" href="#poker" data-fleet="poker">
+            <span class="door-fx" aria-hidden="true"></span>
+            <span class="pillar-index mono">02</span>
             <picture class="pillar-mark">
               <source type="image/avif" srcset="assets/img/wsop-logo-600.avif?v=2" />
               <source type="image/webp" srcset="assets/img/wsop-logo-600.webp?v=2" />
@@ -274,8 +315,12 @@
               <span class="pillar-title-full">World Series of Poker</span>
               <span class="pillar-title-short">WSOP</span>
             </p>
+            </a>
           </li>
-          <li class="hero-pillar reveal-item" data-hero-scene="2hh" tabindex="0">
+          <li class="hero-pillar reveal-item" data-door="2hh">
+            <a class="hero-pillar-link" href="#innovation" data-fleet="2hh">
+            <span class="door-fx" aria-hidden="true"></span>
+            <span class="pillar-index mono">03</span>
             <picture class="pillar-mark">
               <source type="image/avif" srcset="assets/img/twohh-logo-500.avif" />
               <source type="image/webp" srcset="assets/img/twohh-logo-500.webp" />
@@ -294,9 +339,10 @@
               <span class="pillar-title-full">2 Hand Hold ’em</span>
               <span class="pillar-title-short">2HH</span>
             </p>
+            </a>
           </li>
         </ul>
-        <a class="hero-cta mono reveal-item" href="#poker">See poker</a>
+        </div>
       </div>
     </section>
 
@@ -309,9 +355,11 @@
       <div class="poker-grid" data-poker-gallery>
         <div
           class="lower-third"
-          data-reveal="felt"
+          data-reveal="chip"
           tabindex="0"
           data-swap-img="assets/img/wsop-boxer-1200.jpg"
+          data-swap-avif="assets/img/wsop-boxer-1200.avif"
+          data-swap-webp="assets/img/wsop-boxer-1200.webp"
           data-swap-alt="D22-soso with SlayerS BoxeR at WSOP 2025"
           data-swap-caption="WSOP 2025 · with SlayerS_BoxeR"
           data-swap-pos="50% 28%"
@@ -319,33 +367,44 @@
           <span class="lt-label mono">TALENT MANAGER</span>
           <strong>World Series of Poker — Media Team</strong>
           <p>
-            WSOP Talent Manager since November 2025. The official Vlogger Program includes
-            Negreanu, Masato, and SlayerS_BoxeR — recruited after an interview at the 2025 World Series.
+            WSOP Talent Manager since November 2025. Vlogger roster includes
+            Negreanu, Masato, and SlayerS_BoxeR.
           </p>
+          <blockquote class="transmission">
+            I had a trial run last summer at the World Series of Poker. They brought me on full-time last November.
+          </blockquote>
+          <p class="hint mono">Wayne Chiang · PokerOrg · Feb 2026</p>
         </div>
         <figure class="poker-photo" data-reveal="fade">
-          <img
-            id="poker-photo-img"
-            src="assets/img/wsop-boxer-1200.jpg"
-            width="1200"
-            height="1755"
-            data-default="assets/img/wsop-boxer-1200.jpg"
-            data-default-alt="D22-soso with SlayerS BoxeR at WSOP 2025"
-            data-default-pos="50% 28%"
-            data-default-fit="cover"
-            alt="D22-soso with SlayerS BoxeR at WSOP 2025"
-            style="object-position: 50% 28%"
-            loading="lazy"
-            decoding="async"
-          />
+          <picture>
+            <source type="image/avif" srcset="assets/img/wsop-boxer-1200.avif" />
+            <source type="image/webp" srcset="assets/img/wsop-boxer-1200.webp" />
+            <img
+              id="poker-photo-img"
+              src="assets/img/wsop-boxer-1200.jpg"
+              width="1200"
+              height="1755"
+              data-default="assets/img/wsop-boxer-1200.jpg"
+              data-default-avif="assets/img/wsop-boxer-1200.avif"
+              data-default-webp="assets/img/wsop-boxer-1200.webp"
+              data-default-alt="D22-soso with SlayerS BoxeR at WSOP 2025"
+              data-default-pos="50% 28%"
+              data-default-fit="cover"
+              alt="D22-soso with SlayerS BoxeR at WSOP 2025"
+              loading="lazy"
+              decoding="async"
+            />
+          </picture>
           <figcaption class="poker-photo-caption mono">WSOP 2025 · with SlayerS_BoxeR</figcaption>
         </figure>
         <div class="poker-cards">
           <article
             class="felt-card"
-            data-reveal="jump"
+            data-reveal="fade"
             tabindex="0"
             data-swap-img="assets/img/elky-1080.jpg"
+            data-swap-avif="assets/img/elky-1080.avif"
+            data-swap-webp="assets/img/elky-1080.webp"
             data-swap-alt="D22-soso with poker pro ElkY"
             data-swap-caption="Live at the Bike · Parkwest Bicycle Casino"
             data-swap-pos="50% 24%"
@@ -360,9 +419,11 @@
           </article>
           <article
             class="felt-card"
-            data-reveal="twist"
+            data-reveal="fade"
             tabindex="0"
             data-swap-img="assets/img/blackjack-900.jpg"
+            data-swap-avif="assets/img/blackjack-900.avif"
+            data-swap-webp="assets/img/blackjack-900.webp"
             data-swap-alt="Blackjack table — advantage play and poker coaching"
             data-swap-caption="Advantage play · poker coaching"
             data-swap-pos="50% 42%"
@@ -374,9 +435,9 @@
       </div>
 
       <details class="press-fold" data-reveal="fade">
-        <summary class="press-fold-summary mono">
-          <span class="badge-dot" aria-hidden="true"></span>
-          As heard on — press &amp; podcasts
+        <summary class="press-fold-summary">
+          <span class="press-fold-kicker mono">As heard on</span>
+          <span class="press-fold-names">PokerOrg · The Flow Show · Table 1 · Chasing Poker Greatness</span>
         </summary>
         <aside class="press-strip" aria-label="Press and media">
           <ul class="press-strip-list">
@@ -432,7 +493,7 @@
         <p class="lede">The first official Season 1 World Champion, playing Random.</p>
       </header>
 
-      <article class="game-panel theme-panel" data-theme="starcraft" data-reveal="warp" tabindex="0" aria-label="StarCraft theme — cycle atmosphere with the pips or Enter">
+      <article class="game-panel theme-panel" data-theme="starcraft" data-reveal="warp" aria-label="StarCraft theme — cycle atmosphere with the pips">
         <p class="game-tag mono"><span class="badge-dot" aria-hidden="true"></span>THEATER 01 // STARCRAFT: BROOD WAR</p>
         <div class="theme-pips" role="group" aria-label="StarCraft atmosphere">
           <button type="button" class="theme-pip is-active" data-pip="0" aria-pressed="true" aria-label="Cosmic Violet"></button>
@@ -465,7 +526,7 @@
               <div class="interview-cite-body">
                 <p class="interview-cite-kicker mono">Zombie Grub interview</p>
                 <p class="interview-cite-summary">
-                  Case’s Ladder, the first caster’s mic, then Brood War’s first official world title — playing Random.
+                  The Case’s Ladder years, then Brood War’s first official world title — playing Random.
                 </p>
                 <a
                   class="interview-cite-link"
@@ -477,7 +538,6 @@
             </aside>
             <details class="archive-fold">
               <summary class="archive-fold-summary mono">
-                <span class="badge-dot" aria-hidden="true"></span>
                 Championship record — throwback, Game 5
               </summary>
               <div class="archive-fold-body">
@@ -500,7 +560,7 @@
                     <span class="interview-cite-play" aria-hidden="true"></span>
                   </a>
                   <div class="interview-cite-body">
-                    <p class="interview-cite-kicker mono">Throwback // Tasteless &amp; Artosis</p>
+                    <p class="interview-cite-kicker mono">Tasteless &amp; Artosis throwback</p>
                     <p class="interview-cite-summary">
                       D22-soso with Tasteless and Artosis, the casters who carried the scene forward.
                     </p>
@@ -513,24 +573,26 @@
                   </div>
                 </aside>
                 <blockquote class="transmission">
-                  Playing Random, he bested Nautosoft, Shin Ju Young, and Guillaume “Grrrr…” Patry—including a legendary
-                  Lost Temple semi—en route to the finals. On Showdown against Crexis (Chris Low), after losing the cliff war
-                  Terran vs. Terran, micromanaged infantry, Ghosts, and Siege Tanks closed Game 5 (35:37) for Brood War’s
-                  first official world title—$2,500.
+                  D22-soso stands triumphant as the tournament champion.
                 </blockquote>
+                <p class="hint mono">Game 5 · Showdown · 35:37 · Battle.net Season 1 report</p>
+                <p>
+                  Nautosoft, Shin Ju Young, and Guillaume “Grrrr…” Patry on the way. Finals vs Crexis (Chris Low)
+                  on Showdown — Terran vs Terran, then infantry, Ghosts, and Siege Tanks.
+                </p>
                 <ul class="stat-list mono">
                   <li><span>1998–99</span> Top 20 Battle.net · Apr 1998 – Dec 1999</li>
                   <li><span>Oct 1998</span> First StarCraft tournament caster — PGL Season 3 · GX StarCraft with Thresh &amp; Calbear</li>
                   <li><span>Feb 1999</span> B.net vs Kali #2 seed vs Guillaume Patry</li>
                   <li><span>May–Sep 1999</span> PGL S4 2nd ($7,000) · Sports Seoul #5 · World Champions Invitational 3rd · B.net WCF 3rd ($1,000)</li>
                 </ul>
-                <p>At Gamers.com he ran GX StarCraft—blogging the international tournaments, battle reports written immediately after tournament and ladder matches analyzing top-tier ladder play, and <em>Pimpest Plays</em>.</p>
+                <p>At Gamers.com: GX StarCraft with Thresh and Calbear — battle reports after matches, and <em>Pimpest Plays</em>.</p>
               </div>
             </details>
             <p class="archive-links mono">
               Primary sources:
               <a
-                href="http://classic.battle.net/scc/br/bws1final5.shtml"
+                href="https://classic.battle.net/scc/br/bws1final5.shtml"
                 target="_blank"
                 rel="noopener noreferrer"
               >Blizzard Season 1 finals battle report</a>
@@ -560,17 +622,17 @@
         </div>
       </article>
 
-      <aside class="esports-more" data-reveal="jump" aria-labelledby="esports-more-heading">
+      <aside class="esports-more" data-reveal="fade" aria-labelledby="esports-more-heading">
         <h3 id="esports-more-heading">Other games</h3>
         <p class="esports-more-copy">
           Command &amp; Conquer, Warcraft II / III, Magic: The Gathering, Cube Draft, Hearthstone, and the 2002+ casual ladders.
         </p>
-        <ul class="esports-more-theaters mono" aria-label="Other games">
-          <li>C&amp;C</li>
-          <li>Warcraft</li>
-          <li>MTG</li>
-          <li>Cube</li>
-          <li>Hearthstone</li>
+        <ul class="esports-more-theaters" aria-label="Other games">
+          <li><a href="gaming.html#game-cnc">Command &amp; Conquer</a></li>
+          <li><a href="gaming.html#game-warcraft">Warcraft</a></li>
+          <li><a href="gaming.html#game-mtg">Magic: The Gathering</a></li>
+          <li><a href="gaming.html#game-cube">Cube Draft</a></li>
+          <li><a href="gaming.html#game-hearthstone">Hearthstone</a></li>
         </ul>
         <a class="btn btn-gold btn-lg btn-arrow" href="gaming.html">
           Gaming Archive <span class="arrow" aria-hidden="true">→</span>
@@ -582,11 +644,11 @@
     <section id="book" class="section section-book art-view" data-node="book" data-bg="book" data-theme="book">
       <header class="section-head" data-reveal="fade">
         <h2>Betting on Yourself</h2>
-        <p class="lede">Kendall Hunt · Joe Matton · December 2025.</p>
+        <p class="lede">Joe Matton and Wayne Chiang. Kendall Hunt, December 2025.</p>
       </header>
 
       <div class="book-layout" data-reveal="page">
-        <div class="book-showcase" data-parallax="0.06">
+        <div class="book-showcase">
           <div class="book-3d">
             <div class="book-cover">
               <picture>
@@ -607,16 +669,17 @@
         </div>
 
         <div class="book-copy">
-          <p class="plaque mono">Kendall Hunt · Dec 2025 · ISBN 9798319708007 · with Joe Matton</p>
+          <p class="plaque mono">Kendall Hunt · Dec 2025 · ISBN 9798319708007</p>
           <p>
-            <cite>Betting On Yourself: Winning in Business, Poker, and AI</cite> —
-            Joe Matton and Wayne “D22-soso” Chiang on risk and decisions across business and poker.
+            <cite>Betting on Yourself: Winning in Business, Poker, and the Age of AI</cite> —
+            co-authors Joe Matton and Wayne “D22-soso” Chiang on risk and decisions across business and poker.
           </p>
+          <p class="book-themes mono">Business decisions · Poker · The age of AI</p>
           <blockquote class="transmission">Because the most important bet you’ll ever make… is on you.</blockquote>
           <div class="cta-row book-ctas">
             <a
               class="btn btn-primary btn-arrow"
-              href="https://a.co/d/09ixiKgk"
+              href="https://www.amazon.com/dp/9798319708007"
               target="_blank"
               rel="noopener noreferrer"
             >Available on Amazon <span class="arrow" aria-hidden="true">→</span></a>
@@ -633,7 +696,7 @@
 
     <!-- INNOVATION -->
     <section id="innovation" class="section" data-node="innovation" data-bg="2hh" data-bg-from-tab="innovation">
-      <header class="section-head" data-reveal="jump">
+      <header class="section-head" data-reveal="fade">
         <h2>Patented Table Game Inventions</h2>
         <p class="lede">2 Hand Hold’em™ and Badugi Chase™ — U.S. patents, assignee 2 HH, LLC.</p>
       </header>
@@ -649,10 +712,17 @@
             <div>
               <h3>2 Hand Hold’em™</h3>
               <p class="game-tagline">Twice the Action. Twice the Fun.</p>
-              <p class="plaque mono">U.S. Pat. 11,117,045 · 11,731,032 · 12,005,342 · Assignee 2 HH, LLC</p>
-              <p>Two hands, one board. You play both against a single dealer flop — without slowing the pit.</p>
+              <p class="patent-line mono">U.S. Patents:
+                <a href="https://patents.google.com/patent/US11117045" target="_blank" rel="noopener noreferrer">11,117,045</a>
+                <span aria-hidden="true"> | </span>
+                <a href="https://patents.google.com/patent/US11731032" target="_blank" rel="noopener noreferrer">11,731,032</a>
+                <span aria-hidden="true"> | </span>
+                <a href="https://patents.google.com/patent/US12005342" target="_blank" rel="noopener noreferrer">12,005,342</a>
+                · Assignee 2 HH, LLC
+              </p>
+              <p>Two hands, one board. You play both against a single dealer flop — without slowing the pit. Debuted at Great American Casino Tukwila.</p>
               <p class="hint mono">Certified by the Washington State Gambling Commission.</p>
-              <p class="panel-subhead mono"><span class="badge-dot" aria-hidden="true"></span>How to Play — 5 Simple Steps</p>
+              <p class="panel-subhead mono">How to Play — 5 Simple Steps</p>
               <ol class="stat-list play-steps">
                 <li><span>01</span> <span><strong>The Ante</strong> — Place two equal bets in the Hand 1 and Hand 2 Ante circles.</span></li>
                 <li><span>02</span> <span><strong>The Deal</strong> — Player receives 4 hole cards face-down; dealer receives 3 hole cards face-down. The Flop (3 community cards) is dealt face-up.</span></li>
@@ -660,20 +730,21 @@
                 <li><span>04</span> <span><strong>Check or Raise</strong> — Check or Raise (2× Ante) each hand independently.</span></li>
                 <li><span>05</span> <span><strong>The Showdown</strong> — Turn and River are revealed. Each hand is evaluated independently against the dealer’s best 5-card hand.</span></li>
               </ol>
-              <p class="panel-subhead mono"><span class="badge-dot" aria-hidden="true"></span>Proprietary Side Bets</p>
+              <p class="panel-subhead mono">Proprietary Side Bets</p>
               <p class="side-bets mono">Flounder 4 · Nessie 9 · 888 Flop Bonus · Community Bonus</p>
+              <div class="cta-row">
+                <a class="btn btn-primary btn-arrow" href="#play">Play 2 Hand Hold’em <span class="arrow" aria-hidden="true">→</span></a>
+                <a class="btn btn-gold" href="#locate">Find a live table</a>
+              </div>
               <p class="archive-links mono">
-                Live demo:
-                <a href="https://play2hh.com" target="_blank" rel="noopener noreferrer">play2hh.com</a>
-                ·
-                <a href="#play">Play in-site</a>
-                ·
-                <a href="#locate">Find live tables</a>
+                Also at
+                <a class="suit-hover" href="https://play2hh.com" target="_blank" rel="noopener noreferrer">play2hh.com</a>
               </p>
               <p class="hint mono">Click the table to split four hole cards into two hands</p>
             </div>
             <div class="panel-media">
               <canvas id="cards-2hh" width="480" height="300" aria-label="Interactive 2 Hand Hold'em card split demo"></canvas>
+              <p class="canvas-affordance mono" data-canvas-hint="cards-2hh">Tap to deal · drag cards</p>
               <picture>
                 <source type="image/avif" srcset="assets/img/twohh-logo-500.avif" />
                 <source type="image/webp" srcset="assets/img/twohh-logo-500.webp" />
@@ -688,9 +759,16 @@
             <div>
               <h3>Badugi Chase™</h3>
               <p class="game-tagline">The Baby Rainbow.</p>
-              <p class="plaque mono">U.S. Pat. 11,810,421 · 12,131,608 · App. 2023/0419777 · Assignee 2 HH, LLC</p>
+              <p class="patent-line mono">U.S. Patents:
+                <a href="https://patents.google.com/patent/US11810421" target="_blank" rel="noopener noreferrer">11,810,421</a>
+                <span aria-hidden="true"> | </span>
+                <a href="https://patents.google.com/patent/US12131608" target="_blank" rel="noopener noreferrer">12,131,608</a>
+                · App.
+                <a href="https://patents.google.com/patent/US20230419777A1" target="_blank" rel="noopener noreferrer">2023/0419777</a>
+                · Assignee 2 HH, LLC
+              </p>
               <p>Three cards, then The Chase: pick one community card to finish a four-card Badugi. Charles Chang, co-inventor.</p>
-              <p class="panel-subhead mono"><span class="badge-dot" aria-hidden="true"></span>How to Play</p>
+              <p class="panel-subhead mono">How to Play</p>
               <ol class="stat-list play-steps">
                 <li><span>01</span> <span><strong>Ante &amp; Deal</strong> — Place an Ante bet. Player and dealer each receive 3 cards face-down.</span></li>
                 <li><span>02</span> <span><strong>Raise or Fold</strong> — View your hand and choose to Raise (1×, 2×, or 3× Ante) or Fold.</span></li>
@@ -699,7 +777,6 @@
               </ol>
               <details class="archive-fold">
                 <summary class="archive-fold-summary mono">
-                  <span class="badge-dot" aria-hidden="true"></span>
                   Live Version ruleset
                 </summary>
                 <div class="archive-fold-body">
@@ -711,7 +788,7 @@
                   </ol>
                 </div>
               </details>
-              <p class="panel-subhead mono"><span class="badge-dot" aria-hidden="true"></span>Qualifying 4-Card Badugi — Ante Bonus</p>
+              <p class="panel-subhead mono">Qualifying 4-Card Badugi — Ante Bonus</p>
               <ul class="stat-list payout-list mono">
                 <li><span>4-High</span> 25 : 1</li>
                 <li><span>5-High</span> 10 : 1</li>
@@ -724,6 +801,7 @@
             </div>
             <div class="panel-media">
               <canvas id="cards-badugi" width="480" height="300" aria-label="Interactive Badugi Chase triad picker"></canvas>
+              <p class="canvas-affordance mono" data-canvas-hint="cards-badugi">Pick one of three</p>
               <picture>
                 <source type="image/avif" srcset="assets/img/badugi-play-900.avif" />
                 <source type="image/webp" srcset="assets/img/badugi-play-900.webp" />
@@ -744,7 +822,7 @@
 
       <div class="play-panel play-panel-wide" data-reveal="chip">
         <div class="play-frame-wrap" id="play-2hh-wrap">
-          <div class="play-frame-viewport" id="play-2hh-viewport">
+          <div class="play-frame-viewport">
             <div class="play-frame-scaler" id="play-2hh-scaler">
               <iframe
                 id="play-2hh-frame"
@@ -753,7 +831,6 @@
                 loading="lazy"
                 allow="fullscreen"
                 allowfullscreen
-                scrolling="no"
                 referrerpolicy="no-referrer-when-downgrade"
               ></iframe>
             </div>
@@ -764,7 +841,7 @@
           <button type="button" class="play-frame-fs btn btn-primary" id="play-2hh-fs" hidden>
             Enter fullscreen table
           </button>
-          <div class="play-frame-overlay" id="play-2hh-overlay">
+          <div class="play-frame-overlay">
             <picture>
               <source type="image/avif" srcset="assets/img/twohh-logo-500.avif" />
               <source type="image/webp" srcset="assets/img/twohh-logo-500.webp" />
@@ -800,6 +877,7 @@
           >2 Hand Holdem created by StarCraft: Brood War World Champion Wayne “D22-soso” Chiang</a>
           ·
           <a
+            class="suit-hover"
             href="https://play2hh.herokuapp.com/"
             target="_blank"
             rel="noopener noreferrer"
@@ -917,9 +995,8 @@
       </ul>
 
       <p class="hint mono locate-hint" data-reveal="fade">
-        Certified by the Washington State Gambling Commission. Pins mirror the published
-        <a href="https://www.google.com/maps/d/viewer?mid=1jkuOr8dbWp_1eP_5JAC2VYsHcoKf-Uc" target="_blank" rel="noopener noreferrer">Google My Maps venue list</a>
-        — new U.S. locations appear here when that map is updated.
+        The list is the live floor. Pins follow the published
+        <a href="https://www.google.com/maps/d/viewer?mid=1jkuOr8dbWp_1eP_5JAC2VYsHcoKf-Uc" target="_blank" rel="noopener noreferrer">Google My Maps venue list</a>.
       </p>
 
       <div class="cta-row locate-ctas" data-reveal="fade">
@@ -939,7 +1016,7 @@
       </header>
 
       <div class="about-layout">
-        <article class="about-prose" data-reveal="fade" data-enter="about-prose">
+        <article class="about-prose" data-reveal="fade">
           <p class="about-tldr">
             I’m Wayne Chiang. In competition I’m <strong>D22-soso</strong>.
           </p>
@@ -1008,10 +1085,15 @@
                     <dt>2 Hand Hold’em and Badugi Chase</dt>
                     <dd>
                       Inventor of <strong>2 Hand Hold’em™</strong>
-                      (dual-hand Texas Hold’em, 2015; U.S. Pat. 11,117,045, 11,731,032, 12,005,342) and, with
-                      co-inventor Charles Chang, <strong>Badugi Chase™</strong> (U.S. Pat. 11,810,421, 12,131,608).
-                      Assignee: 2 HH, LLC. Live at Great American Casino Tukwila; expanding to Los Angeles,
-                      San Antonio, Las Vegas, Silver Dollar Casino SeaTac, and a future Washington floor.
+                      (dual-hand Texas Hold’em, 2015; U.S. Patents
+                      <a href="https://patents.google.com/patent/US11117045" target="_blank" rel="noopener noreferrer">11,117,045</a>,
+                      <a href="https://patents.google.com/patent/US11731032" target="_blank" rel="noopener noreferrer">11,731,032</a>,
+                      <a href="https://patents.google.com/patent/US12005342" target="_blank" rel="noopener noreferrer">12,005,342</a>) and, with
+                      co-inventor Charles Chang, <strong>Badugi Chase™</strong> (U.S. Patents
+                      <a href="https://patents.google.com/patent/US11810421" target="_blank" rel="noopener noreferrer">11,810,421</a>,
+                      <a href="https://patents.google.com/patent/US12131608" target="_blank" rel="noopener noreferrer">12,131,608</a>).
+                      Assignee: 2 HH, LLC. Debuted at Great American Casino Tukwila; live tables are listed in
+                      <a href="#locate">Locate</a>.
                     </dd>
                   </div>
                 </dl>
@@ -1111,7 +1193,7 @@
 
     <!-- CONTACT -->
     <section id="contact" class="section contact" data-node="contact" data-bg="contact">
-      <header class="section-head" data-reveal="twist">
+      <header class="section-head" data-reveal="fade">
         <h2>Media &amp; licensing</h2>
         <p class="lede">2handholdem@gmail.com — licensing, press, talent. Socials and the media kit sit below.</p>
       </header>
@@ -1167,26 +1249,21 @@
         </ul>
       </aside>
 
-      <p class="contact-socials mono" data-reveal="jump">
+      <nav class="contact-socials mono" data-reveal="jump" aria-label="Social profiles">
         <a href="https://www.linkedin.com/in/d22sosowaynechiang" target="_blank" rel="noopener noreferrer">LinkedIn</a>
-        ·
         <a href="https://liquipedia.net/starcraft/Soso" target="_blank" rel="noopener noreferrer">Liquipedia</a>
-        ·
         <a href="https://x.com/D22_soso" target="_blank" rel="noopener noreferrer">X</a>
-        ·
         <a class="ig-inline" href="https://www.instagram.com/D22_soso/" target="_blank" rel="noopener noreferrer">Instagram</a>
-        ·
         <a href="https://www.youtube.com/@WayneChiangPoker" target="_blank" rel="noopener noreferrer">YouTube</a>
-      </p>
+      </nav>
       <p class="footer-meta mono">
         <a href="#contact">Media kit</a>
+        ·
+        <a href="gaming.html">Gaming Archive</a>
         ·
         <a href="app/privacy/">App privacy</a>
         ·
         <a href="app/terms/">App terms</a>
-        ·
-        <a href="https://www.instagram.com/p/Cr2A8JJrgVa/?img_index=1" target="_blank" rel="noopener noreferrer">2 Hand Holdem created by StarCraft: Brood War World Champion Wayne “D22-soso” Chiang</a>
-        · Bet on yourself
       </p>
       <p class="footer-credit mono">
         Website created by
@@ -1200,6 +1277,11 @@
       </p>
     </section>
   </main>
+
+  <div id="apm-meter" class="apm-meter" aria-hidden="true">
+    <span class="apm-meter-label mono">APM</span>
+    <span class="apm-meter-value mono">0</span>
+  </div>
 
   <button type="button" class="back-top" id="back-top" aria-label="Back to top" aria-hidden="true" tabindex="-1">
     <span class="back-top-chevron" aria-hidden="true">↑</span>

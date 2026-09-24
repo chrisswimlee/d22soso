@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://d22soso.com/sitemap.xml
+Host: https://d22soso.com
