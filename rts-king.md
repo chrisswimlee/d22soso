@@ -1,6 +1,6 @@
 # First Esports Real Time Strategy King
 
-Source: `A Esports Real Time Strategy King .pdf` (Google Docs export, 2026). Prefer this document over older first-party tables where they conflict.
+Source: `sources/A Esports Real Time Strategy King.pdf` (Google Docs export, 2026). Prefer this document over older first-party tables where they conflict.
 
 ## The Dawn
 

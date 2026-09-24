@@ -55,11 +55,8 @@ gen() {
 echo "== Photos =="
 gen champ-trophy   "$SRC/AAA Wayne Chiang Starcraft World Champ.JPG"                              jpg 640 1080 1600 2200
 gen champ-pgl      "$SRC/AAA Wayne Chiang Starcraft World Champ and PGL 2nd.JPG"                  jpg 640 1080
-gen champ-closeup  "$SRC/AAA Starcraft World Champ Close Up.JPG"                                  jpg 640 1080
-gen wsop-boxer     "$SRC/Slayers Boxer D22-soso WSOP 2025.jpg"                                    jpg 720 1200
-gen elky           "$SRC/D22-soso Elky.JPG"                                                       jpg 640 1080
-gen garimto        "$SRC/Garimto D22-soso 2024.jpg"                                               jpg 640 1080
-gen tastosis       "$SRC/Tastosis D22-soso 2024.jpg"                                              jpg 640 1080
+gen wsop-boxer     "$SRC/Slayers Boxer D22-soso WSOP 2025.jpg"                                    jpg 1200
+gen elky           "$SRC/D22-soso Elky.JPG"                                                       jpg 1080
 gen sc-championship "$SRC/The First Official Blizzard StarCraft Brood War World Championships Won by D22-soso.jpg" jpg 900
 gen weissman       "$SRC/wayne chiang brian weissman.jpg"                                         jpg 900
 gen hearthstone-35 "$SRC/Heartsthone 35.jpg"                                                      jpg 720

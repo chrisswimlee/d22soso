@@ -1,7 +1,7 @@
 # StarCraft Brood War’s First World Champion: Leader by Example
 
 Source: `D22-soso Wayne Chiang StarCraft bio.pdf` (2026). For the broader RTS King
-narrative (C&C → WC2 → Brood War → MTG), prefer `rts-king.md` / `A Esports Real Time Strategy King .pdf` where dates conflict.
+narrative (C&C → WC2 → Brood War → MTG), prefer `rts-king.md` / `sources/A Esports Real Time Strategy King.pdf` where dates conflict.
 
 ## The Dawn of Esports
 

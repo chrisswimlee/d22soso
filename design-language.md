@@ -9,9 +9,9 @@ A **documentary command archive** that feels like a video game: WebGL fog, card 
 - Type: Space Grotesk (brand + display) · IBM Plex Sans (body) · IBM Plex Mono (data/hotkeys)
 - Nav: minimap + command-card hotkeys
 - Blockquotes = advisor transmissions; no raw URLs
-- Hero budget: brand lockup leads (D22-soso > name) + one proof line + three hairline pillars (`1999 · Random` / `WSOP Talent` / `U.S. patented`) + one CTA (“See poker”). No logo strip, no dual SCROLL cue. Championship photo is the dominant plane (`object-fit: cover`, near-full opacity, light scrim)
+- Hero budget: header holds the D22 wordmark. First screen is the championship photo + name + one proof line + a three-panel door (`01 1999 · Random` → StarCraft / `02 WSOP Talent` → poker / `03 U.S. patented` → 2HH). The panels are the CTA — no fourth “See poker” link. Marks live inside the panels, not as a mid-air logo strip. Idle attract and hover/tap preview that room’s fleet around the photo and play a one-shot door dialect (warp / chip / deal). No dual SCROLL cue. The photo stays a photograph. `prefers-reduced-motion` skips the intro, attract, and WebGL.
 - First viewport uses executive restraint (`data-theme="hero"` gold chrome; no violet glow, glitch, rainbow progress, or floating section indicator)
-- Trio pillars preview WSOP / 2HH in the mid-band between the proof line and the pillar hairlines (small fade + scale). Championship photo fades as those emblems come in; hover-off / StarCraft restores the plane. No mid-page teleports from the hero (navigation is scroll + command nav)
+- Pillars are proof that also door: each links to its theater. Hover and the idle attract crossfade the hero image in place: championship photo, then the WSOP and 2 Hand Hold’em logos. The pillar marks stay still.
 - Chrome after hero: section indicator is the section name + hairline only (no “NOW VIEWING”, no pill, no glow pulse); scroll progress is a single muted gold hairline
 - Phone chrome: header is brand + command nav. Socials live in Contact / footer below ~1100px. Wordmark stays readable at 359px — shorten nav labels from ~430px (`IP` not `Inventions`) before killing the brand.
 - StarCraft is one room: championship archive (`#esports`), then the Gaming Archive CTA
@@ -22,7 +22,7 @@ A **documentary command archive** that feels like a video game: WebGL fog, card 
 ## Frame discipline
 Two tiers — most theaters are gallery rooms; one archive file remains.
 
-**Gallery bleed (`.art-view`):** Hero champ plane, Poker photo plane, Book showcase, **and every esports theater** (StarCraft, C&C, Warcraft, MTG, Cube, Hearthstone). No enclosed panel chrome — material wash + a single accent rule so content sits on `#bg-stage`. Cube is a quieter MTG continuation (thinner left rule, softer wash), not a second full room.
+**Gallery bleed (`.art-view`):** Hero lockup sits on the championship photo over `#bg-stage`. Poker photo plane, Book showcase, **and every esports theater** (StarCraft, C&C, Warcraft, MTG, Cube, Hearthstone) keep gallery rooms. No enclosed panel chrome — material wash + a single accent rule so content sits on `#bg-stage`. Cube is a quieter MTG continuation (thinner left rule, softer wash), not a second full room.
 
 **Dossier frame:** Innovation tabs only (`.tablist-wrap`). Patents belong in a file. Play iframe is cropped media (`--r-media`), not a panel. About prose uses a left hairline; the career timeline is a vertical spine of bottom rules — neither is a boxed card.
 
@@ -39,12 +39,16 @@ Two tiers — most theaters are gallery rooms; one archive file remains.
 1. WebGL fog-of-war scout + session persistence  
 2. Themed Three.js background fleets (ScrollTrigger parallax)  
 3. Tab themes: starcraft | cnc | warcraft | mtg | hearthstone | poker | 2hh | badugi  
-4. Game panel dialects (3 variants per esports theater; keys `*-v2` / `*-v3`) — cycle from theme pips, keyboard Enter/Space, or desktop click. Full-panel tap on phone does not cycle.  
-5. 2HH 3D card-split (GSAP)  
-6. Badugi 3D triad pick (GSAP)  
+4. Game panel dialects (3 variants per esports theater; keys `*-v2` / `*-v3`) — cycle from theme pips, keyboard Enter/Space, or desktop click. StarCraft pip swaps add a one-shot warp flicker. Full-panel tap on phone does not cycle.  
+5. 2HH 3D card-split (GSAP) — one-shot attract deal/split when the canvas first enters view; affordance caption fades after first touch  
+6. Badugi 3D triad pick (GSAP) — one-shot community-card lift on first view; affordance caption fades after first touch  
 7. Rank plaques (engraved, max 3 proof objects / panel)  
 8. `prefers-reduced-motion` static fallbacks (hide WebGL motion)  
 9. One-shot theater-enter dialects (`warp` / `scan` / `drop` / `deal` / `lid` / `float` / `page` / `chip`) — scout-in clip + unique second beat; mark `data-entered` so re-scroll is a quiet fade only
+10. One-shot homepage intro: colored constellation field (site palette) gathers into abstract StarCraft silhouettes, then condenses into the lockup and pillars while the championship photo fades in. Session-once, skippable, no WotC art, no second canvas. `prefers-reduced-motion` / deep links skip it.
+
+## Quiet flair (chrome, not a signature system)
+Stars, constellation lines, pointer-drawn gold bonds (hold ~300 ms on empty sky), fleet ships, chips, felt ripples, dealer trail, APM easter egg, and suit motes are **quiet chrome**, not a signature system. They ride existing systems — Three.js Points + LineSegments + fleets in `#webgl-bg` (no tsParticles / no second canvas), vanilla DOM ripples, IntersectionObserver / CSS stagger already used for theater enters. Ripple shape follows `data-bg`: minimap ping on hero / StarCraft, dashed chip on poker, split card-backs on 2HH / Badugi. On the hero, stars stay a thin field behind the photograph; fleets may orbit the photo plane. Page copy, patents, and photos stay fixed. Theme-scoped: stars strong on hero / StarCraft, secondary on poker, nearly off on the book / IP / about. After the first viewport the sky fades (`--hero-leave`) and theme planes take over. Desktop RAF may stay awake for float and must pause when the tab is hidden. Off under `prefers-reduced-motion`, coarse-pointer fleet-drag, intro, and immersive table. Do not add another particle engine. Do not rebuild the hero as a particle photograph.
 
 ## Tab dialects
 | Theme | Material |
@@ -81,7 +85,7 @@ No box inside a box: if the parent is already framed, the child gets a rule or a
 No replaying loud theater enters (CRT boot / lid / deal / foil) on every scroll pass — one-shot only.
 
 ## Content
-Only public tiers from `wayne-chiang-truth-document.md` (RTS King narrative sourced from `rts-king.md`; casino IP and author copy from `inventor-author.md`). Photos from `drive-download-20260720T075014Z-1-001/`.
+Only public tiers from `wayne-chiang-truth-document.md` (RTS King narrative sourced from `rts-king.md`; casino IP and author copy from `inventor-author.md`). Photos from the local source dump (`drive-download-…`, gitignored) via `assets/photos`; published renditions live in `assets/img/`.
 
 ## Page split
 - **Main (`index.html`):** Hero, Poker, StarCraft championship theater, StarCraft command systems, Book, Innovation, Play, Locate, About, Contact. StarCraft command ends with a CTA into the Gaming Archive.

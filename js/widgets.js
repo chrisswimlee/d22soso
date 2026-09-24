@@ -1,145 +1,173 @@
-/* Page widgets: hero preview, about fold, poker gallery, 2HH embed, contact */
+/* Page widgets: about fold, poker gallery, 2HH embed, contact */
 import { reduced } from "./pref.js";
 import { measureHeaderHeight } from "./theme-nav.js";
 import { initLocateMap } from "./locate-map.js";
+import { getBgScene } from "./webgl-boot.js";
 
 export function initWidgets() {
-/* Hero — pillar hover swaps champ plane ↔ WSOP / 2HH emblems in the mid-band */
-(function initHeroScenePreview() {
-  const hero = document.getElementById("hero");
-  const stack = hero?.querySelector(".hero-photo-stack");
-  const gate = hero?.querySelector(".hero-gate");
-  if (!hero || !gate) return;
+/* Hero doors — fleet around the photo; the photograph crossfades, marks stay still */
+(function initHeroDoors() {
+  const links = [...document.querySelectorAll(".hero-pillar-link[data-fleet]")];
+  if (!links.length) return;
 
-  const emblems = [...hero.querySelectorAll(".hero-emblem[data-hero-scene]")];
-  const champPhoto = stack?.querySelector(".hero-photo[data-hero-scene='champ']");
-
-  const SCENES = ["champ", "wsop", "2hh"];
-  const DEFAULT = "champ";
-
-  let active = hero.dataset.heroActive || DEFAULT;
-  let pinned = null;
-  let heroVisible = true;
-
+  const ORDER = ["starcraft", "poker", "2hh"];
   const fineHover =
-    typeof matchMedia === "undefined"
-      ? true
-      : matchMedia("(hover: hover) and (pointer: fine)").matches;
+    typeof matchMedia !== "undefined" &&
+    matchMedia("(hover: hover) and (pointer: fine)").matches;
 
-  function triggerFrom(target) {
-    if (!(target instanceof Element)) return null;
-    const el = target.closest(".hero-pillar[data-hero-scene]");
-    return el && hero.contains(el) ? el : null;
+  let hoverKey = null;
+  let attractKey = null;
+  let attractIdx = 0;
+  let attractClock = 0;
+  let holdClock = 0;
+  let sceneApi = null;
+  let photoKey = "starcraft";
+
+  function introBusy() {
+    const root = document.documentElement;
+    return root.classList.contains("is-intro-pending") || root.hasAttribute("data-intro");
   }
 
-  function syncTriggers(key) {
-    hero.querySelectorAll(".hero-pillar[data-hero-scene]").forEach((t) => {
-      const on = t.dataset.heroScene === key;
-      t.classList.toggle("is-previewing", on);
-      t.setAttribute("aria-pressed", on ? "true" : "false");
+  function onHero() {
+    return (document.body.dataset.bg || "") === "hero";
+  }
+
+  function pillarFor(key) {
+    return document.querySelector(`.hero-pillar[data-door="${key}"]`);
+  }
+
+  function setHeroPhoto(key) {
+    const scene = key === "poker" || key === "2hh" ? key : "starcraft";
+    if (scene === photoKey) return;
+    photoKey = scene;
+    document.querySelectorAll(".hero-photo[data-hero-scene]").forEach((el) => {
+      el.classList.toggle("is-active", el.dataset.heroScene === scene);
     });
   }
 
-  function setScene(scene) {
-    const key = SCENES.includes(scene) ? scene : DEFAULT;
-    active = key;
-    hero.dataset.heroActive = key;
-    if (stack) stack.dataset.heroActive = key;
-    if (champPhoto) champPhoto.classList.toggle("is-active", key === "champ");
-    emblems.forEach((el) => {
-      el.classList.toggle("is-active", el.dataset.heroScene === key);
+  function markLive(key) {
+    document.querySelectorAll(".hero-pillar.is-door-live").forEach((el) => {
+      el.classList.remove("is-door-live");
     });
-    syncTriggers(key);
+    if (key) pillarFor(key)?.classList.add("is-door-live");
+    if (key) document.body.dataset.heroFleet = key;
+    else delete document.body.dataset.heroFleet;
   }
 
-  function previewFrom(el) {
-    if (!heroVisible || !el) return;
-    const scene = el.dataset.heroScene;
-    if (!scene) return;
-    setScene(scene);
+  function showFleet(key) {
+    if (reduced) return;
+    const apply = (api) => api?.previewFleet?.(key || null);
+    if (sceneApi) {
+      apply(sceneApi);
+      return;
+    }
+    getBgScene().then((api) => {
+      sceneApi = api;
+      apply(api);
+    });
+  }
+
+  function live(key) {
+    markLive(key);
+    showFleet(key);
+    setHeroPhoto(key);
+  }
+
+  function preview(key) {
+    hoverKey = key;
+    if (holdClock) {
+      window.clearTimeout(holdClock);
+      holdClock = 0;
+    }
+    live(key);
   }
 
   function clearPreview() {
-    if (pinned) return;
-    setScene(DEFAULT);
+    hoverKey = null;
+    live(attractKey);
   }
 
-  if (fineHover) {
-    gate.addEventListener("pointerover", (e) => {
-      if (pinned) return;
-      const t = triggerFrom(e.target);
-      if (!t) return;
-      const from = e.relatedTarget;
-      if (from instanceof Node && t.contains(from)) return;
-      previewFrom(t);
-    });
+  links.forEach((link) => {
+    const key = link.dataset.fleet;
+    if (fineHover && !reduced) {
+      link.addEventListener("pointerenter", () => preview(key));
+      link.addEventListener("pointerleave", clearPreview);
+      link.addEventListener("focus", () => preview(key));
+      link.addEventListener("blur", () => {
+        if (!link.matches(":hover")) clearPreview();
+      });
+    }
+    if (fineHover && !reduced) {
+      link.addEventListener("pointerdown", () => {
+        live(key);
+      });
+    }
+    /* Phone has no hover. First tap crossfades the image and stays; a second tap on that door opens the section. */
+    if (!fineHover) {
+      link.addEventListener(
+        "click",
+        (e) => {
+          if (reduced) return;
+          const scene = key === "poker" || key === "2hh" ? key : "starcraft";
+          if (photoKey === scene) return;
+          e.preventDefault();
+          e.stopImmediatePropagation();
+          hoverKey = key;
+          live(key);
+        },
+        true
+      );
+    }
+  });
 
-    gate.addEventListener("pointerout", (e) => {
-      if (pinned) return;
-      const fromTrig = triggerFrom(e.target);
-      if (!fromTrig) return;
-      const to = e.relatedTarget;
-      if (to instanceof Node && fromTrig.contains(to)) return;
-      const next = triggerFrom(to);
-      if (next) {
-        previewFrom(next);
-        return;
-      }
-      clearPreview();
-    });
+  function attractOnce() {
+    if (reduced || introBusy() || !onHero() || hoverKey || document.hidden) return;
+    attractKey = ORDER[attractIdx % ORDER.length];
+    attractIdx += 1;
+    live(attractKey);
+    if (holdClock) window.clearTimeout(holdClock);
+    holdClock = window.setTimeout(() => {
+      holdClock = 0;
+      if (hoverKey || !onHero()) return;
+      attractKey = null;
+      live(null);
+    }, 4800);
+  }
 
-    gate.addEventListener("focusin", (e) => {
-      const t = triggerFrom(e.target);
-      if (t) previewFrom(t);
-    });
+  function startAttract() {
+    if (reduced || attractClock) return;
+    attractClock = window.setInterval(attractOnce, 7800);
+    window.setTimeout(attractOnce, introBusy() ? 0 : 1600);
+  }
 
-    gate.addEventListener("focusout", (e) => {
-      if (pinned) return;
-      if (triggerFrom(e.relatedTarget)) return;
-      clearPreview();
+  if (introBusy()) {
+    const root = document.documentElement;
+    const obs = new MutationObserver(() => {
+      if (introBusy()) return;
+      obs.disconnect();
+      startAttract();
     });
+    obs.observe(root, { attributes: true, attributeFilter: ["class", "data-intro"] });
   } else {
-    gate.addEventListener("click", (e) => {
-      const t = triggerFrom(e.target);
-      if (!t) return;
-      if (e.target.closest("a[href]")) return;
-      if (pinned === t && active === t.dataset.heroScene) {
-        pinned = null;
-        setScene(DEFAULT);
-        return;
-      }
-      pinned = t;
-      previewFrom(t);
-    });
-
-    window.addEventListener(
-      "scroll",
-      () => {
-        if (!pinned) return;
-        pinned = null;
-        setScene(DEFAULT);
-      },
-      { passive: true }
-    );
+    startAttract();
   }
 
-  if (typeof IntersectionObserver !== "undefined") {
-    const leaveObs = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          heroVisible = entry.isIntersecting;
-          if (!entry.isIntersecting) {
-            pinned = null;
-            setScene(DEFAULT);
-          }
-        });
-      },
-      { threshold: 0.15 }
-    );
-    leaveObs.observe(hero);
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) return;
+    if (!hoverKey && onHero()) bumpIdle();
+  });
+
+  function bumpIdle() {
+    getBgScene().then((api) => api?.previewFleet?.(hoverKey || attractKey || null));
   }
 
-  setScene(DEFAULT);
+  new MutationObserver(() => {
+    if (!onHero()) {
+      hoverKey = null;
+      attractKey = null;
+      markLive(null);
+    }
+  }).observe(document.body, { attributes: true, attributeFilter: ["data-bg"] });
 })();
 
 /* About — animate “Read the full story” expand / collapse */
@@ -239,14 +267,33 @@ export function initWidgets() {
   });
 })();
 
+/* Press / archive folds — stagger interiors on open */
+(function initFoldStagger() {
+  if (reduced) return;
+  document.querySelectorAll("details.press-fold, details.archive-fold").forEach((fold) => {
+    fold.addEventListener("toggle", () => {
+      fold.classList.remove("is-fold-stagger");
+      if (!fold.open) return;
+      void fold.offsetWidth;
+      fold.classList.add("is-fold-stagger");
+    });
+  });
+})();
+
 /* Poker gallery — hover/focus a block to swap the featured photo */
 (function () {
   const gallery = document.querySelector("[data-poker-gallery]");
   const img = document.getElementById("poker-photo-img");
   if (!gallery || !img) return;
+  const picture = img.closest("picture");
+  const wipeEl = picture || img;
+  const avifSource = picture?.querySelector('source[type="image/avif"]') || null;
+  const webpSource = picture?.querySelector('source[type="image/webp"]') || null;
   const caption = gallery.querySelector(".poker-photo-caption");
   const triggers = [...gallery.querySelectorAll("[data-swap-img]")];
   const defSrc = img.dataset.default || img.getAttribute("src");
+  const defAvif = img.dataset.defaultAvif || avifSource?.getAttribute("srcset") || "";
+  const defWebp = img.dataset.defaultWebp || webpSource?.getAttribute("srcset") || "";
   const defAlt = img.dataset.defaultAlt || img.getAttribute("alt");
   const defPos = img.dataset.defaultPos || "50% 28%";
   const defFit = img.dataset.defaultFit || "cover";
@@ -282,18 +329,25 @@ export function initWidgets() {
     img.classList.toggle("is-contain", fit === "contain");
   }
 
+  function applySources(next) {
+    if (avifSource) avifSource.srcset = next.avif || "";
+    if (webpSource) webpSource.srcset = next.webp || "";
+    img.src = next.src;
+  }
+
   function applyFrame(next) {
     const token = ++loadToken;
     if (sameSrc(next.src, applied)) {
       img.style.objectPosition = next.pos;
       applyFit(next.fit);
+      applySources(next);
       if (next.alt) img.alt = next.alt;
       if (caption && next.cap) caption.textContent = next.cap;
-      img.classList.remove("is-swapping");
+      wipeEl.classList.remove("is-swapping");
       return;
     }
 
-    img.classList.add("is-swapping");
+    wipeEl.classList.add("is-swapping");
     clearTimeout(fadeTimer);
 
     const paint = () => {
@@ -301,12 +355,14 @@ export function initWidgets() {
       applied = next.src;
       img.style.objectPosition = next.pos;
       applyFit(next.fit);
-      img.src = next.src;
+      applySources(next);
       if (next.alt) img.alt = next.alt;
       if (caption && next.cap) caption.textContent = next.cap;
       const finish = () => {
         if (token !== loadToken) return;
-        img.classList.remove("is-swapping");
+        requestAnimationFrame(() => {
+          wipeEl.classList.remove("is-swapping");
+        });
       };
       if (typeof img.decode === "function") {
         img.decode().then(finish).catch(finish);
@@ -316,22 +372,40 @@ export function initWidgets() {
     };
 
     fadeTimer = setTimeout(() => {
-      const pre = prefetch(next.src);
+      const pre = prefetch(next.avif || next.webp || next.src);
       if (pre && pre.complete) {
         paint();
         return;
       }
       pre.onload = paint;
-      pre.onerror = paint;
-    }, 120);
+      pre.onerror = () => {
+        const fallback = prefetch(next.src);
+        if (fallback && fallback.complete) {
+          paint();
+          return;
+        }
+        fallback.onload = paint;
+        fallback.onerror = paint;
+      };
+    }, reduced ? 80 : 190);
   }
 
   function frameFrom(t) {
     if (!t) {
-      return { src: defSrc, alt: defAlt, cap: defCap, pos: defPos, fit: defFit };
+      return {
+        src: defSrc,
+        avif: defAvif,
+        webp: defWebp,
+        alt: defAlt,
+        cap: defCap,
+        pos: defPos,
+        fit: defFit,
+      };
     }
     return {
       src: t.getAttribute("data-swap-img"),
+      avif: t.getAttribute("data-swap-avif") || "",
+      webp: t.getAttribute("data-swap-webp") || "",
       alt: t.getAttribute("data-swap-alt") || "",
       cap: t.getAttribute("data-swap-caption") || "",
       pos: t.getAttribute("data-swap-pos") || defPos,
@@ -371,6 +445,7 @@ export function initWidgets() {
   }
 
   triggers.forEach((t) => {
+    prefetch(t.getAttribute("data-swap-avif") || t.getAttribute("data-swap-img"));
     t.addEventListener("mouseenter", () => {
       if (pinned) return;
       showTrigger(t);
@@ -397,6 +472,47 @@ export function initWidgets() {
       pinned = t;
       showTrigger(t);
     });
+  });
+})();
+
+/* StarCraft theater photo — pointer parallax */
+(function initEsportsParallax() {
+  if (reduced) return;
+  const fineHover =
+    typeof matchMedia !== "undefined" &&
+    matchMedia("(hover: hover) and (pointer: fine)").matches;
+  if (!fineHover) return;
+  const panel = document.querySelector("#esports .game-panel");
+  const photo = panel?.querySelector(".panel-img");
+  if (!panel || !photo) return;
+
+  panel.addEventListener(
+    "pointermove",
+    (e) => {
+      const r = panel.getBoundingClientRect();
+      const x = ((e.clientX - r.left) / Math.max(1, r.width) - 0.5) * 2;
+      const y = ((e.clientY - r.top) / Math.max(1, r.height) - 0.5) * 2;
+      const px = (Math.max(-1, Math.min(1, x)) * 6).toFixed(1);
+      const py = (Math.max(-1, Math.min(1, y)) * 6).toFixed(1);
+      photo.style.transform = "translate3d(" + px + "px," + py + "px,0)";
+    },
+    { passive: true }
+  );
+  panel.addEventListener("pointerleave", () => {
+    photo.style.transform = "";
+  });
+})();
+
+/* 2HH / Badugi — fade affordance captions after first touch */
+(function initCanvasAffordances() {
+  document.querySelectorAll("[data-canvas-hint]").forEach((hint) => {
+    const canvas = document.getElementById(hint.dataset.canvasHint);
+    if (!canvas) return;
+    const spend = () => {
+      hint.classList.add("is-spent");
+      canvas.removeEventListener("pointerdown", spend);
+    };
+    canvas.addEventListener("pointerdown", spend);
   });
 })();
 
@@ -589,7 +705,6 @@ function launch2HH() {
   if (!playFrame.getAttribute("src")) {
     playFrame.src = playFrame.getAttribute("data-src") || "https://play2hh.herokuapp.com/";
   }
-  playFrame.setAttribute("scrolling", "no");
   playWrap.classList.add("is-live");
   playSectionEl?.classList.add("is-playing");
   document.body.classList.add("play-2hh-live");
@@ -640,26 +755,42 @@ playFrame?.addEventListener("load", () => {
   if (!playWrap.classList.contains("is-immersive")) centerPlayTable();
 });
 
+function zoomPlayThen(fn) {
+  if (!playWrap || reduced || playWrap.classList.contains("is-immersive")) {
+    fn();
+    return;
+  }
+  playWrap.classList.add("is-zooming-from");
+  void playWrap.offsetWidth;
+  playWrap.classList.add("is-zooming");
+  window.setTimeout(() => {
+    playWrap.classList.remove("is-zooming-from", "is-zooming");
+    fn();
+  }, 380);
+}
+
 playFs?.addEventListener("click", () => {
   launch2HH();
   const target = playWrap;
   if (!target) return;
-  const req =
-    target.requestFullscreen ||
-    target.webkitRequestFullscreen ||
-    target.msRequestFullscreen;
-  if (req && canFullscreen(target)) {
-    Promise.resolve(req.call(target))
-      .then(() => {
-        setImmersive(true);
-        if (playExitImmersive) playExitImmersive.hidden = true;
-        syncPlayChrome();
-      })
-      .catch(() => setImmersive(true));
-    return;
-  }
-  /* iOS Safari / unsupported: CSS immersive fallback */
-  setImmersive(true);
+  const goImmersive = () => {
+    const req =
+      target.requestFullscreen ||
+      target.webkitRequestFullscreen ||
+      target.msRequestFullscreen;
+    if (req && canFullscreen(target)) {
+      Promise.resolve(req.call(target))
+        .then(() => {
+          setImmersive(true);
+          if (playExitImmersive) playExitImmersive.hidden = true;
+          syncPlayChrome();
+        })
+        .catch(() => setImmersive(true));
+      return;
+    }
+    setImmersive(true);
+  };
+  zoomPlayThen(goImmersive);
 });
 
 window.addEventListener("resize", schedulePlaySync, { passive: true });
@@ -718,7 +849,7 @@ document.addEventListener("keydown", (e) => {
 });
 
 /* Leave table lock when navigating to another section */
-document.querySelectorAll('.site-nav a[href^="#"], a[href^="#"]').forEach((a) => {
+document.querySelectorAll('a[href^="#"]').forEach((a) => {
   a.addEventListener("click", () => {
     const href = a.getAttribute("href") || "";
     if (href === "#play" || href === "#main") return;
@@ -734,7 +865,7 @@ syncPlayChrome();
   const FEEDBACK_TO = "200percentooak@gmail.com";
   const SITE_VERSION =
     document.querySelector('meta[name="d22soso-version"]')?.getAttribute("content")?.trim() ||
-    "2026.08.28";
+    "2026.09.10";
 
   const trigger = document.getElementById("feedback-open");
   const dialog = document.getElementById("feedback-dialog");

@@ -4,7 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#0a0a0a" />
-  <meta name="d22soso-version" content="2026.08.28" />
+  <meta name="d22soso-version" content="2026.09.10" />
+  <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <title>Gaming Archive — Wayne "D22-soso" Chiang</title>
@@ -16,10 +17,12 @@
   <meta property="og:title" content="Gaming Archive — Wayne &quot;D22-soso&quot; Chiang" />
   <meta property="og:description" content="C&amp;C, Warcraft, Magic, Cube Draft, and Hearthstone — the games around StarCraft’s first official world title." />
   <meta property="og:image" content="https://d22soso.com/assets/img/champ-trophy-1080.jpg" />
+  <meta property="og:image:alt" content="Wayne D22-soso Chiang with StarCraft Brood War world championship trophy" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Gaming Archive — Wayne &quot;D22-soso&quot; Chiang" />
   <meta name="twitter:description" content="C&amp;C, Warcraft, Magic, Cube Draft, and Hearthstone — the games around Brood War." />
   <meta name="twitter:image" content="https://d22soso.com/assets/img/champ-trophy-1080.jpg" />
+  <meta name="twitter:image:alt" content="Wayne D22-soso Chiang with StarCraft Brood War world championship trophy" />
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%230a0a0a'/%3E%3Crect x='5' y='5' width='54' height='54' rx='9' fill='none' stroke='%238b5cf6' stroke-width='3'/%3E%3Ctext x='32' y='42' font-family='monospace' font-size='22' font-weight='700' fill='%238b5cf6' text-anchor='middle'%3ED22%3C/text%3E%3C/svg%3E" />
   <style>
     html { background: #0a0a0a; color-scheme: dark; }
@@ -28,9 +31,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png" />
   <link rel="stylesheet" href="style.css" />
-  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" />
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
-  <noscript><link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" /></noscript>
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" /></noscript>
   <script type="importmap">
   {
     "imports": {
@@ -47,7 +50,9 @@
   <link rel="modulepreload" href="js/theme-nav.js" />
   <link rel="modulepreload" href="js/motion.js" />
   <link rel="modulepreload" href="js/widgets.js" />
+  <link rel="modulepreload" href="js/flair.js" />
   <link rel="modulepreload" href="js/webgl-boot.js" />
+  <link rel="modulepreload" href="./vendor/three/three.module.js" />
 </head>
 <body data-theme="cnc" data-bg="cnc" data-page="gaming">
   <a class="skip-link" href="#main">Skip to content</a>
@@ -64,9 +69,9 @@
     <div class="bg-layer" data-bg="hearthstone"></div>
     <div class="bg-layer" data-bg="hearthstone-v2"></div>
     <div class="bg-layer" data-bg="hearthstone-v3"></div>
-    <div class="bg-layer" data-bg="starcraft"></div>
     <div class="bg-layer" data-bg="contact"></div>
     <canvas id="webgl-bg" aria-hidden="true"></canvas>
+    <div id="scene-flash" aria-hidden="true"></div>
   </div>
   <div class="scroll-progress" aria-hidden="true"><span class="scroll-progress-bar"></span></div>
   <div id="section-indicator" class="section-indicator" aria-live="polite">
@@ -95,7 +100,7 @@
       <header class="section-head" data-reveal="fade">
         <h1>Gaming Archive</h1>
         <p class="lede">The games around the 1999 Brood War title: Kali ladders, Cube Draft, two Pro Tours, and later ranks.</p>
-        <div class="cta-row" style="margin-top:1.25rem">
+        <div class="cta-row">
           <a class="btn btn-gold btn-arrow" href="index.html#esports">StarCraft World Championship <span class="arrow" aria-hidden="true">→</span></a>
           <a class="btn btn-primary" href="index.html">Back to portfolio</a>
         </div>
@@ -104,7 +109,7 @@
 
     <!-- C&C -->
     <section id="game-cnc" class="section game-section art-view" data-node="esports-cnc" data-bg="cnc" data-theme="cnc" data-base-theme="cnc" data-variant="0">
-      <article class="game-panel theme-panel" data-theme="cnc" data-reveal="scan" tabindex="0" aria-label="Command and Conquer theme — cycle atmosphere with the pips or Enter">
+      <article class="game-panel game-panel--quiet theme-panel" data-theme="cnc" data-reveal="scan" tabindex="0" aria-label="Command and Conquer theme — cycle atmosphere with the pips or Enter">
         <span class="theater-scanline" aria-hidden="true"></span>
         <p class="game-tag mono"><span class="badge-dot" aria-hidden="true"></span>THEATER 02 // COMMAND &amp; CONQUER</p>
         <div class="theme-pips" role="group" aria-label="Command and Conquer atmosphere">
@@ -127,7 +132,7 @@
 
     <!-- Warcraft -->
     <section id="game-warcraft" class="section game-section art-view" data-node="esports-warcraft" data-bg="warcraft" data-theme="warcraft" data-base-theme="warcraft" data-variant="0">
-      <article class="game-panel theme-panel" data-theme="warcraft" data-reveal="drop" tabindex="0" aria-label="Warcraft theme — cycle atmosphere with the pips or Enter">
+      <article class="game-panel game-panel--quiet theme-panel" data-theme="warcraft" data-reveal="drop" tabindex="0" aria-label="Warcraft theme — cycle atmosphere with the pips or Enter">
         <p class="game-tag mono"><span class="badge-dot" aria-hidden="true"></span>THEATER 03 // WARCRAFT II / III</p>
         <div class="theme-pips" role="group" aria-label="Warcraft atmosphere">
           <button type="button" class="theme-pip is-active" data-pip="0" aria-pressed="true" aria-label="Parchment Night"></button>
@@ -149,7 +154,7 @@
 
     <!-- MTG -->
     <section id="game-mtg" class="section game-section art-view" data-node="esports-mtg" data-bg="mtg" data-theme="mtg" data-base-theme="mtg" data-variant="0">
-      <article class="game-panel theme-panel" data-theme="mtg" data-reveal="deal" tabindex="0" aria-label="Magic the Gathering theme — cycle atmosphere with the pips or Enter">
+      <article class="game-panel game-panel--quiet theme-panel" data-theme="mtg" data-reveal="deal" tabindex="0" aria-label="Magic the Gathering theme — cycle atmosphere with the pips or Enter">
         <p class="game-tag mono"><span class="badge-dot" aria-hidden="true"></span>THEATER 04 // MAGIC: THE GATHERING</p>
         <div class="theme-pips" role="group" aria-label="Magic atmosphere">
           <button type="button" class="theme-pip is-active" data-pip="0" aria-pressed="true" aria-label="Lacquer Magenta"></button>
@@ -303,12 +308,12 @@
         <h2>On the main page</h2>
         <p class="lede">StarCraft championship, poker, inventions, and the book.</p>
       </header>
-      <div class="cta-row" data-reveal="jump" style="justify-content:center">
+      <div class="cta-row cta-row--center" data-reveal="jump">
         <a class="btn btn-gold btn-arrow" href="index.html#esports">Brood War World Champion <span class="arrow" aria-hidden="true">→</span></a>
         <a class="btn btn-primary btn-arrow" href="index.html#poker">Poker &amp; WSOP <span class="arrow" aria-hidden="true">→</span></a>
         <a class="btn btn-primary" href="index.html">Home</a>
       </div>
-      <p class="footer-meta mono" style="margin-top:2.5rem;text-align:center">
+      <p class="footer-meta mono">
         <a href="index.html">Portfolio</a>
         ·
         <a href="index.html#contact">Media kit</a>
@@ -319,7 +324,7 @@
         ·
         <a href="https://liquipedia.net/starcraft/Soso" target="_blank" rel="noopener noreferrer">Liquipedia — Soso</a>
       </p>
-      <p class="footer-credit mono" style="text-align:center">
+      <p class="footer-credit mono">
         Website created by
         <a href="https://chrisswimlee.com" target="_blank" rel="noopener noreferrer">chrisswimlee</a>
         ·

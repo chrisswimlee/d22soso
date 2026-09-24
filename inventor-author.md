@@ -1,6 +1,6 @@
 # The Next Evolution: Patented Table Game Inventions
 
-Source: `D22-soso inventor and Author.pdf` (2026). Public copy for the casino IP and author sections. House-edge figures and licensing rates remain first-party / confidential unless this document states them.
+Source: `sources/D22-soso inventor and Author.pdf` (2026). Public copy for the casino IP and author sections. House-edge figures and licensing rates remain first-party / confidential unless this document states them.
 
 Wayne Chiang designs casino table games and holds multiple U.S. patents. The site copy stays in this file so later edits do not re-infect the page with press-release English.
 

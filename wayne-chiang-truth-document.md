@@ -111,8 +111,8 @@ Single source of truth for the public portfolio. Confidence tiers:
 3. LATB buyer: OMG/Cardsharp vs “sold to Bally’s Interactive.”
 4. UCLA: interviewed twice ≠ alumni claim.
 5. Spec errors to avoid: Neutral Ground was StarCraft (at an MTG venue); do **not** claim September 1999 World Championships win (3rd; Patry won).
-6. `A Esports Real Time Strategy King .pdf` / `rts-king.md` (2026) supersedes older first-party dates for B.net vs Kali (Feb), Sports Seoul (#5), World Champions Invitational (Jul), and Battle.net “Top 20 Apr 1998–Dec 1999.”
-7. `D22-soso inventor and Author.pdf` / `inventor-author.md` (2026) is the public copy for 2HH, Badugi Chase, and *Betting on Yourself*. Do not lead with house-edge percentages or the WEB framework on-site. Named Washington expansion: Silver Dollar Casino SeaTac + future Washington location (PDF typos “Futrure Washiington” / “Seatac” normalized on publish).
+6. `sources/A Esports Real Time Strategy King.pdf` / `rts-king.md` (2026) supersedes older first-party dates for B.net vs Kali (Feb), Sports Seoul (#5), World Champions Invitational (Jul), and Battle.net “Top 20 Apr 1998–Dec 1999.”
+7. `sources/D22-soso inventor and Author.pdf` / `inventor-author.md` (2026) is the public copy for 2HH, Badugi Chase, and *Betting on Yourself*. Do not lead with house-edge percentages or the WEB framework on-site. Named Washington expansion: Silver Dollar Casino SeaTac + future Washington location (PDF typos “Futrure Washiington” / “Seatac” normalized on publish).
 8. `rts-king.md` (2026) casual-competitor addendum: Warcraft III US West, Clash Royale Challenger, League of Legends Diamond 5, Hearthstone Legend ranks, Once Upon a Galaxy #1 (PDF typo “Galazy” normalized).
 
 ---

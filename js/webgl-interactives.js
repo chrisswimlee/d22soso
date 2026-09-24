@@ -1,10 +1,46 @@
 /* Panel WebGL scenes: 2HH + Badugi cards */
 import * as THREE from "three";
 import gsap from "gsap";
+import { drawingDpr } from "./pref.js";
+
+const tableCoarse =
+  typeof matchMedia !== "undefined" && matchMedia("(pointer: coarse)").matches;
+const DRAG_PX = 8;
 
 const reduced =
   typeof matchMedia !== "undefined" &&
   matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+function watchAttract(canvas, key, fn) {
+  if (!canvas || reduced) return;
+  try {
+    if (sessionStorage.getItem(key)) return;
+  } catch (_) {}
+  let fired = false;
+  const run = () => {
+    if (fired) return;
+    fired = true;
+    try {
+      sessionStorage.setItem(key, "1");
+    } catch (_) {}
+    window.setTimeout(fn, 900);
+  };
+  if (typeof IntersectionObserver === "undefined") {
+    run();
+    return;
+  }
+  const io = new IntersectionObserver(
+    (entries) => {
+      const hit = entries.some((e) => e.isIntersecting && e.intersectionRatio > 0.2);
+      if (!hit) return;
+      if (canvas.closest("[hidden]")) return;
+      io.disconnect();
+      run();
+    },
+    { threshold: 0.25 }
+  );
+  io.observe(canvas);
+}
 
 function makeRenderer(canvas) {
   const coarse =
@@ -16,24 +52,59 @@ function makeRenderer(canvas) {
     powerPreference: "high-performance",
   });
   renderer.setClearColor(0x08080c, 1);
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, coarse ? 1 : 1.25));
+  renderer.setPixelRatio(drawingDpr());
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
   return renderer;
 }
 
 function fitRenderer(renderer, camera, canvas, fallbackW, fallbackH) {
-  const cssW = canvas.clientWidth || fallbackW;
-  const cssH = canvas.clientHeight || fallbackH;
-  renderer.setSize(cssW, cssH, false);
-  camera.aspect = cssW / Math.max(1, cssH);
-  camera.updateProjectionMatrix();
+  renderer.setPixelRatio(drawingDpr());
+  const rect = canvas.getBoundingClientRect();
+  const cssW = Math.max(1, Math.round(rect.width || canvas.clientWidth || fallbackW));
+  const cssH = Math.max(1, Math.round(rect.height || canvas.clientHeight || fallbackH));
+  const dpr = renderer.getPixelRatio();
+  const bw = Math.round(cssW * dpr);
+  const bh = Math.round(cssH * dpr);
+  if (canvas.width !== bw || canvas.height !== bh) {
+    renderer.setSize(cssW, cssH, false);
+    camera.aspect = cssW / cssH;
+    camera.updateProjectionMatrix();
+  }
   return { w: cssW, h: cssH };
 }
 
-function cardFaceTexture(rank, suit) {
+function watchCanvasBox(canvas, fit) {
+  if (typeof ResizeObserver !== "undefined") {
+    const ro = new ResizeObserver(() => fit());
+    ro.observe(canvas);
+  }
+  window.addEventListener("resize", fit, { passive: true });
+}
+
+function applyMapQuality(tex, renderer) {
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.generateMipmaps = true;
+  tex.minFilter = THREE.LinearMipmapLinearFilter;
+  tex.magFilter = THREE.LinearFilter;
+  tex.anisotropy = renderer?.capabilities?.getMaxAnisotropy?.() || 4;
+  tex.needsUpdate = true;
+  return tex;
+}
+
+function makeDrawCanvas(cssW, cssH) {
+  const dpr = reduced ? 1 : Math.max(2, drawingDpr());
   const c = document.createElement("canvas");
-  c.width = 256;
-  c.height = 360;
+  c.width = Math.round(cssW * dpr);
+  c.height = Math.round(cssH * dpr);
   const ctx = c.getContext("2d");
+  ctx.scale(dpr, dpr);
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = "high";
+  return { c, ctx };
+}
+
+function cardFaceTexture(rank, suit) {
+  const { c, ctx } = makeDrawCanvas(256, 360);
   const red = suit === "♥" || suit === "♦";
   const ink = red ? "#b91c1c" : "#141414";
 
@@ -70,17 +141,11 @@ function cardFaceTexture(rank, suit) {
   ctx.fillText(suit, 0, 52);
   ctx.restore();
 
-  const tex = new THREE.CanvasTexture(c);
-  tex.colorSpace = THREE.SRGBColorSpace;
-  tex.anisotropy = 4;
-  return tex;
+  return applyMapQuality(new THREE.CanvasTexture(c));
 }
 
 function cardBackTexture(tint) {
-  const c = document.createElement("canvas");
-  c.width = 256;
-  c.height = 360;
-  const ctx = c.getContext("2d");
+  const { c, ctx } = makeDrawCanvas(256, 360);
   const base = tint || "#1e3a5f";
   ctx.fillStyle = base;
   ctx.fillRect(0, 0, 256, 360);
@@ -100,9 +165,7 @@ function cardBackTexture(tint) {
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   ctx.fillText("D22", 128, 180);
-  const tex = new THREE.CanvasTexture(c);
-  tex.colorSpace = THREE.SRGBColorSpace;
-  return tex;
+  return applyMapQuality(new THREE.CanvasTexture(c));
 }
 
 function makeCardMesh(rank, suit, opts) {
@@ -128,14 +191,14 @@ function makeCardMesh(rank, suit, opts) {
 function makeFeltTable(radius, feltColor, railColor) {
   const group = new THREE.Group();
   const felt = new THREE.Mesh(
-    new THREE.CircleGeometry(radius, 32),
+    new THREE.CircleGeometry(radius, 64),
     new THREE.MeshBasicMaterial({ color: feltColor })
   );
   felt.rotation.x = -Math.PI / 2;
   group.add(felt);
 
   const rail = new THREE.Mesh(
-    new THREE.RingGeometry(radius * 0.92, radius * 1.06, 32),
+    new THREE.RingGeometry(radius * 0.92, radius * 1.06, 64),
     new THREE.MeshBasicMaterial({
       color: railColor,
       transparent: true,
@@ -149,7 +212,7 @@ function makeFeltTable(radius, feltColor, railColor) {
   group.add(rail);
 
   const inner = new THREE.Mesh(
-    new THREE.RingGeometry(radius * 0.55, radius * 0.58, 32),
+    new THREE.RingGeometry(radius * 0.55, radius * 0.58, 64),
     new THREE.MeshBasicMaterial({
       color: 0xd4af37,
       transparent: true,
@@ -165,12 +228,8 @@ function makeFeltTable(radius, feltColor, railColor) {
 }
 
 function makeHudLabel(width, height, color) {
-  const canvas = document.createElement("canvas");
-  canvas.width = 640;
-  canvas.height = 96;
-  const ctx = canvas.getContext("2d");
-  const tex = new THREE.CanvasTexture(canvas);
-  tex.colorSpace = THREE.SRGBColorSpace;
+  const { c: canvas, ctx } = makeDrawCanvas(640, 96);
+  const tex = applyMapQuality(new THREE.CanvasTexture(canvas));
   const mesh = new THREE.Mesh(
     new THREE.PlaneGeometry(width, height),
     new THREE.MeshBasicMaterial({ map: tex, transparent: true, depthWrite: false })
@@ -194,18 +253,14 @@ function makeHudLabel(width, height, color) {
 }
 
 function makeZoneLabel(text, color) {
-  const canvas = document.createElement("canvas");
-  canvas.width = 256;
-  canvas.height = 64;
-  const ctx = canvas.getContext("2d");
+  const { c: canvas, ctx } = makeDrawCanvas(256, 64);
   ctx.fillStyle = color;
   ctx.font = "700 28px IBM Plex Mono, monospace";
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   ctx.globalAlpha = 0.9;
   ctx.fillText(text, 128, 32);
-  const tex = new THREE.CanvasTexture(canvas);
-  tex.colorSpace = THREE.SRGBColorSpace;
+  const tex = applyMapQuality(new THREE.CanvasTexture(canvas));
   const mesh = new THREE.Mesh(
     new THREE.PlaneGeometry(1.4, 0.32),
     new THREE.MeshBasicMaterial({
@@ -261,6 +316,34 @@ function bindVisibleLoop(canvas, tick, { onHide } = {}) {
     raf = requestAnimationFrame(loop);
   }
   return { isVisible };
+}
+
+function ndcFromEvent(canvas, e, pointer) {
+  const rect = canvas.getBoundingClientRect();
+  pointer.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+  pointer.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+  return rect;
+}
+
+function hitCard(raycaster, camera, pointer, cards) {
+  raycaster.setFromCamera(pointer, camera);
+  const hits = raycaster.intersectObjects(cards, false);
+  return hits.length ? hits[0].object : null;
+}
+
+function intersectTable(raycaster, camera, pointer, y, out) {
+  raycaster.setFromCamera(pointer, camera);
+  const plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), -y);
+  return raycaster.ray.intersectPlane(plane, out) ? out : null;
+}
+
+function clampTable(v) {
+  v.x = Math.max(-2.4, Math.min(2.4, v.x));
+  v.z = Math.max(-1.85, Math.min(2.05, v.z));
+}
+
+function setCardGrab(on) {
+  document.body.classList.toggle("is-dragging-card", !!on);
 }
 
 /* ---------- 2 HAND HOLD'EM ---------- */
@@ -356,12 +439,26 @@ function init2HH(canvas) {
   let board = [];
   let split = false;
   let busy = false;
+  let layoutUntil = 0;
+
+  function allCards() {
+    return hole.concat(board);
+  }
 
   function disposeCards(list) {
     list.forEach((m) => {
       scene.remove(m);
       m.userData.dispose?.();
     });
+  }
+
+  function seedCard(m, i) {
+    m.userData.phase = i * 1.3;
+    m.userData.free = false;
+    m.userData.dragging = false;
+    m.userData.vx = 0;
+    m.userData.vz = 0;
+    m.userData.restY = 0.52;
   }
 
   function dealFresh() {
@@ -374,12 +471,14 @@ function init2HH(canvas) {
       makeCardMesh(c.rank, c.suit, { backTint: "#12304f" })
     );
     hole.forEach((m, i) => {
+      seedCard(m, i);
       m.position.set(-0.9 + i * 0.22, 1.1, 2.4);
       m.rotation.set(-0.4, 0, 0);
       m.scale.setScalar(0.85);
       scene.add(m);
     });
     board.forEach((m, i) => {
+      seedCard(m, i + 4);
       m.position.set(-0.4 + i * 0.2, 1.2, -1.6);
       m.rotation.set(-0.5, 0, 0);
       m.scale.setScalar(0.85);
@@ -387,9 +486,10 @@ function init2HH(canvas) {
     });
   }
 
-  function layout(animate) {
-    const duration = reduced || !animate ? 0.01 : 0.65;
-    const ease = "power3.out";
+  function layout(animate, { dealArc = false } = {}) {
+    const duration = reduced || !animate ? 0.01 : dealArc ? 0.52 : 0.65;
+    const ease = dealArc ? "power2.inOut" : "power3.out";
+    layoutUntil = performance.now() + (duration + (dealArc ? 0.45 : 0.2)) * 1000;
     hole.forEach((m, i) => {
       let x;
       let z;
@@ -403,34 +503,88 @@ function init2HH(canvas) {
         z = 1.2;
         rotY = hand === 0 ? -0.08 : 0.08;
       }
-      gsap.to(m.position, {
-        x,
-        y: 0.52,
-        z,
-        duration,
-        delay: reduced ? 0 : i * 0.04,
-        ease,
-        overwrite: "auto",
-      });
-      gsap.to(m.rotation, {
-        x: -0.18,
-        y: rotY,
-        z: 0,
-        duration,
-        ease,
-        overwrite: "auto",
-      });
+      m.userData.free = false;
+      m.userData.dragging = false;
+      m.userData.vx = 0;
+      m.userData.vz = 0;
+      m.userData.restX = x;
+      m.userData.restY = 0.52;
+      m.userData.restZ = z;
+      const delay = reduced ? 0 : i * (dealArc ? 0.055 : 0.04);
+      if (dealArc && animate && !reduced) {
+        gsap.to(m.position, {
+          x,
+          y: 1.18,
+          z,
+          duration: 0.26,
+          delay,
+          ease: "power2.out",
+          overwrite: "auto",
+          onComplete: () => {
+            gsap.to(m.position, {
+              y: 0.52,
+              duration: 0.3,
+              ease: "power3.in",
+              overwrite: "auto",
+            });
+          },
+        });
+        gsap.fromTo(
+          m.rotation,
+          { x: -0.42, y: rotY, z: (i - 1.5) * 0.1 },
+          { x: -0.18, y: rotY, z: 0, duration: 0.54, delay, ease: "power3.out", overwrite: "auto" }
+        );
+      } else {
+        gsap.to(m.position, {
+          x,
+          y: 0.52,
+          z,
+          duration,
+          delay,
+          ease,
+          overwrite: "auto",
+        });
+        gsap.to(m.rotation, {
+          x: -0.18,
+          y: rotY,
+          z: 0,
+          duration,
+          ease,
+          overwrite: "auto",
+        });
+      }
       gsap.to(m.scale, { x: 1, y: 1, z: 1, duration, ease, overwrite: "auto" });
     });
     board.forEach((m, i) => {
+      const x = -0.85 + i * 0.85;
+      const z = -0.55;
+      m.userData.free = false;
+      m.userData.dragging = false;
+      m.userData.vx = 0;
+      m.userData.vz = 0;
+      m.userData.restX = x;
+      m.userData.restY = 0.52;
+      m.userData.restZ = z;
+      const delay = reduced ? 0 : 0.12 + i * 0.05;
       gsap.to(m.position, {
-        x: -0.85 + i * 0.85,
-        y: 0.52,
-        z: -0.55,
-        duration,
-        delay: reduced ? 0 : 0.12 + i * 0.05,
-        ease,
+        x,
+        y: dealArc && animate && !reduced ? 0.92 : 0.52,
+        z,
+        duration: dealArc && animate && !reduced ? 0.24 : duration,
+        delay,
+        ease: dealArc ? "power2.out" : ease,
         overwrite: "auto",
+        onComplete:
+          dealArc && animate && !reduced
+            ? () => {
+                gsap.to(m.position, {
+                  y: 0.52,
+                  duration: 0.28,
+                  ease: "power3.in",
+                  overwrite: "auto",
+                });
+              }
+            : undefined,
       });
       gsap.to(m.rotation, { x: -0.18, y: 0, z: 0, duration, ease, overwrite: "auto" });
       gsap.to(m.scale, { x: 1, y: 1, z: 1, duration, ease, overwrite: "auto" });
@@ -447,30 +601,128 @@ function init2HH(canvas) {
   }
 
   dealFresh();
-  layout(true);
+  layout(true, { dealArc: true });
 
-  canvas.addEventListener("click", () => {
+  let userTouched = false;
+  canvas.addEventListener(
+    "pointerdown",
+    () => {
+      userTouched = true;
+    },
+    { capture: true }
+  );
+
+  function cycleTable() {
     if (busy) return;
     if (split) {
       busy = true;
       split = false;
       dealFresh();
       label.userData.paint("DEALT — CLICK TO SPLIT INTO TWO HANDS");
-      layout(true);
+      layout(true, { dealArc: true });
       window.setTimeout(() => {
         busy = false;
-      }, reduced ? 40 : 700);
+      }, reduced ? 40 : 780);
       return;
     }
     split = true;
     label.userData.paint("TWO HANDS // ONE BOARD — CLICK TO REDEAL");
-    layout(true);
+    layout(true, { dealArc: true });
+  }
+
+  const raycaster = new THREE.Raycaster();
+  const pointer = new THREE.Vector2();
+  const tableHit = new THREE.Vector3();
+  let drag = null;
+  let dragStart = { x: 0, y: 0 };
+  let didDrag = false;
+
+  function cycleOrIgnore() {
+    if (!didDrag) cycleTable();
+  }
+
+  canvas.addEventListener("pointerdown", (e) => {
+    if (busy || reduced) return;
+    ndcFromEvent(canvas, e, pointer);
+    const hit = tableCoarse ? null : hitCard(raycaster, camera, pointer, allCards());
+    if (!hit) {
+      drag = null;
+      didDrag = false;
+      return;
+    }
+    gsap.killTweensOf(hit.position);
+    drag = hit;
+    didDrag = false;
+    dragStart.x = e.clientX;
+    dragStart.y = e.clientY;
+    hit.userData.dragging = true;
+    hit.userData.vx = 0;
+    hit.userData.vz = 0;
+    canvas.setPointerCapture?.(e.pointerId);
+  });
+
+  canvas.addEventListener("pointermove", (e) => {
+    if (!drag) {
+      if (tableCoarse || reduced) return;
+      ndcFromEvent(canvas, e, pointer);
+      canvas.style.cursor = hitCard(raycaster, camera, pointer, allCards())
+        ? "grab"
+        : "pointer";
+      return;
+    }
+    const dx = e.clientX - dragStart.x;
+    const dy = e.clientY - dragStart.y;
+    if (!didDrag && dx * dx + dy * dy < DRAG_PX * DRAG_PX) return;
+    didDrag = true;
+    setCardGrab(true);
+    canvas.style.cursor = "grabbing";
+    ndcFromEvent(canvas, e, pointer);
+    const p = intersectTable(raycaster, camera, pointer, 0.52, tableHit);
+    if (!p) return;
+    clampTable(p);
+    const prevX = drag.userData.restX ?? drag.position.x;
+    const prevZ = drag.userData.restZ ?? drag.position.z;
+    drag.userData.restX = p.x;
+    drag.userData.restY = 0.62;
+    drag.userData.restZ = p.z;
+    drag.userData.vx = p.x - prevX;
+    drag.userData.vz = p.z - prevZ;
+    drag.position.set(p.x, 0.62, p.z);
+  });
+
+  function endCardDrag() {
+    if (!drag) return;
+    drag.userData.dragging = false;
+    if (didDrag) {
+      drag.userData.free = true;
+      drag.userData.restY = 0.52;
+    }
+    setCardGrab(false);
+    canvas.style.cursor = "pointer";
+    const moved = didDrag;
+    drag = null;
+    return moved;
+  }
+
+  canvas.addEventListener("pointerup", (e) => {
+    const moved = endCardDrag();
+    if (moved) return;
+    if (e.target === canvas) cycleOrIgnore();
+  });
+  canvas.addEventListener("pointercancel", () => {
+    endCardDrag();
   });
   canvas.style.cursor = "pointer";
+
+  watchAttract(canvas, "d22-attract-2hh", () => {
+    if (userTouched || split || busy) return;
+    cycleTable();
+  });
 
   let clock = 0;
   const fit = () => fitRenderer(renderer, camera, canvas, 480, 300);
   fit();
+  watchCanvasBox(canvas, fit);
   bindVisibleLoop(canvas, (first) => {
     if (first) fit();
     clock += 0.016;
@@ -479,13 +731,29 @@ function init2HH(canvas) {
       camera.position.y = 4.1 + Math.sin(clock * 0.18) * 0.04;
       camera.lookAt(0, 0.15, 0.1);
       label.lookAt(camera.position);
+      if (performance.now() > layoutUntil) {
+        allCards().forEach((m, i) => {
+          if (m.userData.dragging) return;
+          if (m.userData.free) {
+            m.userData.restX += m.userData.vx;
+            m.userData.restZ += m.userData.vz;
+            m.userData.vx *= 0.88;
+            m.userData.vz *= 0.88;
+            const tmp = { x: m.userData.restX, z: m.userData.restZ };
+            clampTable(tmp);
+            m.userData.restX = tmp.x;
+            m.userData.restZ = tmp.z;
+            m.position.x = m.userData.restX;
+            m.position.z = m.userData.restZ;
+          }
+          const restY = m.userData.restY ?? 0.52;
+          m.position.y = restY + Math.sin(clock * 1.5 + (m.userData.phase || i)) * 0.028;
+        });
+      }
     }
     renderer.render(scene, camera);
   });
-  window.addEventListener("resize", fit);
 }
-
-/* ---------- BADUGI TRIAD ---------- */
 function initBadugi(canvas) {
   if (!canvas) return;
 
@@ -568,12 +836,22 @@ function initBadugi(canvas) {
   let community = [];
   let picked = false;
   let hoverIdx = -1;
+  let layoutUntil = 0;
 
   function disposeCards(list) {
     list.forEach((m) => {
       scene.remove(m);
       m.userData.dispose?.();
     });
+  }
+
+  function seedToy(m, i) {
+    m.userData.phase = i * 1.2;
+    m.userData.free = false;
+    m.userData.dragging = false;
+    m.userData.vx = 0;
+    m.userData.vz = 0;
+    m.userData.restY = 0.55;
   }
 
   function makeDeal() {
@@ -589,6 +867,8 @@ function initBadugi(canvas) {
       mesh.userData.rejected = false;
       return mesh;
     });
+    hole.forEach((m, i) => seedToy(m, i));
+    community.forEach((m, i) => seedToy(m, i + 4));
     hole.forEach((m, i) => {
       m.position.set(-1.15 + i * 0.28, 1.0, 2.5);
       m.rotation.set(-0.45, 0, 0);
@@ -604,8 +884,14 @@ function initBadugi(canvas) {
   function layout(animate) {
     const duration = reduced || !animate ? 0.01 : 0.55;
     const ease = "power3.out";
+    layoutUntil = performance.now() + (duration + 0.2) * 1000;
 
     hole.forEach((m, i) => {
+      m.userData.free = false;
+      m.userData.dragging = false;
+      m.userData.restX = -1.2 + i * 0.8;
+      m.userData.restY = 0.5;
+      m.userData.restZ = 1.55;
       gsap.to(m.position, {
         x: -1.2 + i * 0.8,
         y: 0.5,
@@ -640,6 +926,12 @@ function initBadugi(canvas) {
         z = 0.05;
         if (hoverIdx === i && !picked) y = 0.72;
       }
+      m.userData.free = false;
+      m.userData.dragging = false;
+      m.userData.restX = x;
+      m.userData.restY = y;
+      m.userData.restZ = z;
+      if (m.userData.holdDrag) return;
       gsap.to(m.position, { x, y, z, duration, ease, overwrite: "auto" });
       gsap.to(m.rotation, {
         x: -0.22,
@@ -707,14 +999,69 @@ function initBadugi(canvas) {
     return bestD < 0.22 ? best : -1;
   }
 
+  function resetDeal() {
+    picked = false;
+    hoverIdx = -1;
+    makeDeal();
+    label.userData.paint("PICK 1 OF 3 COMMUNITY CARDS");
+    communityTag.material.opacity = 0.75;
+    layout(true);
+  }
+
+  function chooseCommunity(idx) {
+    if (idx < 0) return;
+    community.forEach((m, i) => {
+      m.userData.chosen = i === idx;
+      m.userData.rejected = i !== idx;
+      m.userData.free = false;
+      m.userData.holdDrag = false;
+    });
+    picked = true;
+    hoverIdx = -1;
+    label.userData.paint("HAND COMPLETE — CLICK TO RESET");
+    communityTag.material.opacity = 0.35;
+    layout(true);
+  }
+
+  function nearPickSlot(pos) {
+    return Math.abs(pos.x) < 0.55 && Math.abs(pos.z - 0.55) < 0.55;
+  }
+
+  const tableHit = new THREE.Vector3();
+  let drag = null;
+  let dragStart = { x: 0, y: 0 };
+  let didDrag = false;
+
   canvas.addEventListener("pointermove", (e) => {
+    if (drag) {
+      if (tableCoarse || reduced) return;
+      const dx = e.clientX - dragStart.x;
+      const dy = e.clientY - dragStart.y;
+      if (!didDrag && dx * dx + dy * dy < DRAG_PX * DRAG_PX) return;
+      didDrag = true;
+      setCardGrab(true);
+      canvas.style.cursor = "grabbing";
+      ndcFromEvent(canvas, e, pointer);
+      const p = intersectTable(raycaster, camera, pointer, 0.62, tableHit);
+      if (!p) return;
+      clampTable(p);
+      const prevX = drag.userData.restX ?? drag.position.x;
+      const prevZ = drag.userData.restZ ?? drag.position.z;
+      drag.userData.restX = p.x;
+      drag.userData.restY = 0.68;
+      drag.userData.restZ = p.z;
+      drag.userData.vx = p.x - prevX;
+      drag.userData.vz = p.z - prevZ;
+      drag.position.set(p.x, 0.68, p.z);
+      return;
+    }
     if (picked || reduced) return;
     const idx = resolveIndex(e);
     if (idx === hoverIdx) return;
     hoverIdx = idx;
-    canvas.style.cursor = idx >= 0 ? "pointer" : "default";
+    canvas.style.cursor = idx >= 0 ? "grab" : "pointer";
     community.forEach((m, i) => {
-      if (m.userData.rejected || m.userData.chosen) return;
+      if (m.userData.rejected || m.userData.chosen || m.userData.dragging) return;
       gsap.to(m.position, {
         y: i === hoverIdx ? 0.72 : 0.55,
         duration: 0.22,
@@ -724,33 +1071,102 @@ function initBadugi(canvas) {
     });
   });
 
-  canvas.addEventListener("click", (e) => {
+  canvas.addEventListener("pointerdown", (e) => {
+    if (reduced) return;
     if (picked) {
-      picked = false;
-      hoverIdx = -1;
-      makeDeal();
-      label.userData.paint("PICK 1 OF 3 COMMUNITY CARDS");
-      communityTag.material.opacity = 0.75;
-      layout(true);
+      drag = null;
+      didDrag = false;
       return;
     }
+    if (tableCoarse) return;
     const idx = resolveIndex(e);
-    if (idx < 0) return;
-    community.forEach((m, i) => {
-      m.userData.chosen = i === idx;
-      m.userData.rejected = i !== idx;
-    });
-    picked = true;
-    hoverIdx = -1;
-    label.userData.paint("HAND COMPLETE — CLICK TO RESET");
-    communityTag.material.opacity = 0.35;
-    layout(true);
+    const hit = idx >= 0 ? community[idx] : null;
+    if (!hit || hit.userData.rejected) return;
+    gsap.killTweensOf(hit.position);
+    drag = hit;
+    didDrag = false;
+    dragStart.x = e.clientX;
+    dragStart.y = e.clientY;
+    hit.userData.dragging = true;
+    hit.userData.holdDrag = true;
+    hit.userData.vx = 0;
+    hit.userData.vz = 0;
+    canvas.setPointerCapture?.(e.pointerId);
+  });
+
+  canvas.addEventListener("pointerup", (e) => {
+    if (picked && !didDrag) {
+      resetDeal();
+      return;
+    }
+    if (!drag) {
+      if (!picked && !tableCoarse) {
+        const idx = resolveIndex(e);
+        if (idx >= 0) chooseCommunity(idx);
+      } else if (!picked && tableCoarse) {
+        const idx = resolveIndex(e);
+        if (idx >= 0) chooseCommunity(idx);
+      }
+      return;
+    }
+    const card = drag;
+    const idx = community.indexOf(card);
+    card.userData.dragging = false;
+    card.userData.holdDrag = false;
+    setCardGrab(false);
+    canvas.style.cursor = "pointer";
+    drag = null;
+    if (!didDrag) {
+      chooseCommunity(idx);
+      return;
+    }
+    if (nearPickSlot(card.position)) {
+      chooseCommunity(idx);
+      return;
+    }
+    card.userData.free = true;
+    card.userData.restY = 0.55;
+  });
+  canvas.addEventListener("pointercancel", () => {
+    if (!drag) return;
+    drag.userData.dragging = false;
+    drag.userData.holdDrag = false;
+    drag.userData.free = true;
+    drag.userData.restY = 0.55;
+    drag = null;
+    setCardGrab(false);
   });
   canvas.style.cursor = "pointer";
+
+  let userTouched = false;
+  canvas.addEventListener(
+    "pointerdown",
+    () => {
+      userTouched = true;
+    },
+    { capture: true }
+  );
+
+  function attractLift() {
+    if (userTouched || picked || reduced) return;
+    community.forEach((m, i) => {
+      if (m.userData.rejected || m.userData.chosen || m.userData.dragging) return;
+      const fan = (i - 1) * 0.16;
+      const lift = gsap.timeline({ overwrite: "auto" });
+      lift
+        .to(m.position, { y: 0.92, duration: 0.3, delay: i * 0.07, ease: "power2.out" }, 0)
+        .to(m.rotation, { z: fan, duration: 0.3, ease: "power2.out" }, 0)
+        .to(m.position, { y: 0.55, duration: 0.36, ease: "power2.inOut" })
+        .to(m.rotation, { z: 0, duration: 0.36, ease: "power2.inOut" }, "<");
+    });
+  }
+
+  watchAttract(canvas, "d22-attract-badugi", attractLift);
 
   let clock = 0;
   const fit = () => fitRenderer(renderer, camera, canvas, 480, 300);
   fit();
+  watchCanvasBox(canvas, fit);
   bindVisibleLoop(canvas, (first) => {
     if (first) fit();
     clock += 0.016;
@@ -762,10 +1178,33 @@ function initBadugi(canvas) {
       if (picked) {
         pickRing.rotation.z = clock * 0.6;
       }
+      if (performance.now() > layoutUntil) {
+        hole.forEach((m, i) => {
+          if (m.userData.dragging) return;
+          const restY = m.userData.restY ?? 0.5;
+          m.position.y = restY + Math.sin(clock * 1.45 + (m.userData.phase || i)) * 0.022;
+        });
+        community.forEach((m, i) => {
+          if (m.userData.dragging || m.userData.rejected) return;
+          if (m.userData.free) {
+            m.userData.restX += m.userData.vx;
+            m.userData.restZ += m.userData.vz;
+            m.userData.vx *= 0.88;
+            m.userData.vz *= 0.88;
+            const tmp = { x: m.userData.restX, z: m.userData.restZ };
+            clampTable(tmp);
+            m.userData.restX = tmp.x;
+            m.userData.restZ = tmp.z;
+            m.position.x = m.userData.restX;
+            m.position.z = m.userData.restZ;
+          }
+          const restY = m.userData.restY ?? 0.55;
+          m.position.y = restY + Math.sin(clock * 1.45 + (m.userData.phase || i)) * 0.026;
+        });
+      }
     }
     renderer.render(scene, camera);
   });
-  window.addEventListener("resize", fit);
 }
 
 export { init2HH, initBadugi };
