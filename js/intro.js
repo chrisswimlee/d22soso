@@ -1,4 +1,4 @@
-/* One-shot homepage intro: constellation field condenses into the hero lockup. */
+/* One-shot homepage intro: a short fade. The hero photo does not move. */
 import { reduced, coarse } from "./pref.js";
 import { startWebGL } from "./webgl-boot.js";
 

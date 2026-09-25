@@ -1206,46 +1206,31 @@ export function initBgScene(canvas) {
     }
   }
 
-  function playSkyIntro({ duration, onReveal, onRevealPart, onDone } = {}) {
+  function playSkyIntro({ onReveal, onRevealPart, onDone } = {}) {
     stopBootTimeline();
-    boot.playing = true;
-    boot.phase = "field";
-    boot.icon = 0;
-    boot.land = 0;
-    boot.release = 0;
-    boot.partT = { card: 0, lockup: 0, rest: 0 };
+    boot.playing = false;
+    boot.phase = "landed";
+    boot.icon = 1;
+    boot.land = 1;
+    boot.release = 1;
+    boot.partT = { card: 1, lockup: 1, rest: 1 };
     boot.revealed = false;
     boot.firedParts = new Set();
     boot.onReveal = onReveal;
     boot.onRevealPart = onRevealPart;
     boot.onDone = onDone;
     holdFleets();
-    if (!coarse) assignIconTargets();
-    for (let i = 0; i < STAR_COUNT; i++) {
-      starPos[i * 3] = starSpinX[i];
-      starPos[i * 3 + 1] = starSpinY[i];
-      starVel[i * 2] = 0;
-      starVel[i * 2 + 1] = 0;
-    }
-    starGeo.attributes.position.needsUpdate = true;
-    if (!coarse) weaveIdle();
+    snapField();
     syncStarOpacity();
     syncFogOpacity();
     bumpActivity();
-    assignLandTargets();
 
-    const mobile = coarse;
     const tl = gsap.timeline({
       onComplete: () => {
         boot.playing = false;
         boot.phase = "landed";
-        boot.release = 1;
-        SKY_PARTS.forEach((id) => {
-          boot.partT[id] = 1;
-        });
-        boot.land = 1;
-        fireReveal();
         releaseFleets();
+        lockHeroPhoto();
         syncStarOpacity();
         syncFogOpacity();
         try {
@@ -1253,54 +1238,15 @@ export function initBgScene(canvas) {
         } catch {
           /* ignore */
         }
-        gsap.delayedCall(0.12, lockHeroPhoto);
       },
     });
     boot.tl = tl;
-
-    const ease = "power3.inOut";
-    /* Field → silhouettes → photo / lockup / pillars, then release */
-    const waves = mobile
-      ? [
-          { id: "card", at: 0.2, dur: 0.75, show: 0.78 },
-          { id: "lockup", at: 1.05, dur: 0.7, show: 1.55 },
-          { id: "rest", at: 1.85, dur: 0.65, show: 2.3 },
-        ]
-      : [
-          { id: "card", at: 1.15, dur: 0.85, show: 1.75 },
-          { id: "lockup", at: 2.15, dur: 0.72, show: 2.7 },
-          { id: "rest", at: 3.05, dur: 0.68, show: 3.55 },
-        ];
-
-    if (!mobile) {
-      tl.add(() => {
-        boot.phase = "icons";
-      }, 0.32);
-      tl.to(boot, { icon: 1, duration: 1.0, ease }, 0.32);
-    } else {
-      boot.icon = 1;
-    }
-
+    /* Fade the hero in. The photograph stays still; stars do not assemble it. */
     tl.add(() => {
-      boot.phase = "condense";
-      assignLandTargets();
-    }, waves[0].at);
-
-    waves.forEach((wave) => {
-      tl.to(boot.partT, { [wave.id]: 1, duration: wave.dur, ease, overwrite: false }, wave.at);
-      tl.add(() => {
-        boot.land = Math.max(boot.land, boot.partT[wave.id]);
-        firePart(wave.id);
-        if (wave.id === "rest") fireReveal();
-      }, wave.show);
-    });
-
-    const releaseAt = mobile ? 2.55 : 3.85;
-    tl.add(() => {
-      boot.phase = "release";
-      releaseFleets();
-    }, releaseAt);
-    tl.to(boot, { release: 1, duration: mobile ? 1.0 : 1.15, ease: "sine.out" }, releaseAt);
+      SKY_PARTS.forEach(firePart);
+      fireReveal();
+    }, 0.12);
+    tl.to({}, { duration: 0.8 }, 0);
   }
 
   function skipSkyIntro() {

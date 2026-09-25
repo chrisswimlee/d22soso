@@ -170,32 +170,9 @@ html.is-intro-pending[data-intro="playing"] .hero-gate {
 html[data-intro="playing"] .sky-part {
   opacity: 0;
   pointer-events: none;
-}
-
-html[data-intro="playing"] .sky-part[data-sky-part="card"] {
-  transform: scale(1.045);
+  transform: none;
   filter: none;
-  transition:
-    opacity 1.15s cubic-bezier(0.22, 1, 0.36, 1),
-    transform 1.35s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-html[data-intro="playing"] .sky-part[data-sky-part="lockup"] {
-  transform: translate3d(0, 20px, 0);
-  filter: blur(7px);
-  transition:
-    opacity 0.65s ease,
-    transform 0.8s cubic-bezier(0.16, 1, 0.3, 1),
-    filter 0.5s ease;
-}
-
-html[data-intro="playing"] .sky-part[data-sky-part="rest"] {
-  transform: translate3d(0, 12px, 0);
-  filter: blur(3px);
-  transition:
-    opacity 0.7s ease,
-    transform 0.85s cubic-bezier(0.22, 1, 0.36, 1),
-    filter 0.55s ease;
+  transition: opacity 0.55s ease;
 }
 
 html[data-intro="playing"] .sky-part.is-sky-in {
@@ -204,17 +181,8 @@ html[data-intro="playing"] .sky-part.is-sky-in {
   filter: none;
 }
 
-@media (hover: none), (pointer: coarse) {
-  html[data-intro="playing"] .sky-part[data-sky-part="card"] {
-    transform: scale(1.03);
-    transition-duration: 0.85s, 1s;
-  }
-  html[data-intro="playing"] .sky-part[data-sky-part="lockup"],
-  html[data-intro="playing"] .sky-part[data-sky-part="rest"] {
-    transform: translate3d(0, 12px, 0);
-    filter: blur(3px);
-    transition-duration: 0.55s, 0.65s, 0.45s;
-  }
+html[data-intro="playing"] .hero-photo-stack.is-sky-in {
+  opacity: calc(0.97 * (1 - var(--hero-leave, 0)));
 }
 
 html.is-intro-pending .bg-layer {
@@ -1047,14 +1015,16 @@ html.reveal-on [data-reveal="stagger"]:not(.is-inview) .reveal-item:nth-child(5)
 html.reveal-on [data-reveal="stagger"]:not(.is-inview) .reveal-item:nth-child(6) { transition-delay: 0.03s; }
 html.reveal-on [data-reveal="stagger"]:not(.is-inview) .reveal-item:nth-child(7) { transition-delay: 0s; }
 
-/* Hero triptych — uniform fade-up (override mixed stagger transforms) */
+/* Hero — fade only. Pictures and lockup do not move. */
+html.reveal-on .hero [data-reveal="stagger"] .reveal-item,
 html.reveal-on .hero [data-reveal="stagger"]:not(.is-inview) .reveal-item,
-html.reveal-on .hero [data-reveal="stagger"]:not(.is-inview) .hero-trio .reveal-item {
-  transform: translate3d(0, 20px, 0);
+html.reveal-on .hero [data-reveal="stagger"]:not(.is-inview) .hero-trio .reveal-item,
+html.reveal-on .hero [data-reveal="stagger"][data-exit] .reveal-item {
+  transform: none;
 }
 
-html.reveal-on .hero [data-reveal="stagger"].is-inview .reveal-item {
-  transform: none;
+html.reveal-on .hero [data-reveal="stagger"] .reveal-item {
+  transition: opacity 0.45s ease;
 }
 
 /* Theme accents — kept distinct across theaters (no shared primary hexes) */
@@ -1511,7 +1481,8 @@ h3 {
   margin: 0;
   overflow: hidden;
   opacity: 0;
-  transition: opacity 1.75s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: none;
+  transition: opacity 0.7s ease;
 }
 
 .hero-photo.is-active {
@@ -1525,6 +1496,7 @@ h3 {
   object-fit: cover;
   object-position: 48% 40%;
   filter: none;
+  transform: none;
 }
 
 .hero-photo--logo {
@@ -1985,6 +1957,7 @@ html.has-sky-photo[data-intro="playing"] #bg-stage::after {
   object-fit: contain;
   filter: drop-shadow(0 6px 18px rgba(0, 0, 0, 0.45));
   opacity: 0.95;
+  transform: none;
   transition: opacity 0.2s ease;
 }
 
