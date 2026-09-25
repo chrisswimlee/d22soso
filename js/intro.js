@@ -189,6 +189,7 @@ async function play() {
         watchdog = 0;
       }
       runCleanups();
+      revealHero();
       finishStage();
     },
   });
