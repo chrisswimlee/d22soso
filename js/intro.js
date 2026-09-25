@@ -1,8 +1,7 @@
-/* One-shot homepage intro: a short fade. The hero photo does not move. */
+/* Homepage intro: a short fade on every visit to the default page. The hero photo does not move. */
 import { reduced, coarse } from "./pref.js";
 import { startWebGL } from "./webgl-boot.js";
 
-const STORAGE_KEY = "d22-intro-played";
 const SKY_PARTS = ["card", "lockup", "rest"];
 
 let finished = false;
@@ -33,40 +32,15 @@ function hasWebGL() {
   }
 }
 
-function alreadyPlayed() {
-  try {
-    return sessionStorage.getItem(STORAGE_KEY) === "1";
-  } catch {
-    return false;
-  }
-}
-
-function markPlayed() {
-  try {
-    sessionStorage.setItem(STORAGE_KEY, "1");
-  } catch {
-    /* private mode */
-  }
-}
-
 function isDeepLink() {
   const hash = location.hash || "";
   return hash !== "" && hash !== "#" && hash !== "#hero";
-}
-
-function forceReplay() {
-  try {
-    return new URLSearchParams(location.search).get("intro") === "1";
-  } catch {
-    return false;
-  }
 }
 
 function shouldPlay() {
   return !(
     reduced ||
     isDeepLink() ||
-    (alreadyPlayed() && !forceReplay()) ||
     !hasWebGL() ||
     !document.getElementById("webgl-bg") ||
     !document.getElementById("hero")
@@ -98,7 +72,6 @@ function finishStage() {
   const stage = document.getElementById("intro-stage");
   stage?.remove();
   clearPending();
-  markPlayed();
 }
 
 function endIntro({ skipSky = true } = {}) {

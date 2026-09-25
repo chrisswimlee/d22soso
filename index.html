@@ -61,13 +61,9 @@
     (function () {
       try {
         var reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
-        var played = false;
-        try { played = sessionStorage.getItem("d22-intro-played") === "1"; } catch (e) {}
-        var replay = false;
-        try { replay = new URLSearchParams(location.search).get("intro") === "1"; } catch (e) {}
         var hash = location.hash || "";
         var deep = hash !== "" && hash !== "#" && hash !== "#hero";
-        if (!reduce && (!played || replay) && !deep) document.documentElement.classList.add("is-intro-pending");
+        if (!reduce && !deep) document.documentElement.classList.add("is-intro-pending");
       } catch (e) {}
       setTimeout(function () {
         var r = document.documentElement;
