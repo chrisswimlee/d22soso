@@ -373,7 +373,7 @@ export function initBgScene(canvas) {
   scene.add(root);
 
   const themeGroups = new Map();
-  let fleetsHeld = document.documentElement.classList.contains("is-intro-pending");
+  let fleetsHeld = false;
 
   function resolveFleetKey(key) {
     const raw = key || "starcraft";
@@ -478,7 +478,7 @@ export function initBgScene(canvas) {
   const stars = new THREE.Points(starGeo, starMat);
   stars.frustumCulled = false;
   stars.renderOrder = 0;
-  scene.add(stars);
+  stars.visible = false;
 
   const MAX_IDLE = coarse ? 22 : 72;
   const MAX_USER = 40;
@@ -499,7 +499,7 @@ export function initBgScene(canvas) {
   const constellations = new THREE.LineSegments(lineGeo, lineMat);
   constellations.frustumCulled = false;
   constellations.renderOrder = 1;
-  scene.add(constellations);
+  constellations.visible = false;
 
   const idlePairs = [];
   const userBonds = [];
@@ -512,7 +512,9 @@ export function initBgScene(canvas) {
         makeNebulaSprite(0x8b5cf6, -3.4, 1.2, 16, 11),
         makeNebulaSprite(0xd4af37, 3.6, 0.4, 14, 10),
       ];
-  nebulae.forEach((n) => scene.add(n.sprite));
+  nebulae.forEach((n) => {
+    n.sprite.visible = false;
+  });
 
   const liveGrid = new THREE.GridHelper(16, 14, 0xd4af37, 0xd4af37);
   liveGrid.rotation.x = Math.PI / 2;
@@ -574,21 +576,11 @@ export function initBgScene(canvas) {
   }
 
   function desiredStarOpacity() {
-    if (boot.playing) return coarse ? 0.82 : 0.98;
-    const floor = themeFloor();
-    const bg = document.body.dataset.bg || "";
-    if (bg === "hero" || bg === "") {
-      return floor * (1 - heroLeave * 0.82) + 0.04 * heroLeave;
-    }
-    return floor;
+    return 0;
   }
 
   function desiredLineOpacity() {
-    if (boot.playing) return coarse ? 0.22 : 0.28;
-    const floor = lineOpacityForBg(document.body.dataset.bg);
-    const bg = document.body.dataset.bg || "";
-    if (bg === "hero") return floor * (1 - heroLeave * 0.88);
-    return floor;
+    return 0;
   }
 
   function syncStarOpacity() {
@@ -667,57 +659,10 @@ export function initBgScene(canvas) {
 
   let activeKey = resolveFleetKey(document.body.dataset.bg);
   function setTheme(key) {
-    const next = resolveFleetKey(key);
-    const cur = ensureFleet(next);
-    if (next === activeKey && cur.visible && !fleetsHeld) return;
-    activeKey = next;
-    if (fleetsHeld) {
-      themeGroups.forEach((g) => {
-        g.visible = false;
-      });
-      return;
-    }
-    if (reduced) {
-      themeGroups.forEach((g, k) => {
-        g.visible = k === next;
-      });
-      cur.visible = true;
-      return;
-    }
-    themeGroups.forEach((g, k) => {
-      if (k === next) {
-        g.visible = true;
-        g.traverse((obj) => {
-          if (obj.isMesh && obj.material && "opacity" in obj.material) {
-            const target = obj.userData?.kind === "spark" ? 0.7 : 0.42;
-            gsap.fromTo(
-              obj.material,
-              { opacity: 0 },
-              { opacity: target, duration: 0.72, ease: "power2.out", overwrite: "auto" }
-            );
-          }
-        });
-      } else if (g.visible) {
-        const mats = [];
-        g.traverse((obj) => {
-          if (obj.isMesh && obj.material && "opacity" in obj.material) mats.push(obj.material);
-        });
-        if (!mats.length) {
-          g.visible = false;
-          return;
-        }
-        gsap.to(mats, {
-          opacity: 0,
-          duration: 0.58,
-          ease: "power2.in",
-          overwrite: "auto",
-          onComplete: () => {
-            if (activeKey !== k) g.visible = false;
-          },
-        });
-      }
+    activeKey = resolveFleetKey(key);
+    themeGroups.forEach((g) => {
+      g.visible = false;
     });
-    if (cur) cur.visible = true;
   }
 
   let previewKey = null;

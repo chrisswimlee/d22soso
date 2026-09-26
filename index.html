@@ -48,14 +48,7 @@
     html { background: #0a0a0a; color-scheme: dark; }
     html.is-intro-pending,
     html.is-intro-pending body { overflow: hidden !important; }
-    html.is-intro-pending .hero-photo-stack { opacity: 0; }
-    html.is-intro-pending:not([data-intro]) .hero-gate,
-    html.is-intro-pending .site-header,
-    html.is-intro-pending .scroll-progress,
-    html.is-intro-pending #section-indicator {
-      visibility: hidden !important;
-      pointer-events: none !important;
-    }
+    html.is-intro-pending .hero { opacity: 0; }
   </style>
   <script>
     (function () {
@@ -80,7 +73,7 @@
   <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" />
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
   <noscript><link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" /></noscript>
-  <noscript><style>html.is-intro-pending .hero-gate, html.is-intro-pending .hero-photo-stack, html.is-intro-pending .hero-lockup, html.is-intro-pending .site-header { visibility: visible !important; pointer-events: auto !important; opacity: 1 !important; } html.is-intro-pending, html.is-intro-pending body { overflow: visible !important; } #intro-stage { display: none !important; }</style></noscript>
+  <noscript><style>html.is-intro-pending .hero { opacity: 1 !important; } html.is-intro-pending, html.is-intro-pending body { overflow: visible !important; } #intro-stage { display: none !important; }</style></noscript>
   <script type="importmap">
   {
     "imports": {
@@ -204,7 +197,7 @@
   <main id="main" tabindex="-1">
     <!-- HERO — name + proof + trio over the championship photo; sky is chrome -->
     <section id="hero" class="section hero" data-node="hero" data-bg="hero">
-      <div class="hero-photo-stack sky-part" data-sky-part="card" aria-hidden="true">
+      <div class="hero-photo-stack" aria-hidden="true">
         <picture class="hero-photo is-active" data-hero-scene="starcraft">
           <source
             type="image/avif"
@@ -252,18 +245,18 @@
       <div class="hero-orbit" aria-hidden="true">
         <i></i><i></i><i></i><i></i><i></i>
       </div>
-      <div class="hero-gate is-inview" data-reveal="stagger">
-        <div class="hero-lockup sky-part" data-sky-part="lockup">
-        <h1 class="hero-name reveal-item">Wayne Chiang</h1>
-        <p class="hero-proof mono reveal-item">
+      <div class="hero-gate">
+        <div class="hero-lockup">
+        <h1 class="hero-name">Wayne Chiang</h1>
+        <p class="hero-proof mono">
           <span class="hero-proof-full">1999 Brood War World Champion · WSOP Talent Manager</span>
           <span class="hero-proof-short">1999 Brood War · WSOP Talent</span>
         </p>
         </div>
-        <div class="hero-mid" aria-hidden="true"></div>
-        <div class="hero-rest sky-part" data-sky-part="rest">
+        <div class="hero-mid" aria-label="StarCraft command field. Click to move the squad."></div>
+        <div class="hero-rest">
         <ul class="hero-trio" role="list">
-          <li class="hero-pillar reveal-item" data-door="starcraft">
+          <li class="hero-pillar" data-door="starcraft">
             <a class="hero-pillar-link" href="#esports" data-fleet="starcraft">
             <span class="door-fx" aria-hidden="true"></span>
             <span class="pillar-index mono">01</span>
@@ -287,7 +280,7 @@
             </p>
             </a>
           </li>
-          <li class="hero-pillar reveal-item" data-door="poker">
+          <li class="hero-pillar" data-door="poker">
             <a class="hero-pillar-link" href="#poker" data-fleet="poker">
             <span class="door-fx" aria-hidden="true"></span>
             <span class="pillar-index mono">02</span>
@@ -311,7 +304,7 @@
             </p>
             </a>
           </li>
-          <li class="hero-pillar reveal-item" data-door="2hh">
+          <li class="hero-pillar" data-door="2hh">
             <a class="hero-pillar-link" href="#innovation" data-fleet="2hh">
             <span class="door-fx" aria-hidden="true"></span>
             <span class="pillar-index mono">03</span>

@@ -2,9 +2,7 @@
 import { reduced, coarse, isInteractive, atmosphereBlocked, isAtmosphereGrab } from "./pref.js";
 
 const MAX_RIPPLES = 8;
-const MAX_TRAIL = 14;
 const RIPPLE_MS = 620;
-const TRAIL_GAP = 22;
 
 function flairBlocked() {
   return atmosphereBlocked() || isAtmosphereGrab();
@@ -80,70 +78,6 @@ export function initFlair() {
     },
     { passive: true }
   );
-
-  /* ----- Cursor ghost + trail on empty space ----- */
-  const ghost = document.createElement("span");
-  ghost.className = "flair-cursor";
-  layer.appendChild(ghost);
-  let gx = window.innerWidth / 2;
-  let gy = window.innerHeight / 2;
-  let tx = gx;
-  let ty = gy;
-  let ghostRaf = 0;
-  function ghostTick() {
-    if (document.hidden) {
-      ghostRaf = 0;
-      return;
-    }
-    gx += (tx - gx) * 0.2;
-    gy += (ty - gy) * 0.2;
-    ghost.style.transform = "translate(" + gx + "px," + gy + "px) translate(-50%,-50%)";
-    ghostRaf = requestAnimationFrame(ghostTick);
-  }
-  ghostRaf = requestAnimationFrame(ghostTick);
-  document.addEventListener("visibilitychange", () => {
-    if (!document.hidden && !ghostRaf) ghostRaf = requestAnimationFrame(ghostTick);
-  });
-
-  if (fineHover) {
-    let lastX = 0;
-    let lastY = 0;
-    let trailCount = 0;
-    document.addEventListener(
-      "pointermove",
-      (e) => {
-        tx = e.clientX;
-        ty = e.clientY;
-        if (flairBlocked()) return;
-        if (isInteractive(e.target)) return;
-        const dx = e.clientX - lastX;
-        const dy = e.clientY - lastY;
-        if (dx * dx + dy * dy < TRAIL_GAP * TRAIL_GAP) return;
-        if (trailCount >= MAX_TRAIL) return;
-        lastX = e.clientX;
-        lastY = e.clientY;
-        const mote = document.createElement("span");
-        mote.className = "felt-trail";
-        mote.style.left = e.clientX + "px";
-        mote.style.top = e.clientY + "px";
-        trailCount++;
-        spawnTemp(mote, 520);
-        window.setTimeout(() => {
-          trailCount = Math.max(0, trailCount - 1);
-        }, 520);
-      },
-      { passive: true }
-    );
-  } else {
-    document.addEventListener(
-      "pointermove",
-      (e) => {
-        tx = e.clientX;
-        ty = e.clientY;
-      },
-      { passive: true }
-    );
-  }
 
   /* ----- APM easter egg ----- */
   let meter = document.getElementById("apm-meter");

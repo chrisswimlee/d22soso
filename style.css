@@ -132,57 +132,19 @@ canvas {
   outline-offset: 2px;
 }
 
-/* One-shot homepage intro — overlays the first viewport, then disposes */
+/* Homepage enter — one fade of the hero. The photograph is not scaled or hidden on its own. */
 html.is-intro-pending,
-html.is-intro-revealing,
-html[data-intro="playing"] {
+html.is-intro-pending body {
   overflow: hidden;
 }
 
-html.is-intro-pending body,
-html.is-intro-revealing body,
-html[data-intro="playing"] body {
-  overflow: hidden;
-}
-
-html.is-intro-pending .hero-orbit,
-html[data-intro] .hero-orbit {
+html.is-intro-pending .hero {
   opacity: 0;
 }
 
-html.is-intro-pending .hero-photo-stack {
-  opacity: 0;
-}
-
-html.is-intro-pending:not([data-intro]) .hero-gate,
-html.is-intro-pending .site-header,
-html.is-intro-pending .scroll-progress,
-html.is-intro-pending #section-indicator {
-  visibility: hidden;
-  pointer-events: none;
-}
-
-html.is-intro-pending[data-intro="playing"] .hero-gate {
-  visibility: visible;
-  pointer-events: none;
-}
-
-html[data-intro="playing"] .sky-part {
-  opacity: 0;
-  pointer-events: none;
-  transform: none;
-  filter: none;
-  transition: opacity 0.55s ease;
-}
-
-html[data-intro="playing"] .sky-part.is-sky-in {
+html.is-intro-pending.is-intro-in .hero {
   opacity: 1;
-  transform: none;
-  filter: none;
-}
-
-html[data-intro="playing"] .hero-photo-stack.is-sky-in {
-  opacity: calc(0.97 * (1 - var(--hero-leave, 0)));
+  transition: opacity 0.6s ease;
 }
 
 html.is-intro-pending .bg-layer {
@@ -192,21 +154,6 @@ html.is-intro-pending .bg-layer {
 html.is-intro-pending #bg-stage::after,
 html[data-intro="playing"] #bg-stage::after {
   opacity: 0.4;
-}
-
-html.is-intro-revealing .hero-gate {
-  visibility: visible;
-}
-
-html.is-intro-revealing .site-header {
-  visibility: visible;
-  pointer-events: auto;
-  opacity: 1;
-}
-
-html.is-intro-revealing .scroll-progress,
-html.is-intro-revealing #section-indicator {
-  visibility: visible;
 }
 
 #intro-stage {
@@ -220,7 +167,6 @@ html.is-intro-revealing #section-indicator {
 }
 
 html.is-intro-pending #intro-stage,
-html.is-intro-revealing #intro-stage,
 html[data-intro="playing"] #intro-stage {
   display: block !important;
 }
@@ -308,7 +254,6 @@ body.is-dragging-card * {
 }
 
 html.is-intro-pending #scene-flash,
-html.is-intro-revealing #scene-flash,
 html[data-intro] #scene-flash {
   display: none;
 }
@@ -430,12 +375,6 @@ body[data-theme="hero"] #scene-flash::after {
 /* Hero — graphite/gold underlay; photo in .hero-photo wins on top */
 .bg-layer[data-bg="hero"] {
   background:
-    radial-gradient(1px 1px at 12% 22%, rgba(232, 230, 220, 0.4), transparent),
-    radial-gradient(1px 1px at 28% 68%, rgba(210, 200, 180, 0.28), transparent),
-    radial-gradient(1.5px 1.5px at 63% 18%, rgba(255, 255, 255, 0.35), transparent),
-    radial-gradient(1px 1px at 81% 44%, rgba(212, 175, 55, 0.22), transparent),
-    radial-gradient(1px 1px at 45% 82%, rgba(212, 175, 55, 0.2), transparent),
-    radial-gradient(1px 1px at 91% 76%, rgba(220, 210, 200, 0.2), transparent),
     radial-gradient(ellipse 90% 60% at 50% -5%, rgba(212, 175, 55, 0.14), transparent 58%),
     radial-gradient(ellipse 50% 40% at 90% 75%, rgba(138, 134, 120, 0.12), transparent 55%),
     radial-gradient(ellipse 40% 35% at 10% 65%, rgba(212, 175, 55, 0.08), transparent 50%),
@@ -764,33 +703,15 @@ a:hover {
   background: rgba(8, 8, 10, 0.94);
 }
 
-/* Reveal-on-scroll — enter + exit (JS toggles .is-inview / data-exit) */
-html.reveal-on [data-reveal]:not(.is-inview) {
+/* One fade for every section. Nothing slides, scales, or rotates into place. */
+html.reveal-on [data-reveal]:not(.is-inview),
+html.reveal-on [data-reveal][data-exit]:not(.is-inview) {
   opacity: 0;
-  transform: translate3d(0, 28px, 0);
-  /* Keep controls clickable near the viewport edge (Launch / theme panels / poker) */
+  transform: none;
 }
 
 html.reveal-on [data-reveal] {
-  transition:
-    opacity 0.48s cubic-bezier(0.22, 1, 0.36, 1),
-    transform 0.62s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-/* GSAP owns the first theater enter — CSS must not interpolate into it */
-html.reveal-on [data-reveal="warp"]:not([data-entered]),
-html.reveal-on [data-reveal="scan"]:not([data-entered]),
-html.reveal-on [data-reveal="drop"]:not([data-entered]),
-html.reveal-on [data-reveal="deal"]:not([data-entered]),
-html.reveal-on [data-reveal="lid"]:not([data-entered]),
-html.reveal-on [data-reveal="float"]:not([data-entered]),
-html.reveal-on [data-reveal="page"]:not([data-entered]),
-html.reveal-on [data-reveal="chip"]:not([data-entered]),
-html.reveal-on [data-reveal="felt"]:not([data-entered]),
-html.reveal-on [data-reveal="twist"]:not([data-entered]),
-html.reveal-on [data-reveal="jump"]:not([data-entered]),
-html.reveal-on [data-reveal][data-enter]:not([data-entered]) {
-  transition: none !important;
+  transition: opacity 0.45s ease;
 }
 
 html.reveal-on [data-reveal].is-inview {
@@ -798,234 +719,6 @@ html.reveal-on [data-reveal].is-inview {
   transform: none;
 }
 
-/* Directional exits — opposite of the enter path */
-html.reveal-on [data-reveal][data-exit="up"]:not(.is-inview) {
-  transform: translate3d(0, -40px, 0);
-}
-
-html.reveal-on [data-reveal][data-exit="down"]:not(.is-inview) {
-  transform: translate3d(0, 40px, 0);
-}
-
-/* StarCraft — warp in from left; exit flies the other way */
-html.reveal-on [data-reveal="warp"]:not(.is-inview):not([data-exit]) {
-  transform: translate3d(-48px, 18px, 0) scale(0.96);
-}
-html.reveal-on [data-reveal="warp"][data-exit="up"]:not(.is-inview) {
-  transform: translate3d(52px, -28px, 0) scale(0.94);
-}
-html.reveal-on [data-reveal="warp"][data-exit="down"]:not(.is-inview) {
-  transform: translate3d(-52px, 32px, 0) scale(0.94);
-}
-
-/* C&C — CRT scan-in / scan-out */
-html.reveal-on [data-reveal="scan"]:not(.is-inview):not([data-exit]) {
-  transform: translate3d(0, 12px, 0) scaleY(1.04);
-}
-html.reveal-on [data-reveal="scan"][data-exit]:not(.is-inview) {
-  transform: translate3d(0, 0, 0) scaleY(0.04);
-  opacity: 0;
-}
-
-/* Warcraft — banner drop in; lift away on exit */
-html.reveal-on [data-reveal="drop"]:not(.is-inview):not([data-exit]) {
-  transform: translate3d(0, -42px, 0) rotate(-1.2deg);
-}
-html.reveal-on [data-reveal="drop"][data-exit="up"]:not(.is-inview) {
-  transform: translate3d(0, -56px, 0) rotate(1.5deg);
-}
-html.reveal-on [data-reveal="drop"][data-exit="down"]:not(.is-inview) {
-  transform: translate3d(0, 48px, 0) rotate(-2deg);
-}
-
-/* MTG — deal in from right; discard the other way */
-html.reveal-on [data-reveal="deal"]:not(.is-inview):not([data-exit]) {
-  transform: translate3d(56px, 8px, 0) rotate(3deg);
-}
-html.reveal-on [data-reveal="deal"][data-exit="up"]:not(.is-inview) {
-  transform: translate3d(-64px, -20px, 0) rotate(-6deg);
-}
-html.reveal-on [data-reveal="deal"][data-exit="down"]:not(.is-inview) {
-  transform: translate3d(64px, 24px, 0) rotate(8deg);
-}
-
-@media (max-width: 768px) {
-  html.reveal-on [data-reveal="deal"]:not(.is-inview):not([data-exit]),
-  html.reveal-on [data-reveal="deal"][data-exit="up"]:not(.is-inview),
-  html.reveal-on [data-reveal="deal"][data-exit="down"]:not(.is-inview) {
-    transform: translate3d(0, 16px, 0);
-  }
-}
-
-/* Hearthstone — float up in; drift away on exit */
-html.reveal-on [data-reveal="float"]:not(.is-inview):not([data-exit]) {
-  transform: translate3d(0, 36px, 0) scale(0.97);
-}
-html.reveal-on [data-reveal="float"][data-exit="up"]:not(.is-inview) {
-  transform: translate3d(0, -44px, 0) scale(0.96);
-}
-html.reveal-on [data-reveal="float"][data-exit="down"]:not(.is-inview) {
-  transform: translate3d(0, 44px, 0) scale(0.96);
-}
-
-/* Poker — slide across the felt; exit the other rail */
-html.reveal-on [data-reveal="felt"]:not(.is-inview):not([data-exit]) {
-  transform: translate3d(-40px, 20px, 0);
-}
-html.reveal-on [data-reveal="felt"][data-exit="up"]:not(.is-inview) {
-  transform: translate3d(48px, -28px, 0);
-}
-html.reveal-on [data-reveal="felt"][data-exit="down"]:not(.is-inview) {
-  transform: translate3d(-48px, 32px, 0);
-}
-
-/* Book — page lift in; close/flip away */
-html.reveal-on [data-reveal="page"]:not(.is-inview):not([data-exit]) {
-  transform: translate3d(0, 24px, 0) rotateX(8deg);
-  transform-origin: 50% 100%;
-}
-html.reveal-on [data-reveal="page"][data-exit]:not(.is-inview) {
-  transform: translate3d(0, -16px, 0) rotateX(-10deg);
-  transform-origin: 50% 0%;
-}
-
-/* Casino / 2HH — chip pop in; stack collapses out */
-html.reveal-on [data-reveal="chip"]:not(.is-inview):not([data-exit]) {
-  transform: translate3d(0, 30px, 0) scale(0.92);
-}
-html.reveal-on [data-reveal="chip"][data-exit="up"]:not(.is-inview) {
-  transform: translate3d(0, -24px, 0) scale(0.88);
-}
-html.reveal-on [data-reveal="chip"][data-exit="down"]:not(.is-inview) {
-  transform: translate3d(0, 36px, 0) scale(0.85);
-}
-
-/* Text boxes — twist in (3D yaw) */
-html.reveal-on [data-reveal="twist"] {
-  transform-origin: 30% 50%;
-}
-html.reveal-on [data-reveal="twist"]:not(.is-inview):not([data-exit]) {
-  opacity: 0;
-  transform: perspective(900px) rotateY(-32deg) rotateZ(-3deg) translate3d(-28px, 12px, 0);
-}
-html.reveal-on [data-reveal="twist"][data-exit="up"]:not(.is-inview) {
-  transform: perspective(900px) rotateY(28deg) rotateZ(4deg) translate3d(24px, -28px, 0);
-}
-html.reveal-on [data-reveal="twist"][data-exit="down"]:not(.is-inview) {
-  transform: perspective(900px) rotateY(-28deg) rotateZ(-4deg) translate3d(-24px, 32px, 0);
-}
-
-/* Text boxes — jump in (springy pop) */
-html.reveal-on [data-reveal="jump"]:not(.is-inview):not([data-exit]) {
-  opacity: 0;
-  transform: translate3d(0, 64px, 0) scale(0.78);
-}
-html.reveal-on [data-reveal="jump"][data-exit="up"]:not(.is-inview) {
-  transform: translate3d(0, -48px, 0) scale(0.86);
-}
-html.reveal-on [data-reveal="jump"][data-exit="down"]:not(.is-inview) {
-  transform: translate3d(0, 56px, 0) scale(0.84);
-}
-html.reveal-on [data-reveal="jump"] {
-  transition:
-    opacity 0.4s ease,
-    transform 0.75s var(--ease-spring);
-}
-
-/* Text boxes — soft fade in */
-html.reveal-on [data-reveal="fade"]:not(.is-inview):not([data-exit]) {
-  opacity: 0;
-  transform: none;
-}
-html.reveal-on [data-reveal="fade"][data-exit]:not(.is-inview) {
-  opacity: 0;
-  transform: none;
-}
-html.reveal-on [data-reveal="fade"] {
-  transition:
-    opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1),
-    transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-/* Staggered hero/cards — mix twist / jump / fade per child */
-html.reveal-on [data-reveal="stagger"]:not(.is-inview) .reveal-item {
-  opacity: 0;
-}
-
-html.reveal-on [data-reveal="stagger"]:not(.is-inview):not([data-exit]) .reveal-item:nth-child(3n + 1) {
-  transform: perspective(800px) rotateY(-24deg) translate3d(-18px, 8px, 0);
-}
-
-html.reveal-on [data-reveal="stagger"]:not(.is-inview):not([data-exit]) .reveal-item:nth-child(3n + 2) {
-  transform: translate3d(0, 48px, 0) scale(0.84);
-}
-
-html.reveal-on [data-reveal="stagger"]:not(.is-inview):not([data-exit]) .reveal-item:nth-child(3n) {
-  transform: none;
-}
-
-html.reveal-on [data-reveal="stagger"][data-exit="up"]:not(.is-inview) .reveal-item:nth-child(3n + 1) {
-  transform: perspective(800px) rotateY(20deg) translate3d(16px, -24px, 0);
-}
-html.reveal-on [data-reveal="stagger"][data-exit="up"]:not(.is-inview) .reveal-item:nth-child(3n + 2) {
-  transform: translate3d(0, -40px, 0) scale(0.9);
-}
-html.reveal-on [data-reveal="stagger"][data-exit="up"]:not(.is-inview) .reveal-item:nth-child(3n) {
-  transform: none;
-}
-
-html.reveal-on [data-reveal="stagger"][data-exit="down"]:not(.is-inview) .reveal-item:nth-child(3n + 1) {
-  transform: perspective(800px) rotateY(-20deg) translate3d(-16px, 28px, 0);
-}
-html.reveal-on [data-reveal="stagger"][data-exit="down"]:not(.is-inview) .reveal-item:nth-child(3n + 2) {
-  transform: translate3d(0, 44px, 0) scale(0.9);
-}
-html.reveal-on [data-reveal="stagger"][data-exit="down"]:not(.is-inview) .reveal-item:nth-child(3n) {
-  transform: none;
-}
-
-html.reveal-on [data-reveal="stagger"] .reveal-item {
-  transition:
-    opacity 0.45s ease,
-    transform 0.7s var(--ease-spring),
-    filter 0.5s ease;
-}
-
-html.reveal-on [data-reveal="stagger"].is-inview .reveal-item {
-  opacity: 1;
-  transform: none;
-}
-
-html.reveal-on [data-reveal="stagger"].is-inview .reveal-item:nth-child(1) { transition-delay: 0.04s; }
-html.reveal-on [data-reveal="stagger"].is-inview .reveal-item:nth-child(2) { transition-delay: 0.1s; }
-html.reveal-on [data-reveal="stagger"].is-inview .reveal-item:nth-child(3) { transition-delay: 0.16s; }
-html.reveal-on [data-reveal="stagger"].is-inview .reveal-item:nth-child(4) { transition-delay: 0.22s; }
-html.reveal-on [data-reveal="stagger"].is-inview .reveal-item:nth-child(5) { transition-delay: 0.28s; }
-html.reveal-on [data-reveal="stagger"].is-inview .reveal-item:nth-child(6) { transition-delay: 0.34s; }
-html.reveal-on [data-reveal="stagger"].is-inview .reveal-item:nth-child(7) { transition-delay: 0.4s; }
-html.reveal-on [data-reveal="stagger"].is-inview .reveal-item:nth-child(8) { transition-delay: 0.46s; }
-html.reveal-on [data-reveal="stagger"].is-inview .reveal-item:nth-child(9) { transition-delay: 0.52s; }
-
-/* Exit: reverse stagger so trailing items leave first */
-html.reveal-on [data-reveal="stagger"]:not(.is-inview) .reveal-item:nth-child(1) { transition-delay: 0.28s; }
-html.reveal-on [data-reveal="stagger"]:not(.is-inview) .reveal-item:nth-child(2) { transition-delay: 0.22s; }
-html.reveal-on [data-reveal="stagger"]:not(.is-inview) .reveal-item:nth-child(3) { transition-delay: 0.16s; }
-html.reveal-on [data-reveal="stagger"]:not(.is-inview) .reveal-item:nth-child(4) { transition-delay: 0.1s; }
-html.reveal-on [data-reveal="stagger"]:not(.is-inview) .reveal-item:nth-child(5) { transition-delay: 0.06s; }
-html.reveal-on [data-reveal="stagger"]:not(.is-inview) .reveal-item:nth-child(6) { transition-delay: 0.03s; }
-html.reveal-on [data-reveal="stagger"]:not(.is-inview) .reveal-item:nth-child(7) { transition-delay: 0s; }
-
-/* Hero — fade only. Pictures and lockup do not move. */
-html.reveal-on .hero [data-reveal="stagger"] .reveal-item,
-html.reveal-on .hero [data-reveal="stagger"]:not(.is-inview) .reveal-item,
-html.reveal-on .hero [data-reveal="stagger"]:not(.is-inview) .hero-trio .reveal-item,
-html.reveal-on .hero [data-reveal="stagger"][data-exit] .reveal-item {
-  transform: none;
-}
-
-html.reveal-on .hero [data-reveal="stagger"] .reveal-item {
-  transition: opacity 0.45s ease;
-}
 
 /* Theme accents — kept distinct across theaters (no shared primary hexes) */
 /* First viewport — gold/stone restraint (no violet chrome) */
@@ -1629,10 +1322,7 @@ body[data-hero-fleet="2hh"] .hero-scrim::after {
 }
 
 .hero-orbit {
-  position: absolute;
-  inset: 6% 4% 20% 4%;
-  z-index: 1;
-  pointer-events: none;
+  display: none;
 }
 
 .hero-orbit i {
@@ -1771,10 +1461,33 @@ html.has-sky-photo[data-intro="playing"] #bg-stage::after {
 }
 
 .hero-mid {
+  position: relative;
   flex: 1 1 auto;
-  min-height: 5rem;
+  min-height: clamp(7rem, 22vh, 16rem);
   width: 100%;
+  pointer-events: auto;
+  cursor: crosshair;
+  z-index: 3;
+}
+
+.hero-command {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
   pointer-events: none;
+  opacity: calc(1 - var(--hero-leave, 0));
+}
+
+body[data-hero-fleet="poker"] .hero-mid,
+body[data-hero-fleet="2hh"] .hero-mid {
+  pointer-events: none;
+  cursor: default;
+}
+
+body[data-hero-fleet="poker"] .hero-command,
+body[data-hero-fleet="2hh"] .hero-command {
+  opacity: 0;
 }
 
 .hero-name {

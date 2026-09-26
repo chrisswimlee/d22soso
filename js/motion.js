@@ -566,22 +566,9 @@ function playTheaterEnter(el) {
 
 function revealEl(el) {
   if (!el) return;
-  const dialect = el.getAttribute("data-reveal") || "";
-  const wantsEnter =
-    !reduced &&
-    (THEATER_DIALECTS.has(dialect) || el.hasAttribute("data-enter")) &&
-    !el.hasAttribute("data-entered");
-  /* Arm GSAP before .is-inview so CSS reveal transitions never interpolate first */
-  if (wantsEnter) el.classList.add("is-theater-entering");
   el.classList.add("is-inview");
   el.removeAttribute("data-exit");
-
-  if (reduced) {
-    el.setAttribute("data-entered", "");
-    return;
-  }
-
-  if (wantsEnter) playTheaterEnter(el);
+  el.setAttribute("data-entered", "");
 }
 
 function concealEl(el) {
