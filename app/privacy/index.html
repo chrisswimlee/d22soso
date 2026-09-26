@@ -53,9 +53,8 @@
       <ul>
         <li><strong>Chip balance</strong> — Stored securely in the iOS Keychain so it persists across app launches and reinstalls.</li>
         <li><strong>In-app purchase transaction IDs</strong> — Stored in the Keychain to prevent duplicate chip delivery. The same IDs (and product IDs, not unsigned chip totals) may sync through iCloud so a purchase on one device is not dropped on another.</li>
-        <li><strong>Preferences</strong> — Theme, soundtrack choice, bet size, mute setting, replay capture consent, and Terms of Service acceptance are stored using iOS UserDefaults.</li>
+        <li><strong>Preferences</strong> — Theme, soundtrack choice, bet size, mute setting, and Terms of Service acceptance are stored using iOS UserDefaults.</li>
         <li><strong>Daily bonus eligibility</strong> — The calendar day you last claimed the daily bonus is stored in the Keychain (migrated from UserDefaults in older builds).</li>
-        <li><strong>Replay capture consent</strong> — Whether you have enabled the optional "Share Last Hand" feature (ReplayKit) is stored locally.</li>
         <li><strong>Progression</strong> — Level, XP, SapphirES, seasons, shop unlocks, and related lifetime counters are stored in the Keychain and in local Application Support files.</li>
       </ul>
       <p>None of this data is transmitted to our servers or third parties except as described below.</p>
@@ -63,8 +62,13 @@
       <h2>iCloud Sync (Optional)</h2>
       <p>If you are signed in to iCloud, the app may sync your chip balance and progression (including SapphirES, seasons, XP, challenge progress, IAP transaction IDs, and unique grant records such as welcome / daily / Daily Split / bust / ad rewards) using Apple's CloudKit <strong>private</strong> database for your Apple ID. This data stays in your iCloud account; we do not operate a custom backend that reads it. You can disable iCloud for this app in iOS Settings. Sync is best-effort and is skipped when CloudKit is unavailable for the build.</p>
 
-      <h2>Optional Replay Capture (Share Last Hand)</h2>
-      <p>If you tap Share on the table, the app uses Apple's ReplayKit to keep a short rolling buffer of gameplay (about 15 seconds) on your device so you can export a clip. Screen recording is not started when you open the app or tap Play. Nothing is shared unless you explicitly export a clip. You can stop an in-progress recording in Settings.</p>
+      <h2>Share Hand</h2>
+      <p>Share Hand offers two exports, both optional:</p>
+      <ul>
+        <li><strong>Animated GIF</strong> — built on your device from the cards and result of the last showdown. No screen recording.</li>
+        <li><strong>Video clip</strong> — if you pick Video, the app uses Apple's ReplayKit to keep a short rolling buffer of gameplay (about 15 seconds) so you can export an MP4. Screen recording is not started when you open the app or tap Play. You can stop an in-progress recording in Settings.</li>
+      </ul>
+      <p>Nothing is uploaded unless you choose a destination in the iOS share sheet.</p>
 
       <h2>Game Center (Optional)</h2>
       <p>If you sign in to Apple's Game Center, the app may submit leaderboard scores (for example chip balance after reaching Legendary, lifetime hands won, best win streak, and total XP) and display your Game Center nickname on Apple's leaderboard UI. Score submission is optional and does not run unless you are signed in to Game Center. Game Center is operated by Apple; see <a href="https://www.apple.com/privacy/">Apple's Privacy Policy</a> for details. Personal records shown in the in-app Profile stay on your device and do not require Game Center.</p>
@@ -80,7 +84,7 @@
       <p>The app uses Apple's built-in diagnostic tools (e.g., MetricKit) for crash and performance monitoring. No personally identifiable information is collected.</p>
 
       <h2>Children</h2>
-      <p>The app is not directed at children under 13. We do not knowingly collect data from children. The recommended store age rating is 17+ simulated gambling.</p>
+      <p>The app is not directed at children under 13. We do not knowingly collect data from children. Recommended store age rating is 17+ simulated gambling; complete App Store Connect answers to match AdMob, ATT, IAP, and iCloud.</p>
 
       <h2>Changes</h2>
       <p>We may update this policy from time to time. The "Last updated" date at the top indicates when it was last revised.</p>
