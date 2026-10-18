@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#0a0a0a" />
-  <meta name="d22soso-version" content="2026.09.10" />
+  <meta name="d22soso-version" content="2026.10.09" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
@@ -38,7 +38,8 @@
   {
     "imports": {
       "three": "./vendor/three/three.module.js",
-      "gsap": "./vendor/gsap/index.js"
+      "gsap": "./vendor/gsap/index.js",
+      "lenis": "https://cdn.jsdelivr.net/npm/lenis@1.3.23/dist/lenis.mjs"
     }
   }
   </script>
@@ -119,7 +120,7 @@
         </div>
         <div class="panel-grid panel-grid--copy">
           <div>
-            <h3>Command &amp; Conquer: Tiberian Dawn</h3>
+            <h2 class="panel-title">Command &amp; Conquer: Tiberian Dawn</h2>
             <p class="plaque mono">Case’s Ladder · 1v1 &amp; Teams · #1 · 1996</p>
             <p>
               Kali, 1996. Mentored by Bill “Bill1” Macaitis, <strong>SoSOWAC</strong> took Case’s Ladder #1
@@ -141,7 +142,7 @@
         </div>
         <div class="panel-grid panel-grid--copy">
           <div>
-            <h3>Warcraft II / III</h3>
+            <h2 class="panel-title">Warcraft II / III</h2>
             <p class="plaque mono">Top 3 1v1 · Teams #1 · Kali · 1997</p>
             <p>
               Kali, 1997. Clan C4L: Top 3 in 1v1, #1 teams. First met Jay “Gadianton” Severson there —
@@ -163,7 +164,7 @@
         </div>
         <div class="panel-grid panel-grid--copy">
           <div>
-            <h3>Magic: The Gathering</h3>
+            <h2 class="panel-title">Magic: The Gathering</h2>
             <p class="plaque mono">Pro Tour · New York 2001 · Boston 2002</p>
             <p>
               A side game since 1996, after Weissman sessions at Palo Alto’s Round Table Pizza.
@@ -198,13 +199,13 @@
         </div>
         <div class="panel-grid">
           <div>
-            <h3>Cube Draft</h3>
+            <h2 class="panel-title">Cube Draft</h2>
             <p class="plaque mono">Format origin · curated draft · “The Cube”</p>
             <p>
               Early custom draft pools he called “The Cube” — now Cube Draft.
               Brian Weissman and Tom Martell have given public credit for most of the idea.
             </p>
-            <aside class="interview-cite">
+            <div class="interview-cite">
               <a
                 class="interview-cite-thumb"
                 href="https://youtu.be/MNjLKeA-08A?si=0kQD6O58WkGdh8jQ"
@@ -234,7 +235,7 @@
                   rel="noopener noreferrer"
                 >Watch the full interview here <span aria-hidden="true">→</span></a>
               </div>
-            </aside>
+            </div>
           </div>
           <div class="panel-media">
             <picture>
@@ -266,7 +267,7 @@
         </div>
         <div class="panel-grid">
           <div>
-            <h3>Hearthstone — High Legend</h3>
+            <h2 class="panel-title">Hearthstone — High Legend</h2>
             <p class="plaque mono">Legend · Standard #35 NA · Wild #11 NA</p>
             <p>Peak Rank #35 Standard NA, #11 Wild NA, and Top 32 in the Wild Open Americas (2018).</p>
           </div>
@@ -289,7 +290,7 @@
       </article>
 
       <aside class="esports-more" data-reveal="jump" aria-labelledby="casual-heading">
-        <h3 id="casual-heading">Casual competitor</h3>
+        <h2 id="casual-heading">Casual competitor</h2>
         <p class="esports-more-copy">
           After Brood War: later ladders and queues.
         </p>
@@ -315,23 +316,23 @@
       </div>
       <p class="footer-meta mono">
         <a href="index.html">Portfolio</a>
-        ·
+        <span class="footer-sep" aria-hidden="true">·</span>
         <a href="index.html#contact">Media kit</a>
-        ·
+        <span class="footer-sep" aria-hidden="true">·</span>
         <a href="app/privacy/">App privacy</a>
-        ·
+        <span class="footer-sep" aria-hidden="true">·</span>
         <a href="app/terms/">App terms</a>
-        ·
+        <span class="footer-sep" aria-hidden="true">·</span>
         <a href="https://liquipedia.net/starcraft/Soso" target="_blank" rel="noopener noreferrer">Liquipedia — Soso</a>
       </p>
       <p class="footer-credit mono">
         Website created by
         <a href="https://chrisswimlee.com" target="_blank" rel="noopener noreferrer">chrisswimlee</a>
-        ·
+        <span class="footer-sep" aria-hidden="true">·</span>
         <a href="https://chrisswimlee.com" target="_blank" rel="noopener noreferrer">chrisswimlee.com</a>
-        ·
+        <span class="footer-sep" aria-hidden="true">·</span>
         <a href="mailto:chris.suyoung.lee@gmail.com">chris.suyoung.lee@gmail.com</a>
-        ·
+        <span class="footer-sep" aria-hidden="true">·</span>
         <a id="feedback-open" href="mailto:200percentooak@gmail.com?subject=d22soso%20feedback">Submit feedback</a>
       </p>
     </section>

@@ -34,11 +34,7 @@ Then visit [http://localhost:8080](http://localhost:8080).
 | `js/webgl-boot.js` | Idle / on-viewport Three.js loader |
 | `js/webgl-scene.js` | Shared WebGL fleets + fog-of-war scout |
 | `js/webgl-interactives.js` | 2HH / Badugi cards |
-| `wayne-chiang-truth-document.md` | Fact source of truth |
-| `design-language.md` | Design constitution |
-| `sources/` | Editorial source PDFs (not linked from the live site) |
-| `assets/img/` | Optimized imagery served by the site |
-| `tools/optimize-images.sh` | Regenerates `assets/img/` from the local photo dump + `assets/themes/` |
+| `assets/img/` | Optimized imagery served by the site (`CREDITS.md` = background photo licenses) |
 
 The original photo dump (`drive-download-…`) is local-only (gitignored). `assets/photos` is a symlink to that folder for the image pipeline.
 
@@ -46,7 +42,7 @@ The original photo dump (`drive-download-…`) is local-only (gitignored). `asse
 
 - **Three.js** (WebGL) for background fleets, fog scout, and panel scenes — loaded after first paint, panel canvases only when near the viewport
 - **GSAP** for theater enters and card motion
-- Vanilla HTML/CSS orchestration (no build step; vendored ESM via import map)
+- Vanilla HTML/CSS orchestration (no build step; vendored, minified ESM via import map)
 
 ## Game controls
 
@@ -57,4 +53,8 @@ The original photo dump (`drive-download-…`) is local-only (gitignored). `asse
 
 ## Privacy
 
-`confidential-notes.md` is gitignored and must not be published.
+GitHub Pages publishes every committed file, so nothing internal lives in the repo.
+
+`_internal/` (gitignored, local only) holds the fact sheet (`wayne-chiang-truth-document.md`), `design-language.md`, bio source notes, `sources/` PDFs, `confidential-notes.md`, the full-size theme photos (`themes/`), and `tools/optimize-images.sh`. Back it up somewhere private — it is not in git.
+
+`vendor/three/three.module.js` is a tree-shaken build containing only the classes the site uses — see `vendor/three/NOTICE.txt` before adding a new `THREE.*` class.

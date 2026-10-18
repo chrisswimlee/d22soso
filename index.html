@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#0a0a0a" />
-  <meta name="d22soso-version" content="2026.09.10" />
+  <meta name="d22soso-version" content="2026.10.09" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
@@ -78,7 +78,8 @@
   {
     "imports": {
       "three": "./vendor/three/three.module.js",
-      "gsap": "./vendor/gsap/index.js"
+      "gsap": "./vendor/gsap/index.js",
+      "lenis": "https://cdn.jsdelivr.net/npm/lenis@1.3.23/dist/lenis.mjs"
     }
   }
   </script>
@@ -134,7 +135,7 @@
         <a href="#innovation" data-hotkey="4" title="Inventions"><span class="hk">4</span><span class="nav-label nav-label-full">Inventions</span><span class="nav-label nav-label-short">IP</span></a>
         <a href="#about" data-hotkey="5" title="About"><span class="hk">5</span><span class="nav-label">About</span></a>
       </nav>
-      <div class="nav-social" aria-label="Social">
+      <nav class="nav-social" aria-label="Social">
         <a
           class="nav-social-link"
           href="https://www.linkedin.com/in/d22sosowaynechiang"
@@ -190,7 +191,7 @@
           <svg class="nav-social-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31.5 31.5 0 0 0 0 12a31.5 31.5 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31.5 31.5 0 0 0 24 12a31.5 31.5 0 0 0-.5-5.8zM9.75 15.5v-7l6.5 3.5-6.5 3.5z"/></svg>
           <span class="nav-label">YouTube</span>
         </a>
-      </div>
+      </nav>
     </div>
   </header>
 
@@ -242,9 +243,6 @@
         </picture>
       </div>
       <div class="hero-scrim" aria-hidden="true"></div>
-      <div class="hero-orbit" aria-hidden="true">
-        <i></i><i></i><i></i><i></i><i></i>
-      </div>
       <div class="hero-gate">
         <div class="hero-lockup">
         <h1 class="hero-name">Wayne Chiang</h1>
@@ -253,11 +251,11 @@
           <span class="hero-proof-short">1999 Brood War · WSOP Talent</span>
         </p>
         </div>
-        <div class="hero-mid" aria-label="StarCraft command field. Click to move the squad."></div>
+        <div class="hero-mid" aria-hidden="true"></div>
         <div class="hero-rest">
-        <ul class="hero-trio" role="list">
+        <ul class="hero-trio" role="list" aria-label="Change the hero background">
           <li class="hero-pillar" data-door="starcraft">
-            <a class="hero-pillar-link" href="#esports" data-fleet="starcraft">
+            <button type="button" class="hero-pillar-link" data-fleet="starcraft" aria-pressed="false">
             <span class="door-fx" aria-hidden="true"></span>
             <span class="pillar-index mono">01</span>
             <picture class="pillar-mark">
@@ -273,15 +271,15 @@
                 decoding="async"
               />
             </picture>
-            <p class="pillar-header mono">1999 · Random</p>
-            <p class="pillar-title">
+            <span class="pillar-header mono">1999 · Random</span>
+            <span class="pillar-title">
               <span class="pillar-title-full">1999 Brood War</span>
               <span class="pillar-title-short">StarCraft</span>
-            </p>
-            </a>
+            </span>
+            </button>
           </li>
           <li class="hero-pillar" data-door="poker">
-            <a class="hero-pillar-link" href="#poker" data-fleet="poker">
+            <button type="button" class="hero-pillar-link" data-fleet="poker" aria-pressed="false">
             <span class="door-fx" aria-hidden="true"></span>
             <span class="pillar-index mono">02</span>
             <picture class="pillar-mark">
@@ -297,15 +295,15 @@
                 decoding="async"
               />
             </picture>
-            <p class="pillar-header mono">WSOP Talent</p>
-            <p class="pillar-title">
+            <span class="pillar-header mono">WSOP Talent</span>
+            <span class="pillar-title">
               <span class="pillar-title-full">World Series of Poker</span>
               <span class="pillar-title-short">WSOP</span>
-            </p>
-            </a>
+            </span>
+            </button>
           </li>
           <li class="hero-pillar" data-door="2hh">
-            <a class="hero-pillar-link" href="#innovation" data-fleet="2hh">
+            <button type="button" class="hero-pillar-link" data-fleet="2hh" aria-pressed="false">
             <span class="door-fx" aria-hidden="true"></span>
             <span class="pillar-index mono">03</span>
             <picture class="pillar-mark">
@@ -321,12 +319,12 @@
                 decoding="async"
               />
             </picture>
-            <p class="pillar-header mono">U.S. patented</p>
-            <p class="pillar-title">
-              <span class="pillar-title-full">2 Hand Hold ’em</span>
+            <span class="pillar-header mono">U.S. patented</span>
+            <span class="pillar-title">
+              <span class="pillar-title-full">2 Hand Hold’em</span>
               <span class="pillar-title-short">2HH</span>
-            </p>
-            </a>
+            </span>
+            </button>
           </li>
         </ul>
         </div>
@@ -492,7 +490,7 @@
             <h3>StarCraft: Brood War — World Champion</h3>
             <p class="plaque mono">#1 · Case’s Ladder · 1v1 &amp; Teams · 1998</p>
             <p>April 28, 1999. Playing <strong>Random</strong>, D22-soso wins Battle.net Season 1 — Brood War’s first official world title ($2,500). The year before: Case’s Ladder #1, then Neutral Ground Mountain View against Jay Severson.</p>
-            <aside class="interview-cite">
+            <div class="interview-cite">
               <a
                 class="interview-cite-thumb"
                 href="https://www.youtube.com/watch?v=CHd4-eZx2Do"
@@ -522,13 +520,13 @@
                   rel="noopener noreferrer"
                 >Watch the full interview here <span aria-hidden="true">→</span></a>
               </div>
-            </aside>
+            </div>
             <details class="archive-fold">
               <summary class="archive-fold-summary mono">
                 Championship record — throwback, Game 5
               </summary>
               <div class="archive-fold-body">
-                <aside class="interview-cite">
+                <div class="interview-cite">
                   <a
                     class="interview-cite-thumb"
                     href="https://www.youtube.com/watch?v=92bufUCAF6k"
@@ -558,7 +556,7 @@
                       rel="noopener noreferrer"
                     >Watch the throwback <span aria-hidden="true">→</span></a>
                   </div>
-                </aside>
+                </div>
                 <blockquote class="transmission">
                   D22-soso stands triumphant as the tournament champion.
                 </blockquote>
@@ -666,7 +664,7 @@
           <div class="cta-row book-ctas">
             <a
               class="btn btn-primary btn-arrow"
-              href="https://www.amazon.com/dp/9798319708007"
+              href="https://www.amazon.com/dp/B0G7X7Z3LK"
               target="_blank"
               rel="noopener noreferrer"
             >Available on Amazon <span class="arrow" aria-hidden="true">→</span></a>
@@ -690,11 +688,11 @@
 
       <div class="tablist-wrap" data-tabs="innovation" data-reveal="fade">
         <div class="tablist" role="tablist" aria-label="Innovation catalog">
-          <button role="tab" id="tab-2hh" aria-controls="panel-2hh" aria-selected="true" data-theme="2hh">2 Hand Hold’em™</button>
-          <button role="tab" id="tab-badugi" aria-controls="panel-badugi" aria-selected="false" data-theme="badugi">Badugi Chase™</button>
+          <button type="button" role="tab" id="tab-2hh" aria-controls="panel-2hh" aria-selected="true" data-theme="2hh">2 Hand Hold’em™</button>
+          <button type="button" role="tab" id="tab-badugi" aria-controls="panel-badugi" aria-selected="false" data-theme="badugi">Badugi Chase™</button>
         </div>
 
-        <article class="tab-panel theme-panel" id="panel-2hh" role="tabpanel" aria-labelledby="tab-2hh" data-theme="2hh">
+        <div class="tab-panel theme-panel" id="panel-2hh" role="tabpanel" aria-labelledby="tab-2hh" data-theme="2hh">
           <div class="panel-grid">
             <div>
               <h3>2 Hand Hold’em™</h3>
@@ -724,24 +722,24 @@
                 <a class="btn btn-gold" href="#locate">Find a live table</a>
               </div>
               <p class="archive-links mono">
-                Also at
-                <a class="suit-hover" href="https://play2hh.com" target="_blank" rel="noopener noreferrer">play2hh.com</a>
+                Also online:
+                <a class="suit-hover" href="https://play2hh.herokuapp.com/" target="_blank" rel="noopener noreferrer">full desktop table</a>
               </p>
               <p class="hint mono">Click the table to split four hole cards into two hands</p>
             </div>
             <div class="panel-media">
-              <canvas id="cards-2hh" width="480" height="300" aria-label="Interactive 2 Hand Hold'em card split demo"></canvas>
+              <canvas id="cards-2hh" width="480" height="300" aria-label="Interactive 2 Hand Hold’em card split demo"></canvas>
               <p class="canvas-affordance mono" data-canvas-hint="cards-2hh">Tap to deal · drag cards</p>
               <picture>
                 <source type="image/avif" srcset="assets/img/twohh-logo-500.avif" />
                 <source type="image/webp" srcset="assets/img/twohh-logo-500.webp" />
-                <img class="logo-inline logo-float" src="assets/img/twohh-logo-500.png" alt="2 Hand Hold'em trademark logo" width="500" height="433" loading="lazy" decoding="async" />
+                <img class="logo-inline logo-float" src="assets/img/twohh-logo-500.png" alt="2 Hand Hold’em trademark logo" width="500" height="433" loading="lazy" decoding="async" />
               </picture>
             </div>
           </div>
-        </article>
+        </div>
 
-        <article class="tab-panel theme-panel" id="panel-badugi" role="tabpanel" aria-labelledby="tab-badugi" hidden data-theme="badugi">
+        <div class="tab-panel theme-panel" id="panel-badugi" role="tabpanel" aria-labelledby="tab-badugi" hidden data-theme="badugi">
           <div class="panel-grid">
             <div>
               <h3>Badugi Chase™</h3>
@@ -796,7 +794,7 @@
               </picture>
             </div>
           </div>
-        </article>
+        </div>
       </div>
     </section>
 
@@ -817,7 +815,6 @@
                 data-src="https://play2hh.herokuapp.com/"
                 loading="lazy"
                 allow="fullscreen"
-                allowfullscreen
                 referrerpolicy="no-referrer-when-downgrade"
               ></iframe>
             </div>
@@ -835,7 +832,7 @@
               <img
                 class="play-logo"
                 src="assets/img/twohh-logo-500.png"
-                alt="2 Hand Hold'em trademark logo"
+                alt="2 Hand Hold’em trademark logo"
                 width="500"
                 height="433"
                 loading="lazy"
@@ -861,7 +858,7 @@
             href="https://www.instagram.com/p/Cr2A8JJrgVa/?img_index=1"
             target="_blank"
             rel="noopener noreferrer"
-          >2 Hand Holdem created by StarCraft: Brood War World Champion Wayne “D22-soso” Chiang</a>
+          >2 Hand Hold’em created by StarCraft: Brood War World Champion Wayne “D22-soso” Chiang</a>
           ·
           <a
             class="suit-hover"
@@ -877,7 +874,7 @@
     <section id="locate" class="section section-locate" data-node="locate" data-theme="2hh" data-bg="2hh">
       <header class="section-head" data-reveal="fade">
         <h2>Find 2 Hand Hold’em™</h2>
-        <p class="lede">Live now at Circa, Venetian, Commerce, Hustler, The Office, and Desert Bluffs.</p>
+        <p class="lede">Live now at Silver Dollar Casino Seatac, The Commerce, The Venetian Las Vegas, and The Office.</p>
       </header>
 
       <div class="locate-map-wrap" data-reveal="jump">
@@ -904,81 +901,57 @@
           <!-- Fallback pins — replaced at runtime from the published My Maps KML -->
           <a
             class="locate-pin"
-            style="--pin-x: 17%; --pin-y: 53.2%"
-            href="https://www.google.com/maps/search/?api=1&amp;query=Circa+Resort+%26+Casino"
+            style="--pin-x: 4.62%; --pin-y: 8.28%"
+            href="https://www.google.com/maps/search/?api=1&amp;query=47.4301824%2C-122.2947251"
             target="_blank"
             rel="noopener noreferrer"
-            aria-label="Circa Resort &amp; Casino, Las Vegas — open in Google Maps"
+            aria-label="Silver Dollar Casino Seatac — open in Google Maps"
           >
             <span class="locate-pin-dot" aria-hidden="true"></span>
-            <span class="locate-pin-label mono">Circa</span>
+            <span class="locate-pin-label mono">Silver Dollar Casino Seatac</span>
           </a>
           <a
             class="locate-pin"
-            style="--pin-x: 16.6%; --pin-y: 55.1%"
-            href="https://www.google.com/maps/search/?api=1&amp;query=The+Venetian+Las+Vegas"
+            style="--pin-x: 11.72%; --pin-y: 62%"
+            href="https://www.google.com/maps/search/?api=1&amp;query=33.9990952%2C-118.1450002"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="The Commerce Casino &amp; Hotel — open in Google Maps"
+          >
+            <span class="locate-pin-dot" aria-hidden="true"></span>
+            <span class="locate-pin-label mono">The Commerce</span>
+          </a>
+          <a
+            class="locate-pin"
+            style="--pin-x: 16.8%; --pin-y: 53.52%"
+            href="https://www.google.com/maps/search/?api=1&amp;query=36.121174%2C-115.1696526"
             target="_blank"
             rel="noopener noreferrer"
             aria-label="The Venetian Las Vegas — open in Google Maps"
           >
             <span class="locate-pin-dot" aria-hidden="true"></span>
-            <span class="locate-pin-label mono">Venetian</span>
+            <span class="locate-pin-label mono">The Venetian Las Vegas</span>
           </a>
           <a
             class="locate-pin"
-            style="--pin-x: 11.8%; --pin-y: 61.5%"
-            href="https://www.google.com/maps/search/?api=1&amp;query=The+Commerce+Casino+%26+Hotel"
+            style="--pin-x: 45.08%; --pin-y: 79.36%"
+            href="https://www.google.com/maps/search/?api=1&amp;query=29.6603495%2C-98.6290437"
             target="_blank"
             rel="noopener noreferrer"
-            aria-label="The Commerce Casino &amp; Hotel, Los Angeles — open in Google Maps"
-          >
-            <span class="locate-pin-dot" aria-hidden="true"></span>
-            <span class="locate-pin-label mono">Commerce</span>
-          </a>
-          <a
-            class="locate-pin"
-            style="--pin-x: 11.5%; --pin-y: 65%"
-            href="https://www.google.com/maps/search/?api=1&amp;query=Hustler+Casino"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Hustler Casino, Los Angeles — open in Google Maps"
-          >
-            <span class="locate-pin-dot" aria-hidden="true"></span>
-            <span class="locate-pin-label mono">Hustler</span>
-          </a>
-          <a
-            class="locate-pin"
-            style="--pin-x: 45.7%; --pin-y: 79.2%"
-            href="https://www.google.com/maps/search/?api=1&amp;query=The+Office+Card+House"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="The Office Card House, San Antonio — open in Google Maps"
+            aria-label="The Office Card House — open in Google Maps"
           >
             <span class="locate-pin-dot" aria-hidden="true"></span>
             <span class="locate-pin-label mono">The Office</span>
-          </a>
-          <a
-            class="locate-pin"
-            style="--pin-x: 9.9%; --pin-y: 13.2%"
-            href="https://www.google.com/maps/search/?api=1&amp;query=Desert+Bluffs+Poker+Room"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Desert Bluffs Poker Room, Washington — open in Google Maps"
-          >
-            <span class="locate-pin-dot" aria-hidden="true"></span>
-            <span class="locate-pin-label mono">Desert Bluffs</span>
           </a>
         </div>
       </div>
 
       <ul class="stat-list mono locate-venues" data-reveal="fade">
         <li data-locate-static="certified"><span>Certified</span> Washington State Gambling Commission</li>
-        <li><span>Las Vegas</span> Circa Resort &amp; Casino</li>
+        <li><span>Washington</span> Silver Dollar Casino Seatac</li>
+        <li><span>California</span> The Commerce Casino &amp; Hotel</li>
         <li><span>Las Vegas</span> The Venetian Las Vegas</li>
-        <li><span>Los Angeles</span> The Commerce Casino &amp; Hotel</li>
-        <li><span>Los Angeles</span> Hustler Casino</li>
-        <li><span>San Antonio</span> The Office Card House</li>
-        <li><span>Washington</span> Desert Bluffs Poker Room</li>
+        <li><span>Texas</span> The Office Card House</li>
       </ul>
 
       <p class="hint mono locate-hint" data-reveal="fade">
@@ -1120,7 +1093,7 @@
           </details>
         </article>
 
-        <aside class="about-aside" data-reveal="fade" data-enter="about-timeline">
+        <div class="about-aside" data-reveal="fade" data-enter="about-timeline">
           <figure class="about-portrait">
             <picture>
               <source
@@ -1174,7 +1147,7 @@
             <a class="btn btn-primary btn-arrow" href="gaming.html">Other games <span class="arrow" aria-hidden="true">→</span></a>
             <a class="btn btn-gold" href="#poker">Poker &amp; LATB</a>
           </div>
-        </aside>
+        </div>
       </div>
     </section>
 
@@ -1245,21 +1218,21 @@
       </nav>
       <p class="footer-meta mono">
         <a href="#contact">Media kit</a>
-        ·
+        <span class="footer-sep" aria-hidden="true">·</span>
         <a href="gaming.html">Gaming Archive</a>
-        ·
+        <span class="footer-sep" aria-hidden="true">·</span>
         <a href="app/privacy/">App privacy</a>
-        ·
+        <span class="footer-sep" aria-hidden="true">·</span>
         <a href="app/terms/">App terms</a>
       </p>
       <p class="footer-credit mono">
         Website created by
         <a href="https://chrisswimlee.com" target="_blank" rel="noopener noreferrer">chrisswimlee</a>
-        ·
+        <span class="footer-sep" aria-hidden="true">·</span>
         <a href="https://chrisswimlee.com" target="_blank" rel="noopener noreferrer">chrisswimlee.com</a>
-        ·
+        <span class="footer-sep" aria-hidden="true">·</span>
         <a href="mailto:chris.suyoung.lee@gmail.com">chris.suyoung.lee@gmail.com</a>
-        ·
+        <span class="footer-sep" aria-hidden="true">·</span>
         <a id="feedback-open" href="mailto:200percentooak@gmail.com?subject=d22soso%20feedback">Submit feedback</a>
       </p>
     </section>

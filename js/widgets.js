@@ -1,5 +1,6 @@
 /* Page widgets: about fold, poker gallery, 2HH embed, contact */
 import { reduced } from "./pref.js";
+import { scrollToY } from "./smooth-scroll.js";
 import { measureHeaderHeight } from "./theme-nav.js";
 import { initLocateMap } from "./locate-map.js";
 import { getBgScene } from "./webgl-boot.js";
@@ -22,6 +23,7 @@ export function initWidgets() {
   let holdClock = 0;
   let sceneApi = null;
   let photoKey = "starcraft";
+  let pickKey = null;
 
   function introBusy() {
     const root = document.documentElement;
@@ -84,7 +86,25 @@ export function initWidgets() {
 
   function clearPreview() {
     hoverKey = null;
-    live(attractKey);
+    live(pickKey || attractKey);
+  }
+
+  /* Choosing a door only swaps the hero background — no scroll, no jump.
+     The choice sticks and stops the idle attract cycle. */
+  function pick(key) {
+    pickKey = key;
+    hoverKey = null;
+    attractKey = null;
+    if (holdClock) {
+      window.clearTimeout(holdClock);
+      holdClock = 0;
+    }
+    if (attractClock) {
+      window.clearInterval(attractClock);
+      attractClock = 0;
+    }
+    links.forEach((l) => l.setAttribute("aria-pressed", String(l.dataset.fleet === key)));
+    live(key);
   }
 
   links.forEach((link) => {
@@ -92,43 +112,22 @@ export function initWidgets() {
     if (fineHover && !reduced) {
       link.addEventListener("pointerenter", () => preview(key));
       link.addEventListener("pointerleave", clearPreview);
-      link.addEventListener("focus", () => preview(key));
-      link.addEventListener("blur", () => {
-        if (!link.matches(":hover")) clearPreview();
-      });
     }
-    if (fineHover && !reduced) {
-      link.addEventListener("pointerdown", () => {
-        live(key);
-      });
-    }
-    /* Phone has no hover. First tap crossfades the image and stays; a second tap on that door opens the section. */
-    if (!fineHover) {
-      link.addEventListener(
-        "click",
-        (e) => {
-          if (reduced) return;
-          const scene = key === "poker" || key === "2hh" ? key : "starcraft";
-          if (photoKey === scene) return;
-          e.preventDefault();
-          e.stopImmediatePropagation();
-          hoverKey = key;
-          live(key);
-        },
-        true
-      );
-    }
+    link.addEventListener("click", (e) => {
+      e.preventDefault();
+      pick(key);
+    });
   });
 
   function attractOnce() {
-    if (reduced || introBusy() || !onHero() || hoverKey || document.hidden) return;
+    if (reduced || pickKey || introBusy() || !onHero() || hoverKey || document.hidden) return;
     attractKey = ORDER[attractIdx % ORDER.length];
     attractIdx += 1;
     live(attractKey);
     if (holdClock) window.clearTimeout(holdClock);
     holdClock = window.setTimeout(() => {
       holdClock = 0;
-      if (hoverKey || !onHero()) return;
+      if (hoverKey || pickKey || !onHero()) return;
       attractKey = null;
       live(null);
     }, 4800);
@@ -166,6 +165,8 @@ export function initWidgets() {
       hoverKey = null;
       attractKey = null;
       markLive(null);
+    } else if (pickKey) {
+      live(pickKey);
     }
   }).observe(document.body, { attributes: true, attributeFilter: ["data-bg"] });
 })();
@@ -656,15 +657,7 @@ function centerPlayTable() {
   const wrapDocTop = scroller.scrollTop + playWrap.getBoundingClientRect().top - viewTop;
   const nextTop = Math.max(0, Math.round(wrapDocTop - desiredTopInView));
 
-  try {
-    scroller.scrollTo({
-      top: nextTop,
-      left: 0,
-      behavior: reduced ? "auto" : "smooth",
-    });
-  } catch (_) {
-    scroller.scrollTop = nextTop;
-  }
+  scrollToY(nextTop);
 
   window.setTimeout(syncPlayChrome, reduced ? 40 : 320);
 }

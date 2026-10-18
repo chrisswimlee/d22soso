@@ -115,6 +115,15 @@ const progressBar = document.querySelector(".scroll-progress-bar");
 const header = document.querySelector(".site-header");
 const revealNodes = [...document.querySelectorAll("[data-reveal]")];
 
+/* Stagger groups — children arrive one by one when their room fades in.
+   CSS derives each child's delay from nth-child, so lists rebuilt later keep it. */
+const STAGGER_GROUPS =
+  ".locate-venues, .media-kit-assets, .contact-socials, .esports-more-theaters, .esports-more .stat-list, .about-credentials, .cta-row, .press-strip-list";
+document.querySelectorAll(STAGGER_GROUPS).forEach((group) => {
+  if (!group.closest("[data-reveal]") || group.closest(".hero")) return;
+  group.setAttribute("data-stagger", "");
+});
+
 /* Keep body offset in sync when the fixed header wraps (mobile) */
 function syncHeaderOffset() {
   measureHeaderHeight();
@@ -152,7 +161,7 @@ function staggerParts(el) {
   );
   if (tag) parts.push(tag);
   if (plaque) parts.push(plaque);
-  const heading = el.querySelector("h3, .lower-third > strong");
+  const heading = el.querySelector(".panel-title, h3, .lower-third > strong");
   if (heading) parts.push(heading);
   if (copy) parts.push(copy);
   if (media) parts.push(media);
@@ -345,7 +354,7 @@ function playTheaterEnter(el) {
       },
       0.08
     );
-    const lift = el.querySelectorAll(".panel-media, .interview-cite, .plaque, h3");
+    const lift = el.querySelectorAll(".panel-media, .interview-cite, .plaque, .panel-title, h3");
     if (lift.length) {
       gsap.set(lift, { y: 42, opacity: 0, rotateX: -12 });
       tl.to(
