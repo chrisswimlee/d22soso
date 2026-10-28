@@ -94,11 +94,18 @@ function renderExhibitBody(s) {
 }
 
 /* ---------- lightbox ---------- */
+let lightboxFrom = null;
+function closeLightbox() {
+  $("lightbox").hidden = true;
+  lightboxFrom?.focus({ preventScroll: true });
+}
 function lightbox(it) {
   $("lightbox-img").src = it.src; $("lightbox-img").alt = it.alt; $("lightbox-cap").textContent = it.caption || it.alt;
+  lightboxFrom = document.activeElement;
   $("lightbox").hidden = false;
+  $("lightbox-close").focus();
 }
-$("lightbox").addEventListener("click", () => ($("lightbox").hidden = true));
+$("lightbox").addEventListener("click", closeLightbox);
 
 /* ---------- HUD ---------- */
 const list = $("sector-list");
@@ -113,6 +120,7 @@ $("art-total").textContent = ARTIFACTS.length;
 function syncSectorList() {
   list.querySelectorAll("button").forEach((b) => {
     b.classList.toggle("active", b.dataset.id === current);
+    if (b.dataset.id === current) b.setAttribute("aria-current", "true"); else b.removeAttribute("aria-current");
     b.classList.toggle("seen", visited.has(b.dataset.id));
   });
   $("art-count").textContent = foundArtifacts.size;
@@ -155,7 +163,7 @@ function fillReadout(s) {
 /* ---------- labels over the world ---------- */
 const labelsEl = $("labels");
 const labels = SECTORS.map((s, i) => {
-  const el = h("button", { type: "button", class: "label", style: `--accent:${s.accent}`, onclick: () => go(s.id), tabindex: "-1" },
+  const el = h("button", { type: "button", class: "label", style: `--accent:${s.accent}`, onclick: () => go(s.id), onmouseenter: () => preview(s.id), onmouseleave: () => preview(null), tabindex: "-1" },
     h("span", { class: "mono idx", text: String(i + 1).padStart(2, "0") }), h("strong", { text: s.short }), h("span", { class: "mono era", text: s.era }));
   labelsEl.append(el);
   return { s, el };
@@ -222,6 +230,7 @@ function go(id, { fromTour = false, instant = false } = {}) {
   if (!fromTour) tour = null;
   current = id;
   clearTimeout(openTimer);
+  if (app.classList.contains("no-webgl")) { listJump(id); return; }
   if (!world) { openExhibit(s); return; }
   world.setSelected(id);
   world.setIdleSpin(false);
@@ -251,6 +260,7 @@ function openExhibit(s) {
   $("exhibit").hidden = false;
   $("ex-scroll").scrollTop = 0;
   requestAnimationFrame(() => $("exhibit").classList.add("open"));
+  $("ex-title").focus({ preventScroll: true });
   if (location.hash !== `#${s.id}`) history.replaceState(null, "", `#${s.id}`);
   document.title = `${s.name} · D22: The Living Archive`;
   syncSectorList();
@@ -278,6 +288,7 @@ function footer(s) {
 
 function closeExhibit() {
   clearTimeout(openTimer);
+  if ($("exhibit").contains(document.activeElement)) $("sector-list").querySelector(`[data-id="${current}"]`)?.focus({ preventScroll: true });
   $("exhibit").classList.remove("open");
   setTimeout(() => { if (!$("exhibit").classList.contains("open")) $("exhibit").hidden = true; }, 280);
   setMode("explore");
@@ -298,8 +309,11 @@ function deselect() {
 $("tour-btn").addEventListener("click", () => { tour = 0; closeList(); go(TOUR[0], { fromTour: true }); });
 
 /* ---------- list view (also the no-WebGL / small-screen alternative) ---------- */
+function listJump(id) {
+  document.getElementById(`list-${id}`)?.scrollIntoView({ behavior: reduced ? "auto" : "smooth" });
+}
 function buildList() {
-  $("list-nav").replaceChildren(...SECTORS.map((s, i) => h("a", { href: `#list-${s.id}`, style: `--accent:${s.accent}`, onclick: (e) => { e.preventDefault(); document.getElementById(`list-${s.id}`).scrollIntoView({ behavior: reduced ? "auto" : "smooth" }); }, text: `${String(i + 1).padStart(2, "0")} ${s.short}` })));
+  $("list-nav").replaceChildren(...SECTORS.map((s, i) => h("a", { href: `#list-${s.id}`, style: `--accent:${s.accent}`, onclick: (e) => { e.preventDefault(); listJump(s.id); }, text: `${String(i + 1).padStart(2, "0")} ${s.short}` })));
   $("list-body").replaceChildren(...SECTORS.map((s) => h("article", { class: "list-ex", id: `list-${s.id}`, style: `--accent:${s.accent}` },
     h("p", { class: "kicker mono", text: `${s.exhibit.kicker} · ${s.era}` }),
     h("h2", { text: s.name }),
@@ -311,12 +325,15 @@ function openList() {
   if (!listBuilt) { buildList(); listBuilt = true; }
   $("list-view").hidden = false;
   app.classList.add("listing");
+  if (location.hash !== "#list") history.replaceState(null, "", "#list");
   world?.setBackground("list");
 }
 function closeList() {
   if (!world) return;
   $("list-view").hidden = true;
   app.classList.remove("listing");
+  const back = mode === "exhibit" && current ? `#${current}` : location.pathname + location.search;
+  if (location.hash === "#list") history.replaceState(null, "", back);
   world.setBackground(mode === "exhibit" ? "exhibit" : "none");
 }
 $("list-btn").addEventListener("click", openList);
@@ -339,15 +356,16 @@ $("toast").addEventListener("click", () => { $("toast").classList.remove("open")
 addEventListener("keydown", (e) => {
   if (e.target.closest?.("input,textarea")) return;
   if (e.key === "Escape") {
-    if (!$("lightbox").hidden) { $("lightbox").hidden = true; return; }
+    if (!$("lightbox").hidden) { closeLightbox(); return; }
     if (!$("list-view").hidden && world) { closeList(); return; }
     if (mode !== "explore") closeExhibit();
     return;
   }
-  if (!world || !$("list-view").hidden || e.target.closest?.(".exhibit")) return;
+  if (!world || !$("list-view").hidden || e.metaKey || e.ctrlKey || e.altKey) return;
   const n = Number(e.key);
-  if (n >= 1 && n <= SECTORS.length) go(SECTORS[n - 1].id);
-  else if (e.key === "ArrowLeft") world.rotateBy(0.25);
+  if (n >= 1 && n <= SECTORS.length) { go(SECTORS[n - 1].id, { instant: mode === "exhibit" }); return; }
+  if (e.target.closest?.(".exhibit")) return;
+  if (e.key === "ArrowLeft") world.rotateBy(0.25);
   else if (e.key === "ArrowRight") world.rotateBy(-0.25);
   else if (e.key === "+" || e.key === "=") world.zoomBy(1.25);
   else if (e.key === "-") world.zoomBy(0.8);
@@ -365,12 +383,17 @@ function route() {
   else if (byId(id)) go(id, { instant: true });
 }
 
+function fallback() {
+  const id = location.hash.slice(1);
+  app.classList.add("no-webgl");
+  $("loading").remove();
+  openList();
+  if (byId(id)) { listJump(id); history.replaceState(null, "", `#${id}`); }
+}
 async function boot() {
   const { createWorld, webglAvailable } = await import("./world.js").catch(() => ({}));
   if (!createWorld || !webglAvailable()) {
-    app.classList.add("no-webgl");
-    $("loading").remove();
-    openList();
+    fallback();
     return;
   }
   try {
@@ -391,9 +414,7 @@ async function boot() {
     });
   } catch (err) {
     console.error(err);
-    app.classList.add("no-webgl");
-    $("loading").remove();
-    openList();
+    fallback();
     return;
   }
   world.restoreFound([...foundArtifacts]);
@@ -409,5 +430,11 @@ async function boot() {
   setTimeout(() => $("loading").remove(), 600);
   route();
 }
-addEventListener("hashchange", () => { const id = location.hash.slice(1); if (byId(id) && id !== current) go(id); else if (id === "list") openList(); });
+addEventListener("hashchange", () => {
+  const id = location.hash.slice(1);
+  if (id === "list") { openList(); return; }
+  closeList();
+  if (byId(id)) { if (id !== current || mode === "explore") go(id); }
+  else if (mode !== "explore") closeExhibit();
+});
 boot();

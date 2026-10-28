@@ -155,7 +155,7 @@ const BUILD = {
     const tip = mesh(new THREE.SphereGeometry(0.12, 8, 6), glow("#ef4444", 3), 0, 5.1, 0, false);
     tower.add(tip);
     const waves = [0, 1, 2].map(() => {
-      const w = mesh(new THREE.TorusGeometry(0.4, 0.025, 4, 32), mat(accent, { emissive: accent, ei: 2, opacity: 0.6 }), 0, 5.1, 0, false);
+      const w = mesh(new THREE.TorusGeometry(0.4, 0.025, 4, 32), mat(accent, { emissive: accent, ei: 2, opacity: 0.6 }).clone(), 0, 5.1, 0, false);
       w.rotation.x = Math.PI / 2;
       tower.add(w);
       return w;
@@ -903,7 +903,6 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
 
     if (renderer.shadowMap.enabled && shadowTick++ % 6 === 0) renderer.shadowMap.needsUpdate = true;
     renderer.render(scene, camera);
-    if (window.__d22perf) window.__d22perf(renderer.info.render, scene);
     onFrame?.();
   }
 
@@ -964,7 +963,6 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
     setSelected(id) { selected = id; },
     /* "none" | "exhibit" (world partly covered: run slower) | "list" (world hidden: stop) */
     setBackground(v) { background = v; samples.length = 0; },
-    quality: () => ({ tier, calls: renderer.info.render.calls, triangles: renderer.info.render.triangles }),
     setIdleSpin(on) { idleSpin = on; },
     onDiscover(cb) { onDiscover = cb; },
     discover,
@@ -979,7 +977,6 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
     state() {
       return { az: cur.az, zoom: cur.zoom, tx: cur.tx, tz: cur.tz, scout: { x: sc.g.position.x, z: sc.g.position.z }, R, sectors: sectorObjs.map((o) => ({ id: o.s.id, x: o.p.x, z: o.p.z, accent: o.s.accent })), artifacts: artifactObjs.map((a) => ({ id: a.a.id, x: a.p.x, z: a.p.z, found: a.found })) };
     },
-    moving: () => route.length > 0,
   };
 }
 

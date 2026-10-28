@@ -88,6 +88,7 @@ button { font: inherit; color: inherit; touch-action: manipulation; }
 .instrument-row { display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: var(--muted); letter-spacing: 0.06em; }
 .instrument-row b { color: var(--gold-text); }
 .zoom-btns { display: flex; gap: 4px; }
+.phone-only { display: none; }
 .zoom-btns button { width: 30px; height: 30px; border: 1px solid var(--rule); background: rgba(7, 8, 11, 0.8); border-radius: 3px; cursor: pointer; font-size: 16px; }
 .hint { position: absolute; left: var(--gut); bottom: calc(24px + env(safe-area-inset-bottom, 0px)); margin: 0; font-size: 11px; color: var(--muted); letter-spacing: 0.06em; max-width: 260px; }
 
@@ -234,10 +235,12 @@ button.card.picked { transform: translateY(-6px); outline: 2px solid var(--gold-
 .list-ex { display: grid; gap: 24px; scroll-margin-top: 80px; }
 .list-ex .kicker { margin: 0; }
 .list-ex .lede { margin: 0; }
-.no-webgl .list-close, .no-webgl #list-close { display: none; }
+.no-webgl #list-close { display: none; }
 
 .lightbox { position: fixed; inset: 0; z-index: 20; display: grid; place-items: center; align-content: center; gap: 10px; padding: 24px; background: rgba(0, 0, 0, 0.9); cursor: zoom-out; }
 .lightbox img { max-width: 100%; max-height: 82vh; object-fit: contain; border-radius: 4px; }
+.lightbox-close { position: absolute; top: calc(12px + env(safe-area-inset-top, 0px)); right: 12px; }
+.list-actions { display: flex; align-items: center; gap: 14px; }
 .lightbox p { margin: 0; color: var(--muted); font-size: 13px; }
 
 .loading { position: absolute; inset: 0; z-index: 30; display: grid; place-items: center; background: var(--bg); transition: opacity 0.6s; }
@@ -255,7 +258,9 @@ button.card.picked { transform: translateY(-6px); outline: 2px solid var(--gold-
   .deck-top { flex-wrap: wrap; gap: 8px; padding-bottom: 6px; }
   .brand h1 { font-size: 20px; }
   .top-actions { gap: 6px; }
-  .top-actions .btn-link, #list-btn { display: none; }
+  .top-actions .btn-link, .wide-only, .zoom-btns, .list-actions .btn-link { display: none; }
+  .no-webgl .list-actions .btn-link { display: inline-flex; }
+  .phone-only { display: inline; color: #38bdf8; }
   .btn-solid, .btn-ghost { min-height: 34px; padding: 0 10px; font-size: 11px; }
   .sectors { top: auto; transform: none; left: 0; right: 0; width: auto; bottom: calc(8px + env(safe-area-inset-bottom, 0px)); padding: 0; border: 0; }
   .sectors .eyebrow { padding: 0 var(--gut-r) 6px var(--gut); }
@@ -265,7 +270,7 @@ button.card.picked { transform: translateY(-6px); outline: 2px solid var(--gold-
   .sectors strong { font-size: 13px; }
   .instruments { top: calc(112px + env(safe-area-inset-top, 0px)); bottom: auto; width: 76px; }
   #minimap { width: 76px; height: 76px; }
-  .instrument-row > span:first-child { font-size: 10px; }
+  .instrument-row > span:first-child { font-size: 10px; padding: 2px 6px; border-radius: 3px; background: rgba(7, 8, 11, 0.8); white-space: nowrap; }
   .instrument-row { flex-direction: column; align-items: flex-end; gap: 4px; }
   .readout { left: var(--gut); right: var(--gut-r); width: auto; bottom: calc(96px + env(safe-area-inset-bottom, 0px)); padding: 12px 14px; display: grid; grid-template-columns: 1fr auto; text-align: left; column-gap: 12px; align-items: center; }
   .readout .eyebrow, .readout h2, .readout-tag { grid-column: 1; }
@@ -290,3 +295,4 @@ button.card.picked { transform: translateY(-6px); outline: 2px solid var(--gold-
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition: none !important; animation: none !important; }
 }
+#ex-title:focus { outline: none; }

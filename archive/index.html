@@ -26,7 +26,7 @@
       </div>
       <div class="top-actions">
         <button type="button" class="btn-ghost" id="tour-btn">Guided tour</button>
-        <button type="button" class="btn-ghost" id="list-btn">List view</button>
+        <button type="button" class="btn-ghost" id="list-btn">List<span class="wide-only"> view</span></button>
         <a class="btn-solid" id="media-btn" href="#command">Media &amp; licensing</a>
         <a class="btn-link mono" href="../index.html">Classic site</a>
       </div>
@@ -47,7 +47,7 @@
     <div class="instruments">
       <canvas id="minimap" width="300" height="300" aria-label="Minimap. Click to move the camera."></canvas>
       <div class="instrument-row mono">
-        <span>Artifacts <b id="art-count">0</b>/<span id="art-total">9</span></span>
+        <span title="Artifacts recovered"><span class="wide-only">Artifacts </span><span class="phone-only" aria-hidden="true">◆ </span><b id="art-count">0</b>/<span id="art-total">9</span></span>
         <span class="zoom-btns"><button type="button" id="zoom-out" aria-label="Zoom out">−</button><button type="button" id="zoom-in" aria-label="Zoom in">+</button></span>
       </div>
     </div>
@@ -67,7 +67,7 @@
       <div class="exhibit-scroll" id="ex-scroll">
         <header class="ex-head">
           <p class="kicker mono" id="ex-kicker"></p>
-          <h2 id="ex-title"></h2>
+          <h2 id="ex-title" tabindex="-1"></h2>
           <p class="lede" id="ex-lede"></p>
         </header>
         <div class="ex-body" id="ex-body"></div>
@@ -78,13 +78,13 @@
     <div class="list-view" id="list-view" hidden>
       <div class="list-bar">
         <p class="eyebrow mono">D22 Archive / Index</p>
-        <button type="button" class="btn-ghost" id="list-close">Back to the world</button>
+        <span class="list-actions"><a class="btn-link mono" href="../index.html">Classic site</a><button type="button" class="btn-ghost" id="list-close">Back to the world</button></span>
       </div>
       <nav class="list-nav mono" id="list-nav" aria-label="Exhibits"></nav>
       <div class="list-body" id="list-body"></div>
     </div>
 
-    <div class="lightbox" id="lightbox" hidden><img id="lightbox-img" alt="" /><p id="lightbox-cap"></p></div>
+    <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Enlarged photo" hidden><button type="button" class="icon-btn lightbox-close" id="lightbox-close" aria-label="Close photo">×</button><img id="lightbox-img" alt="" /><p id="lightbox-cap"></p></div>
 
     <div class="loading" id="loading"><p class="mono">Assembling the world…</p></div>
   </div>
