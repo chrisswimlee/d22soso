@@ -15,6 +15,8 @@ const SIGHT = 230;
 const OPEN_RANGE = 150;
 const CELL = 32;
 const SLOTS = [[0, 0], [-26, 18], [26, 18]];
+const ZOOM_MIN = 0.5, ZOOM_MAX = 1.5;
+const STORE = "d22-field-museum";
 
 let vw = 0, vh = 0, dpr = 1, zoom = 1;
 const cam = { x: 0, y: 0, follow: true };
@@ -26,6 +28,7 @@ let hoverSite = null;
 let activeSite = null;
 let dismissed = null;
 let pointer = null;
+let targetSite = null;
 const found = new Set();
 
 /* ---------- seeded noise ---------- */
@@ -145,7 +148,11 @@ fog.width = cols; fog.height = rows;
 const fctx = fog.getContext("2d");
 const fogImg = fctx.createImageData(cols, rows);
 
+let fogKey = "";
 function updateFog() {
+  const key = units.map((u) => `${Math.round(u.x / 8)},${Math.round(u.y / 8)}`).join("|");
+  if (key === fogKey) return;
+  fogKey = key;
   const vis = new Uint8Array(cols * rows);
   const rc = Math.ceil(SIGHT / CELL);
   for (const u of units) {
@@ -165,7 +172,11 @@ function updateFog() {
     d[i * 4 + 3] = vis[i] ? 0 : explored[i] ? 110 : 228;
   }
   fctx.putImageData(fogImg, 0, 0);
-  return vis;
+}
+function reveal(wx, wy, r) {
+  for (let y = 0; y < rows; y++) for (let x = 0; x < cols; x++) {
+    if (Math.hypot((x + 0.5) * CELL - wx, (y + 0.5) * CELL - wy) < r) explored[y * cols + x] = 1;
+  }
 }
 const isExplored = (x, y) => explored[Math.floor(y / CELL) * cols + Math.floor(x / CELL)] === 1;
 
@@ -188,10 +199,13 @@ function order(x, y) {
   });
   ping = { x, y, t: 0 };
   cam.follow = true;
+  targetSite = null;
+  showRecenter();
 }
 
 function sendTo(site) {
   order(site.x, site.y + 100);
+  targetSite = site;
   hint(`Moving to ${site.name}…`);
 }
 
@@ -203,23 +217,68 @@ function siteAt(wx, wy) {
   return SITES.find((s) => Math.abs(wx - s.x) < 70 && wy > s.y - 120 && wy < s.y + 40 && isExplored(s.x, s.y));
 }
 
+// Mouse: click to move, drag to box-select, wheel to zoom.
+// Touch: tap to move, one-finger drag to look around, pinch to zoom.
+const touches = new Map();
+let pinch = null;
+
+function setZoom(z, px, py) {
+  // While following the squad, zoom keeps it in frame; otherwise zoom about the pointer.
+  const w = toWorld(px, py);
+  zoom = clamp(z, ZOOM_MIN, ZOOM_MAX);
+  if (!cam.follow) { cam.x = w.x - px / zoom; cam.y = w.y - py / zoom; }
+}
+
 canvas.addEventListener("pointerdown", (e) => {
   if (!started) return;
   canvas.setPointerCapture(e.pointerId);
-  drag = { x0: e.clientX, y0: e.clientY, x1: e.clientX, y1: e.clientY, box: false, button: e.button };
+  touches.set(e.pointerId, { x: e.clientX, y: e.clientY });
+  if (touches.size === 2) {
+    const [a, b] = [...touches.values()];
+    pinch = { d0: Math.hypot(a.x - b.x, a.y - b.y) || 1, z0: zoom };
+    drag = null;
+    return;
+  }
+  if (touches.size > 2 || pinch) return;
+  drag = { x0: e.clientX, y0: e.clientY, x1: e.clientX, y1: e.clientY, box: false, pan: false, button: e.button, touch: e.pointerType !== "mouse" };
 });
 canvas.addEventListener("pointermove", (e) => {
-  const w = toWorld(e.clientX, e.clientY);
-  hoverSite = siteAt(w.x, w.y) || null;
-  canvas.style.cursor = hoverSite ? "pointer" : "crosshair";
-  pointer = { x: e.clientX, y: e.clientY, inside: true };
+  if (e.pointerType === "mouse") {
+    const w = toWorld(e.clientX, e.clientY);
+    hoverSite = siteAt(w.x, w.y) || null;
+    canvas.style.cursor = hoverSite ? "pointer" : "crosshair";
+    pointer = { x: e.clientX, y: e.clientY };
+  }
+  if (touches.has(e.pointerId)) touches.set(e.pointerId, { x: e.clientX, y: e.clientY });
+  if (pinch && touches.size >= 2) {
+    const [a, b] = [...touches.values()];
+    setZoom(pinch.z0 * Math.hypot(a.x - b.x, a.y - b.y) / pinch.d0, (a.x + b.x) / 2, (a.y + b.y) / 2);
+    return;
+  }
   if (!drag) return;
+  const dx = e.clientX - drag.x1, dy = e.clientY - drag.y1;
   drag.x1 = e.clientX; drag.y1 = e.clientY;
-  if (!coarse && drag.button === 0 && Math.hypot(drag.x1 - drag.x0, drag.y1 - drag.y0) > 8) drag.box = true;
+  const far = Math.hypot(drag.x1 - drag.x0, drag.y1 - drag.y0) > 10;
+  if (drag.touch) {
+    if (far) drag.pan = true;
+    if (drag.pan) { cam.x -= dx / zoom; cam.y -= dy / zoom; cam.follow = false; showRecenter(); }
+  } else if (drag.button === 0 && far) drag.box = true;
 });
+function endPointer(e) {
+  touches.delete(e.pointerId);
+  if (pinch) { if (touches.size < 2) { pinch = null; drag = null; } return; }
+}
+canvas.addEventListener("pointercancel", (e) => { endPointer(e); drag = null; });
+canvas.addEventListener("wheel", (e) => {
+  if (!started) return;
+  e.preventDefault();
+  setZoom(zoom * Math.exp(-e.deltaY * 0.0015), e.clientX, e.clientY);
+}, { passive: false });
 canvas.addEventListener("pointerup", (e) => {
+  endPointer(e);
   if (!drag) return;
   const d = drag; drag = null;
+  if (d.pan || d.button === 1) return;
   if (d.box) {
     const a = toWorld(Math.min(d.x0, d.x1), Math.min(d.y0, d.y1));
     const b = toWorld(Math.max(d.x0, d.x1), Math.max(d.y0, d.y1));
@@ -241,9 +300,12 @@ addEventListener("keydown", (e) => {
   const site = SITES.find((s) => s.key === e.key);
   if (site && started) { sendTo(site); return; }
   if (e.key === "Escape") closeExhibit(true);
-  if (/^(Arrow|[wasd]$)/.test(e.key)) { keys.add(e.key); cam.follow = false; }
+  if (e.key === " " && started && !e.target.closest?.("button,a")) { e.preventDefault(); recenter(); }
+  if (/^(Arrow|[wasd]$)/.test(e.key)) { keys.add(e.key); cam.follow = false; showRecenter(); }
 });
 addEventListener("keyup", (e) => keys.delete(e.key));
+addEventListener("blur", () => keys.clear());
+document.addEventListener("visibilitychange", () => keys.clear());
 
 mini.addEventListener("pointerdown", (e) => {
   const move = (ev) => {
@@ -251,6 +313,7 @@ mini.addEventListener("pointerdown", (e) => {
     const wx = ((ev.clientX - r.left) / r.width) * WORLD.w, wy = ((ev.clientY - r.top) / r.height) * WORLD.h;
     if (ev.button === 2) { order(wx, wy); return; }
     cam.follow = false;
+    showRecenter();
     cam.x = wx - vw / zoom / 2; cam.y = wy - vh / zoom / 2;
   };
   move(e);
@@ -267,7 +330,7 @@ for (const s of SITES) {
   b.type = "button";
   b.style.setProperty("--c", s.accent);
   b.title = `${s.name} (${s.key})`;
-  b.innerHTML = `<span class="hk">${s.key}</span>${s.name.split(/[ ’]/)[0]}`;
+  b.innerHTML = `<span class="hk">${s.key}</span>${s.short}`;
   b.addEventListener("click", () => { start(); sendTo(s); });
   s.button = b;
   cmd.appendChild(b);
@@ -280,12 +343,38 @@ function syncUnitName() {
   document.getElementById("unit-name").textContent = n ? `Scout squad ×${n}` : "No units selected";
 }
 
+const recenterBtn = document.getElementById("recenter");
+function showRecenter() { recenterBtn.hidden = cam.follow; }
+function recenter() { cam.follow = true; showRecenter(); }
+recenterBtn.addEventListener("click", recenter);
+
+// Remember what this visitor has already found.
+function save() {
+  try { localStorage.setItem(STORE, JSON.stringify([...found])); } catch {}
+}
+function restore() {
+  let ids = [];
+  try { ids = JSON.parse(localStorage.getItem(STORE) || "[]"); } catch {}
+  for (const s of SITES) {
+    if (!ids.includes(s.id)) continue;
+    found.add(s.id);
+    s.button.classList.add("found");
+    reveal(s.x, s.y + 40, 260);
+  }
+  document.getElementById("found").textContent = found.size;
+}
+
 const intro = document.getElementById("intro");
+if (coarse) {
+  document.getElementById("intro-copy").textContent =
+    "Tap anywhere to move your squad. Drag to look around and pinch to zoom. Walk up to a structure and its exhibit opens.";
+}
 function start() {
   if (started) return;
   started = true;
   intro.hidden = true;
-  canvas.focus?.();
+  const idle = window.requestIdleCallback || ((f) => setTimeout(f, 600));
+  idle(() => SITES.forEach((s) => s.exhibit.img && (new Image().src = imgSrc(s.exhibit.img))));
 }
 document.getElementById("intro-go").addEventListener("click", start);
 intro.addEventListener("click", (e) => { if (e.target === intro) start(); });
@@ -313,18 +402,22 @@ function openExhibit(site) {
   document.getElementById("ex-facts").replaceChildren(...ex.facts.map((t) => Object.assign(document.createElement("li"), { textContent: t })));
   document.getElementById("ex-links").replaceChildren(...(ex.links || []).map((l) => Object.assign(document.createElement("a"), { href: l.href, textContent: l.label })));
   panel.hidden = false;
+  panel.scrollTop = 0;
   requestAnimationFrame(() => panel.classList.add("open"));
+  history.replaceState(null, "", `#${site.id}`);
   if (!found.has(site.id)) {
     found.add(site.id);
     site.button.classList.add("found");
     site.foundAt = performance.now();
     document.getElementById("found").textContent = found.size;
+    save();
     hint(found.size === SITES.length ? "Every exhibit found. Thanks for visiting." : `${site.name} discovered.`);
   }
 }
 function closeExhibit(byUser) {
   if (byUser && activeSite) dismissed = activeSite;
   panel.classList.remove("open");
+  if (location.hash) history.replaceState(null, "", location.pathname + location.search);
   setTimeout(() => { if (!panel.classList.contains("open")) panel.hidden = true; }, 260);
 }
 
@@ -487,10 +580,12 @@ function drawSite(s, t, near) {
       ctx.beginPath(); ctx.ellipse(s.x, s.y, 40 + p * 140, 15 + p * 50, 0, 0, 7); ctx.stroke();
     }
   }
-  ctx.font = "600 12px 'IBM Plex Mono', monospace"; ctx.textAlign = "center";
+  const fs = Math.max(12, 11 / zoom);
+  ctx.font = `600 ${fs}px 'IBM Plex Mono', monospace`; ctx.textAlign = "center";
   const label = `${s.key} · ${s.name}`;
-  ctx.fillStyle = "#000000aa"; ctx.fillRect(s.x - ctx.measureText(label).width / 2 - 6, s.y + 34, ctx.measureText(label).width + 12, 18);
-  ctx.fillStyle = found.has(s.id) ? s.accent : "#d6d1c4"; ctx.fillText(label, s.x, s.y + 47);
+  const lw = ctx.measureText(label).width;
+  ctx.fillStyle = "#000000aa"; ctx.fillRect(s.x - lw / 2 - 6, s.y + 34, lw + 12, fs * 1.5);
+  ctx.fillStyle = found.has(s.id) ? s.accent : "#d6d1c4"; ctx.fillText(label, s.x, s.y + 34 + fs * 1.1);
 }
 
 function drawUnit(u, t, g = ctx, scale = 1) {
@@ -526,10 +621,15 @@ let last = performance.now();
 let miniBase = null;
 let dust = Array.from({ length: 40 }, (_, i) => ({ x: Math.random() * WORLD.w, y: Math.random() * WORLD.h, s: 0.5 + Math.random() }));
 
+let phone = null;
+let portraitOn = true;
+const hud = document.getElementById("hud");
+new ResizeObserver(() => document.documentElement.style.setProperty("--hud-h", `${hud.offsetHeight}px`)).observe(hud);
 function resize() {
-  dpr = Math.min(devicePixelRatio || 1, 2);
+  dpr = Math.min(devicePixelRatio || 1, innerWidth < 760 ? 1.5 : 2);
   vw = innerWidth; vh = innerHeight;
-  zoom = vw < 760 ? 0.72 : 1;
+  if (phone !== vw < 760) { phone = vw < 760; zoom = phone ? 0.8 : 1; }
+  portraitOn = document.getElementById("portrait").offsetParent !== null;
   canvas.width = vw * dpr; canvas.height = vh * dpr;
   miniBase = document.createElement("canvas");
   miniBase.width = mini.width; miniBase.height = mini.height;
@@ -539,7 +639,7 @@ addEventListener("resize", resize);
 resize();
 
 function frame(now) {
-  const dt = Math.min(0.05, (now - last) / 1000);
+  const dt = clamp((now - last) / 1000, 0, 0.05);
   last = now;
   const t = now / 1000;
 
@@ -575,7 +675,9 @@ function frame(now) {
     const lead = units.filter((u) => u.selected)[0] || units[0];
     const open = panel.classList.contains("open");
     const gx = lead.x - vw / zoom / 2 + (open && vw > 760 ? 200 : 0);
-    const gy = lead.y - vh / zoom / 2 + (open && vw <= 760 ? vh * 0.3 : 40);
+    // On phones the exhibit sheet covers the lower half, so park the squad just above it.
+    const sheetTop = panel.getBoundingClientRect().top;
+    const gy = open && phone ? lead.y - (sheetTop - 24) / zoom : lead.y - vh / zoom / 2 + 40;
     const k = reduced ? 1 : 1 - Math.pow(0.02, dt);
     cam.x += (gx - cam.x) * k; cam.y += (gy - cam.y) * k;
   }
@@ -590,6 +692,9 @@ function frame(now) {
       if (d < best) { best = d; near = s; }
     }
   }
+  // Passing a structure on the way somewhere else doesn't open it; arriving does.
+  const moving = units.some((u) => u.moving);
+  if (near && moving && near !== targetSite) near = null;
   if (started && near !== activeSite) {
     activeSite = near;
     if (dismissed && dismissed !== near) dismissed = null;
@@ -601,7 +706,9 @@ function frame(now) {
 
   ctx.setTransform(dpr * zoom, 0, 0, dpr * zoom, -cam.x * dpr * zoom, -cam.y * dpr * zoom);
   ctx.fillStyle = "#050506"; ctx.fillRect(cam.x - 10, cam.y - 10, vw / zoom + 20, vh / zoom + 20);
-  ctx.drawImage(terrain, 0, 0);
+  const tx = clamp(Math.floor(cam.x), 0, WORLD.w), ty = clamp(Math.floor(cam.y), 0, WORLD.h);
+  const tw = Math.min(WORLD.w - tx, Math.ceil(vw / zoom) + 2), th = Math.min(WORLD.h - ty, Math.ceil(vh / zoom) + 2);
+  if (tw > 0 && th > 0) ctx.drawImage(terrain, tx, ty, tw, th, tx, ty, tw, th);
 
   const drawables = [
     ...SITES.filter((s) => isExplored(s.x, s.y)).map((s) => ({ y: s.y, draw: () => drawSite(s, t, s === activeSite) })),
@@ -652,7 +759,21 @@ function frame(now) {
   mctx.strokeStyle = "#ffffffcc"; mctx.lineWidth = 1;
   mctx.strokeRect(cam.x * sx + 0.5, cam.y * sy + 0.5, (vw / zoom) * sx, (vh / zoom) * sy);
 
-  drawPortrait(t);
+  if (portraitOn) drawPortrait(t);
   requestAnimationFrame(frame);
 }
 requestAnimationFrame(frame);
+
+restore();
+const linked = SITES.find((s) => `#${s.id}` === location.hash);
+if (linked) {
+  start();
+  reveal(linked.x, linked.y + 40, 260);
+  for (const u of units) { u.x = u.tx = linked.x + (u.x - hub.x); u.y = u.ty = linked.y + 100 + (u.y - hub.y - 90); }
+  targetSite = linked;
+}
+{
+  const lead = units[0];
+  cam.x = lead.x - vw / zoom / 2; cam.y = lead.y - vh / zoom / 2 + 40;
+}
+

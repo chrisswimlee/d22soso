@@ -6,6 +6,7 @@ export const WORLD = { w: 2600, h: 1800 };
 export const SITES = [
   {
     id: "outpost",
+    short: "Base",
     key: "1",
     name: "Base Camp",
     era: "Start here",
@@ -28,6 +29,7 @@ export const SITES = [
   },
   {
     id: "ladder",
+    short: "Ladder",
     key: "2",
     name: "Ladder Keep",
     era: "1996–97",
@@ -49,6 +51,7 @@ export const SITES = [
   },
   {
     id: "citadel",
+    short: "Champ",
     key: "3",
     name: "Champion’s Spire",
     era: "1999",
@@ -72,6 +75,7 @@ export const SITES = [
   },
   {
     id: "sanctum",
+    short: "Cards",
     key: "4",
     name: "Card Sanctum",
     era: "Mid-90s – 2002",
@@ -94,6 +98,7 @@ export const SITES = [
   },
   {
     id: "foundry",
+    short: "Patents",
     key: "5",
     name: "Patent Foundry",
     era: "2015 →",
@@ -120,6 +125,7 @@ export const SITES = [
   },
   {
     id: "tower",
+    short: "Media",
     key: "6",
     name: "Broadcast Tower",
     era: "Poker & media",
@@ -143,6 +149,7 @@ export const SITES = [
   },
   {
     id: "library",
+    short: "Book",
     key: "7",
     name: "Archive Library",
     era: "Dec 2025",
@@ -163,6 +170,7 @@ export const SITES = [
   },
   {
     id: "tavern",
+    short: "Tavern",
     key: "8",
     name: "Ember Tavern",
     era: "2015 →",
@@ -182,6 +190,7 @@ export const SITES = [
   },
   {
     id: "beacon",
+    short: "Contact",
     key: "9",
     name: "Signal Beacon",
     era: "Contact",

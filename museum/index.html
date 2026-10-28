@@ -23,8 +23,8 @@
     <div class="intro-card">
       <p class="mono kicker">Field Museum</p>
       <h1>Wayne Chiang</h1>
-      <p>Click anywhere to move your squad. Walk up to a structure and its exhibit opens. Drag to select, keys <kbd>1</kbd>–<kbd>9</kbd> to travel.</p>
-      <button type="button" class="btn" id="intro-go">Deploy</button>
+      <p id="intro-copy">Click anywhere to move your squad. Walk up to a structure and its exhibit opens. Drag to select, scroll to zoom, keys <kbd>1</kbd>–<kbd>9</kbd> to travel, <kbd>Space</kbd> to recenter.</p>
+      <button type="button" class="btn" id="intro-go" autofocus>Deploy</button>
     </div>
   </div>
 
@@ -39,6 +39,8 @@
       <p class="links" id="ex-links"></p>
     </div>
   </aside>
+
+  <button type="button" class="recenter mono" id="recenter" hidden>Center on squad</button>
 
   <footer class="hud" id="hud">
     <canvas id="minimap" width="208" height="144" aria-label="Minimap. Click to move the camera."></canvas>

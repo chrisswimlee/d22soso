@@ -8,6 +8,7 @@
   --muted: #a39f94;
   --accent: #d4af37;
   --r: 6px;
+  --hud-h: 170px;
   color-scheme: dark;
 }
 * { box-sizing: border-box; }
@@ -18,9 +19,10 @@ h1, h2 { font-family: "Space Grotesk", sans-serif; margin: 0; line-height: 1.1; 
 a { color: var(--gold-text); }
 kbd { font: 12px "IBM Plex Mono", monospace; border: 1px solid var(--rule); border-radius: 3px; padding: 0 4px; }
 
-#field { position: fixed; inset: 0; width: 100%; height: 100%; display: block; cursor: crosshair; touch-action: none; }
+#field { position: fixed; inset: 0; width: 100%; height: 100%; display: block; cursor: crosshair; touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
+button { touch-action: manipulation; }
 
-.topbar { position: fixed; top: 0; left: 0; right: 0; display: flex; align-items: center; gap: 16px; padding: 10px 16px; background: linear-gradient(#000c, #0000); pointer-events: none; z-index: 3; }
+.topbar { position: fixed; top: 0; left: 0; right: 0; display: flex; align-items: center; gap: 16px; padding: calc(10px + env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) 10px max(16px, env(safe-area-inset-left, 0px)); background: linear-gradient(#000c, #0000); pointer-events: none; z-index: 3; }
 .topbar > * { pointer-events: auto; }
 .brand { font: 700 18px "Space Grotesk", sans-serif; color: var(--gold-text); text-decoration: none; letter-spacing: 0.02em; }
 .brand span { color: var(--text); }
@@ -28,7 +30,7 @@ kbd { font: 12px "IBM Plex Mono", monospace; border: 1px solid var(--rule); bord
 .mission b { color: var(--gold-text); }
 .classic { font-size: 12px; text-decoration: none; border-bottom: 1px solid var(--rule); }
 
-.hud { position: fixed; left: 0; right: 0; bottom: 0; display: grid; grid-template-columns: auto 1fr auto; gap: 16px; align-items: end; padding: 10px 16px calc(10px + env(safe-area-inset-bottom)); background: linear-gradient(#0000, #000d 40%); z-index: 3; pointer-events: none; }
+.hud { position: fixed; left: 0; right: 0; bottom: 0; display: grid; grid-template-columns: auto 1fr auto; gap: 16px; align-items: end; padding: 10px max(16px, env(safe-area-inset-right, 0px)) calc(10px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); background: linear-gradient(#0000, #000d 40%); z-index: 3; pointer-events: none; }
 .hud > * { pointer-events: auto; }
 #minimap { width: 208px; height: 144px; border: 1px solid var(--rule); border-radius: 3px; background: #000; cursor: pointer; display: block; }
 .hud-status { display: flex; gap: 12px; align-items: center; min-width: 0; }
@@ -51,9 +53,11 @@ kbd { font: 12px "IBM Plex Mono", monospace; border: 1px solid var(--rule); bord
 .kicker { margin: 0; color: var(--gold-text); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; }
 .btn { margin-top: 12px; font: 600 14px "IBM Plex Mono", monospace; color: #0a0a0a; background: var(--gold); border: 0; border-radius: 3px; padding: 10px 22px; cursor: pointer; letter-spacing: 0.06em; text-transform: uppercase; }
 
-.exhibit { position: fixed; top: 56px; right: 16px; bottom: 180px; width: min(400px, calc(100vw - 32px)); background: var(--panel); border-left: 2px solid var(--accent); border-radius: var(--r); z-index: 4; overflow: auto; opacity: 0; transform: translateX(12px); transition: opacity 0.25s, transform 0.25s; backdrop-filter: blur(6px); }
+.exhibit { position: fixed; top: calc(56px + env(safe-area-inset-top, 0px)); right: max(16px, env(safe-area-inset-right, 0px)); bottom: calc(var(--hud-h) + 8px); overscroll-behavior: contain; width: min(400px, calc(100vw - 32px)); background: var(--panel); border-left: 2px solid var(--accent); border-radius: var(--r); z-index: 4; overflow: auto; opacity: 0; transform: translateX(12px); transition: opacity 0.25s, transform 0.25s; backdrop-filter: blur(6px); }
 .exhibit.open { opacity: 1; transform: none; }
-.exhibit-close { position: absolute; top: 6px; right: 8px; z-index: 1; background: #000a; color: var(--text); border: 0; font-size: 22px; width: 32px; height: 32px; border-radius: 3px; cursor: pointer; }
+.recenter { position: fixed; left: max(16px, env(safe-area-inset-left, 0px)); bottom: calc(var(--hud-h) + 8px); z-index: 3; font-size: 12px; color: var(--text); background: #0d0e10e6; border: 1px solid var(--rule); border-radius: 3px; padding: 8px 12px; cursor: pointer; }
+.recenter:hover, .recenter:focus-visible, .cmd button:focus-visible, .exhibit-close:focus-visible, .links a:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.exhibit-close { position: sticky; float: right; margin: 6px 8px -44px 0; top: 6px; z-index: 1; background: #000a; color: var(--text); border: 0; font-size: 22px; width: 40px; height: 40px; border-radius: 3px; cursor: pointer; }
 .exhibit-media { margin: 0; aspect-ratio: 16 / 10; background: #000; overflow: hidden; }
 .exhibit-media img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .plate { height: 100%; display: grid; align-content: center; justify-items: start; gap: 2px 0; padding: 20px 24px; background: radial-gradient(120% 90% at 0% 0%, color-mix(in srgb, var(--accent) 22%, transparent), transparent 60%), #0a0b0d; }
@@ -74,10 +78,11 @@ kbd { font: 12px "IBM Plex Mono", monospace; border: 1px solid var(--rule); bord
   #minimap { width: 120px; height: 83px; }
   .hud-status { display: none; }
   .cmd { grid-template-columns: repeat(5, 1fr); justify-self: stretch; }
-  .cmd button { width: auto; }
-  .exhibit { top: auto; right: 8px; left: 8px; width: auto; bottom: 120px; max-height: 46vh; transform: translateY(12px); }
+  .cmd button { width: auto; padding-inline: 1px; font-size: 9.5px; }
+  .exhibit { top: auto; right: 8px; left: 8px; width: auto; bottom: calc(var(--hud-h) + 4px); max-height: 46vh; transform: translateY(12px); }
   .exhibit-media { aspect-ratio: 16 / 7; }
   .exhibit-body h2 { font-size: 20px; }
   .mission { font-size: 12px; }
+  .recenter { bottom: auto; top: calc(50px + env(safe-area-inset-top, 0px)); }
 }
 @media (prefers-reduced-motion: reduce) { .exhibit { transition: none; } }
