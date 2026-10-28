@@ -684,14 +684,14 @@ function monument() {
   g.add(ob);
   g.add(mesh(new THREE.ConeGeometry(0.36, 0.7, 4), gold, 0, 0.7 + 5.2 + 0.35, 0).rotateY(Math.PI / 4));
   const drawPlate = (c) => {
-    c.clearRect(0, 0, 256, 128);
+    c.clearRect(0, 0, 512, 128);
     c.font = "bold 84px 'Space Grotesk', sans-serif"; c.textAlign = "center"; c.fillStyle = "#e8c44a";
-    c.shadowColor = "#e8c44a"; c.shadowBlur = 18; c.fillText("D22", 128, 96);
+    c.shadowColor = "#e8c44a"; c.shadowBlur = 18; c.fillText("D22-soso", 256, 96, 490);
   };
-  const plate = canvasTex(256, 128, drawPlate);
+  const plate = canvasTex(512, 128, drawPlate);
   document.fonts?.ready.then(() => { drawPlate(plate.g); plate.tex.needsUpdate = true; });
   const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: plate.tex, transparent: true, depthWrite: false, toneMapped: false }));
-  sprite.scale.set(3.2, 1.6, 1); sprite.position.y = 8.3;
+  sprite.scale.set(6.4, 1.6, 1); sprite.position.y = 8.3;
   g.add(sprite);
   const rings = [["#e8c44a", 1.6, 0], ["#8b5cf6", 2.1, 1], ["#e8c44a", 2.6, 2]].map(([c, r, i]) => {
     const m = mesh(new THREE.TorusGeometry(r, 0.035, 6, 64), glow(c, 2), 0, 4.2, 0, false);
