@@ -269,7 +269,7 @@ function openExhibit(s) {
   const ix = SECTORS.indexOf(s);
   $("exhibit").style.setProperty("--accent", s.accent);
   $("ex-crumb").textContent = `Sector ${String(ix + 1).padStart(2, "0")} · ${s.name}`;
-  $("ex-kicker").textContent = ex.kicker;
+  $("ex-kicker").textContent = `${ex.kicker.replace(/^Sector \d+ · /, "")} · ${s.era}`; // the bar above already names the sector
   $("ex-title").textContent = ex.title;
   $("ex-lede").textContent = ex.lede;
   $("ex-body").replaceChildren(...renderExhibitBody(s));
@@ -336,6 +336,16 @@ function buildList() {
     h("h2", { text: s.name }),
     h("p", { class: "lede", text: s.exhibit.lede }),
     renderExhibitBody(s))));
+  // Light up the chip for the exhibit being read.
+  const chips = [...$("list-nav").children];
+  const seen = new IntersectionObserver((entries) => {
+    const e = entries.find((x) => x.isIntersecting);
+    if (!e) return;
+    const on = chips.find((c) => c.hash === `#${e.target.id}`), nav = $("list-nav");
+    chips.forEach((c) => c.classList.toggle("on", c === on));
+    if (nav.scrollWidth > nav.clientWidth) nav.scrollTo({ left: on.offsetLeft - 16, behavior: reduced ? "auto" : "smooth" });
+  }, { root: $("list-view"), rootMargin: "-30% 0px -60% 0px" });
+  for (const a of $("list-body").children) seen.observe(a);
 }
 let listBuilt = false;
 function openList() {
