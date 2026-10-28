@@ -26,6 +26,7 @@ function persist() {
 }
 
 /* ---------- small DOM helpers ---------- */
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 function h(tag, attrs = {}, ...kids) {
   const el = document.createElement(tag);
   for (const [k, v] of Object.entries(attrs)) {
@@ -163,17 +164,30 @@ function fillReadout(s) {
 /* ---------- labels over the world ---------- */
 const labelsEl = $("labels");
 const labels = SECTORS.map((s, i) => {
+  const k = s.key;
   const el = h("button", { type: "button", class: "label", style: `--accent:${s.accent}`, onclick: () => go(s.id), onmouseenter: () => preview(s.id), onmouseleave: () => preview(null), tabindex: "-1" },
+    h("span", { class: `key${k.fit === "contain" ? " contain" : ""}` },
+      h("img", { src: k.src, alt: "", decoding: "async", style: k.pos ? `object-position:${k.pos}` : "" }),
+      k.badge ? h("img", { class: "badge", src: k.badge, alt: "", decoding: "async" }) : null),
     h("span", { class: "mono idx", text: String(i + 1).padStart(2, "0") }), h("strong", { text: s.short }), h("span", { class: "mono era", text: s.era }));
   labelsEl.append(el);
-  return { s, el, at: "", on: false };
+  const l = { s, el, at: "", on: false, z: "", w: 0, h: 0 };
+  el.querySelectorAll("img").forEach((im) => im.addEventListener("load", () => (l.w = 0)));
+  return l;
 });
+addEventListener("resize", () => labels.forEach((l) => (l.w = 0)));
 // Runs on every rendered frame, so it only touches the DOM when something changed.
 function placeLabels() {
+  const top = $("app").clientWidth <= 760 ? 104 : 72, W = labelsEl.clientWidth;
   for (const l of labels) {
+    if (!l.w) { l.w = l.el.offsetWidth; l.h = l.el.offsetHeight; }
     const p = world.project("sector", l.s.id);
-    const at = `translate(${Math.round(p.x)}px, ${Math.round(p.y)}px) translate(-50%, -100%)`;
+    // Keep each placard on screen and clear of the header; nearer sectors draw on top.
+    const x = Math.round(clamp(p.x, l.w / 2 + 6, W - l.w / 2 - 6)), y = Math.round(Math.max(p.y, top + l.h + 10));
+    const at = `translate(${x}px, ${y}px) translate(-50%, -100%)`;
     if (at !== l.at) { l.el.style.transform = at; l.at = at; }
+    const z = String(Math.round((1 - p.z) * 1000));
+    if (z !== l.z) { l.el.style.zIndex = z; l.z = z; }
     const on = readoutFor?.id === l.s.id || current === l.s.id;
     if (on !== l.on) { l.el.classList.toggle("on", on); l.on = on; }
   }

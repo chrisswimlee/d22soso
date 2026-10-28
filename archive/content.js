@@ -11,6 +11,7 @@ export const EMAIL = "2handholdem@gmail.com";
 export const SECTORS = [
   {
     id: "arena",
+    key: { src: img("champ-trophy-640"), alt: "Wayne Chiang with the 1999 world championship trophy", pos: "50% 18%" },
     name: "The Championship Arena",
     short: "Arena",
     era: "1996 – 1999",
@@ -79,6 +80,7 @@ export const SECTORS = [
   },
   {
     id: "garden",
+    key: { src: img("weissman-360"), alt: "Wayne Chiang with Brian Weissman", pos: "50% 25%" },
     name: "The Strategy Garden",
     short: "Garden",
     era: "1995 – today",
@@ -123,6 +125,7 @@ export const SECTORS = [
   },
   {
     id: "broadcast",
+    key: { src: img("wsop-boxer-360"), alt: "Wayne Chiang at the 2025 World Series of Poker", pos: "50% 20%", badge: img("wsop-logo-600") },
     name: "The Broadcast Station",
     short: "Broadcast",
     era: "2010s – today",
@@ -169,6 +172,7 @@ export const SECTORS = [
   },
   {
     id: "foundry",
+    key: { src: img("twohh-logo-500"), alt: "2 Hand Hold’em logo", fit: "contain" },
     name: "The Invention Foundry",
     short: "Foundry",
     era: "2015 – today",
@@ -222,6 +226,7 @@ export const SECTORS = [
   },
   {
     id: "library",
+    key: { src: img("betting-on-yourself-cover"), alt: "Betting on Yourself book cover", fit: "contain" },
     name: "The Library",
     short: "Library",
     era: "December 2025",
@@ -257,6 +262,7 @@ export const SECTORS = [
   },
   {
     id: "command",
+    key: { src: img("headshot-pgl-360"), alt: "Wayne Chiang with his 1999 trophies", pos: "50% 22%" },
     name: "The Command Center",
     short: "Command",
     era: "Today",
