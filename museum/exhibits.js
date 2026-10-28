@@ -18,6 +18,7 @@ export const SITES = [
       title: "One strategist, many theaters",
       img: "champ-trophy-1080",
       alt: "Wayne Chiang holding the 1999 championship trophy",
+      pos: "50% 22%",
       body: [
         "First official Brood War Season 1 Ladder Tournament World Champion (1999, playing Random), Cube Draft pioneer, patented casino game inventor, and WSOP Talent Manager.",
         "Every structure on this map is a room of the archive. Send the squad toward one to open it.",
@@ -37,8 +38,7 @@ export const SITES = [
     exhibit: {
       kicker: "1996 – 1997 · Online ladders",
       title: "Before the championship: #1 on the ladders",
-      img: "bg-cnc-v2",
-      alt: "",
+      plate: ["#1", "Case’s Ladder · C&C 1v1 & Teams · 1996", "#1", "Warcraft II Team Ladder · Clan C4L · 1997"],
       body: [
         "As SoSOWAC, he took Case’s Ladder #1 in Command & Conquer 1v1 and Teams in 1996 with Team Synergy, mentored by ladder co-owner Bill “Bill1” Macaitis.",
         "In 1997 he moved to Warcraft II: Top 3 1v1 and Team Ladder #1 with Clan C4L, where he met Jay “Gadianton” Severson.",
@@ -60,7 +60,8 @@ export const SITES = [
       kicker: "April 28, 1999 · Random",
       title: "Brood War Season 1 World Champion",
       img: "champ-pgl-1080",
-      alt: "Wayne Chiang at the PGL event, 1999",
+      alt: "Wayne Chiang with his 1999 StarCraft trophies",
+      pos: "50% 30%",
       body: [
         "Blizzard’s first official Brood War world championship. His path ran through Nautosoft, Shin Ju Young, and Grrrr… before a five-game final against Crexis (Chris Low) on Showdown.",
         "After losing a Terran cliff war, infantry, Ghosts, and Siege Tanks closed out Game 5 at 35:37.",
@@ -82,7 +83,7 @@ export const SITES = [
       kicker: "Magic: The Gathering",
       title: "The Cube",
       img: "weissman-900",
-      alt: "Brian Weissman",
+      alt: "Wayne Chiang with Brian Weissman, who introduced him to competitive Magic",
       body: [
         "Introduced to competitive Magic by Brian Weissman at Round Table Pizza in Palo Alto. His early custom draft pool, “The Cube,” became Cube Draft, later a Magic Online staple.",
         "Public credit for the majority of the Cube Draft idea comes from Brian Weissman and Tom Martell.",
@@ -103,8 +104,9 @@ export const SITES = [
     exhibit: {
       kicker: "Patented table games",
       title: "2 Hand Hold’em™ and Badugi Chase™",
-      img: "badugi-play-900",
-      alt: "Badugi Chase being played",
+      img: "twohh-logo-500",
+      alt: "2 Hand Hold’em logo",
+      fit: "contain",
       body: [
         "2 Hand Hold’em splits four hole cards into two independent hands against one dealer board. Check or raise each hand. Live at Great American Casino Tukwila.",
         "Badugi Chase, “The Baby Rainbow,” co-invented with Charles Chang: pick one of three community cards in the Chase.",
@@ -129,7 +131,8 @@ export const SITES = [
       kicker: "Poker, production, talent",
       title: "Live at the Bike to the WSOP",
       img: "wsop-boxer-1200",
-      alt: "Interviewing SlayerS_BoxeR at the 2025 WSOP",
+      alt: "Wayne Chiang with SlayerS_BoxeR at the 2025 WSOP",
+      pos: "50% 20%",
       body: [
         "Decade-plus high-stakes poker pro. Co-owner and lead producer of Live at the Bike, growing peak concurrents from 2,500 to 8,800 before the 2021 buyout.",
         "Now WSOP Talent Manager on the Media Team, running the Vlogger Program. At the 2025 WSOP he interviewed SlayerS_BoxeR.",
@@ -151,7 +154,8 @@ export const SITES = [
       kicker: "Author · Kendall Hunt",
       title: "Betting on Yourself",
       img: "betting-on-yourself-cover",
-      alt: "Cover of Betting on Yourself",
+      alt: "Cover of Betting on Yourself by Joe Matton and Wayne Chiang",
+      fit: "contain",
       body: ["Co-written with Joe Matton and published in December 2025: lessons from ladders, felt, and the patent office on backing your own read."],
       facts: ["Kendall Hunt · 2025", "with Joe Matton"],
       links: [{ label: "Book room", href: "../index.html#book" }],
@@ -170,7 +174,7 @@ export const SITES = [
       kicker: "Casual competitor",
       title: "Still climbing",
       img: "hearthstone-35-720",
-      alt: "Hearthstone Legend rank 35",
+      alt: "Hearthstone Legend rank 35 screenshot",
       body: ["The ladder habit never left. Hearthstone High Legend, plus Challenger, Diamond, and #1 finishes in newer games."],
       facts: ["Hearthstone #35 Standard NA · #11 Wild NA", "Clash Royale Challenger", "League of Legends Diamond 5", "Once Upon a Galaxy #1"],
       links: [{ label: "Hearthstone room", href: "../gaming.html#game-hearthstone" }],
@@ -188,8 +192,7 @@ export const SITES = [
     exhibit: {
       kicker: "Media & licensing",
       title: "Send a transmission",
-      img: "latb-logo-400",
-      alt: "",
+      plate: ["2handholdem@gmail.com", "Media · licensing · table games"],
       body: ["For media, licensing, and table game inquiries."],
       facts: ["2handholdem@gmail.com", "@D22_soso"],
       links: [{ label: "Email", href: "mailto:2handholdem@gmail.com" }],

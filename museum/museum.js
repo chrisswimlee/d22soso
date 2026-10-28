@@ -300,7 +300,15 @@ function openExhibit(site) {
   document.getElementById("ex-kicker").textContent = ex.kicker;
   document.getElementById("ex-title").textContent = ex.title;
   const img = document.getElementById("ex-img");
-  img.src = imgSrc(ex.img); img.alt = ex.alt;
+  const plate = document.getElementById("ex-plate");
+  img.hidden = !ex.img;
+  if (ex.img) {
+    img.src = imgSrc(ex.img); img.alt = ex.alt;
+    img.style.objectFit = ex.fit || "cover";
+    img.style.objectPosition = ex.pos || "50% 50%";
+  }
+  plate.hidden = !ex.plate;
+  plate.replaceChildren(...(ex.plate || []).map((t, i) => Object.assign(document.createElement(i % 2 ? "span" : "b"), { textContent: t, className: t.length > 14 ? "long" : "" })));
   document.getElementById("ex-text").replaceChildren(...ex.body.map((t) => Object.assign(document.createElement("p"), { textContent: t })));
   document.getElementById("ex-facts").replaceChildren(...ex.facts.map((t) => Object.assign(document.createElement("li"), { textContent: t })));
   document.getElementById("ex-links").replaceChildren(...(ex.links || []).map((l) => Object.assign(document.createElement("a"), { href: l.href, textContent: l.label })));
