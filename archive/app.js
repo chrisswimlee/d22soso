@@ -166,20 +166,27 @@ const labels = SECTORS.map((s, i) => {
   const el = h("button", { type: "button", class: "label", style: `--accent:${s.accent}`, onclick: () => go(s.id), onmouseenter: () => preview(s.id), onmouseleave: () => preview(null), tabindex: "-1" },
     h("span", { class: "mono idx", text: String(i + 1).padStart(2, "0") }), h("strong", { text: s.short }), h("span", { class: "mono era", text: s.era }));
   labelsEl.append(el);
-  return { s, el };
+  return { s, el, at: "", on: false };
 });
+// Runs on every rendered frame, so it only touches the DOM when something changed.
 function placeLabels() {
-  for (const { s, el } of labels) {
-    const p = world.project("sector", s.id);
-    el.style.transform = `translate(${p.x}px, ${p.y}px) translate(-50%, -100%)`;
-    el.classList.toggle("on", readoutFor?.id === s.id || current === s.id);
+  for (const l of labels) {
+    const p = world.project("sector", l.s.id);
+    const at = `translate(${Math.round(p.x)}px, ${Math.round(p.y)}px) translate(-50%, -100%)`;
+    if (at !== l.at) { l.el.style.transform = at; l.at = at; }
+    const on = readoutFor?.id === l.s.id || current === l.s.id;
+    if (on !== l.on) { l.el.classList.toggle("on", on); l.on = on; }
   }
 }
 
 /* ---------- minimap ---------- */
 const mm = $("minimap"), mctx = mm.getContext("2d");
+let mmKey = "";
 function drawMinimap() {
   const st = world.state();
+  const key = [st.az, st.zoom, st.tx, st.tz, st.scout.x, st.scout.z, current, foundArtifacts.size].map((v) => (typeof v === "number" ? v.toFixed(3) : v)).join();
+  if (key === mmKey) return;
+  mmKey = key;
   const W = mm.width, c = W / 2, k = (W / 2 - 14) / st.R;
   const P = (x, z) => [c + x * k, c + z * k];
   mctx.clearRect(0, 0, W, W);
@@ -391,7 +398,7 @@ function fallback() {
   if (byId(id)) { listJump(id); history.replaceState(null, "", `#${id}`); }
 }
 async function boot() {
-  const { createWorld, webglAvailable } = await import("./world.js").catch(() => ({}));
+  const { createWorld, webglAvailable } = await import("./world.js").catch((err) => { console.error(err); return {}; });
   if (!createWorld || !webglAvailable()) {
     fallback();
     return;

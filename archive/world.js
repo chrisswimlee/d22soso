@@ -134,14 +134,28 @@ const BUILD = {
     g.add(box(3.6, 1.9, 2.6, wall, 0, 0.3, -0.4));
     g.add(box(3.9, 0.18, 2.9, roof, 0, 2.2, -0.4));
     // Animated monitor wall facing the centre.
-    const screens = [];
+    // All six screens share one 3x2 canvas atlas: one texture upload per refresh instead of six.
     const labels = ["LIVE", "WSOP", "LATB", "REC", "CH 22", "ON AIR"];
+    const hues = [140, 45, 0, 160, 200, 350];
+    const atlas = canvasTex(384, 160, () => {});
+    const screenMat = new THREE.MeshBasicMaterial({ map: atlas.tex, toneMapped: false });
+    const scan = document.createElement("canvas");
+    scan.width = 128; scan.height = 84;
+    const sg = scan.getContext("2d");
+    sg.fillStyle = "rgba(255,255,255,.08)";
+    for (let y = 0; y < 84; y += 4) sg.fillRect(0, y, 128, 1);
+    const screenParts = [];
     for (let i = 0; i < 6; i++) {
-      const s = canvasTex(128, 80, () => {});
-      const m = mesh(new THREE.PlaneGeometry(1, 0.62), new THREE.MeshBasicMaterial({ map: s.tex, toneMapped: false }), -1.15 + (i % 3) * 1.15, 0.75 + Math.floor(i / 3) * 0.72, 0.92, false);
-      screens.push({ ...s, label: labels[i], hue: [140, 45, 0, 160, 200, 350][i] });
-      g.add(m);
+      const col = i % 3, row = Math.floor(i / 3);
+      const geo = new THREE.PlaneGeometry(1, 0.62);
+      const uv = geo.attributes.uv;
+      for (let j = 0; j < uv.count; j++) uv.setXY(j, (col + uv.getX(j)) / 3, (uv.getY(j) + (row === 0 ? 1 : 0)) / 2);
+      const m = new THREE.Mesh(geo);
+      m.position.set(-1.15 + col * 1.15, 0.75 + row * 0.72, 0.92);
+      m.updateMatrix();
+      screenParts.push([m, m.matrix]);
     }
+    g.add(bake(screenParts, screenMat));
     g.add(box(1.4, 0.32, 0.08, glow("#ef4444", 1.8), 0, 2.45, 0.9));
     // Lattice antenna.
     const tower = new THREE.Group();
@@ -152,7 +166,8 @@ const BUILD = {
       tower.add(leg);
     }
     for (let y = 0.6; y < 5; y += 0.8) tower.add(box(0.5 - y * 0.06, 0.04, 0.5 - y * 0.06, mat("#6b7280"), 0, y, 0));
-    const tip = mesh(new THREE.SphereGeometry(0.12, 8, 6), glow("#ef4444", 3), 0, 5.1, 0, false);
+    const tipOn = glow("#ef4444", 3), tipOff = mat("#4a1010");
+    const tip = mesh(new THREE.SphereGeometry(0.12, 8, 6), tipOn, 0, 5.1, 0, false);
     tower.add(tip);
     const waves = [0, 1, 2].map(() => {
       const w = mesh(new THREE.TorusGeometry(0.4, 0.025, 4, 32), mat(accent, { emissive: accent, ei: 2, opacity: 0.6 }).clone(), 0, 5.1, 0, false);
@@ -172,17 +187,21 @@ const BUILD = {
     return {
       g,
       anim(t, dt) {
-        tip.material = Math.sin(t * 4) > 0 ? glow("#ef4444", 3) : mat("#4a1010");
+        tip.material = Math.sin(t * 4) > 0 ? tipOn : tipOff;
         waves.forEach((w, i) => {
           const p = (t * 0.5 + i / 3) % 1;
           w.scale.setScalar(1 + p * 5); w.material.opacity = 0.7 * (1 - p);
         });
         dish.rotation.y = Math.sin(t * 0.3) * 0.8;
         tick += dt;
-        if (tick > 0.12) {
+        if (tick > 0.15) {
           tick = 0;
-          for (const s of screens) {
-            const { g: c, c: el, label, hue } = s;
+          const c = atlas.g;
+          for (let n = 0; n < 6; n++) {
+            const label = labels[n], hue = hues[n];
+            c.save();
+            c.translate((n % 3) * 128, (n < 3 ? 0 : 1) * 80);
+            c.beginPath(); c.rect(0, 0, 128, 80); c.clip();
             const gr = c.createLinearGradient(0, 0, 128, 80);
             gr.addColorStop(0, `hsl(${hue + Math.sin(t + hue) * 20},60%,${22 + Math.sin(t * 2 + hue) * 6}%)`);
             gr.addColorStop(1, "#05070a");
@@ -191,11 +210,12 @@ const BUILD = {
               const h = 8 + Math.abs(Math.sin(t * 3 + i + hue)) * 30;
               c.fillStyle = "rgba(255,255,255,.18)"; c.fillRect(10 + i * 12, 70 - h, 8, h);
             }
-            c.fillStyle = "rgba(255,255,255,.08)"; for (let y = (t * 40) % 4; y < 80; y += 4) c.fillRect(0, y, 128, 1);
+            c.drawImage(scan, 0, ((t * 40) % 4) - 4);
             c.fillStyle = label === "LIVE" || label === "ON AIR" ? (Math.sin(t * 5) > 0 ? "#ef4444" : "#7f1d1d") : "#e9e6dc";
             c.font = "bold 18px monospace"; c.fillText(label, 8, 22);
-            s.tex.needsUpdate = true;
+            c.restore();
           }
+          atlas.tex.needsUpdate = true;
         }
       },
     };
@@ -222,7 +242,7 @@ const BUILD = {
     // Two hands of floating cards over the anvil.
     g.add(box(1.4, 0.7, 0.8, dark, 0, 0.3, 1.7));
     const faces = [["A", "♠", "#111"], ["K", "♥", "#c81e1e"], ["Q", "♦", "#c81e1e"], ["J", "♣", "#111"]];
-    const cards = faces.map(([r, s, col], i) => {
+    const cards = faces.map(([r, s, col]) => {
       const face = canvasTex(64, 90, (c) => {
         c.fillStyle = "#f8f5ec"; c.fillRect(0, 0, 64, 90);
         c.strokeStyle = accent; c.lineWidth = 4; c.strokeRect(2, 2, 60, 86);
@@ -431,16 +451,22 @@ function mergeStatic(root, anim, into) {
 function bake(pairs, material) {
   const parts = pairs.map(([m, matrix]) => {
     const g = m.geometry.index ? m.geometry.toNonIndexed() : m.geometry.clone();
-    for (const k of Object.keys(g.attributes)) if (k !== "position" && k !== "normal") g.deleteAttribute(k);
+    for (const k of Object.keys(g.attributes)) if (k !== "position" && k !== "normal" && !(k === "uv" && material.map)) g.deleteAttribute(k);
     return g.applyMatrix4(matrix);
   });
   const count = parts.reduce((n, g) => n + g.attributes.position.count, 0);
   const pos = new Float32Array(count * 3), nor = new Float32Array(count * 3);
   let off = 0;
-  for (const g of parts) { pos.set(g.attributes.position.array, off * 3); nor.set(g.attributes.normal.array, off * 3); off += g.attributes.position.count; g.dispose(); }
+  const uv = material.map ? new Float32Array(count * 2) : null;
+  for (const g of parts) {
+    pos.set(g.attributes.position.array, off * 3); nor.set(g.attributes.normal.array, off * 3);
+    uv?.set(g.attributes.uv.array, off * 2);
+    off += g.attributes.position.count; g.dispose();
+  }
   const geo = new THREE.BufferGeometry();
   geo.setAttribute("position", new THREE.BufferAttribute(pos, 3));
   geo.setAttribute("normal", new THREE.BufferAttribute(nor, 3));
+  if (uv) geo.setAttribute("uv", new THREE.BufferAttribute(uv, 2));
   geo.computeBoundingSphere();
   const merged = new THREE.Mesh(geo, material);
   merged.castShadow = pairs.some(([m]) => m.castShadow); merged.receiveShadow = true;
@@ -728,7 +754,7 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
     return h ? h.object.userData.hit : null;
   }
   const ptrs = new Map();
-  let drag = null, pinch = null, hover = null;
+  let drag = null, pinch = null, hover = null, hoverAt = null;
   const userMoved = () => { lastUser = performance.now(); onCameraUser?.(); };
 
   canvas.addEventListener("pointerdown", (e) => {
@@ -754,9 +780,15 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
     }
     if (!drag) {
       if (e.pointerType === "mouse") {
-        const h = pick(e.clientX, e.clientY);
-        if ((h && h.id) !== (hover && hover.id)) { hover = h; onHover?.(h); }
-        canvas.style.cursor = h ? "pointer" : "grab";
+        // Mice can report hundreds of moves a second; raycast at most once per frame.
+        const first = !hoverAt;
+        hoverAt = { x: e.clientX, y: e.clientY };
+        if (first) requestAnimationFrame(() => {
+          const h = pick(hoverAt.x, hoverAt.y);
+          hoverAt = null;
+          if ((h && h.id) !== (hover && hover.id)) { hover = h; onHover?.(h); }
+          canvas.style.cursor = h ? "pointer" : "grab";
+        });
       }
       return;
     }
@@ -802,7 +834,7 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
   }
 
   /* ---------- loop ---------- */
-  let raf = 0, running = true;
+  let running = true;
   let lastRender = 0, background = "none", shadowTick = 0;
   const samples = [];
   const settled = () =>
@@ -813,11 +845,14 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
     if (background === "list") return 0;
     if (drag || pinch || introT < 1 || route.length || ping < 1 || performance.now() - lastUser < 1500 || !settled()) return 60;
     if (background === "exhibit") return mobile ? 12 : 24;
-    return reduced ? 8 : 30;
+    return reduced ? 8 : mobile ? 24 : 30;
   }
   const tmp = new THREE.Vector3();
+  const gemFound = glow("#e8c44a", 2);
+  const gemHover = mat("#64748b", { emissive: "#38bdf8", ei: 0.9, rough: 0.3 });
+  const gemIdle = mat("#4b5563", { emissive: "#38bdf8", ei: 0.25, rough: 0.3 });
   function frame() {
-    raf = requestAnimationFrame(frame);
+    requestAnimationFrame(frame);
     if (!running) return;
     const now = performance.now();
     const fps = fpsCap();
@@ -867,7 +902,7 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
       a.gem.rotation.y = t * (a.found ? 1.2 : 0.4);
       a.gem.position.y = 0.85 + Math.sin(t * 1.5 + a.p.x) * (a.found ? 0.12 : 0.04);
       a.lit = lerp(a.lit, a.found ? 1 : 0, 0.05);
-      a.gem.material = a.found ? glow("#e8c44a", 2) : a.a.id === (hover && hover.id) ? mat("#64748b", { emissive: "#38bdf8", ei: 0.9, rough: 0.3 }) : mat("#4b5563", { emissive: "#38bdf8", ei: 0.25, rough: 0.3 });
+      a.gem.material = a.found ? gemFound : a.a.id === (hover && hover.id) ? gemHover : gemIdle;
       a.beam.material.opacity = a.lit * (0.18 + Math.sin(t * 2) * 0.05);
       a.beam.visible = a.lit > 0.01;
     }
@@ -931,6 +966,11 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
   resize(); applyCamera(); frame();
 
   const proj = new THREE.Vector3();
+  const st = {
+    R, scout: {},
+    sectors: sectorObjs.map((o) => ({ id: o.s.id, x: o.p.x, z: o.p.z, accent: o.s.accent })),
+    artifacts: artifactObjs.map((a) => ({ id: a.a.id, x: a.p.x, z: a.p.z, found: a.found })),
+  };
   return {
     /* Camera framing for a sector; shift moves the subject away from an open exhibit panel. */
     focusSector(id, { shiftX = 0, shiftY = 0, zoom = 2.3 } = {}) {
@@ -965,7 +1005,6 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
     setBackground(v) { background = v; samples.length = 0; },
     setIdleSpin(on) { idleSpin = on; },
     onDiscover(cb) { onDiscover = cb; },
-    discover,
     restoreFound(ids) { for (const a of artifactObjs) if (ids.includes(a.a.id)) { a.found = true; a.lit = 1; } },
     project(kind, id) {
       let v;
@@ -975,7 +1014,10 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
       return { x: (v.x * 0.5 + 0.5) * width, y: (-v.y * 0.5 + 0.5) * height, z: v.z };
     },
     state() {
-      return { az: cur.az, zoom: cur.zoom, tx: cur.tx, tz: cur.tz, scout: { x: sc.g.position.x, z: sc.g.position.z }, R, sectors: sectorObjs.map((o) => ({ id: o.s.id, x: o.p.x, z: o.p.z, accent: o.s.accent })), artifacts: artifactObjs.map((a) => ({ id: a.a.id, x: a.p.x, z: a.p.z, found: a.found })) };
+      st.az = cur.az; st.zoom = cur.zoom; st.tx = cur.tx; st.tz = cur.tz;
+      st.scout.x = sc.g.position.x; st.scout.z = sc.g.position.z;
+      artifactObjs.forEach((a, i) => (st.artifacts[i].found = a.found));
+      return st;
     },
   };
 }

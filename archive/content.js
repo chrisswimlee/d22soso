@@ -1,6 +1,6 @@
 /* D22: The Living Archive — exhibit content.
    Facts follow wayne-chiang-truth-document.md (public tiers only) and the live site copy. */
-export const ASSETS = "../assets/";
+const ASSETS = "../assets/";
 const img = (name) => `${ASSETS}img/${name}.webp`;
 const kit = (name) => `${ASSETS}media-kit/${name}`;
 const yt = (id) => ({ href: `https://www.youtube.com/watch?v=${id}`, thumb: `https://img.youtube.com/vi/${id}/hqdefault.jpg` });

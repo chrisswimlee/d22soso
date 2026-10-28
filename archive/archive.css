@@ -1,7 +1,7 @@
 /* Command deck: tactical instruments around a museum-grade reading surface. */
 :root {
   --bg: #07080b;
-  --panel: rgba(12, 13, 17, 0.9);
+  --panel: rgba(12, 13, 17, 0.94);
   --panel-solid: #0c0d11;
   --ink: #ece8dc;
   --muted: #a39f94;
@@ -44,7 +44,7 @@ button { font: inherit; color: inherit; touch-action: manipulation; }
 
 /* Labels pinned over buildings */
 .labels { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
-.label { position: absolute; left: 0; top: 0; display: grid; grid-template-columns: auto auto; column-gap: 6px; align-items: baseline; padding: 4px 9px 5px; border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent); border-radius: 3px; background: rgba(7, 8, 11, 0.72); pointer-events: auto; cursor: pointer; transition: border-color 0.2s, background 0.2s, opacity 0.3s; backdrop-filter: blur(4px); }
+.label { position: absolute; left: 0; top: 0; display: grid; grid-template-columns: auto auto; column-gap: 6px; align-items: baseline; padding: 4px 9px 5px; border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent); border-radius: 3px; background: rgba(7, 8, 11, 0.86); pointer-events: auto; cursor: pointer; transition: border-color 0.2s, background 0.2s, opacity 0.3s; will-change: transform; }
 .label::after { content: ""; position: absolute; left: 50%; bottom: -9px; width: 1px; height: 8px; background: var(--accent); opacity: 0.6; }
 .label .idx { font-size: 10px; color: var(--accent); }
 .label strong { font: 600 13px var(--display); }
@@ -73,7 +73,7 @@ button { font: inherit; color: inherit; touch-action: manipulation; }
 .sectors button.seen .idx::after { content: " ✓"; color: var(--muted); }
 
 /* Readout: the selected node */
-.readout { position: absolute; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); min-width: 320px; max-width: calc(100vw - 640px); padding: 14px 20px 16px; background: var(--panel); border: 1px solid var(--rule-soft); border-top: 2px solid var(--accent); border-radius: var(--r); text-align: center; backdrop-filter: blur(8px); }
+.readout { position: absolute; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); min-width: 320px; max-width: calc(100vw - 640px); padding: 14px 20px 16px; background: var(--panel); border: 1px solid var(--rule-soft); border-top: 2px solid var(--accent); border-radius: var(--r); text-align: center; }
 .readout::before, .readout::after { content: ""; position: absolute; top: 8px; width: 10px; height: 10px; border-top: 1px solid var(--accent); }
 .readout::before { left: 8px; border-left: 1px solid var(--accent); }
 .readout::after { right: 8px; border-right: 1px solid var(--accent); }
@@ -96,7 +96,7 @@ button { font: inherit; color: inherit; touch-action: manipulation; }
 .sectors, .hint, .instruments { transition: opacity 0.3s; }
 
 /* Artifact toast */
-.toast { position: absolute; left: var(--gut); bottom: calc(64px + env(safe-area-inset-bottom, 0px)); transform: translateY(8px); width: min(420px, calc(100vw - 32px)); padding: 14px 18px; background: var(--panel); border: 1px solid rgba(56, 189, 248, 0.4); border-left: 3px solid var(--gold-text); border-radius: var(--r); opacity: 0; transition: opacity 0.3s, transform 0.3s; cursor: pointer; z-index: 6; backdrop-filter: blur(8px); }
+.toast { position: absolute; left: var(--gut); bottom: calc(64px + env(safe-area-inset-bottom, 0px)); transform: translateY(8px); width: min(420px, calc(100vw - 32px)); padding: 14px 18px; background: var(--panel); border: 1px solid rgba(56, 189, 248, 0.4); border-left: 3px solid var(--gold-text); border-radius: var(--r); opacity: 0; transition: opacity 0.3s, transform 0.3s; cursor: pointer; z-index: 6; }
 .toast.open { opacity: 1; transform: none; }
 .toast .eyebrow { color: var(--gold-text); }
 .toast h3 { font-size: 18px; margin: 4px 0; }
@@ -164,8 +164,8 @@ figcaption { margin-top: 6px; font-size: 12px; color: var(--muted); }
 .monitor strong { font: 600 14px/1.3 var(--display); }
 .monitor span:last-child { font-size: 11px; color: var(--muted); }
 .monitor:hover { border-color: var(--accent); }
-.monitor::after { content: ""; position: absolute; left: 0; right: 0; height: 30%; top: -30%; background: linear-gradient(transparent, rgba(255,255,255,.06), transparent); animation: scan 4s linear infinite; animation-delay: calc(var(--i) * -0.8s); }
-@keyframes scan { to { top: 110%; } }
+.monitor::after { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 30%; background: linear-gradient(transparent, rgba(255,255,255,.06), transparent); transform: translateY(-100%); animation: scan 4s linear infinite; animation-delay: calc(var(--i) * -0.8s); }
+@keyframes scan { to { transform: translateY(370%); } }
 
 .steps { list-style: none; counter-reset: s; margin: 0; padding: 0; display: grid; gap: 8px; }
 .steps li { counter-increment: s; display: grid; grid-template-columns: 30px 1fr; column-gap: 10px; font-size: 14px; }

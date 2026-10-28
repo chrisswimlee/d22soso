@@ -35,7 +35,7 @@ function score5(cs) {
   return tb.reduce((acc, r) => acc * 15 + r, cat) * Math.pow(15, 5 - tb.length);
 }
 
-export function best(cards) {
+function best(cards) {
   let top = -1;
   const n = cards.length;
   for (let a = 0; a < n; a++) for (let b = a + 1; b < n; b++) for (let c = b + 1; c < n; c++) for (let d = c + 1; d < n; d++) for (let e = d + 1; e < n; e++) {
