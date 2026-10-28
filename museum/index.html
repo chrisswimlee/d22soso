@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Field Museum · Wayne “D22-soso” Chiang</title>
+  <meta name="description" content="Explore Wayne Chiang’s career as a playable map: move the squad, lift the fog, and open each exhibit." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="museum.css" />
+</head>
+<body>
+  <canvas id="field" aria-label="Explorable map. Click or tap to move the squad. Use the command card or keys 1 to 9 to travel to an exhibit."></canvas>
+
+  <header class="topbar">
+    <a class="brand" href="../index.html">D22<span>-soso</span></a>
+    <p class="mission mono" id="mission">Exhibits found <b id="found">0</b>/<span id="total">9</span></p>
+    <a class="classic mono" href="../index.html">Classic site</a>
+  </header>
+
+  <div class="intro" id="intro">
+    <div class="intro-card">
+      <p class="mono kicker">Field Museum</p>
+      <h1>Wayne Chiang</h1>
+      <p>Click anywhere to move your squad. Walk up to a structure and its exhibit opens. Drag to select, keys <kbd>1</kbd>–<kbd>9</kbd> to travel.</p>
+      <button type="button" class="btn" id="intro-go">Deploy</button>
+    </div>
+  </div>
+
+  <aside class="exhibit" id="exhibit" aria-live="polite" hidden>
+    <button type="button" class="exhibit-close" id="exhibit-close" aria-label="Close exhibit">×</button>
+    <figure class="exhibit-media"><img id="ex-img" alt="" /></figure>
+    <div class="exhibit-body">
+      <p class="mono kicker" id="ex-kicker"></p>
+      <h2 id="ex-title"></h2>
+      <div id="ex-text"></div>
+      <ul class="facts mono" id="ex-facts"></ul>
+      <p class="links" id="ex-links"></p>
+    </div>
+  </aside>
+
+  <footer class="hud" id="hud">
+    <canvas id="minimap" width="208" height="144" aria-label="Minimap. Click to move the camera."></canvas>
+    <div class="hud-status">
+      <div class="portrait" aria-hidden="true"><canvas id="portrait" width="72" height="72"></canvas></div>
+      <div>
+        <p class="mono unit-name" id="unit-name">Scout squad ×3</p>
+        <p class="hint" id="hint">Explore the map. Structures open as you approach.</p>
+      </div>
+    </div>
+    <nav class="cmd" id="cmd" aria-label="Travel to exhibit"></nav>
+  </footer>
+
+  <script type="module" src="museum.js"></script>
+</body>
+</html>
