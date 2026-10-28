@@ -64,45 +64,86 @@ function canvasTex(w, h, draw) {
 // Each builder returns a group that faces +z (toward the centre after placement) and an anim(t, dt) hook.
 const BUILD = {
   arena(accent) {
+    // A 1999 championship stage: two beige-CRT player booths face off under a scoreboard, crowd in the stands.
     const g = new THREE.Group();
-    const stone = mat("#4a4658"), stone2 = mat("#3a3748"), dark = mat("#1c1b24");
+    const stone = mat("#4a4658"), stone2 = mat("#3a3748"), dark = mat("#1c1b24"), beige = mat("#d6cfba"), steel = mat("#2b2b33");
     g.add(cyl(4.4, 4.7, 0.35, stone2, 0, 0, 0, 16));
     const field = canvasTex(256, 256, (c, w, h) => {
-      c.fillStyle = "#1d2a22"; c.fillRect(0, 0, w, h);
-      c.strokeStyle = "rgba(139,92,246,.45)"; c.lineWidth = 2;
+      c.fillStyle = "#15131f"; c.fillRect(0, 0, w, h);
+      c.strokeStyle = "rgba(139,92,246,.35)"; c.lineWidth = 2;
       for (let i = 0; i <= w; i += 32) { c.beginPath(); c.moveTo(i, 0); c.lineTo(i, h); c.stroke(); c.beginPath(); c.moveTo(0, i); c.lineTo(w, i); c.stroke(); }
-      c.strokeStyle = "rgba(232,196,74,.7)"; c.lineWidth = 4; c.beginPath(); c.arc(w / 2, h / 2, 60, 0, 7); c.stroke();
+      c.strokeStyle = "rgba(232,196,74,.7)"; c.lineWidth = 4; c.beginPath(); c.arc(w / 2, h / 2, 100, 0, 7); c.stroke();
     });
-    const f = mesh(new THREE.CylinderGeometry(3, 3, 0.06, 32), new THREE.MeshLambertMaterial({ map: field.tex }), 0, 0.38, 0);
-    g.add(f);
+    g.add(mesh(new THREE.CylinderGeometry(3, 3, 0.06, 32), new THREE.MeshLambertMaterial({ map: field.tex }), 0, 0.38, 0));
+    // Stepped stands with a crowd of lit seats; the gap faces the centre.
+    const crowd = [glow(accent, 0.9), glow("#fde68a", 0.9), mat("#6b6880")];
     for (let i = 0; i < 16; i++) {
       const a = (i / 16) * Math.PI * 2;
-      if (Math.abs(Math.atan2(Math.sin(a), Math.cos(a)) - Math.PI / 2) < 0.35) continue; // gate faces the centre
-      const s = box(1.2, 1 + (i % 2) * 0.35, 0.9, i % 2 ? stone : stone2, 0, 0.35, 0);
-      s.position.x = Math.cos(a) * 3.7; s.position.z = Math.sin(a) * 3.7;
-      s.rotation.y = -a + Math.PI / 2;
-      g.add(s);
+      if (Math.abs(Math.atan2(Math.sin(a), Math.cos(a)) - Math.PI / 2) < 0.35) continue;
+      const tier = new THREE.Group();
+      tier.add(box(1.25, 0.55, 0.5, stone2, 0, 0, 0.2));
+      tier.add(box(1.25, 1.1, 0.5, stone, 0, 0, -0.3));
+      for (let k = 0; k < 3; k++) {
+        tier.add(box(0.16, 0.16, 0.16, crowd[(i + k) % 3], -0.4 + k * 0.4, 0.55, 0.2));
+        tier.add(box(0.16, 0.16, 0.16, crowd[(i + k + 1) % 3], -0.4 + k * 0.4, 1.1, -0.3));
+      }
+      tier.position.set(Math.cos(a) * 3.75, 0.35, Math.sin(a) * 3.75);
+      tier.rotation.y = -a - Math.PI / 2;
+      g.add(tier);
     }
-    // Trophy on a plinth with a holo ring.
-    g.add(box(0.7, 0.6, 0.7, dark, 0, 0.4, 0));
+    // Stage and two player booths facing each other.
+    g.add(box(3.6, 0.22, 1.5, dark, 0, 0.4, -0.5));
+    const screen = canvasTex(128, 96, (c, w, h) => {
+      c.fillStyle = "#0b1410"; c.fillRect(0, 0, w, h);
+      c.strokeStyle = "rgba(74,222,128,.35)"; c.lineWidth = 1;
+      for (let i = -h; i < w; i += 12) { c.beginPath(); c.moveTo(i, h); c.lineTo(i + h, 0); c.stroke(); c.beginPath(); c.moveTo(i, 0); c.lineTo(i + h, h); c.stroke(); }
+      for (let i = 0; i < 9; i++) { c.fillStyle = i % 2 ? "#a78bfa" : "#fb923c"; c.fillRect(14 + ((i * 37) % 96), 14 + ((i * 23) % 64), 6, 6); }
+      c.fillStyle = "#111"; c.fillRect(0, h - 18, w, 18); c.fillStyle = "#4ade80"; c.font = "bold 12px monospace"; c.fillText("GG  1 - 0", 8, h - 5);
+    });
+    const screenMat = new THREE.MeshBasicMaterial({ map: screen.tex, toneMapped: false });
+    for (const sx of [-1, 1]) {
+      const booth = new THREE.Group();
+      booth.add(box(0.9, 0.06, 0.6, steel, 0, 0.72, 0));
+      booth.add(box(0.06, 0.72, 0.5, steel, 0.4, 0, 0));
+      booth.add(box(0.06, 0.72, 0.5, steel, -0.4, 0, 0));
+      booth.add(box(0.5, 0.42, 0.42, beige, 0, 0.78, -0.1));          // CRT monitor
+      booth.add(box(0.36, 0.3, 0.3, beige, 0, 0.78, -0.3));
+      booth.add(mesh(new THREE.PlaneGeometry(0.42, 0.32), screenMat, 0, 0.99, 0.115, false));
+      booth.add(box(0.44, 0.03, 0.14, beige, 0, 0.78, 0.2));          // keyboard
+      booth.add(box(0.2, 0.62, 0.5, beige, 0.62, 0, -0.05));          // tower
+      booth.add(box(0.46, 0.08, 0.42, mat(accent), 0, 0.42, 0.62));    // chair
+      booth.add(box(0.46, 0.56, 0.08, mat(accent), 0, 0.46, 0.84));
+      booth.add(cyl(0.04, 0.04, 0.42, dark, 0, 0, 0.62, 5));
+      booth.position.set(sx * 1.05, 0.62, -0.5);
+      booth.rotation.y = sx * Math.PI / 2;                             // screens face the opponent's back
+      g.add(booth);
+    }
+    // Scoreboard cube over the stage.
+    const board = canvasTex(256, 128, (c, w, h) => {
+      c.fillStyle = "#07080b"; c.fillRect(0, 0, w, h);
+      c.strokeStyle = accent; c.lineWidth = 6; c.strokeRect(3, 3, w - 6, h - 6);
+      c.textAlign = "center"; c.fillStyle = "#e8c44a"; c.font = "bold 46px 'Space Grotesk', sans-serif"; c.fillText("1999", w / 2, 58);
+      c.fillStyle = "#ece8dc"; c.font = "600 22px 'IBM Plex Mono', monospace"; c.fillText("WORLD CHAMPION", w / 2, 98);
+    });
+    const boardMat = new THREE.MeshBasicMaterial({ map: board.tex, toneMapped: false });
+    const scoreboard = new THREE.Group();
+    scoreboard.add(box(1.7, 0.95, 1.7, dark, 0, -0.47, 0));
+    for (let k = 0; k < 4; k++) {
+      const p = mesh(new THREE.PlaneGeometry(1.6, 0.8), boardMat, Math.sin((k * Math.PI) / 2) * 0.86, 0, Math.cos((k * Math.PI) / 2) * 0.86, false);
+      p.rotation.y = (k * Math.PI) / 2;
+      scoreboard.add(p);
+    }
+    for (const [x, z] of [[-0.7, -0.7], [0.7, -0.7], [-0.7, 0.7], [0.7, 0.7]]) scoreboard.add(cyl(0.015, 0.015, 1.6, dark, x, 0.45, z, 4));
+    scoreboard.position.set(0, 3.5, -0.5);
+    g.add(scoreboard);
+    // The trophy at the front of the stage.
+    g.add(box(0.7, 0.55, 0.7, dark, 0, 0.4, 1.5));
     const pts = [[0, 0], [0.35, 0], [0.12, 0.15], [0.1, 0.5], [0.4, 0.8], [0.45, 1.1], [0, 1.0]].map(([x, y]) => new THREE.Vector2(x, y));
-    const cup = mesh(new THREE.LatheGeometry(pts, 10), mat("#d4af37", { metal: 0.8, rough: 0.3, emissive: "#3a2a05" }), 0, 1.0, 0);
+    const cup = mesh(new THREE.LatheGeometry(pts, 10), mat("#d4af37", { metal: 0.8, rough: 0.3, emissive: "#3a2a05" }), 0, 0.95, 1.5);
     g.add(cup);
-    const ring = mesh(new THREE.TorusGeometry(1.1, 0.04, 6, 40), glow(accent, 2.2), 0, 2.6, 0, false);
+    const ring = mesh(new THREE.TorusGeometry(0.75, 0.035, 6, 32), glow(accent, 2.2), 0, 2.4, 1.5, false);
     ring.rotation.x = Math.PI / 2;
     g.add(ring);
-    // Miniature units skirmishing on the field.
-    const units = [];
-    for (let i = 0; i < 4; i++) {
-      const u = new THREE.Group();
-      const team = i % 2 ? "#ea580c" : accent;
-      u.add(box(0.5, 0.22, 0.34, mat("#2b2b33"), 0, 0, 0));
-      u.add(box(0.26, 0.14, 0.22, mat(team, { emissive: team, ei: 0.4 }), 0, 0.22, 0));
-      const barrel = box(0.32, 0.05, 0.05, dark, 0.22, 0.27, 0); u.add(barrel);
-      u.position.y = 0.42;
-      units.push({ u, phase: i * (Math.PI / 2), r: 1.4 + (i % 2) * 0.6 });
-      g.add(u);
-    }
     // Banners and floodlights.
     const flags = [];
     for (const sx of [-1, 1]) {
@@ -115,13 +156,9 @@ const BUILD = {
     return {
       g,
       anim(t) {
-        ring.rotation.z = t * 0.6; ring.position.y = 2.6 + Math.sin(t * 1.5) * 0.12;
+        ring.rotation.z = t * 0.6; ring.position.y = 2.4 + Math.sin(t * 1.5) * 0.1;
         cup.rotation.y = t * 0.4;
-        for (const { u, phase, r } of units) {
-          const a = t * 0.35 + phase;
-          u.position.x = Math.cos(a) * r; u.position.z = Math.sin(a) * r;
-          u.rotation.y = -a;
-        }
+        scoreboard.rotation.y = t * 0.25;
         flags.forEach((f, i) => (f.rotation.y = Math.sin(t * 3 + i) * 0.35));
       },
     };
@@ -157,6 +194,32 @@ const BUILD = {
     }
     g.add(bake(screenParts, screenMat));
     g.add(box(1.4, 0.32, 0.08, glow("#ef4444", 1.8), 0, 2.45, 0.9));
+    // The set: an oval poker table under studio lights, a camera on a tripod.
+    const felt = mesh(new THREE.CylinderGeometry(0.95, 0.95, 0.08, 20), mat("#14532d"), 0, 0.88, 2.7);
+    felt.scale.x = 1.55; g.add(felt);
+    const rail = mesh(new THREE.TorusGeometry(0.95, 0.09, 5, 24), mat("#2a1a12"), 0, 0.94, 2.7);
+    rail.rotation.x = Math.PI / 2; rail.scale.x = 1.55; g.add(rail);
+    g.add(cyl(0.35, 0.5, 0.62, dark, 0, 0.3, 2.7, 8));
+    const chipCols = ["#ef4444", "#111827", "#2563eb", "#f5f0e1", "#16a34a", "#e8c44a"];
+    for (let i = 0; i < 6; i++) {
+      const a = (i / 6) * Math.PI * 2;
+      const n = 2 + (i % 3);
+      for (let k = 0; k < n; k++) g.add(cyl(0.09, 0.09, 0.04, mat(chipCols[(i + k) % 6]), Math.cos(a) * 1.05, 0.92 + k * 0.04, 2.7 + Math.sin(a) * 0.6, 10));
+      g.add(cyl(0.16, 0.18, 0.5, mat("#3f3f46"), Math.cos(a) * 1.85, 0.3, 2.7 + Math.sin(a) * 1.15, 6));   // stools
+    }
+    for (let i = 0; i < 5; i++) g.add(box(0.2, 0.01, 0.28, mat("#f8f5ec"), -0.5 + i * 0.25, 0.93, 2.7));      // board cards
+    const cam = new THREE.Group();
+    for (const a of [0, 2.1, 4.2]) { const leg = cyl(0.025, 0.025, 1.3, dark, Math.cos(a) * 0.25, 0, Math.sin(a) * 0.25, 4); leg.rotation.z = Math.cos(a) * 0.2; leg.rotation.x = -Math.sin(a) * 0.2; cam.add(leg); }
+    cam.add(box(0.32, 0.3, 0.6, mat("#27272a"), 0, 1.3, 0));
+    cam.add(cyl(0.1, 0.12, 0.25, dark, 0, 1.35, -0.38, 8).rotateX(Math.PI / 2));
+    cam.add(mesh(new THREE.SphereGeometry(0.04, 5, 4), glow("#ef4444", 2.5), 0.1, 1.5, 0.3, false));
+    cam.position.set(2.5, 0.3, 3.6); cam.rotation.y = Math.atan2(2.5, 0.9) + Math.PI;
+    g.add(cam);
+    for (const sx of [-1, 1]) {
+      g.add(cyl(0.03, 0.03, 2.4, dark, sx * 2.6, 0.3, 1.9, 4));
+      const lamp = box(0.4, 0.3, 0.3, mat("#3f3f46"), sx * 2.6, 2.6, 1.9); lamp.rotation.y = -sx * 0.9; g.add(lamp);
+      g.add(mesh(new THREE.CircleGeometry(0.12, 10), glow("#fff4cc", 3), sx * 2.48, 2.75, 2.06, false).rotateY(-sx * 0.9));
+    }
     // Lattice antenna.
     const tower = new THREE.Group();
     tower.position.set(1.9, 0.3, -1.4);
@@ -223,7 +286,7 @@ const BUILD = {
 
   foundry(accent) {
     const g = new THREE.Group();
-    const wall = mat("#2f3a3d"), roof = mat("#1f2a2c"), dark = mat("#141a1c");
+    const wall = mat("#566a6e"), roof = mat("#33494d"), dark = mat("#141a1c");
     g.add(box(5, 0.3, 3.6, mat("#263133"), 0, 0, -0.3));
     g.add(box(4.2, 1.6, 2.6, wall, 0, 0.3, -0.6));
     for (let i = 0; i < 3; i++) {
@@ -239,8 +302,41 @@ const BUILD = {
       g.add(p);
       return p;
     });
-    // Two hands of floating cards over the anvil.
-    g.add(box(1.4, 0.7, 0.8, dark, 0, 0.3, 1.7));
+    // The invention itself: a half-moon casino table printed with the game, two hands floating above it.
+    const layout = canvasTex(256, 256, (c, w) => {
+      c.fillStyle = "#0f5132"; c.fillRect(0, 0, w, w);
+      c.textAlign = "center"; c.fillStyle = "#e8c44a"; c.font = "bold 20px 'Space Grotesk', sans-serif"; c.fillText("2 HAND HOLD'EM", w / 2, 152);
+      c.fillStyle = "rgba(255,255,255,.7)"; c.font = "11px 'IBM Plex Mono', monospace"; c.fillText("PATENTED · TWO HANDS · ONE BOARD", w / 2, 170);
+      c.strokeStyle = "rgba(255,255,255,.75)"; c.lineWidth = 2;
+      for (let i = 0; i < 5; i++) {
+        const a = Math.PI * (0.18 + i * 0.16), x = w / 2 + Math.cos(a) * 92, y = w / 2 + Math.sin(a) * 92;
+        for (const d of [-11, 11]) { c.beginPath(); c.arc(x + d * Math.sin(a), y - d * Math.cos(a), 9, 0, 7); c.stroke(); }
+      }
+    });
+    g.add(mesh(new THREE.CylinderGeometry(1.5, 1.5, 0.55, 20, 1, false, -Math.PI / 2, Math.PI), mat("#3b2416"), 0, 0.3 + 0.275, 1.25));
+    g.add(box(3, 0.55, 0.05, mat("#3b2416"), 0, 0.3, 1.25));
+    const feltTop = mesh(new THREE.CircleGeometry(1.42, 24, Math.PI, Math.PI), new THREE.MeshLambertMaterial({ map: layout.tex }), 0, 0.86, 1.25);
+    feltTop.rotation.x = -Math.PI / 2; g.add(feltTop);
+    const tableRail = mesh(new THREE.TorusGeometry(1.46, 0.07, 5, 20, Math.PI), mat("#1c120c"), 0, 0.87, 1.25);
+    tableRail.rotation.x = Math.PI / 2; g.add(tableRail);
+    const chipCols = ["#ef4444", "#2563eb", "#111827", "#e8c44a"];
+    for (let i = 0; i < 4; i++) for (let k = 0; k < 3 + (i % 2); k++) g.add(cyl(0.08, 0.08, 0.035, mat(chipCols[(i + k) % 4]), -0.9 + i * 0.6, 0.87 + k * 0.035, 2.25 - Math.abs(i - 1.5) * 0.25, 10));
+    // Patent blueprint on an easel.
+    const print = canvasTex(128, 96, (c, w, h) => {
+      c.fillStyle = "#123a6b"; c.fillRect(0, 0, w, h);
+      c.strokeStyle = "rgba(255,255,255,.18)"; c.lineWidth = 1;
+      for (let i = 0; i < w; i += 8) { c.beginPath(); c.moveTo(i, 0); c.lineTo(i, h); c.stroke(); }
+      for (let i = 0; i < h; i += 8) { c.beginPath(); c.moveTo(0, i); c.lineTo(w, i); c.stroke(); }
+      c.strokeStyle = "#e2e8f0"; c.lineWidth = 2;
+      c.beginPath(); c.arc(64, 30, 40, 0.15 * Math.PI, 0.85 * Math.PI); c.lineTo(28, 36); c.stroke();
+      c.strokeRect(40, 46, 12, 16); c.strokeRect(56, 46, 12, 16); c.strokeRect(76, 46, 12, 16);
+      c.fillStyle = "#e2e8f0"; c.font = "bold 9px monospace"; c.fillText("FIG. 1", 8, 88); c.fillText("US PAT.", 84, 88);
+    });
+    const easel = new THREE.Group();
+    easel.add(mesh(new THREE.PlaneGeometry(1.2, 0.9), new THREE.MeshBasicMaterial({ map: print.tex, toneMapped: false }), 0, 1.35, 0.03));
+    for (const sx of [-1, 1]) { const leg = cyl(0.03, 0.03, 1.9, mat("#6b4f35"), sx * 0.45, 0, 0, 4); leg.rotation.z = sx * 0.12; easel.add(leg); }
+    easel.position.set(-2.7, 0.3, 2.0); easel.rotation.y = 0.55;
+    g.add(easel);
     const faces = [["A", "♠", "#111"], ["K", "♥", "#c81e1e"], ["Q", "♦", "#c81e1e"], ["J", "♣", "#111"]];
     const cards = faces.map(([r, s, col]) => {
       const face = canvasTex(64, 90, (c) => {
@@ -268,7 +364,7 @@ const BUILD = {
       anim(t) {
         cards.forEach((c, i) => {
           const hand = i < 2 ? -1 : 1, k = i % 2;
-          c.position.set(hand * 0.75 + (k - 0.5) * 0.42, 2.0 + Math.sin(t * 1.6 + i) * 0.12, 1.7 + k * 0.05);
+          c.position.set(hand * 0.75 + (k - 0.5) * 0.42, 1.75 + Math.sin(t * 1.6 + i) * 0.12, 1.75 + k * 0.05);
           c.rotation.set(-0.15, Math.sin(t * 0.7) * 0.25, (k - 0.5) * 0.35 * -hand);
         });
         gear.rotation.y = t * 0.8;
@@ -283,35 +379,68 @@ const BUILD = {
   },
 
   garden(accent) {
+    // Cube Draft: a draft table inside a ring of standing giant cards, with the Cube itself hovering above.
     const g = new THREE.Group();
     const r = rng(7);
-    // A giant tabletop mid-draft.
-    g.add(box(5.2, 0.5, 3.6, mat("#3b2a1e"), 0, 0, 0));
-    g.add(box(5, 0.06, 3.4, mat("#1f3b2a"), 0, 0.5, 0));
-    const colors = ["#e879f9", "#60a5fa", "#f5f0e1", "#22c55e", "#ef4444", "#111827"];
+    const hues = ["#f5f0e1", "#60a5fa", "#a78bfa", "#ef4444", "#22c55e"];
+    const faces = canvasTex(320, 88, (c) => {
+      hues.forEach((hue, i) => {
+        c.save(); c.translate(i * 64, 0);
+        c.fillStyle = "#16141a"; c.fillRect(0, 0, 64, 88);
+        c.fillStyle = hue; c.fillRect(4, 4, 56, 80);
+        c.fillStyle = "rgba(0,0,0,.25)"; c.fillRect(7, 7, 50, 8);
+        const gr = c.createLinearGradient(0, 18, 0, 50); gr.addColorStop(0, "rgba(255,255,255,.55)"); gr.addColorStop(1, "rgba(0,0,0,.35)");
+        c.fillStyle = gr; c.fillRect(8, 18, 48, 30);
+        c.fillStyle = "rgba(245,240,225,.92)"; c.fillRect(8, 52, 48, 28);
+        c.fillStyle = "rgba(0,0,0,.35)"; for (let y = 57; y < 78; y += 5) c.fillRect(11, y, 30 + ((y * 7) % 12), 2);
+        c.restore();
+      });
+    });
+    const faceMat = new THREE.MeshLambertMaterial({ map: faces.tex });
+    const card = (w, h, i) => {
+      const geo = new THREE.PlaneGeometry(w, h);
+      const uv = geo.attributes.uv;
+      for (let j = 0; j < uv.count; j++) uv.setX(j, (i + uv.getX(j)) / 5);
+      return mesh(geo, faceMat);
+    };
+    // Lawn and draft table with three players' picks laid out.
+    g.add(cyl(4.6, 4.8, 0.12, mat("#22402a"), 0, 0, 0, 20));
+    g.add(box(3.6, 0.55, 2.2, mat("#4a3322"), 0, 0.12, 0.2));
+    g.add(box(3.4, 0.05, 2, mat("#1f3b2a"), 0, 0.67, 0.2));
     for (let i = 0; i < 15; i++) {
-      const x = -1.9 + (i % 5) * 0.95, z = -1 + Math.floor(i / 5) * 1.05;
-      const card = box(0.62, 0.04, 0.86, mat(colors[i % colors.length], { emissive: colors[i % colors.length], ei: 0.12 }), x, 0.56, z);
-      card.rotation.y = (r() - 0.5) * 0.2;
-      g.add(card);
+      const c = card(0.42, 0.58, i % 5);
+      c.rotation.x = -Math.PI / 2; c.rotation.z = (r() - 0.5) * 0.3;
+      c.position.set(-1.35 + (i % 5) * 0.67, 0.73, -0.45 + Math.floor(i / 5) * 0.62);
+      g.add(c);
+    }
+    // Standing stones made of cards, open toward the centre.
+    for (let i = 0; i < 9; i++) {
+      const a = Math.PI + (i / 8) * Math.PI;                       // back half-ring
+      const x = Math.cos(a) * 3.6, z = Math.sin(a) * 3.1 - 0.2;
+      const stand = new THREE.Group();
+      stand.add(box(1.0, 1.45, 0.08, mat("#2a2230"), 0, 0, -0.05));
+      const f = card(0.92, 1.36, i % 5); f.position.set(0, 0.73, 0.0);
+      const back = card(0.92, 1.36, (i + 2) % 5); back.position.set(0, 0.73, -0.1); back.rotation.y = Math.PI;
+      stand.add(f, back);
+      stand.add(box(1.1, 0.12, 0.3, mat("#3a3a40"), 0, 0, 0));
+      stand.position.set(x, 0.12, z);
+      stand.rotation.y = Math.atan2(-x, -z + 0.2);
+      g.add(stand);
     }
     // The Cube, literally.
     const cube = new THREE.Group();
     cube.add(mesh(new THREE.BoxGeometry(1.1, 1.1, 1.1), mat("#2a1630", { opacity: 0.55, emissive: accent, ei: 0.25 }), 0, 0, 0, false));
     cube.add(new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(1.1, 1.1, 1.1)), new THREE.LineBasicMaterial({ color: accent })));
-    cube.position.set(0, 2.6, 0);
+    cube.position.set(0, 2.6, 0.2);
     g.add(cube);
-    // Hedges, trees, flowers.
-    for (const [x, z, w, d] of [[-3.2, 0, 0.6, 3.8], [3.2, 0, 0.6, 3.8], [0, -2.5, 6.8, 0.6]]) g.add(box(w, 0.7, d, mat("#2f5a2a"), x, 0, z));
-    for (let i = 0; i < 7; i++) {
-      const a = r() * Math.PI * 2, d = 3.6 + r() * 0.8;
-      const x = Math.cos(a) * d, z = Math.sin(a) * d * 0.8 - 0.4;
-      if (z > 1.8) continue;
-      g.add(cyl(0.08, 0.1, 0.6, mat("#4a3420"), x, 0, z, 5));
-      const h = 1.2 + r() * 0.8;
-      g.add(mesh(new THREE.ConeGeometry(0.5 + r() * 0.2, h, 6), mat(r() < 0.5 ? "#2e6b35" : "#3f7d3a"), x, 0.6 + h / 2, z));
+    // A few trees behind the ring and lanterns along the path.
+    for (let i = 0; i < 4; i++) {
+      const x = -3.4 + i * 2.3, z = -3.6 - r() * 0.4;
+      g.add(cyl(0.08, 0.1, 0.6, mat("#4a3420"), x, 0.12, z, 5));
+      const h = 1.3 + r() * 0.7;
+      g.add(mesh(new THREE.ConeGeometry(0.5, h, 6), mat(i % 2 ? "#2e6b35" : "#3f7d3a"), x, 0.72 + h / 2, z));
     }
-    for (let i = 0; i < 14; i++) g.add(mesh(new THREE.SphereGeometry(0.08, 5, 4), glow(i % 2 ? accent : "#fde68a", 0.6), -2.8 + r() * 5.6, 0.1, 2 + r() * 0.6, false));
+    for (let i = 0; i < 10; i++) g.add(mesh(new THREE.SphereGeometry(0.08, 5, 4), glow(i % 2 ? accent : "#fde68a", 0.6), -2.6 + i * 0.58, 0.2, 2.4 + (i % 2) * 0.25, false));
     return {
       g,
       anim(t) {
@@ -347,6 +476,20 @@ const BUILD = {
     book.add(box(1.58, 0.05, 1.12, mat("#0f2a4a"), 0, -0.04, 0));
     book.rotation.x = -0.25;
     g.add(book);
+    // Stacks of books flank the steps.
+    const covers = ["#7f1d1d", "#1e3a5f", "#14532d", "#4a1d5c", "#8a6a1f"], pages = mat("#efe6cf");
+    for (const sx of [-1, 1]) {
+      let y = 0.25;
+      for (let i = 0; i < 5; i++) {
+        const w = 1.1 - i * 0.08, h = 0.18 + ((i * 3 + (sx > 0 ? 1 : 0)) % 3) * 0.05, d = 0.75 - i * 0.04;
+        const bk = new THREE.Group();
+        bk.add(box(w, h, d, mat(covers[(i + (sx > 0 ? 2 : 0)) % 5]), 0, 0, 0));
+        bk.add(box(w - 0.06, h - 0.05, 0.02, pages, 0, 0.025, d / 2));
+        bk.position.set(sx * 1.55, y, 2.15); bk.rotation.y = (i % 2 ? 0.12 : -0.1) * sx;
+        g.add(bk);
+        y += h;
+      }
+    }
     const lamps = [-2.4, 2.4].map((x) => {
       g.add(cyl(0.05, 0.05, 1.6, dark, x, 0.5, 2.2, 6));
       const l = mesh(new THREE.SphereGeometry(0.16, 8, 6), glow("#ffd27a", 2.2), x, 2.2, 2.2, false);
@@ -363,43 +506,86 @@ const BUILD = {
   },
 
   command(accent) {
+    // Media HQ: a lit office tower with the D22 crest, a press podium and a step-and-repeat wall out front.
     const g = new THREE.Group();
-    const metal = mat("#3a3a36", { metal: 0.5, rough: 0.5 }), dark = mat("#1a1a18");
-    g.add(cyl(2.4, 2.6, 0.35, mat("#2a2924"), 0, 0, -0.6, 6));
-    g.add(cyl(1.4, 1.7, 3.4, metal, 0, 0.35, -0.6, 6));
-    for (const y of [1.2, 2.1, 3.0]) g.add(cyl(1.47, 1.47, 0.12, glow(accent, 1.4), 0, 0.35 + y, -0.6, 6));
-    g.add(cyl(1.6, 1.4, 0.35, dark, 0, 3.75, -0.6, 6));
+    const metal = mat("#3a3a36", { metal: 0.5, rough: 0.5 }), dark = mat("#1a1a18"), stoneLight = mat("#4a4840");
+    g.add(cyl(3.0, 3.2, 0.3, mat("#2a2924"), 0, 0, -0.4, 8));
+    const windows = canvasTex(64, 128, (c, w, h) => {
+      c.fillStyle = "#14161c"; c.fillRect(0, 0, w, h);
+      for (let y = 4; y < h - 4; y += 10) for (let x = 4; x < w - 4; x += 10) {
+        const lit = ((x * 7 + y * 13) % 5) > 1;
+        c.fillStyle = lit ? "rgba(255,214,140,.9)" : "rgba(80,96,120,.5)"; c.fillRect(x, y, 6, 6);
+      }
+    });
+    const winMat = new THREE.MeshLambertMaterial({ map: windows.tex, emissive: "#ffffff", emissiveMap: windows.tex, emissiveIntensity: 0.55 });
+    const tower = mesh(new THREE.BoxGeometry(2.1, 4.2, 1.7), winMat, 0, 0.3 + 2.1, -1.1);
+    g.add(tower);
+    for (const y of [0.3, 4.5]) g.add(box(2.3, 0.14, 1.9, metal, 0, y, -1.1));
+    g.add(box(0.12, 4.3, 0.12, mat(accent, { emissive: accent, ei: 0.6 }), -1.06, 0.3, -0.24));
+    g.add(box(0.12, 4.3, 0.12, mat(accent, { emissive: accent, ei: 0.6 }), 1.06, 0.3, -0.24));
+    // D22 crest on the roof.
+    const crest = canvasTex(128, 64, (c, w, h) => {
+      c.clearRect(0, 0, w, h);
+      c.fillStyle = "#e8c44a"; c.font = "bold 46px 'Space Grotesk', sans-serif"; c.textAlign = "center"; c.fillText("D22", w / 2, 48);
+    });
+    const crestMat = new THREE.MeshBasicMaterial({ map: crest.tex, transparent: true, toneMapped: false, depthWrite: false });
+    g.add(mesh(new THREE.PlaneGeometry(1.6, 0.8), crestMat, 0, 5.05, -0.22, false));
+    g.add(mesh(new THREE.PlaneGeometry(1.6, 0.8), crestMat, 0, 5.05, -0.26, false).rotateY(Math.PI));
+    g.add(box(1.7, 0.08, 0.14, glow("#e8c44a", 1.2), 0, 4.62, -0.22));
+    // Rooftop dish and beacon.
     const radar = new THREE.Group();
-    radar.position.set(0, 4.3, -0.6);
-    const rbowl = mesh(new THREE.SphereGeometry(0.7, 12, 6, 0, Math.PI * 2, 0, Math.PI / 3), mat("#c9c3b0", { side: THREE.DoubleSide, metal: 0.4 }), 0, 0.3, 0);
+    radar.position.set(0.6, 4.6, -1.5);
+    const rbowl = mesh(new THREE.SphereGeometry(0.45, 12, 6, 0, Math.PI * 2, 0, Math.PI / 3), mat("#c9c3b0", { side: THREE.DoubleSide, metal: 0.4 }), 0, 0.3, 0);
     rbowl.rotation.x = Math.PI / 2.4;
-    radar.add(cyl(0.08, 0.12, 0.4, dark, 0, 0, 0, 6)); radar.add(rbowl);
+    radar.add(cyl(0.06, 0.1, 0.3, dark, 0, 0, 0, 6)); radar.add(rbowl);
     g.add(radar);
-    const beacon = mesh(new THREE.SphereGeometry(0.16, 8, 6), glow(accent, 3), 0.9, 4.6, -1.2, false);
-    g.add(cyl(0.03, 0.03, 0.8, dark, 0.9, 3.9, -1.2, 4)); g.add(beacon);
-    // Landing pad with a circling drone.
-    const pad = cyl(1.2, 1.2, 0.08, mat("#22211d"), 2.1, 0.35, 1.4, 6);
-    g.add(pad);
-    g.add(mesh(new THREE.TorusGeometry(0.85, 0.04, 4, 6), glow(accent, 1.2), 2.1, 0.46, 1.4, false).rotateX(Math.PI / 2));
+    const beacon = mesh(new THREE.SphereGeometry(0.14, 8, 6), glow(accent, 3), -0.7, 5.1, -1.6, false);
+    g.add(cyl(0.03, 0.03, 0.5, dark, -0.7, 4.6, -1.6, 4)); g.add(beacon);
+    // Step-and-repeat wall and press podium with microphones.
+    const backdrop = canvasTex(256, 128, (c, w, h) => {
+      c.fillStyle = "#0e0f13"; c.fillRect(0, 0, w, h);
+      c.font = "bold 18px 'Space Grotesk', sans-serif"; c.textAlign = "center";
+      for (let y = 0; y < 5; y++) for (let x = 0; x < 5; x++) {
+        c.fillStyle = (x + y) % 2 ? "#e8c44a" : "#9a948a";
+        c.fillText((x + y) % 2 ? "D22" : "MEDIA", 26 + x * 52 + (y % 2) * 26, 22 + y * 26);
+      }
+    });
+    const wall = mesh(new THREE.PlaneGeometry(3.4, 1.7), new THREE.MeshLambertMaterial({ map: backdrop.tex }), 0, 1.15, 0.5);
+    g.add(wall);
+    g.add(box(3.5, 0.1, 0.1, metal, 0, 2.0, 0.48));
+    for (const sx of [-1, 1]) g.add(cyl(0.04, 0.04, 1.75, metal, sx * 1.72, 0.3, 0.48, 5));
+    g.add(box(3.6, 0.12, 1.6, stoneLight, 0, 0.3, 1.3));                  // stage
+    g.add(box(0.7, 0.95, 0.45, mat("#20242c"), 0, 0.42, 1.45));            // podium
+    g.add(box(0.74, 0.06, 0.5, metal, 0, 1.37, 1.45));
+    g.add(box(0.36, 0.2, 0.02, glow("#e8c44a", 1), 0, 0.95, 1.68));        // gold plaque
+    const micCols = ["#ef4444", "#22c55e", "#60a5fa", "#e8c44a"];
+    micCols.forEach((col, i) => {
+      const x = -0.18 + i * 0.12;
+      const m = cyl(0.012, 0.012, 0.32, dark, x, 1.4, 1.6, 4); m.rotation.x = 0.4; g.add(m);
+      g.add(box(0.07, 0.06, 0.07, mat(col), x, 1.66, 1.72));
+    });
+    // Camera drone filming the podium.
     const drone = new THREE.Group();
     drone.add(box(0.5, 0.12, 0.5, dark, 0, 0, 0));
     for (const [x, z] of [[-0.3, -0.3], [0.3, -0.3], [-0.3, 0.3], [0.3, 0.3]]) drone.add(mesh(new THREE.CylinderGeometry(0.16, 0.16, 0.02, 10), mat("#9ca3af", { opacity: 0.6 }), x, 0.1, z, false));
     drone.add(mesh(new THREE.SphereGeometry(0.06, 6, 4), glow("#22c55e", 2.5), 0, -0.06, 0.26, false));
     g.add(drone);
-    // Console screens.
+    // Flags out front.
+    const flags = [];
     for (const sx of [-1, 1]) {
-      const s = box(0.9, 0.6, 0.06, glow("#8b5cf6", 0.7), sx * 1.9, 0.6, 0.6);
-      s.rotation.y = sx * 0.5; s.rotation.x = -0.3;
-      g.add(s);
+      g.add(cyl(0.04, 0.04, 2.6, metal, sx * 2.6, 0.3, 2.2, 5));
+      const f = mesh(new THREE.PlaneGeometry(0.7, 0.45), mat(accent, { side: THREE.DoubleSide, emissive: accent, ei: 0.25 }), sx * 2.96, 2.6, 2.2);
+      flags.push(f); g.add(f);
     }
     return {
       g,
       anim(t) {
         radar.rotation.y = t * 0.9;
         beacon.scale.setScalar(0.8 + (Math.sin(t * 3) * 0.5 + 0.5) * 0.6);
-        const a = t * 0.7;
-        drone.position.set(2.1 + Math.cos(a) * 1.3, 2 + Math.sin(t * 2) * 0.2, 1.4 + Math.sin(a) * 1.3);
+        const a = t * 0.6;
+        drone.position.set(Math.cos(a) * 2.4, 2.6 + Math.sin(t * 2) * 0.15, 1.6 + Math.sin(a) * 1.2);
         drone.rotation.y = -a;
+        flags.forEach((f, i) => (f.rotation.y = Math.sin(t * 2.6 + i) * 0.3));
       },
     };
   },
@@ -417,18 +603,22 @@ function mergeStatic(root, anim, into) {
   root.traverse((o) => { if (before.get(o) !== state(o)) moving.add(o); });
   const isStatic = (o) => { for (let p = o; p && p !== root; p = p.parent) if (moving.has(p)) return false; return true; };
   root.updateMatrixWorld(true);
+  // Untextured materials that differ only in base colour share one draw call, with the colour moved into the vertices.
   const groups = new Map();
+  const sig = (m) => m.map || m.emissiveMap ? m.uuid
+    : [m.type, m.emissive?.getHex(), m.emissiveIntensity, m.roughness, m.metalness, m.side].join();
   root.traverse((o) => {
-    if (!o.isMesh || o.isInstancedMesh || !isStatic(o) || Array.isArray(o.material) || o.material.transparent || o.material.map || !o.material.visible) return;
-    if (!groups.has(o.material)) groups.set(o.material, []);
-    groups.get(o.material).push(o);
+    if (!o.isMesh || o.isInstancedMesh || !isStatic(o) || Array.isArray(o.material) || o.material.transparent || !o.material.visible) return;
+    const k = sig(o.material);
+    if (!groups.has(k)) groups.set(k, []);
+    groups.get(k).push(o);
   });
   // Parts that move as one rigid piece (a gear and its teeth, a drone and its rotors) merge inside their group.
   for (const o of moving) {
     if (!o.isGroup) continue;
     const local = new Map();
     for (const c of o.children) {
-      if (!c.isMesh || moving.has(c) || c.children.length || Array.isArray(c.material) || c.material.transparent || c.material.map) continue;
+      if (!c.isMesh || moving.has(c) || c.children.length || Array.isArray(c.material) || c.material.transparent) continue;
       if (!local.has(c.material)) local.set(c.material, []);
       local.get(c.material).push(c);
     }
@@ -440,15 +630,22 @@ function mergeStatic(root, anim, into) {
       o.add(merged);
     }
   }
-  for (const [material, list] of groups) {
+  for (const list of groups.values()) {
     if (list.length < 2) continue;
-    const merged = bake(list.map((m) => [m, m.matrixWorld]), material);
+    let material = list[0].material, tint = false;
+    if (list.some((m) => m.material !== material)) {
+      material = material.clone();
+      material.color.set(0xffffff); material.vertexColors = true;
+      mats.set(material.uuid, material);
+      tint = true;
+    }
+    const merged = bake(list.map((m) => [m, m.matrixWorld]), material, tint);
     for (const m of list) { m.removeFromParent(); m.geometry.dispose(); }
     into.add(merged);
   }
 }
 
-function bake(pairs, material) {
+function bake(pairs, material, tint = false) {
   const parts = pairs.map(([m, matrix]) => {
     const g = m.geometry.index ? m.geometry.toNonIndexed() : m.geometry.clone();
     for (const k of Object.keys(g.attributes)) if (k !== "position" && k !== "normal" && !(k === "uv" && material.map)) g.deleteAttribute(k);
@@ -458,15 +655,19 @@ function bake(pairs, material) {
   const pos = new Float32Array(count * 3), nor = new Float32Array(count * 3);
   let off = 0;
   const uv = material.map ? new Float32Array(count * 2) : null;
-  for (const g of parts) {
+  const col = tint ? new Float32Array(count * 3) : null;
+  parts.forEach((g, i) => {
+    const n = g.attributes.position.count;
     pos.set(g.attributes.position.array, off * 3); nor.set(g.attributes.normal.array, off * 3);
     uv?.set(g.attributes.uv.array, off * 2);
-    off += g.attributes.position.count; g.dispose();
-  }
+    if (col) { const c = pairs[i][0].material.color; for (let v = off; v < off + n; v++) { col[v * 3] = c.r; col[v * 3 + 1] = c.g; col[v * 3 + 2] = c.b; } }
+    off += n; g.dispose();
+  });
   const geo = new THREE.BufferGeometry();
   geo.setAttribute("position", new THREE.BufferAttribute(pos, 3));
   geo.setAttribute("normal", new THREE.BufferAttribute(nor, 3));
   if (uv) geo.setAttribute("uv", new THREE.BufferAttribute(uv, 2));
+  if (col) geo.setAttribute("color", new THREE.BufferAttribute(col, 3));
   geo.computeBoundingSphere();
   const merged = new THREE.Mesh(geo, material);
   merged.castShadow = pairs.some(([m]) => m.castShadow); merged.receiveShadow = true;
