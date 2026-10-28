@@ -22,16 +22,19 @@ function rng(seed) {
   };
 }
 
+// Phones and low-core machines get Lambert shading; desktops keep the physically based look.
+const LIGHT = matchMedia("(max-width: 760px), (pointer: coarse)").matches || (navigator.hardwareConcurrency || 8) <= 4;
 const mats = new Map();
 function mat(color, o = {}) {
   const key = color + JSON.stringify(o);
   if (!mats.has(key)) {
-    mats.set(key, new THREE.MeshStandardMaterial({
-      color, flatShading: true, roughness: o.rough ?? 0.85, metalness: o.metal ?? 0.05,
-      emissive: o.emissive ?? "#000000", emissiveIntensity: o.ei ?? 1,
+    const common = {
+      color, flatShading: true, emissive: o.emissive ?? "#000000", emissiveIntensity: o.ei ?? 1,
       transparent: o.opacity != null, opacity: o.opacity ?? 1, side: o.side ?? THREE.FrontSide,
       depthWrite: o.opacity == null || o.opacity > 0.9,
-    }));
+    };
+    mats.set(key, LIGHT ? new THREE.MeshLambertMaterial(common)
+      : new THREE.MeshStandardMaterial({ ...common, roughness: o.rough ?? 0.85, metalness: o.metal ?? 0.05 }));
   }
   return mats.get(key);
 }
@@ -70,7 +73,7 @@ const BUILD = {
       for (let i = 0; i <= w; i += 32) { c.beginPath(); c.moveTo(i, 0); c.lineTo(i, h); c.stroke(); c.beginPath(); c.moveTo(0, i); c.lineTo(w, i); c.stroke(); }
       c.strokeStyle = "rgba(232,196,74,.7)"; c.lineWidth = 4; c.beginPath(); c.arc(w / 2, h / 2, 60, 0, 7); c.stroke();
     });
-    const f = mesh(new THREE.CylinderGeometry(3, 3, 0.06, 32), new THREE.MeshStandardMaterial({ map: field.tex, roughness: 0.9 }), 0, 0.38, 0);
+    const f = mesh(new THREE.CylinderGeometry(3, 3, 0.06, 32), new THREE.MeshLambertMaterial({ map: field.tex }), 0, 0.38, 0);
     g.add(f);
     for (let i = 0; i < 16; i++) {
       const a = (i / 16) * Math.PI * 2;
@@ -211,7 +214,7 @@ const BUILD = {
     for (let i = 0; i < 4; i++) g.add(box(0.6, 0.12, 0.05, glow(accent, 2), -1.5 + i * 1, 1.1, 0.72));
     g.add(cyl(0.35, 0.45, 3.6, dark, 1.6, 0.3, -1.4, 8));
     const puffs = [0, 1, 2, 3].map((i) => {
-      const p = mesh(new THREE.SphereGeometry(0.35, 6, 5), new THREE.MeshStandardMaterial({ color: "#9aa5a8", transparent: true, opacity: 0.5, flatShading: true, depthWrite: false }), 1.6, 4, -1.4, false);
+      const p = mesh(new THREE.SphereGeometry(0.35, 6, 5), new THREE.MeshLambertMaterial({ color: "#9aa5a8", transparent: true, opacity: 0.5, flatShading: true, depthWrite: false }), 1.6, 4, -1.4, false);
       p.userData.o = i / 4;
       g.add(p);
       return p;
@@ -225,7 +228,7 @@ const BUILD = {
         c.strokeStyle = accent; c.lineWidth = 4; c.strokeRect(2, 2, 60, 86);
         c.fillStyle = col; c.font = "bold 26px serif"; c.fillText(r, 8, 30); c.font = "34px serif"; c.fillText(s, 18, 72);
       });
-      const m = mesh(new THREE.BoxGeometry(0.62, 0.88, 0.02), [mat("#f8f5ec"), mat("#f8f5ec"), mat("#f8f5ec"), mat("#f8f5ec"), new THREE.MeshStandardMaterial({ map: face.tex }), mat("#1f4f4a")], 0, 0, 0, true);
+      const m = mesh(new THREE.PlaneGeometry(0.62, 0.88), new THREE.MeshLambertMaterial({ map: face.tex, side: THREE.DoubleSide }), 0, 0, 0, true);
       g.add(m);
       return m;
     });
@@ -266,12 +269,10 @@ const BUILD = {
     g.add(box(5.2, 0.5, 3.6, mat("#3b2a1e"), 0, 0, 0));
     g.add(box(5, 0.06, 3.4, mat("#1f3b2a"), 0, 0.5, 0));
     const colors = ["#e879f9", "#60a5fa", "#f5f0e1", "#22c55e", "#ef4444", "#111827"];
-    const flips = [];
     for (let i = 0; i < 15; i++) {
       const x = -1.9 + (i % 5) * 0.95, z = -1 + Math.floor(i / 5) * 1.05;
       const card = box(0.62, 0.04, 0.86, mat(colors[i % colors.length], { emissive: colors[i % colors.length], ei: 0.12 }), x, 0.56, z);
       card.rotation.y = (r() - 0.5) * 0.2;
-      flips.push({ card, o: r() * 10 });
       g.add(card);
     }
     // The Cube, literally.
@@ -296,7 +297,6 @@ const BUILD = {
       anim(t) {
         cube.rotation.set(t * 0.4, t * 0.6, 0);
         cube.position.y = 2.6 + Math.sin(t * 1.2) * 0.2;
-        for (const f of flips) f.card.rotation.z = Math.max(0, Math.sin(t * 0.5 + f.o) - 0.96) * 60;
       },
     };
   },
@@ -385,6 +385,68 @@ const BUILD = {
   },
 };
 
+/* Bake every part of a structure that never moves into one mesh per material.
+   Moving parts are found by running the animation at two different times and seeing what changed. */
+function mergeStatic(root, anim, into) {
+  const state = (o) => [...o.position.toArray(), ...o.quaternion.toArray(), ...o.scale.toArray(), o.material?.uuid].join();
+  const before = new Map();
+  anim?.(1.3, 0.2);
+  root.traverse((o) => before.set(o, state(o)));
+  anim?.(7.9, 0.2);
+  const moving = new Set();
+  root.traverse((o) => { if (before.get(o) !== state(o)) moving.add(o); });
+  const isStatic = (o) => { for (let p = o; p && p !== root; p = p.parent) if (moving.has(p)) return false; return true; };
+  root.updateMatrixWorld(true);
+  const groups = new Map();
+  root.traverse((o) => {
+    if (!o.isMesh || o.isInstancedMesh || !isStatic(o) || Array.isArray(o.material) || o.material.transparent || o.material.map || !o.material.visible) return;
+    if (!groups.has(o.material)) groups.set(o.material, []);
+    groups.get(o.material).push(o);
+  });
+  // Parts that move as one rigid piece (a gear and its teeth, a drone and its rotors) merge inside their group.
+  for (const o of moving) {
+    if (!o.isGroup) continue;
+    const local = new Map();
+    for (const c of o.children) {
+      if (!c.isMesh || moving.has(c) || c.children.length || Array.isArray(c.material) || c.material.transparent || c.material.map) continue;
+      if (!local.has(c.material)) local.set(c.material, []);
+      local.get(c.material).push(c);
+    }
+    for (const [material, list] of local) {
+      if (list.length < 2) continue;
+      for (const c of list) c.updateMatrix();
+      const merged = bake(list.map((c) => [c, c.matrix]), material);
+      for (const c of list) { c.removeFromParent(); c.geometry.dispose(); }
+      o.add(merged);
+    }
+  }
+  for (const [material, list] of groups) {
+    if (list.length < 2) continue;
+    const merged = bake(list.map((m) => [m, m.matrixWorld]), material);
+    for (const m of list) { m.removeFromParent(); m.geometry.dispose(); }
+    into.add(merged);
+  }
+}
+
+function bake(pairs, material) {
+  const parts = pairs.map(([m, matrix]) => {
+    const g = m.geometry.index ? m.geometry.toNonIndexed() : m.geometry.clone();
+    for (const k of Object.keys(g.attributes)) if (k !== "position" && k !== "normal") g.deleteAttribute(k);
+    return g.applyMatrix4(matrix);
+  });
+  const count = parts.reduce((n, g) => n + g.attributes.position.count, 0);
+  const pos = new Float32Array(count * 3), nor = new Float32Array(count * 3);
+  let off = 0;
+  for (const g of parts) { pos.set(g.attributes.position.array, off * 3); nor.set(g.attributes.normal.array, off * 3); off += g.attributes.position.count; g.dispose(); }
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+  geo.setAttribute("normal", new THREE.BufferAttribute(nor, 3));
+  geo.computeBoundingSphere();
+  const merged = new THREE.Mesh(geo, material);
+  merged.castShadow = pairs.some(([m]) => m.castShadow); merged.receiveShadow = true;
+  return merged;
+}
+
 function monument() {
   const g = new THREE.Group();
   const stone = mat("#2a2833"), gold = mat("#d4af37", { metal: 0.8, rough: 0.3, emissive: "#2a1f05" });
@@ -435,7 +497,6 @@ function scout() {
 
 function artifactMesh() {
   const g = new THREE.Group();
-  g.add(cyl(0.3, 0.38, 0.35, mat("#2a2a30"), 0, 0, 0, 6));
   const gem = mesh(new THREE.OctahedronGeometry(0.32), mat("#4b5563", { emissive: "#38bdf8", ei: 0.25, rough: 0.3 }), 0, 0.85, 0);
   g.add(gem);
   const beam = mesh(new THREE.CylinderGeometry(0.06, 0.25, 6, 8, 1, true), new THREE.MeshBasicMaterial({ color: "#e8c44a", transparent: true, opacity: 0, depthWrite: false, side: THREE.DoubleSide }), 0, 3.6, 0, false);
@@ -446,12 +507,15 @@ function artifactMesh() {
 /* ---------- world ---------- */
 export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onClick, onCameraUser, onFrame }) {
   const mobile = matchMedia("(max-width: 760px)").matches || matchMedia("(pointer: coarse)").matches;
-  const renderer = new THREE.WebGLRenderer({ canvas, antialias: !mobile || devicePixelRatio < 2, powerPreference: "high-performance" });
-  renderer.setPixelRatio(Math.min(devicePixelRatio || 1, mobile ? 1.75 : 2));
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: !mobile && devicePixelRatio < 2, powerPreference: mobile ? "default" : "high-performance" });
+  // Quality tiers. 2: crisp + soft shadows, 1: lighter pixels + small shadow map, 0: no shadows, 1x pixels.
+  // Phones start at 1 without shadows; any device steps down if it can't hold its frame rate.
+  let tier = mobile || LIGHT ? 1 : 2;
+  const shadowsAllowed = !mobile;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.3;
-  renderer.shadowMap.enabled = !mobile;
-  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.shadowMap.type = THREE.PCFShadowMap;
+  renderer.shadowMap.autoUpdate = false; // the scene is mostly still; shadows refresh a few times a second
 
   const scene = new THREE.Scene();
   scene.background = new THREE.Color("#07080b");
@@ -461,8 +525,7 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
   scene.add(hemi);
   const sun = new THREE.DirectionalLight("#ffe7c2", 2.2);
   sun.position.set(-30, 50, 25);
-  sun.castShadow = !mobile;
-  sun.shadow.mapSize.set(2048, 2048);
+  sun.castShadow = shadowsAllowed;
   Object.assign(sun.shadow.camera, { left: -36, right: 36, top: 36, bottom: -36, near: 1, far: 140 });
   sun.shadow.bias = -0.0008;
   scene.add(sun);
@@ -489,7 +552,7 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
   }
   const tileGeo = new THREE.CylinderGeometry(hex * 0.98, hex * 0.98, 1, 6);
   tileGeo.translate(0, -0.5, 0);
-  const tileMesh = new THREE.InstancedMesh(tileGeo, new THREE.MeshStandardMaterial({ flatShading: true, roughness: 0.95 }), tiles.length);
+  const tileMesh = new THREE.InstancedMesh(tileGeo, new THREE.MeshLambertMaterial({ flatShading: true }), tiles.length);
   tileMesh.receiveShadow = true;
   const m4 = new THREE.Matrix4(), col = new THREE.Color(), base = new THREE.Color();
   tiles.forEach(([x, z], i) => {
@@ -516,13 +579,13 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
   const keel = mesh(keelGeo, mat("#1b1a1f", { side: THREE.DoubleSide }), 0, -6 - 11, 0, false);
   keel.rotation.x = Math.PI;
   world.add(keel);
-  const floaters = [];
+  const deco = new THREE.Group();
   for (let i = 0; i < 9; i++) {
     const a = r() * Math.PI * 2, d = R + 4 + r() * 8;
     const f = mesh(new THREE.DodecahedronGeometry(0.6 + r() * 1.4, 0), mat("#26242c"), Math.cos(a) * d, -2 - r() * 8, Math.sin(a) * d, false);
-    f.userData.o = r() * 6;
-    floaters.push(f); world.add(f);
+    deco.add(f);
   }
+  world.add(deco);
   // Tactical grid far below.
   const grid = new THREE.PolarGridHelper(90, 12, 8, 64, "#2a2440", "#16151c");
   grid.position.y = -34;
@@ -543,7 +606,6 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
   road.rotation.x = -Math.PI / 2; road.position.y = BASE_TOP + 0.13;
   world.add(road);
   const pulses = [];
-  const pulseGeo = new THREE.SphereGeometry(0.14, 6, 4);
   sectors.forEach((s, i) => {
     const a = polar(s.angle, 6.4), b = polar(s.angle, APPROACH_R + 0.5);
     const len = a.distanceTo(b);
@@ -551,12 +613,15 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
     strip.rotation.x = -Math.PI / 2; strip.rotation.z = deg(s.angle) - Math.PI / 2;
     strip.position.set((a.x + b.x) / 2, BASE_TOP + 0.14, (a.z + b.z) / 2);
     world.add(strip);
-    for (let k = 0; k < 3; k++) {
-      const p = new THREE.Mesh(pulseGeo, glow(s.accent, 2.5));
-      p.userData = { a, b, o: k / 3 + i * 0.07 };
-      pulses.push(p); world.add(p);
-    }
+    for (let k = 0; k < 3; k++) pulses.push({ a, b, o: k / 3 + i * 0.07, color: new THREE.Color(s.accent).multiplyScalar(1.6) });
   });
+  // All pathway pulses draw in a single call.
+  const pulseMesh = new THREE.InstancedMesh(new THREE.SphereGeometry(0.14, 6, 4), new THREE.MeshBasicMaterial({ toneMapped: false }), pulses.length);
+  pulses.forEach((p, i) => pulseMesh.setColorAt(i, p.color));
+  pulseMesh.frustumCulled = false;
+  pulseMesh.visible = !reduced;
+  world.add(pulseMesh);
+  const pulsePos = new THREE.Vector3(), pulseM = new THREE.Matrix4();
 
   /* Monument, sectors, artifacts, scout. */
   const mon = monument();
@@ -580,9 +645,15 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
     return { ...built, s, p, hl, approach: polar(s.angle, APPROACH_R) };
   });
 
+  mergeStatic(mon.g, mon.anim, world);
+  for (const o of sectorObjs) mergeStatic(o.g, o.anim, world);
+
+  const pedestals = new THREE.Group();
+  world.add(pedestals);
   const artifactObjs = artifacts.map((a) => {
     const o = artifactMesh();
     const p = polar(a.angle, a.r);
+    pedestals.add(cyl(0.3, 0.38, 0.35, mat("#2a2a30"), p.x, tileH(p.x, p.z), p.z, 6));
     o.g.position.set(p.x, tileH(p.x, p.z), p.z);
     world.add(o.g);
     const hit = new THREE.Mesh(new THREE.SphereGeometry(1.2, 8, 6), new THREE.MeshBasicMaterial({ visible: false }));
@@ -591,6 +662,9 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
     world.add(hit); pickables.push(hit);
     return { ...o, a, p, found: false, lit: 0 };
   });
+
+  mergeStatic(pedestals, null, world);
+  mergeStatic(deco, null, world);
 
   const sc = scout();
   sc.g.position.set(0, PLAZA_TOP, 4.5);
@@ -728,23 +802,47 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
   }
 
   /* ---------- loop ---------- */
-  const clock = new THREE.Clock();
   let raf = 0, running = true;
+  let lastRender = 0, background = "none", shadowTick = 0;
+  const samples = [];
+  const settled = () =>
+    Math.abs(cur.az - goal.az) + Math.abs(cur.el - goal.el) + Math.abs(cur.zoom - goal.zoom) * 0.2 +
+    (Math.abs(cur.tx - goal.tx) + Math.abs(cur.tz - goal.tz)) * 0.05 + Math.abs(cur.shiftX - goal.shiftX) + Math.abs(cur.shiftY - goal.shiftY) < 0.003;
+  // Frame-rate governor: full speed only while something is actually moving.
+  function fpsCap() {
+    if (background === "list") return 0;
+    if (drag || pinch || introT < 1 || route.length || ping < 1 || performance.now() - lastUser < 1500 || !settled()) return 60;
+    if (background === "exhibit") return mobile ? 12 : 24;
+    return reduced ? 8 : 30;
+  }
   const tmp = new THREE.Vector3();
   function frame() {
     raf = requestAnimationFrame(frame);
     if (!running) return;
-    const raw = Math.min(clock.getDelta(), 0.25);
+    const now = performance.now();
+    const fps = fpsCap();
+    if (!fps || now - lastRender < 1000 / fps - 4) return;
+    const raw = lastRender ? Math.min((now - lastRender) / 1000, 0.25) : 0.016;
+    // Adaptive quality: if a device can't hold ~40fps while moving, step down a tier.
+    if (fps === 60 && lastRender && tier > 0) {
+      samples.push(now - lastRender);
+      if (samples.length >= 90) {
+        const median = samples.sort((a, b) => a - b)[45];
+        samples.length = 0;
+        if (median > 26) { tier--; applyTier(); }
+      }
+    }
+    lastRender = now;
     const dt = Math.min(raw, 0.05);
-    const t = reduced ? 0 : clock.elapsedTime;
+    const t = reduced ? 0 : now / 1000;
 
     if (introT < 1) {
       introT = Math.min(1, introT + raw / 3.2);
       const k = ease(introT);
       cur.az = lerp(deg(200), goal.az, k); cur.el = lerp(deg(14), goal.el, k); cur.zoom = lerp(2.6, goal.zoom, k); cur.ty = lerp(3, goal.ty, k);
     } else {
-      if (!drag && !reduced) { goal.az += vAz; vAz *= 0.92; }
-      if (!reduced && !drag && !pinch && performance.now() - lastUser > 9000 && !route.length && idleSpin) goal.az += dt * 0.04;
+      if (!drag && !reduced) { goal.az += vAz * raw * 60; vAz *= Math.pow(0.92, raw * 60); if (Math.abs(vAz) < 1e-4) vAz = 0; }
+      if (!reduced && !drag && !pinch && now - lastUser > 9000 && !route.length && idleSpin && background === "none") { cur.az += dt * 0.04; goal.az += dt * 0.04; }
       const k = reduced ? 1 : 1 - Math.exp(-raw * 5);
       for (const key of ["az", "el", "zoom", "tx", "tz", "ty", "shiftX", "shiftY"]) cur[key] = lerp(cur[key], goal[key], k);
     }
@@ -756,20 +854,22 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
       o.anim(t, dt);
       const want = o.s.id === selected ? 0.95 : o.s.id === (hover && hover.id) ? 0.7 : 0;
       o.hl.material.opacity = lerp(o.hl.material.opacity, want * (0.75 + 0.25 * Math.sin(t * 4)), 0.2);
+      o.hl.visible = o.hl.material.opacity > 0.01;
     }
-    for (const p of pulses) {
-      const k = (t * 0.25 + p.userData.o) % 1;
-      p.position.lerpVectors(p.userData.a, p.userData.b, k);
-      p.position.y = BASE_TOP + 0.35;
-      p.visible = !reduced;
+    if (!reduced) {
+      pulses.forEach((p, i) => {
+        pulsePos.lerpVectors(p.a, p.b, (t * 0.25 + p.o) % 1); pulsePos.y = BASE_TOP + 0.35;
+        pulseMesh.setMatrixAt(i, pulseM.makeTranslation(pulsePos.x, pulsePos.y, pulsePos.z));
+      });
+      pulseMesh.instanceMatrix.needsUpdate = true;
     }
-    floaters.forEach((f) => (f.position.y += Math.sin(t * 0.6 + f.userData.o) * 0.004));
     for (const a of artifactObjs) {
       a.gem.rotation.y = t * (a.found ? 1.2 : 0.4);
       a.gem.position.y = 0.85 + Math.sin(t * 1.5 + a.p.x) * (a.found ? 0.12 : 0.04);
       a.lit = lerp(a.lit, a.found ? 1 : 0, 0.05);
-      a.gem.material = a.found ? glow("#e8c44a", 1.2 + a.lit) : a.a.id === (hover && hover.id) ? mat("#64748b", { emissive: "#38bdf8", ei: 0.9, rough: 0.3 }) : mat("#4b5563", { emissive: "#38bdf8", ei: 0.25, rough: 0.3 });
+      a.gem.material = a.found ? glow("#e8c44a", 2) : a.a.id === (hover && hover.id) ? mat("#64748b", { emissive: "#38bdf8", ei: 0.9, rough: 0.3 }) : mat("#4b5563", { emissive: "#38bdf8", ei: 0.25, rough: 0.3 });
       a.beam.material.opacity = a.lit * (0.18 + Math.sin(t * 2) * 0.05);
+      a.beam.visible = a.lit > 0.01;
     }
 
     // Scout
@@ -801,7 +901,9 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
       if (!a.found && Math.hypot(sc.g.position.x - a.p.x, sc.g.position.z - a.p.z) < 2.6) discover(a.a.id, true);
     }
 
+    if (renderer.shadowMap.enabled && shadowTick++ % 6 === 0) renderer.shadowMap.needsUpdate = true;
     renderer.render(scene, camera);
+    if (window.__d22perf) window.__d22perf(renderer.info.render, scene);
     onFrame?.();
   }
 
@@ -813,8 +915,20 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
     onDiscover?.(a.a, byScout);
   }
 
+  function applyTier() {
+    renderer.setPixelRatio(Math.min(devicePixelRatio || 1, [1, 1.5, 2][tier]));
+    renderer.shadowMap.enabled = shadowsAllowed && tier > 0;
+    sun.castShadow = renderer.shadowMap.enabled;
+    const size = tier === 2 ? 2048 : 1024;
+    if (sun.shadow.mapSize.x !== size) { sun.shadow.mapSize.set(size, size); sun.shadow.map?.dispose(); sun.shadow.map = null; }
+    renderer.shadowMap.needsUpdate = true;
+    mats.forEach((m) => (m.needsUpdate = true));
+    resize();
+  }
+  applyTier();
+
   window.addEventListener("resize", resize);
-  document.addEventListener("visibilitychange", () => { running = !document.hidden; clock.getDelta(); });
+  document.addEventListener("visibilitychange", () => { running = !document.hidden; lastRender = 0; samples.length = 0; });
   resize(); applyCamera(); frame();
 
   const proj = new THREE.Vector3();
@@ -848,6 +962,9 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
       planRoute(a.p.clone().sub(dir.multiplyScalar(1.2))); onArrive = cb;
     },
     setSelected(id) { selected = id; },
+    /* "none" | "exhibit" (world partly covered: run slower) | "list" (world hidden: stop) */
+    setBackground(v) { background = v; samples.length = 0; },
+    quality: () => ({ tier, calls: renderer.info.render.calls, triangles: renderer.info.render.triangles }),
     setIdleSpin(on) { idleSpin = on; },
     onDiscover(cb) { onDiscover = cb; },
     discover,

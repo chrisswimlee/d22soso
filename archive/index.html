@@ -10,7 +10,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:ital,wght@0,400;0,500;1,400&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="archive.css" />
-  <script type="importmap">{ "imports": { "three": "../vendor/three/three.module.js" } }</script>
+  <script type="importmap">{ "imports": { "three": "../vendor/three/three.archive.min.js" } }</script>
+  <link rel="modulepreload" href="../vendor/three/three.archive.min.js" />
+  <link rel="modulepreload" href="world.js" />
 </head>
 <body>
   <div class="app" id="app" data-mode="explore">

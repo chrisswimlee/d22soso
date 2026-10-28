@@ -38,6 +38,8 @@ Then visit [http://localhost:8080](http://localhost:8080).
 | `design-language.md` | Design constitution |
 | `sources/` | Editorial source PDFs (not linked from the live site) |
 | `assets/img/` | Optimized imagery served by the site |
+| `archive/` | D22: The Living Archive — rotatable 3D diorama (Three.js subset in `vendor/three/three.archive.min.js`) |
+| `tools/build-archive-three.sh` | Rebuilds that tree-shaken Three.js subset after `archive/world.js` uses a new `THREE.*` class |
 | `tools/optimize-images.sh` | Regenerates `assets/img/` from the local photo dump + `assets/themes/` |
 
 The original photo dump (`drive-download-…`) is local-only (gitignored). `assets/photos` is a symlink to that folder for the image pipeline.

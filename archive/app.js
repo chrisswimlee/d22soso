@@ -254,7 +254,7 @@ function openExhibit(s) {
   if (location.hash !== `#${s.id}`) history.replaceState(null, "", `#${s.id}`);
   document.title = `${s.name} · D22: The Living Archive`;
   syncSectorList();
-  if (world) world.frame(framing());
+  if (world) { world.frame(framing()); world.setBackground("exhibit"); }
 }
 
 function footer(s) {
@@ -283,7 +283,7 @@ function closeExhibit() {
   setMode("explore");
   if (location.hash) history.replaceState(null, "", location.pathname + location.search);
   document.title = "D22: The Living Archive";
-  if (world) { world.frame({ shiftX: 0, shiftY: 0 }); world.zoomBy(0.6); world.setIdleSpin(true); }
+  if (world) { world.frame({ shiftX: 0, shiftY: 0 }); world.zoomBy(0.6); world.setIdleSpin(true); world.setBackground("none"); }
   preview(null);
 }
 
@@ -311,11 +311,13 @@ function openList() {
   if (!listBuilt) { buildList(); listBuilt = true; }
   $("list-view").hidden = false;
   app.classList.add("listing");
+  world?.setBackground("list");
 }
 function closeList() {
   if (!world) return;
   $("list-view").hidden = true;
   app.classList.remove("listing");
+  world.setBackground(mode === "exhibit" ? "exhibit" : "none");
 }
 $("list-btn").addEventListener("click", openList);
 $("list-close").addEventListener("click", closeList);
