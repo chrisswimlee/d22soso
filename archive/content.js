@@ -166,7 +166,7 @@ export const SECTORS = [
             ["Global Poker", "Bankroll Challenge · 1st"],
           ],
         },
-        { type: "links", items: [{ label: "Poker room on the classic site", href: "../index.html#poker" }] },
+        { type: "links", items: [{ label: "Poker room on the classic site", href: "../classic.html#poker" }] },
       ],
     },
   },
@@ -217,7 +217,7 @@ export const SECTORS = [
           type: "links",
           items: [
             { label: "Play online at play2hh.com", href: "https://play2hh.com" },
-            { label: "Find a live table", href: "../index.html#locate" },
+            { label: "Find a live table", href: "../classic.html#locate" },
             { label: "Patent 11,117,045", href: "https://patents.google.com/patent/US11117045" },
           ],
         },

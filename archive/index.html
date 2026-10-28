@@ -2,96 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>D22: The Living Archive</title>
-  <meta name="description" content="Explore the career of Wayne “D22-soso” Chiang as a miniature world: the 1999 world title, broadcasting, patented table games, Cube Draft, his book, and media contacts." />
-  <meta name="theme-color" content="#07080b" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:ital,wght@0,400;0,500;1,400&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="archive.css" />
-  <script type="importmap">{ "imports": { "three": "../vendor/three/three.archive.min.js" } }</script>
-  <link rel="modulepreload" href="../vendor/three/three.archive.min.js" />
-  <link rel="modulepreload" href="world.js" />
+  <link rel="canonical" href="https://d22soso.com/" />
+  <meta http-equiv="refresh" content="0; url=../" />
+  <script>location.replace("../" + location.hash);</script>
 </head>
-<body>
-  <div class="app" id="app" data-mode="explore">
-    <canvas id="world" aria-label="Interactive 3D map of Wayne Chiang’s archive. Use the sector list to open any exhibit."></canvas>
-    <div class="labels" id="labels"></div>
-
-    <header class="deck-top">
-      <div class="brand">
-        <p class="eyebrow mono">D22 Archive / <span id="view-name">World view</span></p>
-        <h1><a href="#" id="home-link">The Living Archive</a></h1>
-      </div>
-      <div class="top-actions">
-        <button type="button" class="btn-ghost" id="tour-btn">Guided tour</button>
-        <button type="button" class="btn-ghost" id="list-btn">List<span class="wide-only"> view</span></button>
-        <a class="btn-solid" id="media-btn" href="#command">Media &amp; licensing</a>
-        <a class="btn-link mono" href="../index.html">Classic site</a>
-      </div>
-    </header>
-
-    <nav class="sectors" aria-label="Sectors">
-      <p class="eyebrow mono"><span id="mode">Exploration</span> · <span id="sector-count">06</span> sectors</p>
-      <ol id="sector-list"></ol>
-    </nav>
-
-    <section class="readout" id="readout" aria-live="polite" hidden>
-      <p class="eyebrow mono" id="readout-kicker">Command node selected</p>
-      <h2 id="readout-name"></h2>
-      <p class="mono readout-tag" id="readout-tag"></p>
-      <button type="button" class="btn-solid" id="readout-go">Enter exhibit</button>
-    </section>
-
-    <div class="instruments">
-      <canvas id="minimap" width="300" height="300" aria-label="Minimap. Click to move the camera."></canvas>
-      <div class="instrument-row mono">
-        <span title="Artifacts recovered"><span class="wide-only">Artifacts </span><span class="phone-only" aria-hidden="true">◆ </span><b id="art-count">0</b>/<span id="art-total">9</span></span>
-        <span class="zoom-btns"><button type="button" id="zoom-out" aria-label="Zoom out">−</button><button type="button" id="zoom-in" aria-label="Zoom in">+</button></span>
-      </div>
-    </div>
-    <p class="hint mono" id="hint">Drag to rotate · Scroll to zoom · Click a destination</p>
-
-    <div class="toast" id="toast" role="status" hidden>
-      <p class="eyebrow mono">Artifact recovered</p>
-      <h3 id="toast-title"></h3>
-      <p id="toast-text"></p>
-    </div>
-
-    <article class="exhibit" id="exhibit" aria-labelledby="ex-title" hidden>
-      <div class="exhibit-bar">
-        <p class="mono eyebrow" id="ex-crumb"></p>
-        <button type="button" class="icon-btn" id="ex-close" aria-label="Back to the world">×</button>
-      </div>
-      <div class="exhibit-scroll" id="ex-scroll">
-        <header class="ex-head">
-          <p class="kicker mono" id="ex-kicker"></p>
-          <h2 id="ex-title" tabindex="-1"></h2>
-          <p class="lede" id="ex-lede"></p>
-        </header>
-        <div class="ex-body" id="ex-body"></div>
-        <footer class="ex-foot" id="ex-foot"></footer>
-      </div>
-    </article>
-
-    <div class="list-view" id="list-view" hidden>
-      <div class="list-head">
-      <div class="list-bar">
-        <p class="eyebrow mono">D22 Archive / Index</p>
-        <span class="list-actions"><a class="btn-link mono" href="../index.html">Classic site</a><button type="button" class="btn-ghost" id="list-close">Back to the world</button></span>
-      </div>
-      <nav class="list-nav mono" id="list-nav" aria-label="Exhibits"></nav>
-      </div>
-      <div class="list-body" id="list-body"></div>
-    </div>
-
-    <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Enlarged photo" hidden><button type="button" class="icon-btn lightbox-close" id="lightbox-close" aria-label="Close photo">×</button><img id="lightbox-img" alt="" /><p id="lightbox-cap"></p></div>
-
-    <div class="loading" id="loading"><p class="mono">Assembling the world…</p></div>
-  </div>
-
-  <noscript><p style="padding:24px;color:#ece8dc;background:#07080b">This archive needs JavaScript. Visit the <a href="../index.html" style="color:#e8c44a">classic site</a>.</p></noscript>
-  <script type="module" src="app.js"></script>
-</body>
+<body style="background:#07080b;color:#ece8dc;font-family:sans-serif"><p><a href="../" style="color:#e8c44a">Open the archive</a></p></body>
 </html>
