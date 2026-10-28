@@ -125,7 +125,7 @@ export const SECTORS = [
   },
   {
     id: "broadcast",
-    key: { src: img("wsop-boxer-360"), alt: "Wayne Chiang at the 2025 World Series of Poker", pos: "50% 20%", badge: img("wsop-logo-600") },
+    key: { src: img("wsop-logo-600"), alt: "World Series of Poker logo", fit: "contain" },
     name: "The Broadcast Station",
     short: "Broadcast",
     era: "2010s – today",
@@ -262,7 +262,7 @@ export const SECTORS = [
   },
   {
     id: "command",
-    key: { src: img("headshot-pgl-360"), alt: "Wayne Chiang with his 1999 trophies", pos: "50% 22%" },
+    key: { src: img("wsop-boxer-360"), alt: "Wayne Chiang at the 2025 World Series of Poker", pos: "50% 20%" },
     name: "The Command Center",
     short: "Command",
     era: "Today",
