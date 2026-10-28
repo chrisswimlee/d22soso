@@ -46,10 +46,6 @@ button { font: inherit; color: inherit; touch-action: manipulation; }
 .labels { position: absolute; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
 .label { position: absolute; left: 0; top: 0; display: grid; grid-template-columns: auto auto; column-gap: 6px; align-items: baseline; padding: 4px 9px 5px; border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent); border-radius: 3px; background: rgba(7, 8, 11, 0.86); pointer-events: auto; cursor: pointer; transition: border-color 0.2s, background 0.2s, opacity 0.3s; will-change: transform; }
 .label::after { content: ""; position: absolute; left: 50%; bottom: -9px; width: 1px; height: 8px; background: var(--accent); opacity: 0.6; }
-.label .key { grid-column: 1 / -1; position: relative; display: block; width: 132px; aspect-ratio: 3 / 2; margin: 2px 0 6px; border-radius: 2px; overflow: hidden; background: #101116; outline: 1px solid color-mix(in srgb, var(--accent) 55%, transparent); }
-.label .key img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.label .key.contain img { object-fit: contain; padding: 6px; box-sizing: border-box; background: radial-gradient(circle, #1f2a24, #0c0d11); }
-.label .key .badge { position: absolute; right: 4px; bottom: 4px; width: 34px; height: 34px; object-fit: contain; filter: drop-shadow(0 1px 3px rgba(0,0,0,.7)); }
 .label .idx { font-size: 10px; color: var(--accent); }
 .label strong { font: 600 13px var(--display); }
 .label .era { grid-column: 1 / -1; font-size: 10px; color: var(--muted); }
@@ -266,11 +262,7 @@ button.card.picked { transform: translateY(-6px); outline: 2px solid var(--gold-
   .no-webgl .list-actions .btn-link { display: inline-flex; }
   .phone-only { display: inline; color: #38bdf8; }
   .label { padding: 3px 6px 4px; }
-  .label .key { width: 62px; margin-bottom: 3px; }
-  .label .idx { display: none; }
-  .label .key .badge { width: 22px; height: 22px; right: 2px; bottom: 2px; }
-  .label .key.contain img { padding: 3px; }
-  .label strong { font-size: 11px; grid-column: 1 / -1; text-align: center; }
+  .label strong { font-size: 11px; }
   .label .era { display: none; }
   .btn-solid, .btn-ghost { min-height: 34px; padding: 0 10px; font-size: 11px; }
   .sectors { top: auto; transform: none; left: 0; right: 0; width: auto; bottom: calc(8px + env(safe-area-inset-bottom, 0px)); padding: 0; border: 0; }

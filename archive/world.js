@@ -591,6 +591,49 @@ const BUILD = {
   },
 };
 
+/* A pylon behind each building carrying a lit, turning billboard with the area's headline photo.
+   The head swivels to face the camera, so the photo always reads like a sign, never edge-on. */
+const SIGN = { z: -3.4, bottom: 5.6, w: 5.2, h: 3.47 };
+function billboard(key, accent) {
+  const art = canvasTex(384, 256, (c) => { c.fillStyle = "#0c0d11"; c.fillRect(0, 0, 384, 256); });
+  if (key?.src) {
+    const img = new Image();
+    img.decoding = "async";
+    img.onload = () => {
+      const c = art.g, W = 384, H = 256;
+      if (key.fit === "contain") {
+        const gr = c.createRadialGradient(W / 2, H / 2, 10, W / 2, H / 2, W * 0.6);
+        gr.addColorStop(0, "#1f2a24"); gr.addColorStop(1, "#0c0d11");
+        c.fillStyle = gr; c.fillRect(0, 0, W, H);
+        const k = Math.min((W - 24) / img.width, (H - 24) / img.height);
+        c.drawImage(img, (W - img.width * k) / 2, (H - img.height * k) / 2, img.width * k, img.height * k);
+      } else {
+        const [px, py] = (key.pos || "50% 50%").split(" ").map((v) => parseFloat(v) / 100);
+        const k = Math.max(W / img.width, H / img.height), dw = img.width * k, dh = img.height * k;
+        c.drawImage(img, (W - dw) * px, (H - dh) * py, dw, dh);
+      }
+      art.tex.needsUpdate = true;
+    };
+    img.src = key.src;
+  }
+  const { bottom, w, h } = SIGN;
+  const steel = mat("#2b2b33", { metal: 0.5, rough: 0.5 });
+  // Pylon: a tapered mast on a footing, fixed to the ground.
+  const pole = new THREE.Group();
+  pole.add(box(0.9, 0.25, 0.9, steel, 0, 0, 0));
+  pole.add(cyl(0.12, 0.2, bottom + 0.1, steel, 0, 0.2, 0, 6));
+  // Head: frame, accent trim top and bottom, and the photo on both faces.
+  const head = new THREE.Group();
+  head.add(box(w + 0.24, h + 0.24, 0.2, mat("#16161b"), 0, -h / 2 - 0.12, 0));
+  head.add(box(w + 0.32, 0.08, 0.28, glow(accent, 1.4), 0, h / 2 + 0.1, 0));
+  head.add(box(w + 0.32, 0.08, 0.28, glow(accent, 1.4), 0, -h / 2 - 0.18, 0));
+  const face = new THREE.MeshBasicMaterial({ map: art.tex, toneMapped: false });
+  head.add(mesh(new THREE.PlaneGeometry(w, h), face, 0, 0, 0.11, false));
+  head.add(mesh(new THREE.PlaneGeometry(w, h), face, 0, 0, -0.11, false).rotateY(Math.PI));
+  mergeStatic(head, null, head); // still at the origin here, so world space equals head space
+  return { pole, head };
+}
+
 /* Bake every part of a structure that never moves into one mesh per material.
    Moving parts are found by running the animation at two different times and seeing what changed. */
 function mergeStatic(root, anim, into) {
@@ -861,15 +904,24 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
     const p = sectorPos[i];
     built.g.position.set(p.x, PLATEAU_TOP, p.z);
     built.g.rotation.y = Math.atan2(-p.x, -p.z); // front faces the centre
+    const sign = billboard(s.key, s.accent);
+    sign.pole.position.z = SIGN.z;
+    built.g.add(sign.pole);
     world.add(built.g);
+    built.g.updateMatrixWorld(true);
+    const signAt = built.g.localToWorld(new THREE.Vector3(0, 0, SIGN.z));
+    sign.head.position.set(signAt.x, PLATEAU_TOP + SIGN.bottom + SIGN.h / 2 + 0.2, signAt.z);
+    if (mobile) sign.head.scale.setScalar(1.3);
+    world.add(sign.head);
+    const signTop = new THREE.Vector3(signAt.x, sign.head.position.y + (SIGN.h / 2) * sign.head.scale.y + 0.6, signAt.z);
     const hl = new THREE.Mesh(new THREE.RingGeometry(5.3, 5.6, 64), new THREE.MeshBasicMaterial({ color: s.accent, transparent: true, opacity: 0, depthWrite: false }));
     hl.rotation.x = -Math.PI / 2; hl.position.set(p.x, PLATEAU_TOP + 0.06, p.z);
     world.add(hl);
-    const hit = new THREE.Mesh(new THREE.CylinderGeometry(5, 5, 7, 12), new THREE.MeshBasicMaterial({ visible: false }));
-    hit.position.set(p.x, PLATEAU_TOP + 3, p.z);
+    const hit = new THREE.Mesh(new THREE.CylinderGeometry(5, 5, 9, 12), new THREE.MeshBasicMaterial({ visible: false }));
+    hit.position.set(p.x, PLATEAU_TOP + 4.5, p.z);
     hit.userData.hit = { type: "sector", id: s.id };
     world.add(hit); pickables.push(hit);
-    return { ...built, s, p, hl, approach: polar(s.angle, APPROACH_R) };
+    return { ...built, s, p, hl, head: sign.head, signTop, approach: polar(s.angle, APPROACH_R) };
   });
 
   mergeStatic(mon.g, mon.anim, world);
@@ -923,7 +975,7 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
   /* ---------- camera ---------- */
   const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, -200, 400);
   const cur = { az: deg(200), el: deg(14), zoom: 2.6, tx: 0, tz: 0, ty: 3, shiftX: 0, shiftY: 0 };
-  const goal = { az: deg(225), el: deg(36), zoom: 1, tx: 0, tz: 0, ty: 1.5, shiftX: 0, shiftY: 0 };
+  const goal = { az: deg(225), el: deg(36), zoom: 1, tx: 0, tz: 0, ty: 4, shiftX: 0, shiftY: 0 };
   if (reduced) Object.assign(cur, goal);
   let introT = reduced ? 1 : 0;
   let vAz = 0, lastUser = performance.now();
@@ -1087,6 +1139,7 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
     mon.anim(t);
     mon.sprite.material.opacity = lerp(mon.sprite.material.opacity, selected ? 0 : 1, 0.1);
     for (const o of sectorObjs) {
+      o.head.rotation.y = cur.az;
       o.anim(t, dt);
       const want = o.s.id === selected ? 0.95 : o.s.id === (hover && hover.id) ? 0.7 : 0;
       o.hl.material.opacity = lerp(o.hl.material.opacity, want * (0.75 + 0.25 * Math.sin(t * 4)), 0.2);
@@ -1187,7 +1240,7 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
     },
     frame({ shiftX = 0, shiftY = 0 } = {}) { goal.shiftX = shiftX; goal.shiftY = shiftY; },
     overview() {
-      goal.tx = 0; goal.tz = 0; goal.ty = 1.5; goal.zoom = 1; goal.el = deg(36); goal.shiftX = 0; goal.shiftY = 0;
+      goal.tx = 0; goal.tz = 0; goal.ty = 4; goal.zoom = 1; goal.el = deg(36); goal.shiftX = 0; goal.shiftY = 0;
     },
     zoomBy(f) { goal.zoom = clamp(goal.zoom * f, 0.7, 3.6); userMoved(); },
     rotateBy(a) { goal.az += a; userMoved(); },
@@ -1209,7 +1262,8 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
     restoreFound(ids) { for (const a of artifactObjs) if (ids.includes(a.a.id)) { a.found = true; a.lit = 1; } },
     project(kind, id) {
       let v;
-      if (kind === "sector") { const o = sectorObjs.find((x) => x.s.id === id); v = proj.set(o.p.x, PLATEAU_TOP + 6.2, o.p.z); }
+      if (kind === "sector") v = proj.copy(sectorObjs.find((x) => x.s.id === id).signTop);
+      else if (kind === "signBase") { const o = sectorObjs.find((x) => x.s.id === id); v = proj.copy(o.head.position); v.y -= (SIGN.h / 2) * o.head.scale.y + 0.5; }
       else { const a = artifactObjs.find((x) => x.a.id === id); v = proj.set(a.p.x, a.g.position.y + 2, a.p.z); }
       v.project(camera);
       return { x: (v.x * 0.5 + 0.5) * width, y: (-v.y * 0.5 + 0.5) * height, z: v.z };
