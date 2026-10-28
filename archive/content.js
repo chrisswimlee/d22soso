@@ -11,7 +11,7 @@ export const EMAIL = "2handholdem@gmail.com";
 export const SECTORS = [
   {
     id: "arena",
-    key: { src: img("champ-trophy-640"), alt: "Wayne Chiang with the 1999 world championship trophy", pos: "50% 18%" },
+    key: { src: img("champ-trophy-640"), ratio: 0.667, alt: "Wayne Chiang with the 1999 world championship trophy", pos: "50% 18%" },
     name: "The Championship Arena",
     short: "Arena",
     era: "1996 – 1999",
@@ -80,7 +80,7 @@ export const SECTORS = [
   },
   {
     id: "garden",
-    key: { src: img("weissman-360"), alt: "Wayne Chiang with Brian Weissman", pos: "50% 25%" },
+    key: { src: img("weissman-360"), ratio: 1.78, alt: "Wayne Chiang with Brian Weissman", pos: "50% 25%" },
     name: "The Strategy Garden",
     short: "Garden",
     era: "1995 – today",
@@ -125,7 +125,7 @@ export const SECTORS = [
   },
   {
     id: "broadcast",
-    key: { src: img("wsop-logo-600"), alt: "World Series of Poker logo", fit: "contain" },
+    key: { src: img("wsop-logo-600"), ratio: 1, alt: "World Series of Poker logo", fit: "contain" },
     name: "The Broadcast Station",
     short: "Broadcast",
     era: "2010s – today",
@@ -172,7 +172,7 @@ export const SECTORS = [
   },
   {
     id: "foundry",
-    key: { src: img("twohh-logo-500"), alt: "2 Hand Hold’em logo", fit: "contain" },
+    key: { src: img("twohh-logo-500"), ratio: 1.15, alt: "2 Hand Hold’em logo", fit: "contain" },
     name: "The Invention Foundry",
     short: "Foundry",
     era: "2015 – today",
@@ -226,7 +226,7 @@ export const SECTORS = [
   },
   {
     id: "library",
-    key: { src: img("betting-on-yourself-cover"), alt: "Betting on Yourself book cover", fit: "contain" },
+    key: { src: img("betting-on-yourself-cover"), ratio: 0.667, alt: "Betting on Yourself book cover", fit: "contain" },
     name: "The Library",
     short: "Library",
     era: "December 2025",
@@ -262,7 +262,7 @@ export const SECTORS = [
   },
   {
     id: "command",
-    key: { src: img("wsop-boxer-360"), alt: "Wayne Chiang at the 2025 World Series of Poker", pos: "50% 20%" },
+    key: { src: img("wsop-boxer-360"), ratio: 0.684, alt: "Wayne Chiang at the 2025 World Series of Poker", pos: "50% 20%" },
     name: "The Command Center",
     short: "Command",
     era: "Today",

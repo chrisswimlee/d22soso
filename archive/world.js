@@ -592,17 +592,20 @@ const BUILD = {
 };
 
 /* A pylon behind each building carrying a lit, turning billboard with the area's headline photo.
-   The head swivels to face the camera, so the photo always reads like a sign, never edge-on. */
-const SIGN = { z: -3.4, bottom: 5.6, w: 5.2, h: 3.47 };
+   The head swivels and tilts to meet the camera square-on, so the photo is never edge-on or squashed. */
+const SIGN = { z: -3.4, bottom: 5.6, area: 14 };
 function billboard(key, accent) {
-  const art = canvasTex(384, 256, (c) => { c.fillStyle = "#0c0d11"; c.fillRect(0, 0, 384, 256); });
+  // Board takes the photo's own proportions (same area for all), so nothing is squeezed or over-cropped.
+  const r = key?.ratio || 1.5, w = Math.sqrt(SIGN.area * r), h = Math.sqrt(SIGN.area / r);
+  const W = r >= 1 ? 384 : Math.round(384 * r), H = r >= 1 ? Math.round(384 / r) : 384;
+  const art = canvasTex(W, H, (c) => { c.fillStyle = "#0c0d11"; c.fillRect(0, 0, W, H); });
   if (key?.src) {
     const img = new Image();
     img.decoding = "async";
     img.onload = () => {
-      const c = art.g, W = 384, H = 256;
+      const c = art.g;
       if (key.fit === "contain") {
-        const gr = c.createRadialGradient(W / 2, H / 2, 10, W / 2, H / 2, W * 0.6);
+        const gr = c.createRadialGradient(W / 2, H / 2, 10, W / 2, H / 2, Math.max(W, H) * 0.6);
         gr.addColorStop(0, "#1f2a24"); gr.addColorStop(1, "#0c0d11");
         c.fillStyle = gr; c.fillRect(0, 0, W, H);
         const k = Math.min((W - 24) / img.width, (H - 24) / img.height);
@@ -616,7 +619,7 @@ function billboard(key, accent) {
     };
     img.src = key.src;
   }
-  const { bottom, w, h } = SIGN;
+  const { bottom } = SIGN;
   const steel = mat("#2b2b33", { metal: 0.5, rough: 0.5 });
   // Pylon: a tapered mast on a footing, fixed to the ground.
   const pole = new THREE.Group();
@@ -631,7 +634,8 @@ function billboard(key, accent) {
   head.add(mesh(new THREE.PlaneGeometry(w, h), face, 0, 0, 0.11, false));
   head.add(mesh(new THREE.PlaneGeometry(w, h), face, 0, 0, -0.11, false).rotateY(Math.PI));
   mergeStatic(head, null, head); // still at the origin here, so world space equals head space
-  return { pole, head };
+  head.rotation.order = "YXZ"; // swivel to the camera, then tilt back to meet it square-on
+  return { pole, head, h };
 }
 
 /* Bake every part of a structure that never moves into one mesh per material.
@@ -910,10 +914,9 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
     world.add(built.g);
     built.g.updateMatrixWorld(true);
     const signAt = built.g.localToWorld(new THREE.Vector3(0, 0, SIGN.z));
-    sign.head.position.set(signAt.x, PLATEAU_TOP + SIGN.bottom + SIGN.h / 2 + 0.2, signAt.z);
+    sign.head.position.set(signAt.x, PLATEAU_TOP + SIGN.bottom + sign.h / 2 + 0.2, signAt.z);
     if (mobile) sign.head.scale.setScalar(1.3);
     world.add(sign.head);
-    const signTop = new THREE.Vector3(signAt.x, sign.head.position.y + (SIGN.h / 2) * sign.head.scale.y + 0.6, signAt.z);
     const hl = new THREE.Mesh(new THREE.RingGeometry(5.3, 5.6, 64), new THREE.MeshBasicMaterial({ color: s.accent, transparent: true, opacity: 0, depthWrite: false }));
     hl.rotation.x = -Math.PI / 2; hl.position.set(p.x, PLATEAU_TOP + 0.06, p.z);
     world.add(hl);
@@ -921,7 +924,7 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
     hit.position.set(p.x, PLATEAU_TOP + 4.5, p.z);
     hit.userData.hit = { type: "sector", id: s.id };
     world.add(hit); pickables.push(hit);
-    return { ...built, s, p, hl, head: sign.head, signTop, approach: polar(s.angle, APPROACH_R) };
+    return { ...built, s, p, hl, head: sign.head, signH: sign.h, approach: polar(s.angle, APPROACH_R) };
   });
 
   mergeStatic(mon.g, mon.anim, world);
@@ -1139,7 +1142,7 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
     mon.anim(t);
     mon.sprite.material.opacity = lerp(mon.sprite.material.opacity, selected ? 0 : 1, 0.1);
     for (const o of sectorObjs) {
-      o.head.rotation.y = cur.az;
+      o.head.rotation.y = cur.az; o.head.rotation.x = -cur.el;
       o.anim(t, dt);
       const want = o.s.id === selected ? 0.95 : o.s.id === (hover && hover.id) ? 0.7 : 0;
       o.hl.material.opacity = lerp(o.hl.material.opacity, want * (0.75 + 0.25 * Math.sin(t * 4)), 0.2);
@@ -1219,7 +1222,7 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
   document.addEventListener("visibilitychange", () => { running = !document.hidden; lastRender = 0; samples.length = 0; });
   resize(); applyCamera(); frame();
 
-  const proj = new THREE.Vector3();
+  const proj = new THREE.Vector3(), camUp = new THREE.Vector3();
   const st = {
     R, scout: {},
     sectors: sectorObjs.map((o) => ({ id: o.s.id, x: o.p.x, z: o.p.z, accent: o.s.accent })),
@@ -1262,8 +1265,11 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
     restoreFound(ids) { for (const a of artifactObjs) if (ids.includes(a.a.id)) { a.found = true; a.lit = 1; } },
     project(kind, id) {
       let v;
-      if (kind === "sector") v = proj.copy(sectorObjs.find((x) => x.s.id === id).signTop);
-      else if (kind === "signBase") { const o = sectorObjs.find((x) => x.s.id === id); v = proj.copy(o.head.position); v.y -= (SIGN.h / 2) * o.head.scale.y + 0.5; }
+      if (kind === "sector" || kind === "signBase") {
+        // The board faces the camera square-on, so its edges sit along the camera's up axis.
+        const o = sectorObjs.find((x) => x.s.id === id), up = camUp.set(0, 1, 0).applyQuaternion(camera.quaternion);
+        v = proj.copy(o.head.position).addScaledVector(up, ((o.signH / 2) * o.head.scale.y + 0.5) * (kind === "sector" ? 1 : -1));
+      }
       else { const a = artifactObjs.find((x) => x.a.id === id); v = proj.set(a.p.x, a.g.position.y + 2, a.p.z); }
       v.project(camera);
       return { x: (v.x * 0.5 + 0.5) * width, y: (-v.y * 0.5 + 0.5) * height, z: v.z };
