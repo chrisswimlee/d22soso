@@ -794,7 +794,7 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
   let tier = mobile || LIGHT ? 1 : 2;
   const shadowsAllowed = !mobile;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.3;
+  renderer.toneMappingExposure = 1.45;
   renderer.shadowMap.type = THREE.PCFShadowMap;
   renderer.shadowMap.autoUpdate = false; // the scene is mostly still; shadows refresh a few times a second
 
@@ -802,9 +802,9 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
   scene.background = new THREE.Color("#07080b");
   scene.fog = new THREE.Fog("#07080b", 120, 220);
 
-  const hemi = new THREE.HemisphereLight("#c9d0ff", "#2a1f12", 1.35);
+  const hemi = new THREE.HemisphereLight("#e4ddff", "#3a2a16", 1.7);
   scene.add(hemi);
-  const sun = new THREE.DirectionalLight("#ffe7c2", 2.2);
+  const sun = new THREE.DirectionalLight("#ffdcae", 2.7);
   sun.position.set(-30, 50, 25);
   sun.castShadow = shadowsAllowed;
   Object.assign(sun.shadow.camera, { left: -36, right: 36, top: 36, bottom: -36, near: 1, far: 140 });
@@ -841,7 +841,7 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
     m4.makeScale(1, h, 1); m4.setPosition(x, tileH(x, z), z);
     tileMesh.setMatrixAt(i, m4);
     const d = Math.hypot(x, z);
-    base.set(d < 6.5 ? "#3a3744" : "#30333b").offsetHSL(0, 0, (r() - 0.5) * 0.03);
+    base.set(d < 6.5 ? "#4a4554" : "#3b3d46").offsetHSL(0, 0, (r() - 0.5) * 0.03);
     let best = null, bd = 1e9;
     sectorPos.forEach((p, k) => { const dd = Math.hypot(x - p.x, z - p.z); if (dd < bd) { bd = dd; best = k; } });
     if (bd < 9) base.lerp(col.set(sectors[best].ground), clamp(1 - (bd - 4) / 5, 0, 1));
@@ -985,7 +985,9 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
   /* ---------- camera ---------- */
   const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, -200, 400);
   const cur = { az: deg(200), el: deg(14), zoom: 2.6, tx: 0, tz: 0, ty: 3, shiftX: 0, shiftY: 0 };
-  const goal = { az: deg(225), el: deg(36), zoom: 1, tx: 0, tz: 0, ty: 7.5, shiftX: 0, shiftY: 0 };
+  // Tall phone screens look down more steeply so the island fills the height instead of leaving empty floor.
+  const OV = matchMedia("(max-aspect-ratio: 4/5)").matches ? { el: deg(50), ty: 6 } : { el: deg(36), ty: 7.5 };
+  const goal = { az: deg(225), el: OV.el, zoom: 1, tx: 0, tz: 0, ty: OV.ty, shiftX: 0, shiftY: 0 };
   if (reduced) Object.assign(cur, goal);
   let introT = reduced ? 1 : 0;
   let vAz = 0, lastUser = performance.now();
@@ -997,7 +999,7 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
   }
   function applyCamera() {
     const aspect = width / height;
-    const fit = aspect < 1 ? 56 / aspect : 44; // whole island in view
+    const fit = aspect < 1 ? 49 / aspect : 44; // whole island in view, edge to edge on phones
     const h = fit / cur.zoom, w = h * aspect;
     const ox = cur.shiftX * w, oy = cur.shiftY * h;
     camera.left = -w / 2 - ox; camera.right = w / 2 - ox; camera.top = h / 2 - oy; camera.bottom = -h / 2 - oy;
@@ -1250,7 +1252,7 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
     },
     frame({ shiftX = 0, shiftY = 0 } = {}) { goal.shiftX = shiftX; goal.shiftY = shiftY; },
     overview() {
-      goal.tx = 0; goal.tz = 0; goal.ty = 7.5; goal.zoom = 1; goal.el = deg(36); goal.shiftX = 0; goal.shiftY = 0;
+      goal.tx = 0; goal.tz = 0; goal.ty = OV.ty; goal.zoom = 1; goal.el = OV.el; goal.shiftX = 0; goal.shiftY = 0;
     },
     zoomBy(f) { goal.zoom = clamp(goal.zoom * f, 0.7, 3.6); userMoved(); },
     rotateBy(a) { goal.az += a; userMoved(); },

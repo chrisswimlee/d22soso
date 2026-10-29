@@ -277,7 +277,14 @@ export const SECTORS = [
         "First official StarCraft: Brood War Season 1 World Champion (Random, 1999), Cube Draft pioneer, patented casino game inventor, Talent Manager for the World Series of Poker, and co-author of Betting on Yourself.",
       blocks: [
         { type: "contact" },
-        { type: "gallery", items: [{ src: `${ASSETS}media-kit/headshot-closeup.jpg`, alt: "Close-up of the engraved 1999 world champion trophy", caption: "The Season 1 trophy, engraved D22-soso. From the media kit.", pos: "50% 45%" }] },
+        {
+          type: "gallery",
+          items: [
+            { src: `${ASSETS}media-kit/headshot-trophy.jpg`, alt: "Press headshot of Wayne Chiang with the 1999 world championship trophy", caption: "Press headshot, with the Season 1 trophy.", pos: "50% 20%" },
+            { src: `${ASSETS}media-kit/headshot-pgl.jpg`, alt: "Press headshot of Wayne Chiang with his 1999 trophies", caption: "Press headshot, with the 1999 trophies.", pos: "50% 25%" },
+            { src: `${ASSETS}media-kit/headshot-closeup.jpg`, alt: "Close-up of the engraved 1999 world champion trophy", caption: "The trophy plate, engraved D22-soso.", pos: "50% 45%" },
+          ],
+        },
         {
           type: "downloads",
           title: "Press & media kit",

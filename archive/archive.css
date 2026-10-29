@@ -63,6 +63,11 @@ button { font: inherit; color: inherit; touch-action: manipulation; }
 .brand h1 { transition: opacity 0.3s; }
 /* While reading an exhibit the header shrinks to its crumb and name, clear of the focused sign. */
 [data-mode="exhibit"] .intro { opacity: 0; }
+.btn-cta { display: inline-flex; align-items: center; gap: 8px; margin-top: 12px; min-height: 40px; padding: 0 18px; border: 1px solid var(--gold); border-radius: 999px; background: rgba(212, 175, 55, 0.14); color: var(--gold-text); font: 600 13px/1 var(--mono); letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; transition: background 0.2s, color 0.2s; }
+.btn-cta:hover { background: var(--gold); color: #0b0b0b; }
+.btn-cta span { transition: transform 0.2s; }
+.btn-cta:hover span { transform: translateX(3px); }
+[data-mode="exhibit"] .btn-cta { opacity: 0; pointer-events: none; }
 .btn-ghost.quiet { border-color: transparent; background: transparent; color: var(--muted); }
 .btn-ghost.quiet:hover { color: var(--ink); border-color: transparent; }
 .brand h1 a { color: var(--ink); text-decoration: none; }
@@ -292,6 +297,13 @@ button.card.picked { transform: translateY(-6px); outline: 2px solid var(--gold-
   .sectors { left: var(--gut); right: var(--gut-r); width: auto; bottom: calc(12px + env(safe-area-inset-bottom, 0px)); }
   .sectors-panel { max-height: 60vh; overflow-y: auto; }
   .intro { font-size: 13px; margin-top: 2px; }
+  /* Name, one line, then the tour button sharing a row with List and Media. */
+  .deck-top { display: grid; grid-template-columns: auto 1fr; align-items: center; column-gap: 8px; row-gap: 0; }
+  .brand { display: contents; }
+  .brand > * { grid-column: 1 / -1; pointer-events: auto; }
+  .brand .eyebrow { display: none; }
+  .brand .btn-cta { grid-column: 1; margin-top: 10px; min-height: 36px; padding: 0 14px; font-size: 12px; }
+  .top-actions { grid-column: 2; margin-top: 10px; }
   /* Phones keep only the world, the signs and the drawer: no minimap, counter or hint. */
   .instruments { display: none; }
   .readout { left: var(--gut); right: var(--gut-r); width: auto; bottom: calc(60px + env(safe-area-inset-bottom, 0px)); padding: 12px 14px; display: grid; grid-template-columns: 1fr auto; text-align: left; column-gap: 12px; align-items: center; }
@@ -306,7 +318,7 @@ button.card.picked { transform: translateY(-6px); outline: 2px solid var(--gold-
   .lede { font-size: 16px; }
   .gallery.n3 { grid-template-columns: 1fr 1fr; }
   .gallery.n3 figure:first-child { grid-column: 1 / -1; }
-  .gallery.n3 figure:first-child .zoomable { aspect-ratio: 16 / 11; }
+  .gallery.n3 figure:first-child .zoomable { aspect-ratio: 1; } /* the lead photos are portraits: keep the trophy and his face in frame */
   .facts div { grid-template-columns: 1fr; gap: 2px; }
   .media-card { grid-template-columns: 104px 1fr; }
   .downloads { grid-template-columns: 1fr; }
