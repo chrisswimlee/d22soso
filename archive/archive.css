@@ -362,3 +362,11 @@ button.card.picked { transform: translateY(-6px); outline: 2px solid var(--gold-
   *, *::before, *::after { transition: none !important; animation: none !important; }
 }
 #ex-title:focus { outline: none; }
+
+/* Phones: the logo sits above the heading so the text runs full width. */
+@media (max-width: 760px) {
+  .emblem { float: none; display: block; width: 92px; margin: 0 0 14px; padding: 8px; }
+  .list-ex:has(> .emblem) { grid-template-columns: minmax(0, 1fr); }
+  .list-ex:has(> .emblem) > :is(.kicker, h2, .lede) { grid-column: 1; }
+  .list-ex:has(> .emblem) > .emblem { grid-row: auto; grid-column: 1; width: 92px; margin: 0 0 14px; }
+}

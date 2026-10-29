@@ -494,7 +494,7 @@ const BUILD = {
 
   library(accent) {
     const g = new THREE.Group();
-    const marble = mat("#d9d2c0"), marble2 = mat("#b8b09c"), dark = mat("#1e1a14");
+    const marble = mat("#a99c84"), marble2 = mat("#8b7f6a"), dark = mat("#1e1a14");
     g.add(box(5.4, 0.25, 3.8, marble2, 0, 0, -0.4));
     g.add(box(5, 0.25, 3.4, marble, 0, 0.25, -0.4));
     g.add(box(4.2, 2, 2.2, dark, 0, 0.5, -0.8));
@@ -639,8 +639,9 @@ const SIGN = { z: -3.4, bottom: 5.6, area: 9, heroArea: 22 };
 function billboard(key, accent) {
   // Board takes the photo's own proportions, so nothing is squeezed or over-cropped.
   // The headline credentials (world title, WSOP, 2 Hand Hold'em) get boards over twice the size of the rest.
-  const area = key?.hero ? SIGN.heroArea : SIGN.area;
-  const r = key?.ratio || 1.5, w = Math.sqrt(area * r), h = Math.sqrt(area / r);
+  const r = key?.ratio || 1.5;
+  const area = key?.hero ? SIGN.heroArea * (r < 1 ? 1.3 : 1) : SIGN.area; // a tall photo reads smaller than a square logo at equal area
+  const w = Math.sqrt(area * r), h = Math.sqrt(area / r);
   const W = r >= 1 ? 384 : Math.round(384 * r), H = r >= 1 ? Math.round(384 / r) : 384;
   const art = canvasTex(W, H, (c) => { c.fillStyle = "#0c0d11"; c.fillRect(0, 0, W, H); });
   if (key?.src) {
@@ -1321,7 +1322,7 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
       if (kind === "sector" || kind === "signBase") {
         // The board faces the camera square-on, so its edges sit along the camera's up axis.
         const o = sectorObjs.find((x) => x.s.id === id), up = camUp.set(0, 1, 0).applyQuaternion(camera.quaternion);
-        v = proj.copy(o.head.position).addScaledVector(up, ((o.signH / 2) * o.head.scale.y + 0.5) * (kind === "sector" ? 1 : -1));
+        v = proj.copy(o.head.position).addScaledVector(up, kind === "sector" ? (o.signH / 2) * o.head.scale.y + 0.5 : -((o.signH / 2) * o.head.scale.y + 0.25));
       }
       else { const a = artifactObjs.find((x) => x.a.id === id); v = proj.set(a.p.x, a.g.position.y + 2, a.p.z); }
       v.project(camera);

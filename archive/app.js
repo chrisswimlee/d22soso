@@ -180,11 +180,10 @@ function placeLabels() {
   const top = headerH, W = labelsEl.clientWidth;
   for (const l of labels) {
     if (!l.w) { l.w = l.el.offsetWidth; l.h = l.el.offsetHeight; }
-    let p = world.project("sector", l.s.id), below = false;
-    // Plaques sit above their billboard; if that would run under the header, hang them below it instead.
-    if (p.y - l.h < top + 6) { p = world.project("signBase", l.s.id); below = true; }
-    const x = Math.round(clamp(p.x, l.w / 2 + 6, W - l.w / 2 - 6)), y = Math.round(Math.max(p.y, below ? top + 6 : top + l.h + 6));
-    const at = `translate(${x}px, ${y}px) translate(-50%, ${below ? "0" : "-100%"})`;
+    // Every plaque hangs directly under its own billboard, so it always reads as that sign's caption.
+    const p = world.project("signBase", l.s.id);
+    const x = Math.round(clamp(p.x, l.w / 2 + 6, W - l.w / 2 - 6)), y = Math.round(Math.max(p.y, top + 6));
+    const at = `translate(${x}px, ${y}px) translate(-50%, 0)`;
     if (at !== l.at) { l.el.style.transform = at; l.at = at; }
     const z = String(Math.round((1 - p.z) * 1000));
     if (z !== l.z) { l.el.style.zIndex = z; l.z = z; }
