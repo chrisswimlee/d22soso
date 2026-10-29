@@ -872,23 +872,14 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
   const hex = 1.05, tiles = [];
   for (let q = -32; q <= 32; q++) for (let rr = -32; rr <= 32; rr++) {
     const x = hex * Math.sqrt(3) * (q + rr / 2), z = hex * 1.5 * rr;
-    if (Math.hypot(x, z) < R - 0.6) tiles.push([x, z, (((q - rr) % 3) + 3) % 3]);
+    if (Math.hypot(x, z) < R - 0.6) tiles.push([x, z]);
   }
   const tileGeo = new THREE.CylinderGeometry(hex * 0.98, hex * 0.98, 1, 6);
   tileGeo.translate(0, -0.5, 0);
   const tileMesh = new THREE.InstancedMesh(tileGeo, new THREE.MeshLambertMaterial({ flatShading: true }), tiles.length);
   tileMesh.receiveShadow = true;
   const m4 = new THREE.Matrix4(), col = new THREE.Color(), base = new THREE.Color();
-  // Each sector's pad gets its own floor: one palette laid in a three-colour hex tiling (k), fading into neutral ground.
-  const FLOORS = {
-    arena: ["#2c2445", "#262040", "#31294d"],     // stage floor
-    garden: ["#2a4023", "#2f4827", "#253a1f"],    // lawn
-    broadcast: ["#1b3d2c", "#183727", "#1e4231"], // card-room felt
-    foundry: ["#34403f", "#2e3938", "#283231"],   // steel plate
-    library: ["#3d3024", "#463729", "#352a1f"],   // parquet
-    command: ["#22252f", "#282c38", "#1d2029"],   // dark marble
-  };
-  tiles.forEach(([x, z, k], i) => {
+  tiles.forEach(([x, z], i) => {
     const h = tileH(x, z) + 6;
     m4.makeScale(1, h, 1); m4.setPosition(x, tileH(x, z), z);
     tileMesh.setMatrixAt(i, m4);
@@ -896,8 +887,7 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
     base.set(d < 6.5 ? "#4a4554" : "#3b3d46").offsetHSL(0, 0, (r() - 0.5) * 0.03);
     let best = null, bd = 1e9;
     sectorPos.forEach((p, k) => { const dd = Math.hypot(x - p.x, z - p.z); if (dd < bd) { bd = dd; best = k; } });
-    const floor = FLOORS[sectors[best].id];
-    if (bd < 8.5) base.lerp(col.set(floor ? floor[k] : sectors[best].ground), clamp(1 - (bd - 6.2) / 2.3, 0, 1));
+    if (bd < 9) base.lerp(col.set(sectors[best].ground), clamp(1 - (bd - 4) / 5, 0, 1));
     if (d > R - 2.4) base.multiplyScalar(0.7);
     tileMesh.setColorAt(i, base);
   });
