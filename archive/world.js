@@ -48,6 +48,15 @@ function mesh(geo, material, x = 0, y = 0, z = 0, shadow = true) {
 }
 const box = (w, h, d, m, x, y, z) => mesh(new THREE.BoxGeometry(w, h, d), m, x, y + h / 2, z);
 const cyl = (rt, rb, h, m, x, y, z, seg = 8) => mesh(new THREE.CylinderGeometry(rt, rb, h, seg), m, x, y + h / 2, z);
+// A soft light cone from a fixture down to a target (additive, so it reads as haze rather than a solid).
+function beam(from, to, color, r0 = 0.12, r1 = 0.75) {
+  const a = new THREE.Vector3(...from), b = new THREE.Vector3(...to), len = a.distanceTo(b);
+  const m = new THREE.Mesh(new THREE.CylinderGeometry(r0, r1, len, 16, 1, true),
+    new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.16, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide, toneMapped: false }));
+  m.position.copy(a).add(b).multiplyScalar(0.5);
+  m.quaternion.setFromUnitVectors(new THREE.Vector3(0, -1, 0), b.clone().sub(a).normalize());
+  return m;
+}
 
 function canvasTex(w, h, draw) {
   const c = document.createElement("canvas");
@@ -153,9 +162,19 @@ const BUILD = {
       g.add(cyl(0.08, 0.1, 3.6, stone2, sx * 3.6, 0.35, -2.2, 6));
       g.add(box(0.5, 0.25, 0.3, glow("#fff4cc", 2), sx * 3.6, 3.95, -2.2));
     }
+    // Spotlights crossing on the trophy, a red carpet up to it, and gold rope posts.
+    const beams = [-1, 1].map((sx) => { const b = beam([sx * 3.6, 3.95, -2.2], [0, 0.7, 1.5], "#fff1c2", 0.14, 0.8); g.add(b); return b; });
+    g.add(box(0.9, 0.025, 1.9, mat("#8a1c2b", { rough: 0.95 }), 0, 0.41, 2.85));
+    g.add(box(1.0, 0.012, 1.95, mat("#d4af37", { metal: 0.6, rough: 0.4 }), 0, 0.405, 2.85));
+    for (const sx of [-1, 1]) for (const z of [2.2, 3.0, 3.75]) {
+      g.add(cyl(0.035, 0.05, 0.55, mat("#d4af37", { metal: 0.8, rough: 0.3 }), sx * 0.68, 0.41, z, 6));
+      g.add(mesh(new THREE.SphereGeometry(0.07, 8, 6), glow("#e8c44a", 1.2), sx * 0.68, 1.0, z, false));
+    }
+    for (const sx of [-1, 1]) for (const z of [2.6, 3.37]) g.add(box(0.03, 0.03, 0.75, glow("#b91c1c", 0.6), sx * 0.68, 0.84, z));
     return {
       g,
       anim(t) {
+        beams.forEach((b, i) => (b.material.opacity = 0.13 + Math.sin(t * 1.3 + i * 2) * 0.04));
         ring.rotation.z = t * 0.6; ring.position.y = 2.4 + Math.sin(t * 1.5) * 0.1;
         cup.rotation.y = t * 0.4;
         scoreboard.rotation.y = t * 0.25;
@@ -246,6 +265,13 @@ const BUILD = {
     bowl.rotation.x = -Math.PI / 2.5;
     dish.add(bowl); dish.add(cyl(0.05, 0.08, 0.5, dark, 0, -0.5, 0, 6));
     g.add(dish);
+    // Studio light stands raking across the table.
+    const studio = [-1, 1].map((sx) => {
+      g.add(cyl(0.035, 0.05, 2.6, mat("#4b5563", { metal: 0.5 }), sx * 2.15, 0.3, 3.25, 5));
+      const lamp = box(0.42, 0.34, 0.3, glow("#fff7e0", 1.8), sx * 2.15, 2.85, 3.25);
+      lamp.rotation.y = -sx * 0.6; g.add(lamp);
+      const b = beam([sx * 2.15, 3.0, 3.25], [sx * 0.3, 0.9, 2.7], "#fff4d6", 0.16, 0.85); g.add(b); return b;
+    });
     let tick = 0;
     return {
       g,
@@ -256,6 +282,7 @@ const BUILD = {
           w.scale.setScalar(1 + p * 5); w.material.opacity = 0.7 * (1 - p);
         });
         dish.rotation.y = Math.sin(t * 0.3) * 0.8;
+        studio.forEach((b, i) => (b.material.opacity = 0.12 + Math.sin(t * 1.1 + i * 2.5) * 0.035));
         tick += dt;
         if (tick > 0.15) {
           tick = 0;
@@ -359,6 +386,21 @@ const BUILD = {
     }
     gear.rotation.x = Math.PI / 2;
     g.add(gear);
+    // A hand dealt on the felt: one five-card board, and four hole cards that become two hands.
+    const faceUp = mat("#f8f5ec", { rough: 0.6 }), faceDown = mat("#8a1c2b", { rough: 0.7 });
+    for (let i = 0; i < 5; i++) g.add(box(0.2, 0.012, 0.28, i < 3 ? faceUp : faceDown, -0.48 + i * 0.24, 0.865, 1.55));
+    for (const [x, rot] of [[-0.5, 0.15], [-0.3, -0.05], [0.3, 0.05], [0.5, -0.15]]) {
+      const c = box(0.2, 0.012, 0.28, faceUp, x, 0.865, 2.2); c.rotation.y = rot; g.add(c);
+    }
+    // A gold patent seal over the door.
+    const seal = canvasTex(128, 128, (c, w, h) => {
+      c.fillStyle = "#d4af37"; c.beginPath(); c.arc(64, 64, 62, 0, 7); c.fill();
+      c.strokeStyle = "#7a5a10"; c.lineWidth = 4; c.beginPath(); c.arc(64, 64, 52, 0, 7); c.stroke();
+      c.fillStyle = "#3d2a05"; c.textAlign = "center"; c.font = "bold 22px 'Space Grotesk', sans-serif"; c.fillText("U.S.", 64, 52);
+      c.font = "bold 20px 'IBM Plex Mono', monospace"; c.fillText("PATENT", 64, 78);
+    });
+    const sealM = mesh(new THREE.CircleGeometry(0.3, 24), new THREE.MeshBasicMaterial({ map: seal.tex, toneMapped: false }), 0, 1.58, 0.72, false);
+    g.add(sealM);
     return {
       g,
       anim(t) {

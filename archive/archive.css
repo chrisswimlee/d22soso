@@ -63,7 +63,7 @@ button { font: inherit; color: inherit; touch-action: manipulation; }
 .brand h1 { transition: opacity 0.3s; }
 /* While reading an exhibit the header shrinks to its crumb and name, clear of the focused sign. */
 [data-mode="exhibit"] .intro { opacity: 0; }
-.btn-cta { display: inline-flex; align-items: center; gap: 8px; margin-top: 12px; min-height: 40px; padding: 0 18px; border: 1px solid var(--gold); border-radius: 999px; background: rgba(212, 175, 55, 0.14); color: var(--gold-text); font: 600 13px/1 var(--mono); letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; transition: background 0.2s, color 0.2s; }
+.btn-cta { justify-self: start; display: inline-flex; align-items: center; gap: 8px; margin-top: 12px; min-height: 40px; padding: 0 18px; border: 1px solid var(--gold); border-radius: 999px; background: rgba(212, 175, 55, 0.14); color: var(--gold-text); font: 600 13px/1 var(--mono); letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; transition: background 0.2s, color 0.2s; }
 .btn-cta:hover { background: var(--gold); color: #0b0b0b; }
 .btn-cta span { transition: transform 0.2s; }
 .btn-cta:hover span { transform: translateX(3px); }
@@ -273,9 +273,33 @@ button.card.picked { transform: translateY(-6px); outline: 2px solid var(--gold-
 .list-actions { display: flex; align-items: center; gap: 14px; }
 .lightbox p { margin: 0; color: var(--muted); font-size: 13px; }
 
-.loading { position: absolute; inset: 0; z-index: 30; display: grid; place-items: center; background: var(--bg); transition: opacity 0.6s; }
-.loading p { font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold-text); }
+/* Loading reveal: the trophy photo and his name while the world assembles behind it. */
+.loading { position: absolute; inset: 0; z-index: 30; display: grid; place-items: center; padding: 24px; background: radial-gradient(ellipse at 35% 45%, #1a1712, var(--bg) 70%); transition: opacity 0.7s; }
 .loading.done { opacity: 0; pointer-events: none; }
+.reveal { display: flex; align-items: center; gap: clamp(20px, 4vw, 48px); max-width: 860px; animation: reveal-in 0.9s ease-out both; }
+.reveal-photo { width: clamp(180px, 26vw, 300px); height: auto; aspect-ratio: 2 / 3; object-fit: cover; object-position: 50% 15%; border: 2px solid var(--gold); border-radius: var(--r); box-shadow: 0 0 60px rgba(232, 196, 74, 0.22), 0 30px 80px rgba(0, 0, 0, 0.6); }
+.reveal-text { display: grid; gap: 10px; }
+.reveal-text .eyebrow { color: var(--gold-text); }
+.reveal-name { margin: 0; font: 700 clamp(32px, 5vw, 56px)/1.05 var(--display); letter-spacing: -0.02em; }
+.reveal-line { margin: 0; font-size: clamp(16px, 1.8vw, 20px); color: var(--ink); opacity: 0.86; }
+.reveal-status { margin: 14px 0 0; display: flex; align-items: center; gap: 12px; font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
+.reveal-status .bar { position: relative; width: 120px; height: 2px; background: var(--rule-soft); overflow: hidden; }
+.reveal-status .bar::after { content: ""; position: absolute; inset: 0; width: 40%; background: var(--gold-text); animation: reveal-bar 1.1s ease-in-out infinite; }
+@keyframes reveal-in { from { opacity: 0; transform: translateY(12px); } }
+@keyframes reveal-bar { from { transform: translateX(-100%); } to { transform: translateX(250%); } }
+@media (max-width: 640px) {
+  .reveal { flex-direction: column; text-align: center; }
+  .reveal-photo { width: min(56vw, 240px); }
+  .reveal-status { justify-content: center; }
+}
+
+/* Header portrait: the trophy photo stays beside his name. */
+.brand { display: grid; grid-template-columns: auto 1fr; column-gap: 14px; align-items: start; }
+.brand > :not(.portrait) { grid-column: 2; }
+.portrait { grid-row: 1 / span 4; display: block; width: 76px; aspect-ratio: 4 / 5; border: 2px solid var(--gold); border-radius: var(--r); overflow: hidden; box-shadow: 0 0 24px rgba(232, 196, 74, 0.2); transition: transform 0.2s, opacity 0.3s; }
+.portrait:hover { transform: translateY(-2px); }
+.portrait img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 12%; display: block; }
+[data-mode="exhibit"] .portrait { opacity: 0; pointer-events: none; }
 
 /* Mid widths: tuck the readout so it never collides with the rail or the minimap. */
 @media (max-width: 1180px) {
@@ -298,12 +322,16 @@ button.card.picked { transform: translateY(-6px); outline: 2px solid var(--gold-
   .sectors-panel { max-height: 60vh; overflow-y: auto; }
   .intro { font-size: 13px; margin-top: 2px; }
   /* Name, one line, then the tour button sharing a row with List and Media. */
-  .deck-top { display: grid; grid-template-columns: auto 1fr; align-items: center; column-gap: 8px; row-gap: 0; }
+  .deck-top { display: grid; align-items: center; column-gap: 8px; row-gap: 0; }
   .brand { display: contents; }
   .brand > * { grid-column: 1 / -1; pointer-events: auto; }
   .brand .eyebrow { display: none; }
-  .brand .btn-cta { grid-column: 1; margin-top: 10px; min-height: 36px; padding: 0 14px; font-size: 12px; }
-  .top-actions { grid-column: 2; margin-top: 10px; }
+  .deck-top { grid-template-columns: auto 1fr auto; }
+  .deck-top .brand .portrait { grid-column: 1; grid-row: 1 / span 2; width: 46px; align-self: center; margin-right: 2px; }
+  .deck-top .brand h1 { grid-column: 2 / -1; grid-row: 1; }
+  .deck-top .brand .intro { grid-column: 2 / -1; grid-row: 2; }
+  .deck-top .brand .btn-cta { grid-column: 1 / span 2; grid-row: 3; justify-self: start; margin-top: 10px; min-height: 36px; padding: 0 14px; font-size: 12px; }
+  .top-actions { grid-column: 3; grid-row: 3; margin-top: 10px; flex-wrap: nowrap; }
   /* Phones keep only the world, the signs and the drawer: no minimap, counter or hint. */
   .instruments { display: none; }
   .readout { left: var(--gut); right: var(--gut-r); width: auto; bottom: calc(60px + env(safe-area-inset-bottom, 0px)); padding: 12px 14px; display: grid; grid-template-columns: 1fr auto; text-align: left; column-gap: 12px; align-items: center; }

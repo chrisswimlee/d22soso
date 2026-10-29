@@ -481,9 +481,12 @@ async function boot() {
   });
   if (matchMedia("(pointer: coarse)").matches) $("hint").textContent = "Drag to rotate · Pinch to zoom · Tap a destination";
   syncSectorList();
-  $("loading").classList.add("done");
-  setTimeout(() => $("loading").remove(), 600);
   route();
+  // Let the reveal be seen for a moment, then lift it off the world.
+  setTimeout(() => {
+    $("loading").classList.add("done");
+    setTimeout(() => $("loading").remove(), 700);
+  }, Math.max(0, (reduced ? 600 : 1500) - performance.now()));
 }
 addEventListener("hashchange", () => {
   const id = location.hash.slice(1);

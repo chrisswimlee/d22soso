@@ -12,13 +12,15 @@
   <meta property="og:site_name" content="D22-soso" />
   <meta property="og:title" content="Wayne &quot;D22-soso&quot; Chiang — StarCraft Brood War World Champion" />
   <meta property="og:description" content="First official StarCraft: Brood War Season 1 World Champion (Random). Cube Draft pioneer. Patented casino game inventor. WSOP Talent Manager. Author of Betting on Yourself." />
-  <meta property="og:image" content="https://d22soso.com/assets/img/champ-trophy-1080.jpg" />
-  <meta property="og:image:alt" content="Wayne D22-soso Chiang with StarCraft Brood War world championship trophy" />
+  <meta property="og:image" content="https://d22soso.com/assets/img/og-living-archive.jpg" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="Wayne D22-soso Chiang holding the 1999 world championship trophy, beside a miniature 3D island of his career" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Wayne &quot;D22-soso&quot; Chiang — StarCraft Brood War World Champion" />
   <meta name="twitter:description" content="First official StarCraft: Brood War Season 1 World Champion (Random). Cube Draft pioneer. Patented casino game inventor. WSOP Talent Manager." />
-  <meta name="twitter:image" content="https://d22soso.com/assets/img/champ-trophy-1080.jpg" />
-  <meta name="twitter:image:alt" content="Wayne D22-soso Chiang with StarCraft Brood War world championship trophy" />
+  <meta name="twitter:image" content="https://d22soso.com/assets/img/og-living-archive.jpg" />
+  <meta name="twitter:image:alt" content="Wayne D22-soso Chiang holding the 1999 world championship trophy, beside a miniature 3D island of his career" />
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%230a0a0a'/%3E%3Crect x='5' y='5' width='54' height='54' rx='9' fill='none' stroke='%238b5cf6' stroke-width='3'/%3E%3Ctext x='32' y='42' font-family='monospace' font-size='22' font-weight='700' fill='%238b5cf6' text-anchor='middle'%3ED22%3C/text%3E%3C/svg%3E" />
   <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png" />
   <script>
@@ -29,6 +31,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:ital,wght@0,400;0,500;1,400&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="archive/archive.css" />
+  <link rel="preload" as="image" href="assets/img/champ-trophy-640.webp" />
   <script type="importmap">{ "imports": { "three": "./vendor/three/three.archive.min.js" } }</script>
   <link rel="modulepreload" href="./vendor/three/three.archive.min.js" />
   <link rel="modulepreload" href="archive/world.js" />
@@ -40,8 +43,9 @@
 
     <header class="deck-top">
       <div class="brand">
+        <a class="portrait" href="#arena" aria-label="The 1999 world championship"><img src="assets/img/champ-trophy-640.webp" alt="" width="640" height="960" /></a>
         <p class="eyebrow mono">The Living Archive / <span id="view-name">World view</span></p>
-        <h1><a href="#" id="home-link">Wayne “D22-soso” Chiang</a></h1>
+        <h1><a href="#" id="home-link">Wayne “D22‑soso” Chiang</a></h1>
         <p class="intro">First Brood War World Champion, 1999<span class="wide-only"> · WSOP Talent Manager · Inventor of 2 Hand Hold’em</span></p>
         <button type="button" class="btn-cta" id="tour-btn">Start the tour <span aria-hidden="true">→</span></button>
       </div>
@@ -112,7 +116,17 @@
 
     <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Enlarged photo" hidden><button type="button" class="icon-btn lightbox-close" id="lightbox-close" aria-label="Close photo">×</button><img id="lightbox-img" alt="" /><p id="lightbox-cap"></p></div>
 
-    <div class="loading" id="loading"><p class="mono">Assembling the world…</p></div>
+    <div class="loading" id="loading">
+      <div class="reveal">
+        <img class="reveal-photo" src="assets/img/champ-trophy-640.webp" alt="Wayne Chiang holding the 1999 world championship trophy" width="640" height="960" fetchpriority="high" />
+        <div class="reveal-text">
+          <p class="eyebrow mono">The Living Archive</p>
+          <p class="reveal-name">Wayne “D22‑soso” Chiang</p>
+          <p class="reveal-line">First Brood War World Champion, 1999</p>
+          <p class="reveal-status mono"><span class="bar" aria-hidden="true"></span>Entering the archive</p>
+        </div>
+      </div>
+    </div>
   </div>
 
   <noscript><p style="padding:24px;color:#ece8dc;background:#07080b">This archive needs JavaScript. Visit the <a href="classic.html" style="color:#e8c44a">classic site</a>.</p></noscript>
