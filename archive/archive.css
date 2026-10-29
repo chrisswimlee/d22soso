@@ -355,7 +355,7 @@ button.card.picked { transform: translateY(-6px); outline: 2px solid var(--gold-
   /* While an exhibit is open the sheet is the focus: drop the header buttons and float the toast just above the sheet. */
   .top-actions { transition: opacity 0.3s; }
   [data-mode="exhibit"] .top-actions, [data-mode="exhibit"] .brand h1 { opacity: 0; pointer-events: none; }
-  [data-mode="exhibit"] .toast { top: auto; bottom: calc(62vh + 10px); }
+  [data-mode="exhibit"] .toast { display: none; } /* the small view above the sheet is for the building */
   [data-mode="exhibit"] .instruments { opacity: 0; pointer-events: none; }
 }
 @media (prefers-reduced-motion: reduce) {

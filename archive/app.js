@@ -241,8 +241,12 @@ mm.addEventListener("click", (e) => {
 });
 
 /* ---------- modes ---------- */
+// Centre the focused sector in the part of the screen the exhibit panel leaves open.
 function framing() {
-  return phoneMQ.matches ? { shiftX: 0, shiftY: 0.3, zoom: 1.9 } : { shiftX: -0.24, shiftY: 0, zoom: 2.3 };
+  const W = innerWidth, H = innerHeight;
+  if (phoneMQ.matches) return { shiftX: 0, shiftY: 0.5 - 0.21, zoom: 1.75 }; // sheet starts at 38vh
+  const free = W - Math.min(600, 0.47 * W) - 16, top = 84; // the exhibit-mode header: eyebrow and name
+  return { shiftX: free / 2 / W - 0.5, shiftY: 0.5 - (top + (H - top) / 2) / H, zoom: 2.2 };
 }
 
 function go(id, { fromTour = false, instant = false } = {}) {

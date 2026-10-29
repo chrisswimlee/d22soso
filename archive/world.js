@@ -1284,7 +1284,8 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
     focusSector(id, { shiftX = 0, shiftY = 0, zoom = 2.3 } = {}) {
       const o = sectorObjs.find((x) => x.s.id === id);
       if (!o) return;
-      goal.tx = o.p.x * 0.92; goal.tz = o.p.z * 0.92; goal.ty = PLATEAU_TOP + 1.2;
+      // Aim between the building and the top of its sign so the whole set (sign included) sits in frame.
+      goal.tx = o.p.x * 0.92; goal.tz = o.p.z * 0.92; goal.ty = PLATEAU_TOP + (SIGN.bottom + o.signH) * 0.45;
       // Three-quarter view from the centre side, swung off-axis so the monument never blocks the facade.
       let az = Math.atan2(-o.p.x, -o.p.z) + 0.75;
       while (az - cur.az > Math.PI) az -= Math.PI * 2;
