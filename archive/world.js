@@ -985,7 +985,7 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
   /* ---------- camera ---------- */
   const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, -200, 400);
   const cur = { az: deg(200), el: deg(14), zoom: 2.6, tx: 0, tz: 0, ty: 3, shiftX: 0, shiftY: 0 };
-  const goal = { az: deg(225), el: deg(36), zoom: 1, tx: 0, tz: 0, ty: 4, shiftX: 0, shiftY: 0 };
+  const goal = { az: deg(225), el: deg(36), zoom: 1, tx: 0, tz: 0, ty: 7.5, shiftX: 0, shiftY: 0 };
   if (reduced) Object.assign(cur, goal);
   let introT = reduced ? 1 : 0;
   let vAz = 0, lastUser = performance.now();
@@ -1250,7 +1250,7 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
     },
     frame({ shiftX = 0, shiftY = 0 } = {}) { goal.shiftX = shiftX; goal.shiftY = shiftY; },
     overview() {
-      goal.tx = 0; goal.tz = 0; goal.ty = 4; goal.zoom = 1; goal.el = deg(36); goal.shiftX = 0; goal.shiftY = 0;
+      goal.tx = 0; goal.tz = 0; goal.ty = 7.5; goal.zoom = 1; goal.el = deg(36); goal.shiftX = 0; goal.shiftY = 0;
     },
     zoomBy(f) { goal.zoom = clamp(goal.zoom * f, 0.7, 3.6); userMoved(); },
     rotateBy(a) { goal.az += a; userMoved(); },

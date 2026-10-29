@@ -164,16 +164,20 @@ function fillReadout(s) {
 /* ---------- labels over the world ---------- */
 const labelsEl = $("labels");
 const labels = SECTORS.map((s, i) => {
-  const el = h("button", { type: "button", class: "label", style: `--accent:${s.accent}`, onclick: () => go(s.id), onmouseenter: () => preview(s.id), onmouseleave: () => preview(null), tabindex: "-1" },
-    h("span", { class: "mono idx", text: String(i + 1).padStart(2, "0") }), h("strong", { text: s.short }), h("span", { class: "mono era", text: s.era }));
+  // The three headline areas carry full plaques; the rest stay quiet until hovered or zoomed in on.
+  const major = !!s.key?.hero;
+  const el = h("button", { type: "button", class: major ? "label" : "label minor", style: `--accent:${s.accent}`, onclick: () => go(s.id), onmouseenter: () => preview(s.id), onmouseleave: () => preview(null), tabindex: "-1" },
+    h("span", { class: "mono idx", text: String(i + 1).padStart(2, "0") }), h("strong", { text: s.short }), major ? h("span", { class: "mono era", text: s.era }) : null);
   labelsEl.append(el);
   const l = { s, el, at: "", on: false, z: "", w: 0, h: 0 };
   return l;
 });
-addEventListener("resize", () => labels.forEach((l) => (l.w = 0)));
+let headerH = 0;
+addEventListener("resize", () => { labels.forEach((l) => (l.w = 0)); headerH = 0; });
 // Runs on every rendered frame, so it only touches the DOM when something changed.
 function placeLabels() {
-  const top = $("app").clientWidth <= 760 ? 104 : 64, W = labelsEl.clientWidth;
+  if (!headerH) headerH = document.querySelector(".deck-top").offsetHeight - 8;
+  const top = headerH, W = labelsEl.clientWidth;
   for (const l of labels) {
     if (!l.w) { l.w = l.el.offsetWidth; l.h = l.el.offsetHeight; }
     let p = world.project("sector", l.s.id), below = false;
@@ -326,6 +330,16 @@ function deselect() {
   syncSectorList();
 }
 
+/* ---------- sectors drawer ---------- */
+function setDrawer(open) {
+  $("sectors-panel").hidden = !open;
+  $("sectors-btn").setAttribute("aria-expanded", String(open));
+  app.classList.toggle("drawer-open", open);
+}
+$("sectors-btn").addEventListener("click", () => setDrawer($("sectors-panel").hidden));
+$("sector-list").addEventListener("click", () => setDrawer(false));
+addEventListener("pointerdown", (e) => { if (!e.target.closest?.(".sectors")) setDrawer(false); });
+
 /* ---------- tour ---------- */
 $("tour-btn").addEventListener("click", () => { tour = 0; closeList(); go(TOUR[0], { fromTour: true }); });
 
@@ -390,6 +404,7 @@ addEventListener("keydown", (e) => {
   if (e.key === "Escape") {
     if (!$("lightbox").hidden) { closeLightbox(); return; }
     if (!$("list-view").hidden && world) { closeList(); return; }
+    if (!$("sectors-panel").hidden) { setDrawer(false); return; }
     if (mode !== "explore") closeExhibit();
     return;
   }
@@ -442,7 +457,13 @@ async function boot() {
         }
       },
       onCameraUser: () => app.classList.add("touched"),
-      onFrame: () => { if (!world) return; placeLabels(); if (frameN++ % 3 === 0) drawMinimap(); },
+      onFrame: () => {
+        if (!world) return;
+        placeLabels();
+        if (frameN++ % 3) return;
+        app.classList.toggle("zoomed", world.state().zoom > 1.35);
+        if (mm.offsetParent) drawMinimap(); // hidden on phones, so skip the work there
+      },
     });
   } catch (err) {
     console.error(err);
@@ -450,9 +471,11 @@ async function boot() {
     return;
   }
   world.restoreFound([...foundArtifacts]);
+  app.classList.toggle("has-finds", foundArtifacts.size > 0); // the counter appears once there is something to count
   world.onDiscover((a) => {
     if (foundArtifacts.has(a.id)) return;
     foundArtifacts.add(a.id); persist(); syncSectorList();
+    app.classList.add("has-finds");
     showArtifact(a);
     $("hint").textContent = foundArtifacts.size === ARTIFACTS.length ? "Every artifact recovered." : "Drag to rotate · Scroll to zoom · Click a destination";
   });

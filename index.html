@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>D22: The Living Archive</title>
+  <title>Wayne “D22-soso” Chiang · The Living Archive</title>
   <meta name="description" content="Explore the career of Wayne “D22-soso” Chiang as a miniature world: the 1999 world title, broadcasting, patented table games, Cube Draft, his book, and media contacts." />
   <meta name="theme-color" content="#07080b" />
   <link rel="canonical" href="https://d22soso.com/" />
@@ -40,20 +40,24 @@
 
     <header class="deck-top">
       <div class="brand">
-        <p class="eyebrow mono">D22 Archive / <span id="view-name">World view</span></p>
-        <h1><a href="#" id="home-link">The Living Archive</a></h1>
+        <p class="eyebrow mono">The Living Archive / <span id="view-name">World view</span></p>
+        <h1><a href="#" id="home-link">Wayne “D22-soso” Chiang</a></h1>
+        <p class="intro">First Brood War World Champion, 1999<span class="wide-only"> · WSOP Talent Manager · Inventor of 2 Hand Hold’em</span></p>
       </div>
       <div class="top-actions">
         <button type="button" class="btn-ghost" id="tour-btn">Guided tour</button>
-        <button type="button" class="btn-ghost" id="list-btn">List<span class="wide-only"> view</span></button>
+        <button type="button" class="btn-ghost quiet" id="list-btn">List<span class="wide-only"> view</span></button>
         <a class="btn-solid" id="media-btn" href="#command">Media &amp; licensing</a>
         <a class="btn-link mono" href="classic.html">Classic site</a>
       </div>
     </header>
 
     <nav class="sectors" aria-label="Sectors">
-      <p class="eyebrow mono"><span id="mode">Exploration</span> · <span id="sector-count">06</span> sectors</p>
-      <ol id="sector-list"></ol>
+      <div class="sectors-panel" id="sectors-panel" hidden>
+        <p class="eyebrow mono"><span id="mode">Exploration</span> · <span id="sector-count">06</span> sectors</p>
+        <ol id="sector-list"></ol>
+      </div>
+      <button type="button" class="btn-ghost sectors-btn" id="sectors-btn" aria-expanded="false" aria-controls="sectors-panel">Sectors <span class="mono" aria-hidden="true">▴</span></button>
     </nav>
 
     <section class="readout" id="readout" aria-live="polite" hidden>
@@ -66,11 +70,11 @@
     <div class="instruments">
       <canvas id="minimap" width="300" height="300" aria-label="Minimap. Click to move the camera."></canvas>
       <div class="instrument-row mono">
-        <span title="Artifacts recovered"><span class="wide-only">Artifacts </span><span class="phone-only" aria-hidden="true">◆ </span><b id="art-count">0</b>/<span id="art-total">9</span></span>
+        <span class="finds" title="Artifacts recovered">Artifacts <b id="art-count">0</b>/<span id="art-total">9</span></span>
         <span class="zoom-btns"><button type="button" id="zoom-out" aria-label="Zoom out">−</button><button type="button" id="zoom-in" aria-label="Zoom in">+</button></span>
       </div>
     </div>
-    <p class="hint mono" id="hint">Drag to rotate · Scroll to zoom · Click a destination</p>
+    <p class="hint" id="hint">Drag to rotate · Scroll to zoom · Click a sign to enter</p>
 
     <div class="toast" id="toast" role="status" hidden>
       <p class="eyebrow mono">Artifact recovered</p>
