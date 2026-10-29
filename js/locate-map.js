@@ -174,18 +174,6 @@ function renderList(list, venues) {
   }
 }
 
-/* Lede names the live venues so it never drifts from the map */
-function renderLede(lede, venues) {
-  if (!lede) return;
-  const live = venues.filter((v) => !v.future).map((v) => v.label);
-  if (!live.length) return;
-  const names =
-    live.length === 1
-      ? live[0]
-      : live.slice(0, -1).join(", ") + (live.length > 2 ? "," : "") + " and " + live[live.length - 1];
-  lede.textContent = "Live now at " + names + ".";
-}
-
 export async function initLocateMap() {
   const plane = document.querySelector(".locate-plane");
   const list = document.querySelector(".locate-venues");
@@ -203,7 +191,6 @@ export async function initLocateMap() {
 
     renderPins(plane, venues);
     renderList(list, venues);
-    renderLede(document.querySelector("#locate .lede"), venues);
     plane.dataset.locateSource = "kml";
     plane.setAttribute(
       "aria-label",

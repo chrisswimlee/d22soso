@@ -1,6 +1,5 @@
 /* Tabs, hotkeys, theme, bg crossfade, command nav */
 import { reduced } from "./pref.js";
-import { isSmoothActive, scrollToY } from "./smooth-scroll.js";
 
 export function measureHeaderHeight() {
   const siteHeader = document.querySelector(".site-header");
@@ -461,12 +460,8 @@ function armNavLock() {
   navProgrammatic = true;
   navScrollLockUntil = performance.now() + (reduced ? 80 : 2200);
 
-  /* Lenis moves the page in per-frame steps, which can fire scrollend early;
-     the stable-frame tick below ends the lock instead. */
-  if (!isSmoothActive()) {
-    const onScrollEnd = () => endNavLock();
-    window.addEventListener("scrollend", onScrollEnd, { once: true });
-  }
+  const onScrollEnd = () => endNavLock();
+  window.addEventListener("scrollend", onScrollEnd, { once: true });
 
   let lastY = window.scrollY;
   let stable = 0;
@@ -512,14 +507,21 @@ function goToHash(href, pulseEl, opts) {
   }
 
   /* Scroll the document element directly — scrollIntoView can target a
-     non-moving body scrollport when overflow-x/y compute to auto.
-     scrollToY routes through Lenis when it is running. */
+     non-moving body scrollport when overflow-x/y compute to auto. */
   const scroller = document.scrollingElement || document.documentElement;
   const top = Math.max(
     0,
     scroller.scrollTop + target.getBoundingClientRect().top - measureHeaderHeight() - 12
   );
-  scrollToY(top);
+  try {
+    scroller.scrollTo({
+      top,
+      left: 0,
+      behavior: reduced ? "auto" : "smooth",
+    });
+  } catch (_) {
+    scroller.scrollTop = top;
+  }
 
   const hashId = sceneTarget?.id || target.id || rawId;
   const nextHash = "#" + hashId;

@@ -1,6 +1,3 @@
 three.js r170 (0.170.0)
 Source: npm package three@0.170.0 build/three.module.js
 License: MIT (see LICENSE)
-Served build: tree-shaken + minified with esbuild to only the classes used by
-js/webgl-scene.js and js/webgl-interactives.js. If you use a new THREE.* class,
-rebuild from the full source (git history) with that name added to the export list.

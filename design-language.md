@@ -1,0 +1,92 @@
+# D22-soso Portfolio — Design Language (Cursor Constitution)
+
+## North star
+A **documentary command archive** that feels like a video game: WebGL fog, card physics. Not a neon resume. One strategist, many theaters.
+
+## Shell
+- BG `#0a0a0a`, surfaces `#0f0f0f` / `#121212`
+- Accents: electric violet `#8b5cf6`, gold `#d4af37` (rules / fills / material), gold-text `#e8c44a` (type / chrome). No `--gold-dim` or gold+muted mixes on type smaller than 14px. Hero and mid-page accent type under 14px get a two-stop dark text-shadow (`--gold-type-shadow`) — or a hairline plate (`.plaque`) — so AA holds on trophy planes, photo washes, and felt.
+- Type: Space Grotesk (brand + display) · IBM Plex Sans (body) · IBM Plex Mono (data/hotkeys)
+- Nav: minimap + command-card hotkeys
+- Blockquotes = advisor transmissions; no raw URLs
+- Hero budget: header holds the D22 wordmark. First screen is the championship photo + name + one proof line + a three-panel door (`01 1999 · Random` → StarCraft / `02 WSOP Talent` → poker / `03 U.S. patented` → 2HH). The panels are the CTA — no fourth “See poker” link. Marks live inside the panels, not as a mid-air logo strip. Idle attract and hover/tap preview that room’s fleet around the photo and play a one-shot door dialect (warp / chip / deal). No dual SCROLL cue. The photo stays a photograph. `prefers-reduced-motion` skips the intro, attract, and WebGL.
+- First viewport uses executive restraint (`data-theme="hero"` gold chrome; no violet glow, glitch, rainbow progress, or floating section indicator)
+- Pillars are proof that also door: each links to its theater. Hover and the idle attract crossfade the hero image in place: championship photo, then the WSOP and 2 Hand Hold’em logos. The photograph and the pillar marks never move.
+- Chrome after hero: section indicator is the section name + hairline only (no “NOW VIEWING”, no pill, no glow pulse); scroll progress is a single muted gold hairline
+- Phone chrome: header is brand + command nav. Socials live in Contact / footer below ~1100px. Wordmark stays readable at 359px — shorten nav labels from ~430px (`IP` not `Inventions`) before killing the brand.
+- StarCraft is one room: championship archive (`#esports`), then the Gaming Archive CTA
+- Championship archive first viewport is proof + one interview + photo. Lore (throwback, Game 5 transmission, stat list, GX StarCraft) lives in a collapsed fold — same pattern as poker press.
+- Poker press (“As heard on”) lives in a collapsed fold under the felt plane — not in the first poker viewport
+- Motion: signature systems stay loud; chrome dots/pips are static (no infinite pulse)
+
+## Frame discipline
+Two tiers — most theaters are gallery rooms; one archive file remains.
+
+**Gallery bleed (`.art-view`):** Hero lockup sits on the championship photo over `#bg-stage`. Poker photo plane, Book showcase, **and every esports theater** (StarCraft, C&C, Warcraft, MTG, Cube, Hearthstone) keep gallery rooms. No enclosed panel chrome — material wash + a single accent rule so content sits on `#bg-stage`. Cube is a quieter MTG continuation (thinner left rule, softer wash), not a second full room.
+
+**Dossier frame:** Innovation tabs only (`.tablist-wrap`). Patents belong in a file. Play iframe is cropped media (`--r-media`), not a panel. About prose uses a left hairline; the career timeline is a vertical spine of bottom rules — neither is a boxed card.
+
+- Rank plaques stay. Eyebrow `//` labels and badge-dots are **theater-scoped** (`.game-tag` on StarCraft / gaming rooms) — not a page template. Poker, book, about, play, locate, and contact open with a title and one hairline only. No dossier costume on those rooms.
+- Proof groups (`.about-fact`, `.about-credentials`, `.about-book`, `.interview-cite`) use a left hairline.
+- Row lists (`.stat-list`, `.career-timeline`, `.dossier-meta`) use bottom rules only.
+- Material is a container cue on its own: felt, phosphor, and lacquer gradients replace a border rather than sit under one.
+- Media (images, canvases, iframes) is cropped by radius, not outlined. Canvases keep one hairline because it reads as an affordance.
+- Radius comes from `--r-panel` (8px) / `--r-media` (6px) / `--r-control` (3px). No fourth value.
+- Never stack `0 0 0 Npx` rings on an element that already has a border — the ring duplicates the border line.
+- Warcraft’s heraldic plate may keep a gold frame — it is the proof object, not a nested card inside a panel.
+
+## Signature systems (required)
+1. WebGL fog-of-war scout + session persistence  
+2. Themed Three.js background fleets (ScrollTrigger parallax)  
+3. Tab themes: starcraft | cnc | warcraft | mtg | hearthstone | poker | 2hh | badugi  
+4. Game panel dialects (3 variants per esports theater; keys `*-v2` / `*-v3`) — cycle from theme pips, keyboard Enter/Space, or desktop click. StarCraft pip swaps add a one-shot warp flicker. Full-panel tap on phone does not cycle.  
+5. 2HH 3D card-split (GSAP) — one-shot attract deal/split when the canvas first enters view; affordance caption fades after first touch  
+6. Badugi 3D triad pick (GSAP) — one-shot community-card lift on first view; affordance caption fades after first touch  
+7. Rank plaques (engraved, max 3 proof objects / panel)  
+8. `prefers-reduced-motion` static fallbacks (hide WebGL motion)  
+9. One fade for every section enter and exit. No slide, scale, twist, or jump. `data-reveal` names stay as room labels; they do not change the motion.
+10. Homepage enter: the hero (photo, name, pillars) fades in together on every visit to the default page. The photograph stays still and only crossfades when the image changes. Skippable. `prefers-reduced-motion` and deep links skip it.
+
+## Quiet flair (chrome, not a signature system)
+Stars, constellation lines, pointer-drawn gold bonds (hold ~300 ms on empty sky), fleet ships, chips, felt ripples, dealer trail, APM easter egg, and suit motes are **quiet chrome**, not a signature system. They ride existing systems — Three.js Points + LineSegments + fleets in `#webgl-bg` (no tsParticles / no second canvas), vanilla DOM ripples, IntersectionObserver / CSS stagger already used for theater enters. Ripple shape follows `data-bg`: minimap ping on hero / StarCraft, dashed chip on poker, split card-backs on 2HH / Badugi. On the hero, stars stay a thin field behind the photograph; fleets may orbit the photo plane. Page copy, patents, and photos stay fixed. Theme-scoped: stars strong on hero / StarCraft, secondary on poker, nearly off on the book / IP / about. After the first viewport the sky fades (`--hero-leave`) and theme planes take over. Desktop RAF may stay awake for float and must pause when the tab is hidden. Off under `prefers-reduced-motion`, coarse-pointer fleet-drag, intro, and immersive table. Do not add another particle engine. Do not rebuild the hero as a particle photograph.
+
+## Tab dialects
+| Theme | Material |
+|-------|----------|
+| starcraft | Sci-fi metal, violet/gold |
+| cnc | CRT phosphor, military grid |
+| warcraft | Warm stone/parchment, banner |
+| mtg | Lacquer, card ratio modules |
+| hearthstone | Ember amber, legend plate |
+| poker | Felt green depth, lower-thirds |
+| 2hh | Dual-hand cool/warm split |
+| badugi | Ice lowball, triad geometry |
+
+## Game panel variants (pips / keyboard; desktop click)
+Each esports `.game-panel` cycles `0 → 1 → 2 → 0` from the theme pips, Enter/Space, or a fine-pointer click on the panel. Phone taps on copy do not cycle. Variants are **material dialects** (texture + atmosphere + panel treatment), not recolors. WebGL fleets map `*-v2` / `*-v3` back to the base key. No Blizzard/Westwood HUD theft. Rooms without a people photo (C&C, Warcraft) keep a quiet `#0a0a0a` wash — stock atmosphere stays veiled.
+
+| Theater | v0 | v1 | v2 |
+|---------|----|----|----|
+| starcraft | **Cosmic Violet** — `#8b5cf6`/`#d4af37` · championship archive | **Protoss Teal** — `#2dd4bf`/`#a8e6ff` · trophy archive | **Amber Dusk** — `#ea580c`/`#b45309` siege copper · PGL archive |
+| cnc | **Phosphor CRT** — `#39ff14`/`#c4a35a` · Case’s Ladder | **Nod Crimson** — `#b42318`/`#7a868c` · IR crop | **GDI Brass** — `#c4a035`/`#7a8b99` · briefing crop |
+| warcraft | **Parchment Night** — `#60a5fa`/`#fbbf24` · WC2 SoSOWAC | **Alliance Banner** — `#3b82f6`/`#d4af37` heraldic · WC2 image | **Horde Ember** — `#b91c1c`/`#84cc16` blood/fel |
+| mtg | **Lacquer Magenta** — `#e879f9`/`#fbbf24` foil (not SC violet) | **Swamp Ink** — `#86efac`/`#a8a29e` | **Plains Gold** — `#f5f0e1`/`#eab308` |
+| hearthstone | **Tavern Ember** — `#f59e0b`/`#fde68a` · Legend #35 | **Frost Legend** — `#67e8f9`/`#f0f9ff` ice cyan | **Midnight Inn** — `#94a3b8`/`#cbd5e1` slate pewter |
+
+Panel materials use `.game-panel[data-theme="…"]` (scoped to that panel only). Hover/active change wash/rule intensity only so material stays intact — never a brighter box border. All esports `.art-view` theaters cycle dialects via wash/rule, matching StarCraft.
+
+## Anti-patterns
+No Zerg-rush memes, RGB gamer chrome, Blizzard HUD theft, badge dumps, confidential $ / royalties, spreadsheet patents.
+No hero identity-card teleports that jump mid-page before the visitor orients.
+No neon / violet-glow treatment on the first-viewport triptych.
+No floating HUD pills or rainbow progress on the hero.
+No dossier costume (`LABEL // LABEL` + badge-dot) on poker / book / about / play / locate / contact.
+No box inside a box: if the parent is already framed, the child gets a rule or a tint.
+No replaying loud theater enters (CRT boot / lid / deal / foil) on every scroll pass — one-shot only.
+
+## Content
+Only public tiers from `wayne-chiang-truth-document.md` (RTS King narrative sourced from `rts-king.md`; casino IP and author copy from `inventor-author.md`). Photos from the local source dump (`drive-download-…`, gitignored) via `assets/photos`; published renditions live in `assets/img/`.
+
+## Page split
+- **Main (`index.html`):** Hero, Poker, StarCraft championship theater, StarCraft command systems, Book, Innovation, Play, Locate, About, Contact. StarCraft command ends with a CTA into the Gaming Archive.
+- **Gaming Archive (`gaming.html`):** C&C, Warcraft, MTG, Cube, Hearthstone theaters with the same art-view + one-shot enter dialects. Nav bridges back to the main portfolio.
