@@ -541,7 +541,7 @@ export function initBgScene(canvas) {
   function gridOpacityForBg(key) {
     const raw = key || "";
     const base = raw.replace(/-v[23]$/, "");
-    if (raw === "hero" || base === "hero") return skyPhotoReady ? 0 : 0.06;
+    if (raw === "hero" || base === "hero") return 0; /* no lines over the hero */
     if (base === "starcraft") return 0.06;
     return 0;
   }
@@ -549,7 +549,7 @@ export function initBgScene(canvas) {
   function lineOpacityForBg(key) {
     const raw = key || "";
     const base = raw.replace(/-v[23]$/, "");
-    if (raw === "hero" || base === "hero") return skyPhotoReady ? 0.04 : coarse ? 0.12 : 0.16;
+    if (raw === "hero" || base === "hero") return 0; /* no lines over the hero */
     if (base === "starcraft") return coarse ? 0.16 : 0.28;
     if (["poker", "2hh", "badugi"].includes(base)) return 0.08;
     return 0.02;

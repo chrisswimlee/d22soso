@@ -1,5 +1,6 @@
 /* Tabs, hotkeys, theme, bg crossfade, command nav */
 import { reduced } from "./pref.js";
+import { isSmoothActive, scrollToY } from "./smooth-scroll.js";
 
 export function measureHeaderHeight() {
   const siteHeader = document.querySelector(".site-header");
@@ -161,7 +162,7 @@ function setupGamePanelThemes() {
     const keys = base ? GAME_VARIANT_KEYS[base] : null;
     if (!section || !keys) return;
 
-    function applyVariant(nextIndex) {
+    function applyVariant(nextIndex, opts) {
       const idx = ((nextIndex % keys.length) + keys.length) % keys.length;
       const key = keys[idx];
       section.dataset.variant = String(idx);
@@ -176,14 +177,15 @@ function setupGamePanelThemes() {
       claimSceneSection(section);
       setIndicatorLabel(section.id);
       setSceneBg(key, key);
-      if (!reduced) {
+      /* Keyboard-initiated switches change instantly; pointer clicks get the beat */
+      if (!reduced && !(opts && opts.fromKey)) {
         import("./motion.js").then((m) => m.themeBeat?.(panel, base));
       }
     }
 
-    function cycleVariant() {
+    function cycleVariant(opts) {
       const current = Math.abs(Number(section.dataset.variant || 0)) % keys.length;
-      applyVariant(current + 1);
+      applyVariant(current + 1, opts);
     }
 
     const pips = panel.querySelector(".theme-pips");
@@ -199,7 +201,7 @@ function setupGamePanelThemes() {
       if (e.target.closest(".theme-pips, button")) return;
       if (e.key !== "Enter" && e.key !== " ") return;
       e.preventDefault();
-      cycleVariant();
+      cycleVariant({ fromKey: true });
     });
 
     syncThemePips(panel, Math.abs(Number(section.dataset.variant || 0)) % keys.length);
@@ -219,6 +221,7 @@ const SECTION_LABELS = {
   "game-cube": "Cube Draft",
   "game-hearthstone": "Hearthstone",
   poker: "Poker",
+  archive: "The Archive",
   book: "Betting on Yourself",
   innovation: "Table Game Inventions",
   play: "Play 2 Hand Hold'em",
@@ -392,6 +395,7 @@ function resolvePrimaryNavId(sectionId) {
   if (!sectionId || sectionId === "hero") return null;
   if (
     sectionId === "esports" ||
+    sectionId === "archive" ||
     sectionId === "gaming-archive" ||
     sectionId === "gaming-return" ||
     sectionId.startsWith("game-")
@@ -460,8 +464,12 @@ function armNavLock() {
   navProgrammatic = true;
   navScrollLockUntil = performance.now() + (reduced ? 80 : 2200);
 
-  const onScrollEnd = () => endNavLock();
-  window.addEventListener("scrollend", onScrollEnd, { once: true });
+  /* Lenis moves the page in per-frame steps, which can fire scrollend early;
+     the stable-frame tick below ends the lock instead. */
+  if (!isSmoothActive()) {
+    const onScrollEnd = () => endNavLock();
+    window.addEventListener("scrollend", onScrollEnd, { once: true });
+  }
 
   let lastY = window.scrollY;
   let stable = 0;
@@ -507,21 +515,15 @@ function goToHash(href, pulseEl, opts) {
   }
 
   /* Scroll the document element directly — scrollIntoView can target a
-     non-moving body scrollport when overflow-x/y compute to auto. */
+     non-moving body scrollport when overflow-x/y compute to auto.
+     scrollToY routes through Lenis when it is running. */
   const scroller = document.scrollingElement || document.documentElement;
   const top = Math.max(
     0,
     scroller.scrollTop + target.getBoundingClientRect().top - measureHeaderHeight() - 12
   );
-  try {
-    scroller.scrollTo({
-      top,
-      left: 0,
-      behavior: reduced ? "auto" : "smooth",
-    });
-  } catch (_) {
-    scroller.scrollTop = top;
-  }
+  /* Keyboard jumps (hotkeys 1–5) land instantly; clicks keep the eased scroll */
+  scrollToY(top, { immediate: !!(opts && opts.immediate) });
 
   const hashId = sceneTarget?.id || target.id || rawId;
   const nextHash = "#" + hashId;
@@ -601,7 +603,7 @@ window.addEventListener("keydown", (e) => {
   if (link) {
     e.preventDefault();
     const href = link.getAttribute("href") || "";
-    if (href.startsWith("#")) goToHash(href, link);
+    if (href.startsWith("#")) goToHash(href, link, { immediate: true });
     else window.location.assign(href);
   }
 });
@@ -745,6 +747,7 @@ const sceneSections = [
   "hero",
   "poker",
   "esports",
+  "archive",
   "gaming-archive",
   "game-cnc",
   "game-warcraft",

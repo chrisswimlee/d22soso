@@ -34,7 +34,7 @@ export function scrollToY(top, { immediate = false } = {}) {
   }
   const scroller = document.scrollingElement || document.documentElement;
   try {
-    scroller.scrollTo({ top: y, left: 0, behavior: reduced || immediate ? "auto" : "smooth" });
+    scroller.scrollTo({ top: y, left: 0, behavior: reduced || immediate ? "instant" : "smooth" /* "auto" would inherit html{scroll-behavior:smooth} */ });
   } catch (_) {
     scroller.scrollTop = y;
   }
@@ -65,7 +65,7 @@ export async function initSmoothScroll() {
 
   lenis = new Lenis({
     autoRaf: true, /* rAF pauses with the tab, per motion rules */
-    lerp: 0.075, /* lower = longer glide */
+    lerp: 0.12, /* lower = longer glide; 0.12 keeps the wheel close to the hand */
     smoothWheel: true,
     syncTouch: false,
     anchors: false, /* in-page links route through theme-nav goToHash */

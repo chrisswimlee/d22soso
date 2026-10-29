@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#0a0a0a" />
-  <meta name="d22soso-version" content="2026.09.10" />
+  <meta name="d22soso-version" content="2026.10.19" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
@@ -38,7 +38,8 @@
   {
     "imports": {
       "three": "./vendor/three/three.module.js",
-      "gsap": "./vendor/gsap/index.js"
+      "gsap": "./vendor/gsap/index.js",
+      "lenis": "https://cdn.jsdelivr.net/npm/lenis@1.3.23/dist/lenis.mjs"
     }
   }
   </script>
@@ -52,7 +53,6 @@
   <link rel="modulepreload" href="js/widgets.js" />
   <link rel="modulepreload" href="js/flair.js" />
   <link rel="modulepreload" href="js/webgl-boot.js" />
-  <link rel="modulepreload" href="./vendor/three/three.module.js" />
 </head>
 <body data-theme="cnc" data-bg="cnc" data-page="gaming">
   <a class="skip-link" href="#main">Skip to content</a>
@@ -101,8 +101,8 @@
         <h1>Gaming Archive</h1>
         <p class="lede">The games around the 1999 Brood War title: Kali ladders, Cube Draft, two Pro Tours, and later ranks.</p>
         <div class="cta-row">
-          <a class="btn btn-gold btn-arrow" href="classic.html#esports">StarCraft World Championship <span class="arrow" aria-hidden="true">→</span></a>
-          <a class="btn btn-primary" href="classic.html">Back to portfolio</a>
+          <a class="btn btn-gold btn-arrow" href="index.html#esports">StarCraft World Championship <span class="arrow" aria-hidden="true">→</span></a>
+          <a class="btn btn-primary" href="index.html">Back to portfolio</a>
         </div>
       </header>
     </section>
@@ -119,7 +119,7 @@
         </div>
         <div class="panel-grid panel-grid--copy">
           <div>
-            <h3>Command &amp; Conquer: Tiberian Dawn</h3>
+            <h2 class="panel-title">Command &amp; Conquer: Tiberian Dawn</h2>
             <p class="plaque mono">Case’s Ladder · 1v1 &amp; Teams · #1 · 1996</p>
             <p>
               Kali, 1996. Mentored by Bill “Bill1” Macaitis, <strong>SoSOWAC</strong> took Case’s Ladder #1
@@ -141,7 +141,7 @@
         </div>
         <div class="panel-grid panel-grid--copy">
           <div>
-            <h3>Warcraft II / III</h3>
+            <h2 class="panel-title">Warcraft II / III</h2>
             <p class="plaque mono">Top 3 1v1 · Teams #1 · Kali · 1997</p>
             <p>
               Kali, 1997. Clan C4L: Top 3 in 1v1, #1 teams. First met Jay “Gadianton” Severson there —
@@ -163,7 +163,7 @@
         </div>
         <div class="panel-grid panel-grid--copy">
           <div>
-            <h3>Magic: The Gathering</h3>
+            <h2 class="panel-title">Magic: The Gathering</h2>
             <p class="plaque mono">Pro Tour · New York 2001 · Boston 2002</p>
             <p>
               A side game since 1996, after Weissman sessions at Palo Alto’s Round Table Pizza.
@@ -198,13 +198,13 @@
         </div>
         <div class="panel-grid">
           <div>
-            <h3>Cube Draft</h3>
+            <h2 class="panel-title">Cube Draft</h2>
             <p class="plaque mono">Format origin · curated draft · “The Cube”</p>
             <p>
               Early custom draft pools he called “The Cube” — now Cube Draft.
               Brian Weissman and Tom Martell have given public credit for most of the idea.
             </p>
-            <aside class="interview-cite">
+            <div class="interview-cite">
               <a
                 class="interview-cite-thumb"
                 href="https://youtu.be/MNjLKeA-08A?si=0kQD6O58WkGdh8jQ"
@@ -234,10 +234,10 @@
                   rel="noopener noreferrer"
                 >Watch the full interview here <span aria-hidden="true">→</span></a>
               </div>
-            </aside>
+            </div>
           </div>
           <div class="panel-media">
-            <picture>
+            <picture data-exhibit="frame" data-exhibit-kind="Photograph" data-exhibit-title="Wayne Chiang with Brian Weissman" data-exhibit-meta="Cube Draft oral history" data-exhibit-note="Brian Weissman and Tom Martell have given public credit for most of the Cube Draft idea.">
               <source type="image/avif" srcset="assets/img/weissman-900.avif" />
               <source type="image/webp" srcset="assets/img/weissman-900.webp" />
               <img
@@ -266,12 +266,12 @@
         </div>
         <div class="panel-grid">
           <div>
-            <h3>Hearthstone — High Legend</h3>
+            <h2 class="panel-title">Hearthstone — High Legend</h2>
             <p class="plaque mono">Legend · Standard #35 NA · Wild #11 NA</p>
             <p>Peak Rank #35 Standard NA, #11 Wild NA, and Top 32 in the Wild Open Americas (2018).</p>
           </div>
           <div class="panel-media">
-            <picture>
+            <picture data-exhibit="frame" data-exhibit-kind="Screenshot" data-exhibit-title="Hearthstone — High Legend" data-exhibit-meta="Peak #35 Standard NA · #11 Wild NA" data-exhibit-note="Top 32 in the Wild Open Americas (2018).">
               <source type="image/avif" srcset="assets/img/hearthstone-35-720.avif" />
               <source type="image/webp" srcset="assets/img/hearthstone-35-720.webp" />
               <img
@@ -289,7 +289,7 @@
       </article>
 
       <aside class="esports-more" data-reveal="jump" aria-labelledby="casual-heading">
-        <h3 id="casual-heading">Casual competitor</h3>
+        <h2 id="casual-heading">Casual competitor</h2>
         <p class="esports-more-copy">
           After Brood War: later ladders and queues.
         </p>
@@ -309,33 +309,36 @@
         <p class="lede">StarCraft championship, poker, inventions, and the book.</p>
       </header>
       <div class="cta-row cta-row--center" data-reveal="jump">
-        <a class="btn btn-gold btn-arrow" href="classic.html#esports">Brood War World Champion <span class="arrow" aria-hidden="true">→</span></a>
-        <a class="btn btn-primary btn-arrow" href="classic.html#poker">Poker &amp; WSOP <span class="arrow" aria-hidden="true">→</span></a>
+        <a class="btn btn-gold btn-arrow" href="index.html#esports">Brood War World Champion <span class="arrow" aria-hidden="true">→</span></a>
+        <a class="btn btn-primary btn-arrow" href="index.html#poker">Poker &amp; WSOP <span class="arrow" aria-hidden="true">→</span></a>
         <a class="btn btn-primary" href="index.html">Home</a>
       </div>
-      <p class="footer-meta mono">
-        <a href="classic.html">Portfolio</a>
-        ·
-        <a href="classic.html#contact">Media kit</a>
-        ·
-        <a href="app/privacy/">App privacy</a>
-        ·
-        <a href="app/terms/">App terms</a>
-        ·
-        <a href="https://liquipedia.net/starcraft/Soso" target="_blank" rel="noopener noreferrer">Liquipedia — Soso</a>
-      </p>
-      <p class="footer-credit mono">
-        Website created by
-        <a href="https://chrisswimlee.com" target="_blank" rel="noopener noreferrer">chrisswimlee</a>
-        ·
-        <a href="https://chrisswimlee.com" target="_blank" rel="noopener noreferrer">chrisswimlee.com</a>
-        ·
-        <a href="mailto:chris.suyoung.lee@gmail.com">chris.suyoung.lee@gmail.com</a>
-        ·
-        <a id="feedback-open" href="mailto:200percentooak@gmail.com?subject=d22soso%20feedback">Submit feedback</a>
-      </p>
     </section>
   </main>
+
+  <footer class="site-footer">
+    <p class="footer-meta mono">
+      <a href="index.html">Portfolio</a>
+      <span class="footer-sep" aria-hidden="true">·</span>
+      <a href="index.html#contact">Media kit</a>
+      <span class="footer-sep" aria-hidden="true">·</span>
+      <a href="app/privacy/">App privacy</a>
+      <span class="footer-sep" aria-hidden="true">·</span>
+      <a href="app/terms/">App terms</a>
+      <span class="footer-sep" aria-hidden="true">·</span>
+      <a href="https://liquipedia.net/starcraft/Soso" target="_blank" rel="noopener noreferrer">Liquipedia — Soso</a>
+    </p>
+    <p class="footer-credit mono">
+      Website created by
+      <a href="https://chrisswimlee.com" target="_blank" rel="noopener noreferrer">chrisswimlee</a>
+      <span class="footer-sep" aria-hidden="true">·</span>
+      <a href="https://chrisswimlee.com" target="_blank" rel="noopener noreferrer">chrisswimlee.com</a>
+      <span class="footer-sep" aria-hidden="true">·</span>
+      <a href="mailto:chris.suyoung.lee@gmail.com">chris.suyoung.lee@gmail.com</a>
+      <span class="footer-sep" aria-hidden="true">·</span>
+      <a id="feedback-open" href="mailto:200percentooak@gmail.com?subject=d22soso%20feedback">Submit feedback</a>
+    </p>
+  </footer>
 
   <button type="button" class="back-top" id="back-top" aria-label="Back to top" aria-hidden="true" tabindex="-1">
     <span class="back-top-chevron" aria-hidden="true">↑</span>

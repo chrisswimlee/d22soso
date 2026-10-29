@@ -174,6 +174,61 @@ function renderList(list, venues) {
   }
 }
 
+/* Labels are wider than dot spacing allows on small maps (LA and Las Vegas
+   sit a few px apart on a phone). Measure the real labels and, for any that
+   lands on an earlier one, try the other side of its pin, then above, then
+   below; keep the default if nothing is clear. */
+const LABEL_MOVES = ["locate-pin--flip", "locate-pin--above", "locate-pin--below"];
+
+function untangleLabels(plane) {
+  const pins = [...plane.querySelectorAll(".locate-pin")];
+  if (!pins.length) return;
+  plane.classList.add("is-measuring");
+  pins.forEach((pin) => pin.classList.remove(...LABEL_MOVES));
+  const bounds = plane.getBoundingClientRect();
+  const placed = [];
+  const clear = (r) =>
+    r.left >= bounds.left - 1 &&
+    r.right <= bounds.right + 1 &&
+    !placed.some((q) => r.left < q.right - 2 && r.right > q.left + 2 && r.top < q.bottom - 2 && r.bottom > q.top + 2);
+
+  for (const pin of pins) {
+    const label = pin.querySelector(".locate-pin-label");
+    if (!label) continue;
+    let chosen = clear(label.getBoundingClientRect()) ? "" : null;
+    for (const move of LABEL_MOVES) {
+      if (chosen !== null) break;
+      pin.classList.add(move);
+      if (clear(label.getBoundingClientRect())) chosen = move;
+      else pin.classList.remove(move);
+    }
+    placed.push(label.getBoundingClientRect());
+  }
+  plane.classList.remove("is-measuring");
+}
+
+function watchLabels(plane) {
+  untangleLabels(plane);
+  if (!("ResizeObserver" in window)) return;
+  let frame = 0;
+  new ResizeObserver(() => {
+    cancelAnimationFrame(frame);
+    frame = requestAnimationFrame(() => untangleLabels(plane));
+  }).observe(plane);
+}
+
+/* Lede names the live venues so it never drifts from the map */
+function renderLede(lede, venues) {
+  if (!lede) return;
+  const live = venues.filter((v) => !v.future).map((v) => v.label);
+  if (!live.length) return;
+  const names =
+    live.length === 1
+      ? live[0]
+      : live.slice(0, -1).join(", ") + (live.length > 2 ? "," : "") + " and " + live[live.length - 1];
+  lede.textContent = "Live now at " + names + ".";
+}
+
 export async function initLocateMap() {
   const plane = document.querySelector(".locate-plane");
   const list = document.querySelector(".locate-venues");
@@ -181,6 +236,7 @@ export async function initLocateMap() {
 
   plane.dataset.locateMid = MAP_MID;
   plane.dataset.locateSource = "pending";
+  watchLabels(plane);
 
   try {
     const res = await fetch(KML_URL, { credentials: "omit" });
@@ -190,7 +246,9 @@ export async function initLocateMap() {
     if (!venues.length) throw new Error("KML empty");
 
     renderPins(plane, venues);
+    untangleLabels(plane);
     renderList(list, venues);
+    renderLede(document.querySelector("#locate .lede"), venues);
     plane.dataset.locateSource = "kml";
     plane.setAttribute(
       "aria-label",

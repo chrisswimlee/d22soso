@@ -115,6 +115,15 @@ const progressBar = document.querySelector(".scroll-progress-bar");
 const header = document.querySelector(".site-header");
 const revealNodes = [...document.querySelectorAll("[data-reveal]")];
 
+/* Stagger groups — children arrive one by one when their room fades in.
+   CSS derives each child's delay from nth-child, so lists rebuilt later keep it. */
+const STAGGER_GROUPS =
+  ".locate-venues, .media-kit-assets, .contact-socials, .esports-more-theaters, .esports-more .stat-list, .about-credentials, .cta-row, .press-strip-list";
+document.querySelectorAll(STAGGER_GROUPS).forEach((group) => {
+  if (!group.closest("[data-reveal]") || group.closest(".hero")) return;
+  group.setAttribute("data-stagger", "");
+});
+
 /* Keep body offset in sync when the fixed header wraps (mobile) */
 function syncHeaderOffset() {
   measureHeaderHeight();
@@ -152,7 +161,7 @@ function staggerParts(el) {
   );
   if (tag) parts.push(tag);
   if (plaque) parts.push(plaque);
-  const heading = el.querySelector("h3, .lower-third > strong");
+  const heading = el.querySelector(".panel-title, h3, .lower-third > strong");
   if (heading) parts.push(heading);
   if (copy) parts.push(copy);
   if (media) parts.push(media);
@@ -345,7 +354,7 @@ function playTheaterEnter(el) {
       },
       0.08
     );
-    const lift = el.querySelectorAll(".panel-media, .interview-cite, .plaque, h3");
+    const lift = el.querySelectorAll(".panel-media, .interview-cite, .plaque, .panel-title, h3");
     if (lift.length) {
       gsap.set(lift, { y: 42, opacity: 0, rotateX: -12 });
       tl.to(
@@ -567,21 +576,7 @@ function playTheaterEnter(el) {
 function revealEl(el) {
   if (!el) return;
   el.classList.add("is-inview");
-  el.removeAttribute("data-exit");
   el.setAttribute("data-entered", "");
-}
-
-function concealEl(el) {
-  if (!el || !el.classList.contains("is-inview")) return;
-  /* Don't interrupt mid-enter — finish quietly when complete */
-  if (el.classList.contains("is-theater-entering")) return;
-
-  const rect = el.getBoundingClientRect();
-  const vh = window.innerHeight || document.documentElement.clientHeight;
-  const mid = rect.top + rect.height * 0.5;
-  /* Leaving through the top → exit up; through the bottom → exit down */
-  el.dataset.exit = mid < vh * 0.5 ? "up" : "down";
-  el.classList.remove("is-inview");
 }
 
 function revealAll() {
@@ -600,7 +595,6 @@ function syncReveals() {
   const band = Math.round((window.innerHeight || 0) * 0.06);
   revealNodes.forEach((el) => {
     if (isInViewport(el, band)) revealEl(el);
-    else concealEl(el);
   });
 }
 
@@ -617,15 +611,18 @@ if (reduced) {
   document.documentElement.classList.add("reveal-on");
   syncReveals();
 
+  /* Reveal once: content fades in the first time it enters and then stays,
+     so re-reading a section never replays the fade or blanks it mid-scroll. */
   const revealObs = new IntersectionObserver(
-    (entries) => {
+    (entries, observer) => {
       entries.forEach((entry) => {
-        if (entry.isIntersecting) revealEl(entry.target);
-        else concealEl(entry.target);
+        if (!entry.isIntersecting) return;
+        revealEl(entry.target);
+        observer.unobserve(entry.target);
       });
     },
     {
-      /* Shrink the “live” band so exits start as content leaves the frame */
+      /* Start the fade just inside the frame */
       threshold: [0, 0.08, 0.18],
       rootMargin: "-6% 0px -8% 0px",
     }
@@ -680,5 +677,31 @@ function revealHashTarget() {
 }
 revealHashTarget();
 window.addEventListener("hashchange", revealHashTarget);
+
+/* ---------- Pointer tilt ---------- */
+/* Theaters and the book lean a few degrees toward the pointer (fine
+   pointers only). Kept under 5deg so it reads as weight, not a toy.
+   Perspective is re-applied on enter because theater enters clear
+   transforms when they finish. Photo drift lives in exhibit.js. */
+if (!reduced && window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
+  document.querySelectorAll(".game-panel, .book-showcase").forEach((el) => {
+    const toRx = gsap.quickTo(el, "rotationX", { duration: 0.55, ease: "power3.out" });
+    const toRy = gsap.quickTo(el, "rotationY", { duration: 0.55, ease: "power3.out" });
+    el.addEventListener("pointerenter", () => gsap.set(el, { transformPerspective: 900 }));
+    el.addEventListener("pointermove", (e) => {
+      if (el.classList.contains("is-theater-entering")) return;
+      const r = el.getBoundingClientRect();
+      if (!r.width || !r.height) return;
+      const px = (e.clientX - r.left) / r.width - 0.5;
+      const py = (e.clientY - r.top) / r.height - 0.5;
+      toRy(px * 4.5);
+      toRx(-py * 4.5);
+    });
+    el.addEventListener("pointerleave", () => {
+      toRx(0);
+      toRy(0);
+    });
+  });
+}
 
 }

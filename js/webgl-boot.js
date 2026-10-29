@@ -2,6 +2,14 @@
 import { reduced, whenIdle, nearViewport } from "./pref.js";
 
 const booted = new Set();
+
+/* Save-Data, 2G/3G or ≤2 GB devices skip the ambient fleets (~490 KB of
+   Three.js). Interactive card canvases still boot when you reach them. */
+const lean = (() => {
+  const c = navigator.connection;
+  if (c && (c.saveData || /(^|-)(2g|3g)$/.test(c.effectiveType || ""))) return true;
+  return typeof navigator.deviceMemory === "number" && navigator.deviceMemory <= 2;
+})();
 let interactivesPromise = null;
 let bgScenePromise = null;
 
@@ -23,7 +31,7 @@ function bootCanvas(id, initName) {
 
 function bootBgScene() {
   const canvas = document.getElementById("webgl-bg");
-  if (reduced) {
+  if (reduced || lean) {
     if (canvas) canvas.style.display = "none";
     return Promise.resolve(null);
   }
