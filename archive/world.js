@@ -835,8 +835,9 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
   // Phones start at 1 without shadows; any device steps down if it can't hold its frame rate.
   let tier = mobile || LIGHT ? 1 : 2;
   const shadowsAllowed = !mobile;
-  renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.45;
+  // Neutral keeps each sector's color and the gold trims true, where ACES washed them toward grey.
+  renderer.toneMapping = THREE.NeutralToneMapping;
+  renderer.toneMappingExposure = 1.6;
   renderer.shadowMap.type = THREE.PCFShadowMap;
   renderer.shadowMap.autoUpdate = false; // the scene is mostly still; shadows refresh a few times a second
 
@@ -844,15 +845,15 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
   scene.background = new THREE.Color("#07080b");
   scene.fog = new THREE.Fog("#07080b", 120, 220);
 
-  const hemi = new THREE.HemisphereLight("#e4ddff", "#3a2a16", 1.7);
+  const hemi = new THREE.HemisphereLight("#e4ddff", "#3a2a16", 1.25);
   scene.add(hemi);
-  const sun = new THREE.DirectionalLight("#ffdcae", 2.7);
+  const sun = new THREE.DirectionalLight("#ffe4c2", 3.4);
   sun.position.set(-30, 50, 25);
   sun.castShadow = shadowsAllowed;
   Object.assign(sun.shadow.camera, { left: -36, right: 36, top: 36, bottom: -36, near: 1, far: 140 });
   sun.shadow.bias = -0.0008;
   scene.add(sun);
-  const rim = new THREE.DirectionalLight("#8b5cf6", 0.6);
+  const rim = new THREE.DirectionalLight("#a78bfa", 1.2);
   rim.position.set(30, 10, -30);
   scene.add(rim);
 
