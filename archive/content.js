@@ -11,7 +11,7 @@ export const EMAIL = "2handholdem@gmail.com";
 export const SECTORS = [
   {
     id: "arena",
-    key: { src: img("champ-trophy-640"), ratio: 0.667, alt: "Wayne Chiang with the 1999 world championship trophy", pos: "50% 18%" },
+    key: { hero: true, src: img("champ-trophy-640"), ratio: 0.667, alt: "Wayne Chiang with the 1999 world championship trophy", pos: "50% 18%" },
     name: "The Championship Arena",
     short: "Arena",
     era: "1996 – 1999",
@@ -28,7 +28,7 @@ export const SECTORS = [
         {
           type: "gallery",
           items: [
-            { src: img("champ-trophy-1080"), alt: "Wayne Chiang holding the 1999 championship trophy", caption: "The Season 1 trophy.", pos: "50% 20%" },
+            { hero: true, src: img("champ-trophy-1080"), alt: "Wayne Chiang holding the 1999 championship trophy", caption: "The Season 1 trophy.", pos: "50% 20%" },
             { src: img("champ-pgl-1080"), alt: "Wayne Chiang with his 1999 StarCraft trophies", caption: "The 1999 trophies.", pos: "50% 25%" },
             { src: img("sc-championship-900"), alt: "Archive page of the first official Brood War world championship bracket", caption: "Archive: the Season 1 bracket.", pos: "50% 0%" },
           ],
@@ -125,7 +125,7 @@ export const SECTORS = [
   },
   {
     id: "broadcast",
-    key: { src: img("wsop-logo-600"), ratio: 1, alt: "World Series of Poker logo", fit: "contain" },
+    key: { hero: true, src: img("wsop-logo-600"), ratio: 1, alt: "World Series of Poker logo", fit: "contain" },
     name: "The Broadcast Station",
     short: "Broadcast",
     era: "2010s – today",
@@ -172,7 +172,7 @@ export const SECTORS = [
   },
   {
     id: "foundry",
-    key: { src: img("twohh-logo-500"), ratio: 1.15, alt: "2 Hand Hold’em logo", fit: "contain" },
+    key: { hero: true, src: img("twohh-logo-500"), ratio: 1.15, alt: "2 Hand Hold’em logo", fit: "contain" },
     name: "The Invention Foundry",
     short: "Foundry",
     era: "2015 – today",

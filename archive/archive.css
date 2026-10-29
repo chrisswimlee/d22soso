@@ -111,6 +111,11 @@ button { font: inherit; color: inherit; touch-action: manipulation; }
 .icon-btn:hover { border-color: var(--accent); }
 .exhibit-scroll { overflow-y: auto; overscroll-behavior: contain; padding: 28px 28px 32px; flex: 1; }
 .ex-head { margin-bottom: 24px; }
+.emblem { float: right; width: clamp(96px, 22%, 148px); aspect-ratio: 1; object-fit: contain; margin: 0 0 12px 20px; padding: 10px; box-sizing: border-box; border: 2px solid var(--gold); border-radius: var(--r); background: radial-gradient(circle, #1f2a24, #0c0d11); box-shadow: 0 0 24px rgba(232, 196, 74, 0.18); }
+.list-ex:has(> .emblem) { grid-template-columns: minmax(0, 1fr) clamp(96px, 20vw, 148px); column-gap: 20px; }
+.list-ex:has(> .emblem) > * { grid-column: 1 / -1; }
+.list-ex:has(> .emblem) > :is(.kicker, h2, .lede) { grid-column: 1; }
+.list-ex:has(> .emblem) > .emblem { grid-row: 1 / span 3; grid-column: 2; align-self: start; width: 100%; margin: 0; float: none; }
 .kicker { margin: 0 0 10px; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); }
 .ex-head h2, .list-ex h2 { font-size: clamp(28px, 3.4vw, 40px); letter-spacing: -0.015em; }
 .lede { font-size: 17px; line-height: 1.6; color: var(--ink); margin: 14px 0 0; max-width: 62ch; }
@@ -124,6 +129,7 @@ button { font: inherit; color: inherit; touch-action: manipulation; }
 .gallery figure { margin: 0; min-width: 0; }
 .zoomable { display: block; width: 100%; padding: 0; border: 0; background: #000; cursor: zoom-in; border-radius: var(--r); overflow: hidden; aspect-ratio: 4 / 5; }
 .gallery.n1 .zoomable { aspect-ratio: 16 / 10; }
+.zoomable.hero { outline: 2px solid var(--gold); outline-offset: -2px; box-shadow: 0 0 24px rgba(232, 196, 74, 0.18); }
 .zoomable img { width: 100%; height: 100%; display: block; transition: transform 0.4s; }
 .zoomable:hover img { transform: scale(1.03); }
 figcaption { margin-top: 6px; font-size: 12px; color: var(--muted); }

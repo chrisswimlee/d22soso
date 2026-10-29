@@ -45,7 +45,7 @@ const ext = (href) => /^https?:/.test(href) ? { target: "_blank", rel: "noopener
 const BLOCKS = {
   gallery: (b) => h("div", { class: `gallery n${b.items.length}` }, b.items.map((it) =>
     h("figure", {},
-      h("button", { type: "button", class: "zoomable", "aria-label": `Enlarge: ${it.alt}`, onclick: () => lightbox(it) },
+      h("button", { type: "button", class: it.hero ? "zoomable hero" : "zoomable", "aria-label": `Enlarge: ${it.alt}`, onclick: () => lightbox(it) },
         h("img", { src: it.src, alt: it.alt, loading: "lazy", decoding: "async", style: `object-position:${it.pos || "50% 50%"};object-fit:${it.fit || "cover"}` })),
       it.caption && h("figcaption", { text: it.caption })))),
   story: (b) => h("section", { class: "story" }, b.title && h("h3", { class: "sec mono", text: b.title }), b.text.map((t) => h("p", { text: t }))),
@@ -271,6 +271,10 @@ function openExhibit(s) {
   $("ex-crumb").textContent = `Sector ${String(ix + 1).padStart(2, "0")} · ${s.name}`;
   $("ex-kicker").textContent = `${ex.kicker.replace(/^Sector \d+ · /, "")} · ${s.era}`; // the bar above already names the sector
   $("ex-title").textContent = ex.title;
+  // Headline logos (WSOP, 2 Hand Hold'em) sit beside the title as the exhibit's emblem.
+  const em = $("ex-emblem"), logo = s.key?.hero && s.key.fit === "contain";
+  em.hidden = !logo;
+  if (logo) { em.src = s.key.src; em.alt = s.key.alt; }
   $("ex-lede").textContent = ex.lede;
   $("ex-body").replaceChildren(...renderExhibitBody(s));
   $("ex-foot").replaceChildren(footer(s));
@@ -332,6 +336,7 @@ function listJump(id) {
 function buildList() {
   $("list-nav").replaceChildren(...SECTORS.map((s, i) => h("a", { href: `#list-${s.id}`, style: `--accent:${s.accent}`, onclick: (e) => { e.preventDefault(); listJump(s.id); }, text: `${String(i + 1).padStart(2, "0")} ${s.short}` })));
   $("list-body").replaceChildren(...SECTORS.map((s) => h("article", { class: "list-ex", id: `list-${s.id}`, style: `--accent:${s.accent}` },
+    s.key?.hero && s.key.fit === "contain" ? h("img", { class: "emblem", src: s.key.src, alt: s.key.alt, loading: "lazy", decoding: "async" }) : null,
     h("p", { class: "kicker mono", text: `${s.exhibit.kicker} · ${s.era}` }),
     h("h2", { text: s.name }),
     h("p", { class: "lede", text: s.exhibit.lede }),

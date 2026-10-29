@@ -593,10 +593,12 @@ const BUILD = {
 
 /* A pylon behind each building carrying a lit, turning billboard with the area's headline photo.
    The head swivels and tilts to meet the camera square-on, so the photo is never edge-on or squashed. */
-const SIGN = { z: -3.4, bottom: 5.6, area: 14 };
+const SIGN = { z: -3.4, bottom: 5.6, area: 9, heroArea: 22 };
 function billboard(key, accent) {
-  // Board takes the photo's own proportions (same area for all), so nothing is squeezed or over-cropped.
-  const r = key?.ratio || 1.5, w = Math.sqrt(SIGN.area * r), h = Math.sqrt(SIGN.area / r);
+  // Board takes the photo's own proportions, so nothing is squeezed or over-cropped.
+  // The headline credentials (world title, WSOP, 2 Hand Hold'em) get boards over twice the size of the rest.
+  const area = key?.hero ? SIGN.heroArea : SIGN.area;
+  const r = key?.ratio || 1.5, w = Math.sqrt(area * r), h = Math.sqrt(area / r);
   const W = r >= 1 ? 384 : Math.round(384 * r), H = r >= 1 ? Math.round(384 / r) : 384;
   const art = canvasTex(W, H, (c) => { c.fillStyle = "#0c0d11"; c.fillRect(0, 0, W, H); });
   if (key?.src) {
@@ -613,7 +615,9 @@ function billboard(key, accent) {
       } else {
         const [px, py] = (key.pos || "50% 50%").split(" ").map((v) => parseFloat(v) / 100);
         const k = Math.max(W / img.width, H / img.height), dw = img.width * k, dh = img.height * k;
+        if (key.hero) c.filter = "brightness(1.35) contrast(1.05)"; // the studio trophy shot is dark; lift it so it reads from afar
         c.drawImage(img, (W - dw) * px, (H - dh) * py, dw, dh);
+        c.filter = "none";
       }
       art.tex.needsUpdate = true;
     };
@@ -628,8 +632,11 @@ function billboard(key, accent) {
   // Head: frame, accent trim top and bottom, and the photo on both faces.
   const head = new THREE.Group();
   head.add(box(w + 0.24, h + 0.24, 0.2, mat("#16161b"), 0, -h / 2 - 0.12, 0));
-  head.add(box(w + 0.32, 0.08, 0.28, glow(accent, 1.4), 0, h / 2 + 0.1, 0));
-  head.add(box(w + 0.32, 0.08, 0.28, glow(accent, 1.4), 0, -h / 2 - 0.18, 0));
+  // Headline boards get a full lit gold frame; the rest keep a thin accent trim top and bottom.
+  const t = key?.hero ? 0.14 : 0.08, trim = key?.hero ? glow("#e8c44a", 1.6) : glow(accent, 1.2);
+  head.add(box(w + 0.32, t, 0.28, trim, 0, h / 2 + 0.1, 0));
+  head.add(box(w + 0.32, t, 0.28, trim, 0, -h / 2 - 0.12 - t, 0));
+  if (key?.hero) for (const x of [-1, 1]) head.add(box(t, h + 0.24, 0.28, trim, x * (w / 2 + 0.16 - t / 2), -h / 2 - 0.12, 0));
   const face = new THREE.MeshBasicMaterial({ map: art.tex, toneMapped: false });
   head.add(mesh(new THREE.PlaneGeometry(w, h), face, 0, 0, 0.11, false));
   head.add(mesh(new THREE.PlaneGeometry(w, h), face, 0, 0, -0.11, false).rotateY(Math.PI));
