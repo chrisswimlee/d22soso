@@ -11,7 +11,7 @@ export const EMAIL = "2handholdem@gmail.com";
 export const SECTORS = [
   {
     id: "arena",
-    key: { hero: true, src: img("champ-trophy-640"), ratio: 0.667, alt: "Wayne Chiang with the 1999 world championship trophy", pos: "50% 18%" },
+    key: { hero: true, src: img("champ-trophy-640"), ratio: 0.667, alt: "Wayne Chiang with the 1999 world championship trophy", pos: "34% 48%", zoom: 1.58, scale: 1.36, frame: "gold" },
     name: "The Championship Arena",
     short: "Arena",
     era: "1996 – 1999",
@@ -80,7 +80,7 @@ export const SECTORS = [
   },
   {
     id: "garden",
-    key: { src: img("weissman-360"), ratio: 1.78, alt: "Wayne Chiang with Brian Weissman", pos: "50% 25%" },
+    key: { src: img("weissman-360"), ratio: 1.78, alt: "Wayne Chiang with Brian Weissman", pos: "50% 50%", fit: "contain", zoom: 1.08, scale: 0.86 },
     name: "The Strategy Garden",
     short: "Garden",
     era: "1995 – today",
@@ -226,7 +226,7 @@ export const SECTORS = [
   },
   {
     id: "library",
-    key: { src: img("betting-on-yourself-cover"), ratio: 0.667, alt: "Betting on Yourself book cover", fit: "contain" },
+    key: { src: img("betting-on-yourself-cover"), ratio: 0.667, alt: "Betting on Yourself book cover", fit: "contain", zoom: 1.1, scale: 1.4, frame: "gold" },
     name: "The Library",
     short: "Library",
     era: "December 2025",
@@ -262,7 +262,7 @@ export const SECTORS = [
   },
   {
     id: "command",
-    key: { src: img("wsop-boxer-360"), ratio: 0.684, alt: "Wayne Chiang at the 2025 World Series of Poker", pos: "50% 20%" },
+    key: { src: img("wsop-boxer-360"), ratio: 0.684, alt: "Wayne Chiang at the 2025 World Series of Poker", pos: "50% 24%", zoom: 1.15, scale: 1.34, frame: "gold" },
     name: "The Command Center",
     short: "Command",
     era: "Today",
@@ -327,8 +327,8 @@ export const SECTORS = [
   },
 ];
 
-/* Guided tour: chronological. */
-export const TOUR = ["garden", "arena", "broadcast", "foundry", "library", "command"];
+/* Guided tour leads with the world title, then the rest of the career. */
+export const TOUR = ["arena", "garden", "broadcast", "foundry", "library", "command"];
 
 /* Fog of discovery: optional, smaller stories placed between sectors. */
 export const ARTIFACTS = [

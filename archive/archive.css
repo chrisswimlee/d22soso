@@ -44,15 +44,10 @@ button { font: inherit; color: inherit; touch-action: manipulation; }
 
 /* Labels pinned over buildings */
 .labels { position: absolute; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
-.label { position: absolute; left: 0; top: 0; display: grid; grid-template-columns: auto auto; column-gap: 6px; align-items: baseline; padding: 4px 9px 5px; border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent); border-radius: 3px; background: rgba(7, 8, 11, 0.86); pointer-events: auto; cursor: pointer; transition: border-color 0.2s, background 0.2s, opacity 0.3s; will-change: transform; }
-.label::after { content: ""; position: absolute; left: 50%; bottom: -9px; width: 1px; height: 8px; background: var(--accent); opacity: 0.6; }
-.label .idx { font-size: 11px; color: var(--accent); }
-.label strong { font: 600 13px var(--display); }
-.label .era { grid-column: 1 / -1; font-size: 11px; color: var(--muted); }
-.label.on, .label:hover { border-color: var(--accent); background: rgba(7, 8, 11, 0.9); }
-.label.minor { opacity: 0.55; border-color: color-mix(in srgb, var(--accent) 25%, transparent); }
-.label.minor strong { font-size: 12px; }
-.label.minor:hover, .label.minor.on, .zoomed .label.minor { opacity: 1; }
+.label { position: absolute; left: 0; top: 0; display: grid; grid-template-columns: auto auto; column-gap: 6px; align-items: baseline; padding: 3px 2px 4px; border: 0; background: none; pointer-events: auto; cursor: pointer; text-shadow: 0 1px 2px #07080b, 0 0 10px #07080b; will-change: transform; }
+.label .idx { font-size: 12px; color: var(--accent); }
+.label strong { font: 600 16px/1.1 var(--display); letter-spacing: -0.01em; color: #f4f0e6; }
+.label.on strong, .label:hover strong { color: #fff; }
 [data-mode="exhibit"] .label, [data-mode="exhibit"] .label.minor { opacity: 0; pointer-events: none; }
 
 /* Top deck */
@@ -68,6 +63,22 @@ button { font: inherit; color: inherit; touch-action: manipulation; }
 .btn-cta span { transition: transform 0.2s; }
 .btn-cta:hover span { transform: translateX(3px); }
 [data-mode="exhibit"] .btn-cta { opacity: 0; pointer-events: none; }
+/* The sheet owns the right side. Keep the name in the open column instead of under it. */
+@media (min-width: 761px) {
+  [data-mode="exhibit"] .deck-top {
+    right: calc(min(600px, 47vw) + var(--gut-r) + 20px);
+  }
+  [data-mode="exhibit"] .portrait,
+  [data-mode="exhibit"] .intro,
+  [data-mode="exhibit"] .btn-cta,
+  [data-mode="exhibit"] .top-actions {
+    display: none;
+  }
+  [data-mode="exhibit"] .brand h1 {
+    font-size: clamp(22px, 2.2vw, 28px);
+    margin-top: 2px;
+  }
+}
 .btn-ghost.quiet { border-color: transparent; background: transparent; color: var(--muted); }
 .btn-ghost.quiet:hover { color: var(--ink); border-color: transparent; }
 .brand h1 a { color: var(--ink); text-decoration: none; }
@@ -110,11 +121,19 @@ button { font: inherit; color: inherit; touch-action: manipulation; }
 .instrument-row b { color: var(--gold-text); }
 .zoom-btns { display: flex; gap: 4px; }
 .zoom-btns button { width: 30px; height: 30px; border: 1px solid var(--rule); background: rgba(7, 8, 11, 0.8); border-radius: 3px; cursor: pointer; font-size: 16px; }
-.hint { position: absolute; left: 50%; transform: translateX(-50%); bottom: calc(28px + env(safe-area-inset-bottom, 0px)); margin: 0; padding: 6px 14px; font-size: 13px; color: var(--ink); background: rgba(7, 8, 11, 0.72); border-radius: 999px; white-space: nowrap; pointer-events: none; }
+.hint { position: absolute; left: 50%; transform: translateX(-50%); bottom: calc(40px + env(safe-area-inset-bottom, 0px)); margin: 0; padding: 6px 14px; font-size: 13px; color: var(--ink); background: rgba(7, 8, 11, 0.72); border-radius: 999px; white-space: nowrap; pointer-events: none; }
 .touched .hint, .app:has(.readout:not([hidden])) .hint { opacity: 0; }
+.credit { position: absolute; z-index: 4; left: 50%; bottom: calc(6px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); padding: 16px 14px 0; font-size: 12px; line-height: 1; letter-spacing: 0.08em; color: var(--muted); text-decoration: none; text-shadow: 0 1px 2px #07080b, 0 0 10px #07080b; white-space: nowrap; }
+.credit:hover { color: var(--ink); }
+.app:has(.readout:not([hidden])) .credit,
+.app:has(.sectors-panel:not([hidden])) .credit,
+.listing .credit { opacity: 0; pointer-events: none; }
+@media (min-width: 761px) {
+  [data-mode="exhibit"] .credit { left: calc((100% - min(600px, 47vw) - var(--gut-r)) / 2); }
+}
 
 [data-mode="exhibit"] .sectors, [data-mode="exhibit"] .hint, [data-mode="exhibit"] .instruments { opacity: 0; pointer-events: none; }
-.sectors, .hint, .instruments { transition: opacity 0.3s; }
+.sectors, .hint, .instruments, .credit { transition: opacity 0.3s; }
 
 /* Artifact toast */
 .toast { position: absolute; left: var(--gut); bottom: calc(64px + env(safe-area-inset-bottom, 0px)); transform: translateY(8px); width: min(420px, calc(100vw - 32px)); padding: 14px 18px; background: var(--panel); border: 1px solid rgba(56, 189, 248, 0.4); border-left: 3px solid var(--gold-text); border-radius: var(--r); opacity: 0; transition: opacity 0.3s, transform 0.3s; cursor: pointer; z-index: 6; }
@@ -127,7 +146,7 @@ button { font: inherit; color: inherit; touch-action: manipulation; }
 .exhibit { position: absolute; top: calc(12px + env(safe-area-inset-top, 0px)); right: var(--gut-r); bottom: calc(12px + env(safe-area-inset-bottom, 0px)); width: min(600px, 47vw); display: flex; flex-direction: column; background: var(--panel-solid); border: 1px solid var(--rule-soft); border-top: 3px solid var(--accent); border-radius: var(--r); z-index: 5; opacity: 0; transform: translateX(16px); transition: opacity 0.35s, transform 0.35s; box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6); }
 .exhibit.open { opacity: 1; transform: none; }
 .exhibit-bar { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 10px 10px 24px; border-bottom: 1px solid var(--rule-soft); }
-.exhibit-bar .eyebrow { color: var(--accent); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.exhibit-bar .eyebrow { color: var(--accent); line-height: 1.35; }
 .icon-btn { width: 40px; height: 40px; flex: none; border: 1px solid var(--rule-soft); background: transparent; border-radius: 3px; font-size: 22px; cursor: pointer; }
 .icon-btn:hover { border-color: var(--accent); }
 .exhibit-scroll { overflow-y: auto; overscroll-behavior: contain; padding: 28px 28px 32px; flex: 1; }
@@ -150,6 +169,7 @@ button { font: inherit; color: inherit; touch-action: manipulation; }
 .gallery figure { margin: 0; min-width: 0; }
 .zoomable { display: block; width: 100%; padding: 0; border: 0; background: #000; cursor: zoom-in; border-radius: var(--r); overflow: hidden; aspect-ratio: 4 / 5; }
 .gallery.n1 .zoomable { aspect-ratio: 16 / 10; }
+.gallery .zoomable.contain { aspect-ratio: 3 / 4; background: #0c0d11; }
 .zoomable.hero { outline: 2px solid var(--gold); outline-offset: -2px; box-shadow: 0 0 24px rgba(232, 196, 74, 0.18); }
 .zoomable img { width: 100%; height: 100%; display: block; transition: transform 0.4s; }
 .zoomable:hover img { transform: scale(1.03); }
@@ -249,6 +269,9 @@ button.card.picked { transform: translateY(-6px); outline: 2px solid var(--gold-
 .downloads a:hover { border-color: var(--gold); }
 
 .ex-foot { margin-top: 32px; padding-top: 18px; border-top: 1px solid var(--rule-soft); }
+.ex-credit { display: none; margin: 28px 0 0; text-align: center; font-size: 12px; letter-spacing: 0.08em; }
+.ex-credit a, .list-credit a { color: var(--muted); text-decoration: none; }
+.ex-credit a:hover, .list-credit a:hover { color: var(--ink); }
 .foot-actions { display: flex; flex-wrap: wrap; gap: 8px; }
 .foot-actions.spread { justify-content: space-between; }
 .tour-foot .eyebrow { color: var(--gold-text); margin-bottom: 10px; }
@@ -261,7 +284,8 @@ button.card.picked { transform: translateY(-6px); outline: 2px solid var(--gold-
 .list-nav a { flex: none; color: var(--ink); text-decoration: none; padding: 6px 10px; border: 1px solid var(--rule-soft); border-left: 2px solid var(--accent); border-radius: 3px; transition: background 0.2s, border-color 0.2s; }
 .list-nav a.on { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 16%, transparent); }
 @media (hover: hover) { .list-nav a:hover { border-color: var(--accent); } }
-.list-body { max-width: 760px; margin: 0 auto; padding: 32px var(--gut-r) 80px var(--gut); display: grid; gap: 72px; }
+.list-body { max-width: 760px; margin: 0 auto; padding: 32px var(--gut-r) 48px var(--gut); display: grid; gap: 72px; }
+.list-credit { margin: 0 auto; max-width: 760px; padding: 0 var(--gut-r) calc(40px + env(safe-area-inset-bottom, 0px)) var(--gut); text-align: center; font-size: 12px; letter-spacing: 0.08em; }
 .list-ex { display: grid; gap: 24px; scroll-margin-top: 132px; }
 .list-ex .kicker { margin: 0; }
 .list-ex .lede { margin: 0; }
@@ -312,13 +336,16 @@ button.card.picked { transform: translateY(-6px); outline: 2px solid var(--gold-
   .deck-top { flex-wrap: wrap; gap: 8px; padding-bottom: 6px; }
   .brand h1 { font-size: 22px; }
   .top-actions { gap: 6px; }
-  .top-actions .btn-link, .wide-only, .zoom-btns, .list-actions .btn-link { display: none; }
-  .no-webgl .list-actions .btn-link { display: inline-flex; }
-  .label { padding: 3px 6px 4px; }
-  .label strong { font-size: 12px; }
-  .label .era { display: none; }
+  .top-actions .btn-link, .wide-only, .zoom-btns { display: none; }
+  .list-bar { flex-wrap: wrap; }
+  .list-actions { flex: 1 1 auto; justify-content: flex-end; }
+  .label { padding: 2px 0 3px; }
+  .label strong { font-size: 13px; }
   .btn-solid, .btn-ghost { min-height: 34px; padding: 0 10px; font-size: 12px; }
   .sectors { left: var(--gut); right: var(--gut-r); width: auto; bottom: calc(12px + env(safe-area-inset-bottom, 0px)); }
+  .credit { bottom: calc(54px + env(safe-area-inset-bottom, 0px)); }
+  [data-mode="exhibit"] .credit { opacity: 0; pointer-events: none; }
+  .ex-credit { display: block; }
   .sectors-panel { max-height: 60vh; overflow-y: auto; }
   .intro { font-size: 13px; margin-top: 2px; }
   /* Name, one line, then the tour button sharing a row with List and Media. */

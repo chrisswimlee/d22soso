@@ -633,59 +633,120 @@ const BUILD = {
   },
 };
 
-/* A pylon behind each building carrying a lit, turning billboard with the area's headline photo.
-   The head swivels and tilts to meet the camera square-on, so the photo is never edge-on or squashed. */
-const SIGN = { z: -3.4, bottom: 5.6, area: 9, heroArea: 22 };
-function billboard(key, accent) {
-  // Board takes the photo's own proportions, so nothing is squeezed or over-cropped.
-  // The headline credentials (world title, WSOP, 2 Hand Hold'em) get boards over twice the size of the rest.
-  const r = key?.ratio || 1.5;
-  const area = key?.hero ? SIGN.heroArea * (r < 1 ? 1.3 : 1) : SIGN.area; // a tall photo reads smaller than a square logo at equal area
-  const w = Math.sqrt(area * r), h = Math.sqrt(area / r);
-  const W = r >= 1 ? 384 : Math.round(384 * r), H = r >= 1 ? Math.round(384 / r) : 384;
-  const art = canvasTex(W, H, (c) => { c.fillStyle = "#0c0d11"; c.fillRect(0, 0, W, H); });
-  if (key?.src) {
-    const img = new Image();
-    img.decoding = "async";
-    img.onload = () => {
-      const c = art.g;
-      if (key.fit === "contain") {
-        const gr = c.createRadialGradient(W / 2, H / 2, 10, W / 2, H / 2, Math.max(W, H) * 0.6);
-        gr.addColorStop(0, "#1f2a24"); gr.addColorStop(1, "#0c0d11");
-        c.fillStyle = gr; c.fillRect(0, 0, W, H);
-        const k = Math.min((W - 24) / img.width, (H - 24) / img.height);
-        c.drawImage(img, (W - img.width * k) / 2, (H - img.height * k) / 2, img.width * k, img.height * k);
-      } else {
-        const [px, py] = (key.pos || "50% 50%").split(" ").map((v) => parseFloat(v) / 100);
-        const k = Math.max(W / img.width, H / img.height), dw = img.width * k, dh = img.height * k;
-        if (key.hero) c.filter = "brightness(1.35) contrast(1.05)"; // the studio trophy shot is dark; lift it so it reads from afar
-        c.drawImage(img, (W - dw) * px, (H - dh) * py, dw, dh);
+/* One size for every sign. A flat print on a slim pole — no chassis —
+   with the sector name large enough to read from the overview. */
+const SIGN = { z: -4.6, bottom: 4.7, w: 7.1, h: 8.7 };
+function roundPath(c, x, y, w, h, rad) {
+  const r = Math.min(rad, w / 2, h / 2);
+  c.beginPath();
+  c.moveTo(x + r, y);
+  c.arcTo(x + w, y, x + w, y + h, r);
+  c.arcTo(x + w, y + h, x, y + h, r);
+  c.arcTo(x, y + h, x, y, r);
+  c.arcTo(x, y, x + w, y, r);
+  c.closePath();
+}
+function billboard(key, accent, name) {
+  const ratio = key?.ratio || 1;
+  const wide = key?.fit === "contain" && ratio > 1.25;
+  /* A horizontal photo letterboxed in the portrait board reads small.
+     Give it its own wider print, tall enough to sit with the other signs. */
+  const scale = key?.scale || 1;
+  const planeW = (wide ? 7.35 * ratio : SIGN.w) * scale;
+  const planeH = (wide ? 7.35 * 1.14 : SIGN.h) * scale;
+  const W = wide ? 1200 : 720;
+  const H = wide ? Math.round(W * planeH / planeW) : 880;
+  const logo = key?.fit === "contain";
+  const art = canvasTex(W, H, () => {});
+  let imgEl = null;
+  const paint = () => {
+    const c = art.g;
+    c.clearRect(0, 0, W, H);
+    const label = String(name || "").toUpperCase();
+    const drawName = (y) => {
+      c.font = `700 ${Math.round(H * 0.055)}px "Space Grotesk", "Helvetica Neue", Arial, sans-serif`;
+      c.textAlign = "center";
+      c.textBaseline = "middle";
+      c.lineWidth = 12;
+      c.strokeStyle = "rgba(7,8,11,0.92)";
+      c.strokeText(label, W / 2, y);
+      c.fillStyle = "#f4f0e6";
+      c.fillText(label, W / 2, y);
+    };
+    /* Stroke sits just inside the photo so its outer edge meets the picture. */
+    const strokeGold = (x, y, w, h, rad) => {
+      if (key?.frame !== "gold") return;
+      const x0 = Math.max(0, x), y0 = Math.max(0, y);
+      const x1 = Math.min(W, x + w), y1 = Math.min(H, y + h);
+      const rw = x1 - x0, rh = y1 - y0;
+      if (rw < 12 || rh < 12) return;
+      const line = Math.max(6, Math.round(Math.min(rw, rh) * 0.016));
+      const inset = line / 2;
+      c.save();
+      roundPath(c, x0 + inset, y0 + inset, rw - line, rh - line, Math.max(0, (rad || 0) - inset));
+      c.lineWidth = line;
+      c.strokeStyle = "#e8c44a";
+      c.stroke();
+      c.restore();
+    };
+    if (!logo) {
+      c.save();
+      roundPath(c, 0, 0, W, H, 32);
+      c.clip();
+      c.fillStyle = "#0c0d11";
+      c.fillRect(0, 0, W, H);
+      if (imgEl?.naturalWidth) {
+        const [px, py] = (key.pos || "50% 18%").split(" ").map((v) => parseFloat(v) / 100);
+        const zoom = key.zoom || 1;
+        const k = Math.max(W / imgEl.width, H / imgEl.height) * zoom;
+        const dw = imgEl.width * k, dh = imgEl.height * k;
+        c.filter = "brightness(1.16) contrast(1.05)";
+        c.drawImage(imgEl, (W - dw) * px, (H - dh) * py, dw, dh);
         c.filter = "none";
       }
-      art.tex.needsUpdate = true;
-    };
-    img.src = key.src;
+      const shade = c.createLinearGradient(0, H * 0.78, 0, H);
+      shade.addColorStop(0, "rgba(7,8,11,0)");
+      shade.addColorStop(1, "rgba(7,8,11,0.78)");
+      c.fillStyle = shade;
+      c.fillRect(0, H * 0.78, W, H * 0.22);
+      drawName(H * 0.93);
+      c.restore();
+      strokeGold(0, 0, W, H, 32);
+    } else if (imgEl?.naturalWidth) {
+      const boxH = H * 0.9;
+      const zoom = key.zoom || 1;
+      const k = Math.min((W - 8) / imgEl.width, (boxH - 8) / imgEl.height) * zoom;
+      const dw = imgEl.width * k, dh = imgEl.height * k;
+      const ix = (W - dw) / 2, iy = (boxH - dh) / 2;
+      c.drawImage(imgEl, ix, iy, dw, dh);
+      strokeGold(ix, iy, dw, dh, 0);
+      drawName(H * 0.95);
+    } else {
+      drawName(H * 0.88);
+    }
+    art.tex.needsUpdate = true;
+  };
+  paint();
+  if (key?.src) {
+    imgEl = new Image();
+    imgEl.decoding = "async";
+    imgEl.onload = paint;
+    imgEl.src = key.src;
   }
-  const { bottom } = SIGN;
-  const steel = mat("#2b2b33", { metal: 0.5, rough: 0.5 });
-  // Pylon: a tapered mast on a footing, fixed to the ground.
+  document.fonts?.ready?.then(paint);
+
+  const steel = mat("#2b2b33", { metal: 0.45, rough: 0.55 });
   const pole = new THREE.Group();
-  pole.add(box(0.9, 0.25, 0.9, steel, 0, 0, 0));
-  pole.add(cyl(0.12, 0.2, bottom + 0.1, steel, 0, 0.2, 0, 6));
-  // Head: frame, accent trim top and bottom, and the photo on both faces.
+  pole.add(box(0.5, 0.14, 0.5, steel, 0, 0, 0));
+  pole.add(cyl(0.06, 0.1, SIGN.bottom, steel, 0, 0.1, 0, 6));
   const head = new THREE.Group();
-  head.add(box(w + 0.24, h + 0.24, 0.2, mat("#16161b"), 0, -h / 2 - 0.12, 0));
-  // Headline boards get a full lit gold frame; the rest keep a thin accent trim top and bottom.
-  const t = key?.hero ? 0.14 : 0.08, trim = key?.hero ? glow("#e8c44a", 1.6) : glow(accent, 1.2);
-  head.add(box(w + 0.32, t, 0.28, trim, 0, h / 2 + 0.1, 0));
-  head.add(box(w + 0.32, t, 0.28, trim, 0, -h / 2 - 0.12 - t, 0));
-  if (key?.hero) for (const x of [-1, 1]) head.add(box(t, h + 0.24, 0.28, trim, x * (w / 2 + 0.16 - t / 2), -h / 2 - 0.12, 0));
-  const face = new THREE.MeshBasicMaterial({ map: art.tex, toneMapped: false });
-  head.add(mesh(new THREE.PlaneGeometry(w, h), face, 0, 0, 0.11, false));
-  head.add(mesh(new THREE.PlaneGeometry(w, h), face, 0, 0, -0.11, false).rotateY(Math.PI));
-  mergeStatic(head, null, head); // still at the origin here, so world space equals head space
-  head.rotation.order = "YXZ"; // swivel to the camera, then tilt back to meet it square-on
-  return { pole, head, h };
+  const face = new THREE.MeshBasicMaterial({ map: art.tex, toneMapped: false, transparent: true, depthWrite: false });
+  head.add(mesh(new THREE.PlaneGeometry(planeW, planeH), face, 0, 0, 0.02, false));
+  const back = mesh(new THREE.PlaneGeometry(planeW, planeH), face, 0, 0, -0.02, false);
+  back.rotation.y = Math.PI;
+  head.add(back);
+  head.rotation.order = "YXZ";
+  return { pole, head, h: planeH, w: planeW };
 }
 
 /* Bake every part of a structure that never moves into one mesh per material.
@@ -889,6 +950,18 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
     let best = null, bd = 1e9;
     sectorPos.forEach((p, k) => { const dd = Math.hypot(x - p.x, z - p.z); if (dd < bd) { bd = dd; best = k; } });
     if (bd < 9) base.lerp(col.set(sectors[best].ground), clamp(1 - (bd - 4) / 5, 0, 1));
+    /* The open wedges between sectors get a warmer stone so the grid isn't one gray field. */
+    if (d > 8 && d < 16.4) {
+      const ang = Math.atan2(-z, x);
+      let nearA = Math.PI;
+      for (const s of sectors) {
+        let da = ang - deg(s.angle);
+        while (da > Math.PI) da -= Math.PI * 2;
+        while (da < -Math.PI) da += Math.PI * 2;
+        nearA = Math.min(nearA, Math.abs(da));
+      }
+      if (nearA > 0.32) base.lerp(col.set("#514c44"), clamp((nearA - 0.32) / 0.24, 0, 1) * 0.5);
+    }
     if (d > R - 2.4) base.multiplyScalar(0.7);
     tileMesh.setColorAt(i, base);
   });
@@ -948,6 +1021,31 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
   world.add(pulseMesh);
   const pulsePos = new THREE.Vector3(), pulseM = new THREE.Matrix4();
 
+  /* One quiet marker in each wedge: a pad, a short lamp, a stone. No shadows. */
+  const wedgePad = mat("#45423c");
+  const wedgePost = mat("#2c2b30", { metal: 0.35, rough: 0.6 });
+  const wedgeRock = mat("#3a3840");
+  const wedgeLamp = new THREE.MeshBasicMaterial({ color: "#e8c44a" });
+  const sortedAngles = sectors.map((s) => s.angle).sort((a, b) => a - b);
+  sortedAngles.forEach((a, i) => {
+    const b = sortedAngles[(i + 1) % sortedAngles.length];
+    let span = b - a;
+    if (span <= 0) span += 360;
+    const mid = a + span / 2;
+    const at = polar(mid, 13.5);
+    const y = BASE_TOP;
+    const pad = cyl(0.62, 0.72, 0.12, wedgePad, at.x, y, at.z, 6);
+    const post = cyl(0.04, 0.065, 1.15, wedgePost, at.x, y + 0.08, at.z, 5);
+    pad.castShadow = post.castShadow = false;
+    world.add(pad);
+    world.add(post);
+    world.add(mesh(new THREE.SphereGeometry(0.1, 8, 6), wedgeLamp, at.x, y + 1.32, at.z, false));
+    const side = deg(mid) + 1.15;
+    const rock = mesh(new THREE.DodecahedronGeometry(0.28, 0), wedgeRock, at.x + Math.cos(side) * 0.85, y + 0.14, at.z - Math.sin(side) * 0.85, false);
+    rock.rotation.set(r() * 0.4, r() * 3, 0);
+    world.add(rock);
+  });
+
   /* Monument, sectors, artifacts, scout. */
   const mon = monument();
   mon.g.position.y = PLAZA_TOP;
@@ -959,14 +1057,14 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
     const p = sectorPos[i];
     built.g.position.set(p.x, PLATEAU_TOP, p.z);
     built.g.rotation.y = Math.atan2(-p.x, -p.z); // front faces the centre
-    const sign = billboard(s.key, s.accent);
+    const sign = billboard(s.key, s.accent, s.short);
     sign.pole.position.z = SIGN.z;
     built.g.add(sign.pole);
     world.add(built.g);
     built.g.updateMatrixWorld(true);
     const signAt = built.g.localToWorld(new THREE.Vector3(0, 0, SIGN.z));
     sign.head.position.set(signAt.x, PLATEAU_TOP + SIGN.bottom + sign.h / 2 + 0.2, signAt.z);
-    if (mobile) sign.head.scale.setScalar(1.3);
+    if (mobile) sign.head.scale.setScalar(1.02);
     world.add(sign.head);
     const hl = new THREE.Mesh(new THREE.RingGeometry(5.3, 5.6, 64), new THREE.MeshBasicMaterial({ color: s.accent, transparent: true, opacity: 0, depthWrite: false }));
     hl.rotation.x = -Math.PI / 2; hl.position.set(p.x, PLATEAU_TOP + 0.06, p.z);
@@ -975,7 +1073,7 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
     hit.position.set(p.x, PLATEAU_TOP + 4.5, p.z);
     hit.userData.hit = { type: "sector", id: s.id };
     world.add(hit); pickables.push(hit);
-    return { ...built, s, p, hl, head: sign.head, signH: sign.h, approach: polar(s.angle, APPROACH_R) };
+    return { ...built, s, p, hl, head: sign.head, signH: sign.h, signW: sign.w, approach: polar(s.angle, APPROACH_R) };
   });
 
   mergeStatic(mon.g, mon.anim, world);
@@ -1146,34 +1244,45 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
   let running = true;
   let lastRender = 0, background = "none", shadowTick = 0;
   const samples = [];
+  let raf = 0;
   const settled = () =>
     Math.abs(cur.az - goal.az) + Math.abs(cur.el - goal.el) + Math.abs(cur.zoom - goal.zoom) * 0.2 +
     (Math.abs(cur.tx - goal.tx) + Math.abs(cur.tz - goal.tz)) * 0.05 + Math.abs(cur.shiftX - goal.shiftX) + Math.abs(cur.shiftY - goal.shiftY) < 0.003;
   // Frame-rate governor: full speed only while something is actually moving.
+  // The list view stops the loop entirely so scrolling the index isn't fighting the GPU.
   function fpsCap() {
     if (background === "list") return 0;
     if (drag || pinch || introT < 1 || route.length || ping < 1 || performance.now() - lastUser < 1500 || !settled()) return 60;
-    if (background === "exhibit") return mobile ? 12 : 24;
+    if (background === "exhibit") return mobile ? 12 : 20;
     return reduced ? 8 : mobile ? 24 : 30;
+  }
+  function schedule() {
+    if (!raf && running && fpsCap()) raf = requestAnimationFrame(frame);
   }
   const tmp = new THREE.Vector3();
   const gemFound = glow("#e8c44a", 2);
   const gemHover = mat("#64748b", { emissive: "#38bdf8", ei: 0.9, rough: 0.3 });
   const gemIdle = mat("#4b5563", { emissive: "#38bdf8", ei: 0.25, rough: 0.3 });
-  function frame() {
-    requestAnimationFrame(frame);
+  function frame(stamp) {
+    raf = 0;
     if (!running) return;
-    const now = performance.now();
     const fps = fpsCap();
-    if (!fps || now - lastRender < 1000 / fps - 4) return;
+    if (!fps) return;
+    schedule();
+    const now = stamp || performance.now();
+    if (lastRender && now - lastRender < 1000 / fps - 4) return;
     const raw = lastRender ? Math.min((now - lastRender) / 1000, 0.25) : 0.016;
-    // Adaptive quality: if a device can't hold ~40fps while moving, step down a tier.
-    if (fps === 60 && lastRender && tier > 0) {
-      samples.push(now - lastRender);
-      if (samples.length >= 90) {
-        const median = samples.sort((a, b) => a - b)[45];
-        samples.length = 0;
-        if (median > 26) { tier--; applyTier(); }
+    // Adaptive quality: step down if motion can't hold its budget, or a resting frame runs long.
+    if (tier > 0 && lastRender) {
+      const frameMs = now - lastRender;
+      if (fps === 60 || frameMs > 42) {
+        samples.push(frameMs);
+        if (samples.length >= 45) {
+          samples.sort((a, b) => a - b);
+          const median = samples[(samples.length / 2) | 0];
+          samples.length = 0;
+          if ((fps === 60 && median > 26) || median > 42) { tier--; applyTier(); }
+        }
       }
     }
     lastRender = now;
@@ -1212,7 +1321,8 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
       a.gem.rotation.y = t * (a.found ? 1.2 : 0.4);
       a.gem.position.y = 0.85 + Math.sin(t * 1.5 + a.p.x) * (a.found ? 0.12 : 0.04);
       a.lit = lerp(a.lit, a.found ? 1 : 0, 0.05);
-      a.gem.material = a.found ? gemFound : a.a.id === (hover && hover.id) ? gemHover : gemIdle;
+      const gemMat = a.found ? gemFound : a.a.id === (hover && hover.id) ? gemHover : gemIdle;
+      if (a.gem.material !== gemMat) a.gem.material = gemMat;
       a.beam.material.opacity = a.lit * (0.18 + Math.sin(t * 2) * 0.05);
       a.beam.visible = a.lit > 0.01;
     }
@@ -1246,7 +1356,9 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
       if (!a.found && Math.hypot(sc.g.position.x - a.p.x, sc.g.position.z - a.p.z) < 2.6) discover(a.a.id, true);
     }
 
-    if (renderer.shadowMap.enabled && shadowTick++ % 6 === 0) renderer.shadowMap.needsUpdate = true;
+    // Directional shadows don't change when only the camera orbits. Refresh while something in the scene moves.
+    const casting = route.length || introT < 1 || drag || pinch || ping < 1;
+    if (renderer.shadowMap.enabled && casting && shadowTick++ % 3 === 0) renderer.shadowMap.needsUpdate = true;
     renderer.render(scene, camera);
     onFrame?.();
   }
@@ -1272,7 +1384,12 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
   applyTier();
 
   window.addEventListener("resize", resize);
-  document.addEventListener("visibilitychange", () => { running = !document.hidden; lastRender = 0; samples.length = 0; });
+  document.addEventListener("visibilitychange", () => {
+    running = !document.hidden;
+    lastRender = 0;
+    samples.length = 0;
+    if (running) schedule();
+  });
   resize(); applyCamera(); frame();
 
   const proj = new THREE.Vector3(), camUp = new THREE.Vector3();
@@ -1282,17 +1399,33 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
     artifacts: artifactObjs.map((a) => ({ id: a.a.id, x: a.p.x, z: a.p.z, found: a.found })),
   };
   return {
-    /* Camera framing for a sector; shift moves the subject away from an open exhibit panel. */
-    focusSector(id, { shiftX = 0, shiftY = 0, zoom = 2.3 } = {}) {
+    /* Camera framing for a sector. `clear` is the screen rect the sign and
+       its building must fit in, so the exhibit sheet never covers them. */
+    focusSector(id, clear) {
       const o = sectorObjs.find((x) => x.s.id === id);
       if (!o) return;
-      // Aim between the building and the top of its sign so the whole set (sign included) sits in frame.
-      goal.tx = o.p.x * 0.92; goal.tz = o.p.z * 0.92; goal.ty = PLATEAU_TOP + (SIGN.bottom + o.signH) * 0.45;
-      // Three-quarter view from the centre side, swung off-axis so the monument never blocks the facade.
-      let az = Math.atan2(-o.p.x, -o.p.z) + 0.75;
+      const sy = o.head.scale.y || 1, sx = o.head.scale.x || 1;
+      const signTop = o.head.position.y + (o.signH * sy) / 2;
+      const baseY = PLATEAU_TOP;
+      const stack = signTop - baseY;
+      const spanY = stack * 1.38;
+      const spanX = Math.max((o.signW || SIGN.w) * sx, 10.5) * 1.08;
+      const aspect = width / Math.max(1, height);
+      const fit = aspect < 1 ? 49 / aspect : 44;
+      const box = clear || { cx: width / 2, cy: height / 2, w: width, h: height };
+      const zoomY = fit * (box.h / Math.max(1, height)) / spanY;
+      const zoomX = fit * aspect * (box.w / Math.max(1, width)) / spanX;
+      goal.tx = o.p.x;
+      goal.tz = o.p.z;
+      goal.ty = baseY + stack * 0.42;
+      let az = Math.atan2(-o.p.x, -o.p.z);
       while (az - cur.az > Math.PI) az -= Math.PI * 2;
       while (az - cur.az < -Math.PI) az += Math.PI * 2;
-      goal.az = az; goal.el = deg(34); goal.zoom = zoom; goal.shiftX = shiftX; goal.shiftY = shiftY;
+      goal.az = az;
+      goal.el = deg(30);
+      goal.zoom = clamp(Math.min(zoomY, zoomX), 1.05, 2.4);
+      goal.shiftX = box.cx / Math.max(1, width) - 0.5;
+      goal.shiftY = 0.5 - box.cy / Math.max(1, height);
       introT = 1; vAz = 0;
     },
     frame({ shiftX = 0, shiftY = 0 } = {}) { goal.shiftX = shiftX; goal.shiftY = shiftY; },
@@ -1313,7 +1446,7 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
     },
     setSelected(id) { selected = id; },
     /* "none" | "exhibit" (world partly covered: run slower) | "list" (world hidden: stop) */
-    setBackground(v) { background = v; samples.length = 0; },
+    setBackground(v) { background = v; samples.length = 0; schedule(); },
     setIdleSpin(on) { idleSpin = on; },
     onDiscover(cb) { onDiscover = cb; },
     restoreFound(ids) { for (const a of artifactObjs) if (ids.includes(a.a.id)) { a.found = true; a.lit = 1; } },

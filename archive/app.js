@@ -45,7 +45,7 @@ const ext = (href) => /^https?:/.test(href) ? { target: "_blank", rel: "noopener
 const BLOCKS = {
   gallery: (b) => h("div", { class: `gallery n${b.items.length}` }, b.items.map((it) =>
     h("figure", {},
-      h("button", { type: "button", class: it.hero ? "zoomable hero" : "zoomable", "aria-label": `Enlarge: ${it.alt}`, onclick: () => lightbox(it) },
+      h("button", { type: "button", class: ["zoomable", it.hero ? "hero" : "", it.fit === "contain" ? "contain" : ""].filter(Boolean).join(" "), "aria-label": `Enlarge: ${it.alt}`, onclick: () => lightbox(it) },
         h("img", { src: it.src, alt: it.alt, loading: "lazy", decoding: "async", style: `object-position:${it.pos || "50% 50%"};object-fit:${it.fit || "cover"}` })),
       it.caption && h("figcaption", { text: it.caption })))),
   story: (b) => h("section", { class: "story" }, b.title && h("h3", { class: "sec mono", text: b.title }), b.text.map((t) => h("p", { text: t }))),
@@ -164,10 +164,8 @@ function fillReadout(s) {
 /* ---------- labels over the world ---------- */
 const labelsEl = $("labels");
 const labels = SECTORS.map((s, i) => {
-  // The three headline areas carry full plaques; the rest stay quiet until hovered or zoomed in on.
-  const major = !!s.key?.hero;
-  const el = h("button", { type: "button", class: major ? "label" : "label minor", style: `--accent:${s.accent}`, onclick: () => go(s.id), onmouseenter: () => preview(s.id), onmouseleave: () => preview(null), tabindex: "-1" },
-    h("span", { class: "mono idx", text: String(i + 1).padStart(2, "0") }), h("strong", { text: s.short }), major ? h("span", { class: "mono era", text: s.era }) : null);
+  const el = h("button", { type: "button", class: "label", style: `--accent:${s.accent}`, onclick: () => go(s.id), onmouseenter: () => preview(s.id), onmouseleave: () => preview(null), tabindex: "-1" },
+    h("span", { class: "mono idx", text: String(i + 1).padStart(2, "0") }), h("strong", { text: s.short }));
   labelsEl.append(el);
   const l = { s, el, at: "", on: false, z: "", w: 0, h: 0 };
   return l;
@@ -240,12 +238,22 @@ mm.addEventListener("click", (e) => {
 });
 
 /* ---------- modes ---------- */
-// Centre the focused sector in the part of the screen the exhibit panel leaves open.
-function framing() {
+/* Screen area left clear of the exhibit sheet, header, and edges. */
+function clearFrame() {
   const W = innerWidth, H = innerHeight;
-  if (phoneMQ.matches) return { shiftX: 0, shiftY: 0.5 - 0.21, zoom: 1.75 }; // sheet starts at 38vh
-  const free = W - Math.min(600, 0.47 * W) - 16, top = 84; // the exhibit-mode header: eyebrow and name
-  return { shiftX: free / 2 / W - 0.5, shiftY: 0.5 - (top + (H - top) / 2) / H, zoom: 2.2 };
+  const header = document.querySelector(".deck-top")?.getBoundingClientRect().height || 72;
+  if (phoneMQ.matches) {
+    const sheetTop = H * 0.38;
+    const top = header + 8;
+    const height = Math.max(96, sheetTop - top - 8);
+    return { cx: W / 2, cy: top + height / 2, w: W - 16, h: height };
+  }
+  const panel = Math.min(600, W * 0.47) + 36;
+  const top = header + 8;
+  const bottom = 16;
+  const height = Math.max(160, H - top - bottom);
+  const width = Math.max(180, W - panel);
+  return { cx: width / 2, cy: top + height / 2, w: width - 12, h: height };
 }
 
 function go(id, { fromTour = false, instant = false } = {}) {
@@ -259,11 +267,10 @@ function go(id, { fromTour = false, instant = false } = {}) {
   world.setSelected(id);
   world.setIdleSpin(false);
   world.sendScoutToSector(id, () => world.setSelected(id));
-  world.focusSector(id, framing());
+  $("readout").hidden = true;
+  world.focusSector(id, clearFrame());
   setMode("travel");
   syncSectorList();
-  preview(id);
-  // Never make the visitor wait on the scout: the exhibit opens once the camera has arrived.
   openTimer = setTimeout(() => openExhibit(s), instant || reduced ? 0 : 950);
 }
 
@@ -292,7 +299,7 @@ function openExhibit(s) {
   if (location.hash !== `#${s.id}`) history.replaceState(null, "", `#${s.id}`);
   document.title = `${s.name} · D22: The Living Archive`;
   syncSectorList();
-  if (world) { world.frame(framing()); world.setBackground("exhibit"); }
+  if (world) { world.focusSector(s.id, clearFrame()); world.setBackground("exhibit"); }
 }
 
 function footer(s) {
@@ -462,10 +469,11 @@ async function boot() {
       onCameraUser: () => app.classList.add("touched"),
       onFrame: () => {
         if (!world) return;
-        placeLabels();
+        const reading = mode === "exhibit" || app.classList.contains("listing");
+        if (!reading) placeLabels();
         if (frameN++ % 3) return;
         app.classList.toggle("zoomed", world.state().zoom > 1.35);
-        if (mm.offsetParent) drawMinimap(); // hidden on phones, so skip the work there
+        if (!reading && mm.offsetParent) drawMinimap(); // hidden on phones and while a sheet is open
       },
     });
   } catch (err) {

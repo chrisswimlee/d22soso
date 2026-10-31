@@ -1,0 +1,198 @@
+[
+  {
+    "t": 1.2,
+    "file": "1.20.jpg",
+    "state": {
+      "t": 1.2,
+      "mode": "intro",
+      "stalled": 0,
+      "q": 1,
+      "world": 0,
+      "az": 3.491,
+      "zoom": 2.6,
+      "found": 0
+    }
+  },
+  {
+    "t": 2.3,
+    "file": "2.30.jpg",
+    "state": {
+      "t": 2.3,
+      "mode": "intro",
+      "stalled": 0,
+      "q": 1,
+      "world": 0,
+      "az": 3.491,
+      "zoom": 2.6,
+      "found": 0
+    }
+  },
+  {
+    "t": 2.73,
+    "file": "2.73.jpg",
+    "state": {
+      "t": 2.73333,
+      "mode": "pull",
+      "stalled": 0,
+      "q": 1,
+      "world": 0.253,
+      "az": 3.492,
+      "zoom": 2.596,
+      "found": 0
+    }
+  },
+  {
+    "t": 3.5,
+    "file": "3.50.jpg",
+    "state": {
+      "t": 3.5,
+      "mode": "pull",
+      "stalled": 0,
+      "q": 1,
+      "world": 1.02,
+      "az": 3.55,
+      "zoom": 2.383,
+      "found": 0
+    }
+  },
+  {
+    "t": 4.7,
+    "file": "4.70.jpg",
+    "state": {
+      "t": 4.7,
+      "mode": "pull",
+      "stalled": 0,
+      "q": 1,
+      "world": 2.22,
+      "az": 3.879,
+      "zoom": 1.175,
+      "found": 0
+    }
+  },
+  {
+    "t": 6.2,
+    "file": "6.20.jpg",
+    "state": {
+      "t": 6.2,
+      "mode": "orbit",
+      "stalled": 0,
+      "q": 1,
+      "world": 3.72,
+      "az": 4.025,
+      "zoom": 1,
+      "found": 1
+    }
+  },
+  {
+    "t": 7.6,
+    "file": "7.60.jpg",
+    "state": {
+      "t": 7.6,
+      "mode": "arena",
+      "stalled": 0,
+      "q": 1,
+      "world": 5.12,
+      "az": 6.869,
+      "zoom": 1.734,
+      "found": 2
+    }
+  },
+  {
+    "t": 9.3,
+    "file": "9.30.jpg",
+    "state": {
+      "t": 9.3,
+      "mode": "arena",
+      "stalled": 0,
+      "q": 1,
+      "world": 6.82,
+      "az": 7.033,
+      "zoom": 1.78,
+      "found": 2
+    }
+  },
+  {
+    "t": 11,
+    "file": "11.00.jpg",
+    "state": {
+      "t": 11,
+      "mode": "foundry",
+      "stalled": 0,
+      "q": 1,
+      "world": 8.52,
+      "az": 3.94,
+      "zoom": 1.8,
+      "found": 2
+    }
+  },
+  {
+    "t": 12.4,
+    "file": "12.40.jpg",
+    "state": {
+      "t": 12.4,
+      "mode": "foundry",
+      "stalled": 0,
+      "q": 1,
+      "world": 9.92,
+      "az": 3.892,
+      "zoom": 1.8,
+      "found": 2
+    }
+  },
+  {
+    "t": 14.6,
+    "file": "14.60.jpg",
+    "state": {
+      "t": 14.6,
+      "mode": "wide",
+      "stalled": 0,
+      "q": 1,
+      "world": 12.12,
+      "az": 3.927,
+      "zoom": 1.001,
+      "found": 2
+    }
+  },
+  {
+    "t": 15.8,
+    "file": "15.80.jpg",
+    "state": {
+      "t": 15.8,
+      "mode": "wide",
+      "stalled": 0,
+      "q": 1,
+      "world": 13.32,
+      "az": 3.927,
+      "zoom": 1,
+      "found": 2
+    }
+  },
+  {
+    "t": 17.13,
+    "file": "17.13.jpg",
+    "state": {
+      "t": 17.13333,
+      "mode": "end",
+      "stalled": 0,
+      "q": 1,
+      "world": 14.653,
+      "az": 3.927,
+      "zoom": 0.911,
+      "found": 2
+    }
+  },
+  {
+    "t": 19,
+    "file": "19.00.jpg",
+    "state": {
+      "t": 19,
+      "mode": "end",
+      "stalled": 0,
+      "q": 1,
+      "world": 16.52,
+      "az": 3.927,
+      "zoom": 0.9,
+      "found": 2
+    }
+  }
+]

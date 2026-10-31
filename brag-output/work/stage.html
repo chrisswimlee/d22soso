@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <base href="/" />
+  <title>Brag — The Living Archive</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:ital,wght@0,400;0,500&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/archive/archive.css" />
+  <script type="importmap">{ "imports": { "three": "/vendor/three/three.archive.min.js" } }</script>
+  <style>
+    html, body { width: 1920px; height: 1080px; margin: 0; overflow: hidden; background: #07080b; }
+    .app { width: 1920px; height: 1080px; }
+    #world { width: 1920px; height: 1080px; }
+    #plate {
+      position: absolute; inset: 0; z-index: 6; pointer-events: none;
+      background: radial-gradient(ellipse at 35% 45%, #1a1712, #07080b 70%);
+    }
+    #hook.loading { background: transparent; transition: none; z-index: 7; pointer-events: none; }
+    #hook .reveal { animation: none !important; max-width: 1280px; gap: 64px; opacity: 1; transform: none; }
+    #hook .reveal-photo { width: 340px; object-position: 50% 12%; }
+    #hook .reveal-text .eyebrow { font-size: 16px; letter-spacing: 0.18em; }
+    #hook .reveal-name { font-size: 68px; white-space: nowrap; }
+    #hook .reveal-line { font-size: 28px; opacity: 1; white-space: nowrap; }
+    #hook .reveal-status { font-size: 15px; letter-spacing: 0.16em; color: #b5b0a4; }
+    #hook .reveal-status .bar { width: 148px; }
+    #hook .reveal-status .bar::after { animation: none !important; transform: none !important; width: calc(var(--p, 0) * 1%); }
+    #minimap {
+      position: absolute; right: 44px; bottom: 40px; z-index: 4;
+      width: 136px; height: 136px;
+    }
+    #scrim {
+      position: absolute; left: 0; right: 0; bottom: 0; height: 320px; z-index: 3; pointer-events: none;
+      background: linear-gradient(to top, rgba(7,8,11,0.97) 0%, rgba(7,8,11,0.88) 28%, rgba(7,8,11,0.45) 62%, rgba(7,8,11,0) 100%);
+    }
+    #scrim.end {
+      height: 460px;
+      background: linear-gradient(to top, #07080b 0%, #07080b 34%, rgba(7,8,11,0.92) 52%, rgba(7,8,11,0) 100%);
+    }
+    #caption {
+      position: absolute; z-index: 5; left: 80px; width: 760px; bottom: 64px; pointer-events: none;
+    }
+    #caption.tight { width: 560px; }
+    #caption.end { left: 0; width: auto; right: 0; bottom: 58px; text-align: center; }
+    #caption .rule { width: 42px; height: 2px; margin: 0 0 16px; background: var(--accent, #e8c44a); }
+    #caption.end .rule { margin-left: auto; margin-right: auto; }
+    #caption .eyebrow { font-size: 18px; letter-spacing: 0.16em; color: #e8c44a; margin: 0 0 12px; }
+    #caption h2 { font-size: 54px; letter-spacing: -0.025em; color: #ece8dc; max-width: 18em; line-height: 1.05; }
+    #caption.end h2 { font-size: 76px; max-width: none; }
+    #caption .sub { margin: 14px 0 0; font-size: 28px; line-height: 1.25; color: #ece8dc; }
+    #caption.end .sub {
+      font-family: "IBM Plex Mono", ui-monospace, monospace;
+      font-weight: 600; font-size: 32px; letter-spacing: 0.04em; color: #e8c44a;
+    }
+  </style>
+  <script>
+    window.__error = "";
+    window.__clock = { now: 0.001, q: [] };
+    window.__nativeNow = performance.now.bind(performance);
+    performance.now = () => window.__clock.now;
+    window.__clock.now = 4242;
+    if (Math.abs(performance.now() - 4242) > 0.1) window.__error += "performance.now not hooked\n";
+    window.__clock.now = 0.001;
+
+    const nativeMatch = window.matchMedia.bind(window);
+    window.matchMedia = (q) => {
+      const s = String(q);
+      if (s.includes("prefers-reduced-motion") || s.includes("pointer: coarse") || s.includes("max-width")) {
+        return { matches: false, media: s, addEventListener() {}, removeEventListener() {}, addListener() {}, removeListener() {}, onchange: null, dispatchEvent() { return false; } };
+      }
+      return nativeMatch(q);
+    };
+    try { Object.defineProperty(navigator, "hardwareConcurrency", { get: () => 8 }); } catch (e) {}
+
+    const origGetContext = HTMLCanvasElement.prototype.getContext;
+    HTMLCanvasElement.prototype.getContext = function (type, attrs) {
+      if (String(type).indexOf("webgl") !== -1) attrs = Object.assign({}, attrs, { preserveDrawingBuffer: true, antialias: true });
+      return origGetContext.call(this, type, attrs);
+    };
+
+    let rid = 0;
+    window.requestAnimationFrame = (cb) => {
+      const id = ++rid;
+      window.__clock.q.push({ id, cb });
+      return id;
+    };
+    window.cancelAnimationFrame = (id) => {
+      const i = window.__clock.q.findIndex((x) => x.id === id);
+      if (i >= 0) window.__clock.q.splice(i, 1);
+    };
+    window.addEventListener("error", (e) => { window.__error += (e.message || "error") + "\n"; });
+    window.addEventListener("unhandledrejection", (e) => { window.__error += String(e.reason) + "\n"; });
+  </script>
+</head>
+<body>
+  <div class="app" id="app">
+    <canvas id="world" width="1920" height="1080"></canvas>
+    <canvas id="minimap" width="320" height="320" aria-hidden="true"></canvas>
+    <div id="scrim"></div>
+    <div id="caption">
+      <div class="rule" id="cap-rule"></div>
+      <p class="eyebrow mono" id="cap-kicker"></p>
+      <h2 id="cap-title"></h2>
+      <p class="sub" id="cap-sub"></p>
+    </div>
+    <div id="plate"></div>
+    <div class="loading" id="hook">
+      <div class="reveal">
+        <img class="reveal-photo" src="/assets/img/champ-trophy-640.webp" alt="Wayne Chiang holding the 1999 world championship trophy" width="640" height="960" />
+        <div class="reveal-text">
+          <p class="eyebrow mono">The Living Archive</p>
+          <p class="reveal-name">Wayne “D22‑soso” Chiang</p>
+          <p class="reveal-line">First Brood War World Champion, 1999</p>
+          <p class="reveal-status mono"><span class="bar" id="loadbar"></span>Entering the archive</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script type="module">
+    import { createWorld } from "/archive/world.js";
+    import { SECTORS, ARTIFACTS } from "/archive/content.js";
+
+    const $ = (id) => document.getElementById(id);
+    const WORLD_START = 2.48;
+    const CAM = { arena: 7.05, foundry: 10.20, wide: 13.25, end: 16.72 };
+    const BEATS = [
+      { id: "reveal", a: 5.12, b: 5.45, c: 7.10, d: 7.42, accent: "#e8c44a",
+        kicker: "06 sectors", title: "One career. One island.", sub: "Click a sign to enter." },
+      { id: "arena", a: 7.98, b: 8.30, c: 10.20, d: 10.52, accent: "#8b5cf6",
+        kicker: "Sector 01  ·  Real-time strategy", title: "April 28, 1999. Playing Random.", sub: "The first Brood War world champion." },
+      { id: "foundry", a: 11.08, b: 11.40, c: 13.25, d: 13.57, accent: "#2dd4bf",
+        kicker: "Sector 04  ·  Patented table games", title: "Two hands. One board.", sub: "2 Hand Hold’em. Three U.S. patents." },
+      { id: "wide", a: 14.18, b: 14.50, c: 16.40, d: 16.72, accent: "#e879f9",
+        kicker: "The rest of the island", title: "The Cube became Cube Draft.", sub: "WSOP Talent Manager. Betting on Yourself." },
+      { id: "end", a: 17.22, b: 17.55, c: 21, d: 21, accent: "#e8c44a", end: true,
+        kicker: "Wayne “D22‑soso” Chiang", title: "The Living Archive", sub: "d22soso.com" },
+    ];
+
+    const smooth = (x) => { x = Math.min(1, Math.max(0, x)); return x * x * (3 - 2 * x); };
+    function fade(t, a, b, c, d) {
+      if (t <= a || t >= d) return 0;
+      if (t < b) return smooth((t - a) / (b - a));
+      if (t > c) return smooth((d - t) / (d - c));
+      return 1;
+    }
+
+    const hook = $("hook");
+    const plate = $("plate");
+    const caption = $("caption");
+    const scrim = $("scrim");
+    const minimap = $("minimap");
+    const mctx = minimap.getContext("2d");
+    const found = new Set();
+    let world = null;
+    let mode = "intro";
+    let selected = null;
+    let beatId = "";
+
+    function stepWorld(dt) {
+      if (dt <= 0) return;
+      window.__clock.now += dt * 1000;
+      const batch = window.__clock.q.splice(0, window.__clock.q.length);
+      if (!batch.length) { window.__stalled = (window.__stalled || 0) + 1; return; }
+      for (const item of batch) item.cb(window.__clock.now);
+    }
+
+    function direct(t) {
+      if (mode === "intro" && t >= WORLD_START) {
+        mode = "pull";
+        world.setIdleSpin(false);
+        world.sendScoutToSector("arena");
+      }
+      const wt = window.__clock.now / 1000;
+      if (mode === "pull" && wt >= 3.18) mode = "orbit";
+      if (mode === "orbit") {
+        if (t < CAM.arena) world.rotateBy(0.009);
+        else {
+          mode = "arena";
+          selected = "arena";
+          world.focusSector("arena", { zoom: 1.78, shiftY: 0.2 });
+          world.setSelected("arena");
+        }
+      } else if (mode === "arena" && t >= CAM.foundry) {
+        mode = "foundry";
+        selected = "foundry";
+        world.focusSector("foundry", { zoom: 1.8, shiftY: 0.12 });
+        world.setSelected("foundry");
+      } else if (mode === "foundry" && t >= CAM.wide) {
+        mode = "wide";
+        selected = null;
+        world.setSelected(null);
+        world.overview();
+        const target = 225 * Math.PI / 180;
+        let d = target - world.state().az;
+        while (d > Math.PI) d -= Math.PI * 2;
+        while (d < -Math.PI) d += Math.PI * 2;
+        world.rotateBy(d);
+      } else if (mode === "wide" && t >= CAM.end) {
+        mode = "end";
+        world.zoomBy(0.9);
+        world.frame({ shiftY: 0.12 });
+      }
+      window.__mode = mode;
+    }
+
+    function drawMinimap() {
+      const st = world.state();
+      const W = minimap.width, c = W / 2, k = (W / 2 - 18) / st.R;
+      const P = (x, z) => [c + x * k, c + z * k];
+      mctx.clearRect(0, 0, W, W);
+      mctx.fillStyle = "#101116";
+      mctx.beginPath(); mctx.arc(c, c, st.R * k, 0, 7); mctx.fill();
+      mctx.strokeStyle = "rgba(232,196,74,.35)"; mctx.lineWidth = 2; mctx.stroke();
+      mctx.strokeStyle = "rgba(232,196,74,.25)"; mctx.lineWidth = 3;
+      mctx.beginPath(); mctx.arc(c, c, 10.5 * k, 0, 7); mctx.stroke();
+      for (const s of st.sectors) {
+        const [x, y] = P(s.x, s.z);
+        mctx.strokeStyle = "rgba(232,196,74,.2)";
+        mctx.beginPath(); mctx.moveTo(c, c); mctx.lineTo(x, y); mctx.stroke();
+        mctx.fillStyle = s.accent;
+        mctx.globalAlpha = s.id === selected ? 1 : 0.75;
+        mctx.beginPath(); mctx.arc(x, y, s.id === selected ? 16 : 12, 0, 7); mctx.fill();
+        mctx.globalAlpha = 1;
+      }
+      st.artifacts.forEach((a) => {
+        const [x, y] = P(a.x, a.z);
+        mctx.fillStyle = (a.found || found.has(a.id)) ? "#e8c44a" : "rgba(148,163,184,.45)";
+        mctx.fillRect(x - 3.5, y - 3.5, 7, 7);
+      });
+      mctx.fillStyle = "#e8c44a";
+      mctx.beginPath(); mctx.arc(c, c, 5, 0, 7); mctx.fill();
+      const [sx, sy] = P(st.scout.x, st.scout.z);
+      mctx.fillStyle = "#86efac";
+      mctx.beginPath(); mctx.arc(sx, sy, 7, 0, 7); mctx.fill();
+    }
+
+    function paint(t) {
+      const hookOp = fade(t, 0.04, 0.26, 2.12, 2.48);
+      hook.style.opacity = String(hookOp);
+      const bar = t <= 0.12 ? 0 : t >= 1.15 ? 100 : ((t - 0.12) / 1.03) * 100;
+      $("loadbar").style.setProperty("--p", bar.toFixed(1));
+      const plateOp = t <= 2.48 ? 1 : t >= 2.98 ? 0 : 1 - smooth((t - 2.48) / 0.5);
+      plate.style.opacity = String(plateOp);
+
+      const beat = BEATS.find((b) => t >= b.a && t <= b.d) || null;
+      const op = beat ? fade(t, beat.a, beat.b, beat.c, beat.d) : 0;
+      if (beat && beat.id !== beatId && op > 0) {
+        beatId = beat.id;
+        $("cap-kicker").textContent = beat.kicker;
+        $("cap-title").textContent = beat.title;
+        $("cap-sub").textContent = beat.sub;
+        caption.style.setProperty("--accent", beat.accent);
+      }
+      if (!beat) beatId = "";
+      caption.style.opacity = String(op);
+      caption.classList.toggle("end", !!(beat && beat.end));
+      caption.classList.toggle("tight", !!(beat && beat.id === "foundry"));
+      const rise = beat && t < beat.b ? (1 - fade(t, beat.a, beat.b, beat.b, beat.b + 1)) * 14 : 0;
+      caption.style.transform = beat && beat.end ? `translateY(${rise}px)` : `translateY(${rise}px)`;
+      scrim.style.opacity = String(op);
+      scrim.classList.toggle("end", !!(beat && beat.end));
+
+      const showMap = plateOp < 0.08 && !(beat && beat.end) && t > 3.1 && t < CAM.end;
+      minimap.style.opacity = showMap ? "0.92" : "0";
+      if (showMap) drawMinimap();
+    }
+
+    window.__frame = (t) => {
+      const prev = window.__videoT || 0;
+      window.__videoT = t;
+      const a = Math.max(prev, WORLD_START);
+      const b = Math.max(t, WORLD_START);
+      direct(t);
+      stepWorld(Math.max(0, b - a));
+      paint(t);
+      return {
+        t, mode, stalled: window.__stalled || 0,
+        q: window.__clock.q.length,
+        world: +(window.__clock.now / 1000).toFixed(3),
+        az: +world.state().az.toFixed(3),
+        zoom: +world.state().zoom.toFixed(3),
+        found: found.size,
+      };
+    };
+
+    const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+    try {
+      await document.fonts.ready;
+      const deadline = window.__nativeNow() + 6000;
+      while (window.__nativeNow() < deadline) {
+        if (document.fonts.check('700 64px "Space Grotesk"') && document.fonts.check('600 18px "IBM Plex Mono"')) break;
+        await sleep(80);
+      }
+      const urls = ["/assets/img/champ-trophy-640.webp", ...SECTORS.map((s) => s.key && s.key.src).filter(Boolean)];
+      await Promise.all(urls.map((src) => {
+        const img = new Image();
+        img.src = new URL(src, document.baseURI).href;
+        return img.decode().catch(() => {});
+      }));
+
+      const canvas = $("world");
+      world = createWorld({
+        canvas, sectors: SECTORS, artifacts: ARTIFACTS, reduced: false,
+        onHover() {}, onClick() {}, onCameraUser() {}, onFrame() {},
+      });
+      world.setIdleSpin(false);
+      world.onDiscover((a) => found.add(a.id));
+      window.__world = world;
+      await sleep(180);
+      paint(0);
+      const gl = canvas.getContext("webgl2") || canvas.getContext("webgl");
+      window.__gl = gl ? gl.getParameter(gl.RENDERER) : "no-gl";
+      window.__fonts = document.fonts.check('700 64px "Space Grotesk"');
+      window.__ready = true;
+    } catch (err) {
+      window.__error += (err && err.stack) || String(err);
+      window.__ready = true;
+    }
+  </script>
+</body>
+</html>
