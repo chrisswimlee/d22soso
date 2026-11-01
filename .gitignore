@@ -9,3 +9,7 @@ drive-download-20260720T075014Z-1-001/
 assets/photos
 
 _internal/
+
+# Local Chrome profile from the launch-video capture. Its lock files are
+# symlinks that only exist on this machine, and Pages follows symlinks.
+brag-output/work/chrome-profile/
