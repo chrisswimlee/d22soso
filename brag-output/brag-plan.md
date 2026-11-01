@@ -25,7 +25,7 @@
 | 5.12–7.42 | Title | “One career. One island.” / “Click a sign to enter.” |
 | 7.05–10.52 | Arena | “April 28, 1999. Playing Random.” / “The first Brood War world champion.” |
 | 10.20–13.57 | Foundry | “Two hands. One board.” / “2 Hand Hold’em. Three U.S. patents.” |
-| 13.25–16.72 | The rest | “The Cube became Cube Draft.” / “WSOP Talent Manager. Betting on Yourself.” |
-| 16.72–20.00 | Punchline | The whole island. “The Living Archive” / d22soso.com |
+| 13.25–16.20 | Wide | Pull back to the full island; all six signs in the clear. |
+| 16.20–20.00 | Punchline | The whole island. “The Living Archive” / d22soso.com |
 
-Camera moves start as the previous line leaves. New type arrives once the shot has settled. The score is one piece in D: a lone drone under the portrait, a whoosh as the island opens, a mallet on each lock, and a lift to D major on the title.
+Camera moves start as the previous line leaves. New type arrives once the shot has settled. The score is a warm chamber-electronic piece in D (felt piano, analog string pad, muted rhythmic pulse, and pitched transition swells) moving `D5 → Dm9 → Bbmaj9 → Gm9 → Fmaj7/A → C6/9 → A7sus4 → Gmaj9 → Asus4 → D(add9)` in stereo reverb.

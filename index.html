@@ -30,11 +30,11 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:ital,wght@0,400;0,500;1,400&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="archive/archive.css" />
+  <link rel="stylesheet" href="archive/archive.css?v=15" />
   <link rel="preload" as="image" href="assets/img/champ-trophy-640.webp" />
   <script type="importmap">{ "imports": { "three": "./vendor/three/three.archive.min.js" } }</script>
   <link rel="modulepreload" href="./vendor/three/three.archive.min.js" />
-  <link rel="modulepreload" href="archive/world.js" />
+  <link rel="modulepreload" href="archive/world.js?v=70" />
 </head>
 <body>
   <div class="app" id="app" data-mode="explore">
@@ -46,13 +46,8 @@
         <a class="portrait" href="#arena" aria-label="The 1999 world championship"><img src="assets/img/champ-trophy-640.webp" alt="" width="640" height="960" /></a>
         <p class="eyebrow mono">The Living Archive / <span id="view-name">World view</span></p>
         <h1><a href="#" id="home-link">Wayne “D22‑soso” Chiang</a></h1>
-        <p class="intro">First Brood War World Champion, 1999<span class="wide-only"> · WSOP Talent Manager · Inventor of 2 Hand Hold’em</span></p>
+        <p class="intro">First Brood War World Champion, 1999<span class="wide-only"> · <span class="nowrap">WSOP Talent Manager</span> · <span class="nowrap">Inventor of 2 Hand Hold’em</span></span></p>
         <button type="button" class="btn-cta" id="tour-btn">Start the tour <span aria-hidden="true">→</span></button>
-      </div>
-      <div class="top-actions">
-        <button type="button" class="btn-ghost quiet" id="list-btn">List<span class="wide-only"> view</span></button>
-        <a class="btn-solid" id="media-btn" href="#command">Media<span class="wide-only"> &amp; licensing</span></a>
-        <a class="btn-link mono" href="classic.html">Classic site</a>
       </div>
     </header>
 
@@ -60,12 +55,17 @@
       <div class="sectors-panel" id="sectors-panel" hidden>
         <p class="eyebrow mono"><span id="mode">Exploration</span> · <span id="sector-count">06</span> sectors</p>
         <ol id="sector-list"></ol>
+        <div class="sectors-more">
+          <button type="button" class="btn-link" id="list-btn">List view</button>
+          <a class="btn-link" id="media-btn" href="#command">Media</a>
+          <a class="btn-link" href="classic.html">Classic site</a>
+        </div>
       </div>
       <button type="button" class="btn-ghost sectors-btn" id="sectors-btn" aria-expanded="false" aria-controls="sectors-panel">Sectors <span class="mono" aria-hidden="true">▴</span></button>
     </nav>
 
     <section class="readout" id="readout" aria-live="polite" hidden>
-      <p class="eyebrow mono" id="readout-kicker">Command node selected</p>
+      <p class="eyebrow mono" id="readout-kicker">Destination</p>
       <h2 id="readout-name"></h2>
       <p class="mono readout-tag" id="readout-tag"></p>
       <button type="button" class="btn-solid" id="readout-go">Enter exhibit</button>
@@ -74,7 +74,10 @@
     <div class="instruments">
       <canvas id="minimap" width="300" height="300" aria-label="Minimap. Click to move the camera."></canvas>
       <div class="instrument-row mono">
-        <span class="finds" title="Artifacts recovered">Artifacts <b id="art-count">0</b>/<span id="art-total">9</span></span>
+        <span class="finds" title="Artifacts recovered">
+          <span>Artifacts <b id="art-count">0</b>/<span id="art-total">6</span></span>
+          <span class="finds-hint" id="finds-hint">Explore to find 6 artifacts</span>
+        </span>
         <span class="zoom-btns"><button type="button" id="zoom-out" aria-label="Zoom out">−</button><button type="button" id="zoom-in" aria-label="Zoom in">+</button></span>
       </div>
     </div>
@@ -103,6 +106,16 @@
         <footer class="ex-foot" id="ex-foot"></footer>
         <p class="ex-credit mono"><a href="https://chrisswimlee.com" target="_blank" rel="noopener noreferrer">Designed by chrisswimlee</a></p>
       </div>
+      <nav class="ex-nav" aria-label="Other sectors">
+        <button type="button" class="arrow-btn prev" id="ex-prev">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M14.5 5.5 8 12l6.5 6.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span id="ex-prev-name"></span>
+        </button>
+        <button type="button" class="arrow-btn next" id="ex-next">
+          <span id="ex-next-name"></span>
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9.5 5.5 16 12l-6.5 6.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </nav>
     </article>
 
     <div class="list-view" id="list-view" hidden>
@@ -133,6 +146,6 @@
   </div>
 
   <noscript><p style="padding:24px;color:#ece8dc;background:#07080b">This archive needs JavaScript. Visit the <a href="classic.html" style="color:#e8c44a">classic site</a>.</p></noscript>
-  <script type="module" src="archive/app.js"></script>
+  <script type="module" src="archive/app.js?v=80"></script>
 </body>
 </html>

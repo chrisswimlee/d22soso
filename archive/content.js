@@ -11,7 +11,7 @@ export const EMAIL = "2handholdem@gmail.com";
 export const SECTORS = [
   {
     id: "arena",
-    key: { hero: true, src: img("champ-trophy-640"), ratio: 0.667, alt: "Wayne Chiang with the 1999 world championship trophy", pos: "34% 48%", zoom: 1.58, scale: 1.36, frame: "gold" },
+    key: { hero: true, src: img("champ-trophy-sign"), ratio: 0.667, alt: "Wayne Chiang with the 1999 world championship trophy", pos: "34% 48%", zoom: 1.58, scale: 1.52, frame: "gold" },
     name: "The Championship Arena",
     short: "Arena",
     era: "1996 – 1999",
@@ -28,9 +28,8 @@ export const SECTORS = [
         {
           type: "gallery",
           items: [
-            { hero: true, src: img("champ-trophy-1080"), alt: "Wayne Chiang holding the 1999 championship trophy", caption: "The Season 1 trophy.", pos: "50% 20%" },
+            { hero: true, src: img("sc-championship-900"), alt: "Archive page of the first official Brood War world championship bracket", caption: "The Season 1 bracket.", pos: "50% 0%" },
             { src: img("champ-pgl-1080"), alt: "Wayne Chiang with his 1999 StarCraft trophies", caption: "The 1999 trophies.", pos: "50% 25%" },
-            { src: img("sc-championship-900"), alt: "Archive page of the first official Brood War world championship bracket", caption: "Archive: the Season 1 bracket.", pos: "50% 0%" },
           ],
         },
         {
@@ -80,7 +79,7 @@ export const SECTORS = [
   },
   {
     id: "garden",
-    key: { src: img("weissman-360"), ratio: 1.78, alt: "Wayne Chiang with Brian Weissman", pos: "50% 50%", fit: "contain", zoom: 1.08, scale: 0.86 },
+    key: { src: img("weissman-sign"), ratio: 1.78, alt: "Wayne Chiang with Brian Weissman", pos: "50% 50%", fit: "contain", zoom: 1, scale: 0.72 },
     name: "The Strategy Garden",
     short: "Garden",
     era: "1995 – today",
@@ -125,7 +124,7 @@ export const SECTORS = [
   },
   {
     id: "broadcast",
-    key: { hero: true, src: img("wsop-logo-600"), ratio: 1, alt: "World Series of Poker logo", fit: "contain" },
+    key: { hero: true, src: img("wsop-logo-sign"), ratio: 1, alt: "World Series of Poker logo", fit: "contain", scale: 0.64 },
     name: "The Broadcast Station",
     short: "Broadcast",
     era: "2010s – today",
@@ -172,7 +171,7 @@ export const SECTORS = [
   },
   {
     id: "foundry",
-    key: { hero: true, src: img("twohh-logo-500"), ratio: 1.15, alt: "2 Hand Hold’em logo", fit: "contain" },
+    key: { hero: true, src: img("twohh-logo-cut"), ratio: 1.15, alt: "2 Hand Hold’em logo", fit: "contain", scale: 0.58 },
     name: "The Invention Foundry",
     short: "Foundry",
     era: "2015 – today",
@@ -226,7 +225,7 @@ export const SECTORS = [
   },
   {
     id: "library",
-    key: { src: img("betting-on-yourself-cover"), ratio: 0.667, alt: "Betting on Yourself book cover", fit: "contain", zoom: 1.1, scale: 1.4, frame: "gold" },
+    key: { src: img("book-cover-sign") + "?v=2", ratio: 0.667, alt: "Betting on Yourself book cover", fit: "contain", zoom: 1, scale: 0.78, frame: "gold" },
     name: "The Library",
     short: "Library",
     era: "December 2025",
@@ -240,7 +239,7 @@ export const SECTORS = [
       lede:
         "Winning in Business, Poker, and the Age of AI. Co-written with Fortune 500 executive and WSOP champion Joe Matton, published by Kendall Hunt in December 2025.",
       blocks: [
-        { type: "book", cover: img("betting-on-yourself-cover") },
+        { type: "book", cover: img("book-cover-sign") + "?v=2" },
         {
           type: "facts",
           items: [
@@ -262,7 +261,7 @@ export const SECTORS = [
   },
   {
     id: "command",
-    key: { src: img("wsop-boxer-360"), ratio: 0.684, alt: "Wayne Chiang at the 2025 World Series of Poker", pos: "50% 24%", zoom: 1.15, scale: 1.34, frame: "gold" },
+    key: { src: img("wsop-boxer-sign"), ratio: 0.684, alt: "Wayne Chiang at the 2025 World Series of Poker", pos: "50% 24%", zoom: 1.15, scale: 0.78, frame: "gold" },
     name: "The Command Center",
     short: "Command",
     era: "Today",
@@ -330,7 +329,7 @@ export const SECTORS = [
 /* Guided tour leads with the world title, then the rest of the career. */
 export const TOUR = ["arena", "garden", "broadcast", "foundry", "library", "command"];
 
-/* Fog of discovery: optional, smaller stories placed between sectors. */
+/* Smaller stories between the sectors. Three more hang on the underside of the island. */
 export const ARTIFACTS = [
   { id: "name", angle: 112, r: 25, title: "How he became D22", text: "Dennis “Thresh” Fong renamed him D22-soso. His rival Gadianton became D23-Gadianton." },
   { id: "caster", angle: 68, r: 24, title: "One day late", text: "He missed PGL Season 3 registration by a single day in October 1998, so he called the matches instead and became StarCraft’s first play-by-play caster." },
@@ -338,7 +337,7 @@ export const ARTIFACTS = [
   { id: "usa", angle: 52, r: 10, title: "USA vs Canada", text: "MVP of the June 1999 USA vs Canada showcase, sweeping his matches 3–0." },
   { id: "pizza", angle: 8, r: 25, title: "Round Table Pizza", text: "Competitive Magic started at a Round Table Pizza in Palo Alto, with Brian Weissman across the table." },
   { id: "count", angle: -58, r: 25, title: "Counted out", text: "A blackjack advantage player using Hi-Lo and Hi-Opt 1, he was banned from major Las Vegas and San Diego properties." },
-  { id: "bankroll", angle: -12, r: 10, title: "Bankroll Challenge", text: "Won the streamed Global Poker Bankroll Challenge, finishing +$11,464." },
-  { id: "pimp", angle: -118, r: 24, title: "Pimpest Plays", text: "At Gamers.com he ran GX StarCraft with Thresh and Calbear: battle reports after matches and Pimpest Plays, an early blueprint for esports highlight reels." },
-  { id: "script", angle: -172, r: 23, title: "Screenwriter", text: "A feature screenplay of his was a finalist at the 2007 Screenwriting Expo." },
+  { id: "bankroll", under: true, angle: 15, title: "Bankroll Challenge", text: "Won the streamed Global Poker Bankroll Challenge, finishing +$11,464." },
+  { id: "pimp", under: true, angle: 135, title: "Pimpest Plays", text: "At Gamers.com he ran GX StarCraft with Thresh and Calbear: battle reports after matches and Pimpest Plays, an early blueprint for esports highlight reels." },
+  { id: "script", under: true, angle: 255, title: "Screenwriter", text: "A feature screenplay of his was a finalist at the 2007 Screenwriting Expo." },
 ];

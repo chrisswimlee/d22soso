@@ -1,5 +1,5 @@
 /* D22: The Living Archive — modes, HUD, exhibits, tour, and fallbacks around the 3D world. */
-import { SECTORS, TOUR, ARTIFACTS, EMAIL } from "./content.js";
+import { SECTORS, TOUR, ARTIFACTS, EMAIL } from "./content.js?v=12";
 import { mountDemo } from "./holdem.js";
 
 const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -16,11 +16,15 @@ let tour = null;
 let readoutFor = null;
 let openTimer = 0;
 let frameN = 0;
+let wasUnder = false;
 
 /* ---------- persistence ---------- */
 const saved = (() => { try { return JSON.parse(localStorage.getItem(STORE) || "{}"); } catch { return {}; } })();
 const foundArtifacts = new Set(saved.artifacts || []);
 const visited = new Set(saved.visited || []);
+const SURFACE = ARTIFACTS.filter((a) => !a.under);
+const surfaceFound = () => SURFACE.reduce((n, a) => n + (foundArtifacts.has(a.id) ? 1 : 0), 0);
+const buriedLeft = () => ARTIFACTS.some((a) => a.under && !foundArtifacts.has(a.id));
 function persist() {
   try { localStorage.setItem(STORE, JSON.stringify({ artifacts: [...foundArtifacts], visited: [...visited] })); } catch {}
 }
@@ -116,44 +120,70 @@ SECTORS.forEach((s, i) => {
     h("span", { class: "nm" }, h("strong", { text: s.name.replace(/^The /, "") }), h("span", { class: "mono", text: s.era })))));
 });
 $("sector-count").textContent = String(SECTORS.length).padStart(2, "0");
-$("art-total").textContent = ARTIFACTS.length;
+$("art-total").textContent = SURFACE.length;
+$("finds-hint").textContent = `Explore to find ${SURFACE.length} artifacts`;
 
+function shownSelection() {
+  if (mode !== "explore") return current;
+  return readoutFor?.kind === "sector" ? readoutFor.id : null;
+}
 function syncSectorList() {
+  const sel = shownSelection();
   list.querySelectorAll("button").forEach((b) => {
-    b.classList.toggle("active", b.dataset.id === current);
-    if (b.dataset.id === current) b.setAttribute("aria-current", "true"); else b.removeAttribute("aria-current");
+    b.classList.toggle("active", b.dataset.id === sel);
+    if (b.dataset.id === sel) b.setAttribute("aria-current", "true"); else b.removeAttribute("aria-current");
     b.classList.toggle("seen", visited.has(b.dataset.id));
   });
-  $("art-count").textContent = foundArtifacts.size;
+  $("art-count").textContent = surfaceFound();
+  $("finds-hint").hidden = surfaceFound() >= SURFACE.length;
 }
 
 function setMode(m) {
   mode = m;
   app.dataset.mode = m;
+  headerH = 0;
   $("mode").textContent = { explore: "Exploration", travel: "Travel", exhibit: "Exhibit" }[m];
   $("view-name").textContent = m === "exhibit" && current ? byId(current).short : "World view";
+  if (m === "explore") flushToast();
+  else hideToast();
 }
 
+function hideReadout() {
+  readoutFor = null;
+  $("readout").hidden = true;
+}
 function preview(id, kind = "sector") {
-  readoutFor = id ? { id, kind } : null;
   const r = $("readout");
-  if (!id || mode === "exhibit") { r.hidden = !current || mode === "exhibit"; if (current && mode !== "exhibit") fillReadout(byId(current)); return; }
+  // One sector is lit at a time. Hover previews it; travel and the open exhibit keep the committed one.
+  if (mode !== "explore" || !id) {
+    hideReadout();
+    if (mode === "explore") world?.setHighlight(null);
+    syncSectorList();
+    return;
+  }
+  readoutFor = { id, kind };
   if (kind === "artifact") {
     const a = ARTIFACTS.find((x) => x.id === id);
     const found = foundArtifacts.has(id);
     $("readout-kicker").textContent = found ? "Artifact recovered" : "Unidentified artifact";
     $("readout-name").textContent = found ? a.title : "Signal detected";
-    $("readout-tag").textContent = found ? "Click to read again" : "Click to send the scout";
+    $("readout-tag").textContent = found ? "Click to read again" : a.under ? "Click to recover" : "Click to send the scout";
     $("readout-go").hidden = true;
     r.style.setProperty("--accent", "#38bdf8");
     r.hidden = false;
+    world?.setHighlight(null);
+    syncSectorList();
     return;
   }
-  fillReadout(byId(id));
+  const s = byId(id);
+  if (!s) { hideReadout(); world?.setHighlight(null); syncSectorList(); return; }
+  fillReadout(s);
   r.hidden = false;
+  world?.setHighlight(id);
+  syncSectorList();
 }
 function fillReadout(s) {
-  $("readout-kicker").textContent = s.id === current ? "Command node selected" : "Destination";
+  $("readout-kicker").textContent = s.id === current ? s.short : "Destination";
   $("readout-name").textContent = s.name;
   $("readout-tag").textContent = s.tagline;
   $("readout-go").hidden = false;
@@ -164,28 +194,98 @@ function fillReadout(s) {
 /* ---------- labels over the world ---------- */
 const labelsEl = $("labels");
 const labels = SECTORS.map((s, i) => {
-  const el = h("button", { type: "button", class: "label", style: `--accent:${s.accent}`, onclick: () => go(s.id), onmouseenter: () => preview(s.id), onmouseleave: () => preview(null), tabindex: "-1" },
+  const el = h("button", { type: "button", class: "label off", style: `--accent:${s.accent}`, onclick: () => go(s.id), onmouseenter: () => preview(s.id), onmouseleave: () => preview(null), tabindex: "-1" },
     h("span", { class: "mono idx", text: String(i + 1).padStart(2, "0") }), h("strong", { text: s.short }));
   labelsEl.append(el);
-  const l = { s, el, at: "", on: false, z: "", w: 0, h: 0 };
+  const l = { s, el, at: "", on: false, z: "", w: 0, h: 0, hide: true };
   return l;
 });
 let headerH = 0;
-addEventListener("resize", () => { labels.forEach((l) => (l.w = 0)); headerH = 0; });
+let sat = 0;
+let frameTimer = 0;
+function measureSat() {
+  const prev = app.style.paddingTop;
+  app.style.paddingTop = "env(safe-area-inset-top, 0px)";
+  sat = parseFloat(getComputedStyle(app).paddingTop) || 0;
+  app.style.paddingTop = prev;
+}
+measureSat();
+addEventListener("resize", () => {
+  labels.forEach((l) => (l.w = 0));
+  headerH = 0;
+  measureSat();
+  clearTimeout(frameTimer);
+  frameTimer = setTimeout(() => {
+    if (!world) return;
+    syncHint();
+    if (mode === "exhibit") placeLead();
+    if (current && (mode === "exhibit" || mode === "travel")) world.focusSector(current, clearFrame());
+    else if (mode === "explore" && phoneMQ.matches) frameOverview();
+  }, 150);
+});
 // Runs on every rendered frame, so it only touches the DOM when something changed.
+// Captions stay on their own signs. A sign whose center has left the screen takes its name with it.
+function chromeRects() {
+  const rects = [];
+  for (const sel of [".deck-top", ".sectors", ".instruments", ".readout", ".hint"]) {
+    const el = document.querySelector(sel);
+    if (!el) continue;
+    const cs = getComputedStyle(el);
+    if (cs.display === "none" || cs.visibility === "hidden" || parseFloat(cs.opacity) < 0.4) continue;
+    if (el.hidden) continue;
+    const r = el.getBoundingClientRect();
+    if (r.width > 8 && r.height > 8) rects.push(r);
+  }
+  return rects;
+}
+function hitsChrome(x, y, w, h, rects) {
+  const left = x - w / 2, right = x + w / 2, bottom = y + h;
+  return rects.some((r) => right > r.left + 2 && left < r.right - 2 && bottom > r.top + 2 && y < r.bottom - 2);
+}
+function onOtherSign(id, x, y, w, h) {
+  const left = x - w / 2, right = x + w / 2, top = y, bottom = y + h;
+  return labels.some((other) => {
+    if (other.s.id === id) return false;
+    const r = world.signOnScreen(other.s.id);
+    if (!r.halfW) return false;
+    return right > r.x - r.halfW + 6 && left < r.x + r.halfW - 6 && bottom > r.y - r.halfH + 6 && top < r.y + r.halfH - 6;
+  });
+}
 function placeLabels() {
-  if (!headerH) headerH = document.querySelector(".deck-top").offsetHeight - 8;
-  const top = headerH, W = labelsEl.clientWidth;
+  if (world.state().under) {
+    for (const l of labels) if (!l.hide) { l.el.classList.add("off"); l.hide = true; }
+    return;
+  }
+  if (!headerH) {
+    const deck = document.querySelector(".deck-top");
+    const shown = deck && getComputedStyle(deck).display !== "none";
+    headerH = shown ? Math.max(8, deck.offsetHeight - 8) : Math.max(8, sat + 4);
+  }
+  const W = labelsEl.clientWidth, H = labelsEl.clientHeight, rects = chromeRects();
   for (const l of labels) {
-    if (!l.w) { l.w = l.el.offsetWidth; l.h = l.el.offsetHeight; }
-    // Every plaque hangs directly under its own billboard, so it always reads as that sign's caption.
-    const p = world.project("signBase", l.s.id);
-    const x = Math.round(clamp(p.x, l.w / 2 + 6, W - l.w / 2 - 6)), y = Math.round(Math.max(p.y, top + 6));
-    const at = `translate(${x}px, ${y}px) translate(-50%, 0)`;
+    if (!l.w) {
+      const w = l.el.offsetWidth, h = l.el.offsetHeight;
+      if (!w) continue;
+      l.w = w; l.h = h;
+    }
+    const vis = world.signOnScreen(l.s.id);
+    const halfH = vis.halfH || 0;
+    const x = vis.x;
+    // Just under the board. If the dock or another sign is there, sit on the board itself.
+    // Never slide the name sideways, and never park it in the sky above the sign.
+    let y = (vis.y ?? 0) + halfH + 2;
+    let hide = !vis.fullyIn;
+    const blocked = (yy) => onOtherSign(l.s.id, x, yy, l.w, l.h) || hitsChrome(x, yy, l.w, l.h, rects) || yy < headerH || yy + l.h > H - 6;
+    if (!hide && blocked(y)) y = (vis.y ?? 0) + halfH - l.h - 2;
+    if (!hide && blocked(y)) hide = true;
+    if (!hide && (x - l.w / 2 < 6 || x + l.w / 2 > W - 6)) hide = true;
+    if (hide !== l.hide) { l.el.classList.toggle("off", hide); l.hide = hide; }
+    if (hide) continue;
+    const at = `translate(${Math.round(x)}px, ${Math.round(y)}px) translate(-50%, 0)`;
     if (at !== l.at) { l.el.style.transform = at; l.at = at; }
-    const z = String(Math.round((1 - p.z) * 1000));
+    const z = String(Math.round((1 - (vis.z ?? 0)) * 1000));
     if (z !== l.z) { l.el.style.zIndex = z; l.z = z; }
-    const on = readoutFor?.id === l.s.id || current === l.s.id;
+    const on = l.s.id === shownSelection();
     if (on !== l.on) { l.el.classList.toggle("on", on); l.on = on; }
   }
 }
@@ -195,7 +295,7 @@ const mm = $("minimap"), mctx = mm.getContext("2d");
 let mmKey = "";
 function drawMinimap() {
   const st = world.state();
-  const key = [st.az, st.zoom, st.tx, st.tz, st.scout.x, st.scout.z, current, foundArtifacts.size].map((v) => (typeof v === "number" ? v.toFixed(3) : v)).join();
+  const key = [st.az, st.zoom, st.tx, st.tz, st.scout.x, st.scout.z, shownSelection(), foundArtifacts.size].map((v) => (typeof v === "number" ? v.toFixed(3) : v)).join();
   if (key === mmKey) return;
   mmKey = key;
   const W = mm.width, c = W / 2, k = (W / 2 - 14) / st.R;
@@ -207,11 +307,13 @@ function drawMinimap() {
   for (const s of st.sectors) {
     const [x, y] = P(s.x, s.z);
     mctx.strokeStyle = "rgba(232,196,74,.2)"; mctx.beginPath(); mctx.moveTo(c, c); mctx.lineTo(x, y); mctx.stroke();
-    mctx.fillStyle = s.accent; mctx.globalAlpha = s.id === current ? 1 : 0.75;
-    mctx.beginPath(); mctx.arc(x, y, s.id === current ? 15 : 11, 0, 7); mctx.fill();
+    const sel = shownSelection();
+    mctx.fillStyle = s.accent; mctx.globalAlpha = s.id === sel ? 1 : 0.75;
+    mctx.beginPath(); mctx.arc(x, y, s.id === sel ? 15 : 11, 0, 7); mctx.fill();
     mctx.globalAlpha = 1;
   }
   for (const a of st.artifacts) {
+    if (a.under) continue;
     const [x, y] = P(a.x, a.z);
     mctx.fillStyle = a.found ? "#e8c44a" : "rgba(148,163,184,.45)";
     mctx.fillRect(x - 3, y - 3, 6, 6);
@@ -239,17 +341,66 @@ mm.addEventListener("click", (e) => {
 
 /* ---------- modes ---------- */
 /* Screen area left clear of the exhibit sheet, header, and edges. */
+/* On a phone the header and the bottom dock cover the canvas. Keep the island in the open band. */
+function exploreClear() {
+  if (!phoneMQ.matches) return null;
+  const deck = document.querySelector(".deck-top");
+  const deckShown = deck && getComputedStyle(deck).display !== "none";
+  const top = (deckShown ? deck.getBoundingClientRect().height : sat) + 8;
+  const hint = $("hint");
+  const hintShown = hint && !hint.hidden && getComputedStyle(hint).display !== "none";
+  const btn = $("sectors-btn").getBoundingClientRect();
+  const inst = document.querySelector(".instruments").getBoundingClientRect();
+  let dockTop = inst.height > 8 ? Math.min(btn.top, inst.top) : btn.top;
+  if (hintShown) dockTop = Math.min(dockTop, hint.getBoundingClientRect().top);
+  const bottom = Math.max(56, innerHeight - dockTop + 6);
+  const height = Math.max(180, innerHeight - top - bottom);
+  return { cx: innerWidth / 2, cy: top + height / 2, w: Math.max(140, innerWidth - 16), h: height };
+}
+/* On a phone the lead portrait sits between the title and the lede, so the face is in the first screen. */
+function placeLead() {
+  const head = document.querySelector(".exhibit .ex-head");
+  const body = $("ex-body");
+  const lede = head?.querySelector(".lede");
+  if (!lede || !body) return;
+  const first = body.firstElementChild;
+  const parked = head.querySelector(".gallery");
+  const lead = (first?.classList.contains("gallery") && first) || parked;
+  if (!lead) return;
+  if (phoneMQ.matches) lede.before(lead);
+  else if (lead.parentElement !== body) body.prepend(lead);
+}
+function hintLine(kind) {
+  const touch = phoneMQ.matches || matchMedia("(pointer: coarse)").matches;
+  if (kind === "under") return "Drag down to return";
+  if (kind === "done") return buriedLeft() ? "Drag up, past the stop." : "Every artifact recovered.";
+  if (kind === "scout") return "Scout dispatched to the signal…";
+  if (kind === "found") return touch ? "Drag to rotate · Pinch to zoom · Tap a sign" : "Drag to rotate · Scroll to zoom · Click a destination";
+  return touch ? "Drag to rotate · Pinch to zoom · Tap a sign" : "Drag to rotate · Scroll to zoom · Click a sign to enter";
+}
+function syncHint() {
+  const under = !!(world && world.state().under);
+  $("hint").textContent = hintLine(under ? "under" : surfaceFound() >= SURFACE.length ? "done" : undefined);
+}
+function frameOverview() {
+  const clear = exploreClear();
+  if (clear) world?.overview(clear);
+  else world?.overview();
+}
+
 function clearFrame() {
   const W = innerWidth, H = innerHeight;
-  const header = document.querySelector(".deck-top")?.getBoundingClientRect().height || 72;
+  const deck = document.querySelector(".deck-top");
+  const deckShown = deck && getComputedStyle(deck).display !== "none";
+  const header = deckShown ? deck.getBoundingClientRect().height : 0;
   if (phoneMQ.matches) {
     const sheetTop = H * 0.38;
-    const top = header + 8;
-    const height = Math.max(96, sheetTop - top - 8);
-    return { cx: W / 2, cy: top + height / 2, w: W - 16, h: height };
+    const top = Math.max(header, sat) + 18;
+    const height = Math.max(120, sheetTop - top - 14);
+    return { cx: W / 2, cy: top + height / 2, w: Math.max(140, W - 20), h: height };
   }
   const panel = Math.min(600, W * 0.47) + 36;
-  const top = header + 8;
+  const top = (header || 72) + 8;
   const bottom = 16;
   const height = Math.max(160, H - top - bottom);
   const width = Math.max(180, W - panel);
@@ -267,22 +418,27 @@ function go(id, { fromTour = false, instant = false } = {}) {
   world.setSelected(id);
   world.setIdleSpin(false);
   world.sendScoutToSector(id, () => world.setSelected(id));
-  $("readout").hidden = true;
-  world.focusSector(id, clearFrame());
+  hideReadout();
+  // Already reading: swap the panel in the same turn so the list, the card, and the sheet name one sector.
+  if (mode === "exhibit" || instant || reduced) {
+    openExhibit(s);
+    return;
+  }
   setMode("travel");
+  world.focusSector(id, clearFrame());
   syncSectorList();
-  openTimer = setTimeout(() => openExhibit(s), instant || reduced ? 0 : 950);
+  openTimer = setTimeout(() => openExhibit(s), 950);
 }
 
 function openExhibit(s) {
   current = s.id;
   visited.add(s.id); persist();
   setMode("exhibit");
-  $("readout").hidden = true;
+  hideReadout();
   const ex = s.exhibit;
   const ix = SECTORS.indexOf(s);
   $("exhibit").style.setProperty("--accent", s.accent);
-  $("ex-crumb").textContent = `Sector ${String(ix + 1).padStart(2, "0")} · ${s.name}`;
+  $("ex-crumb").textContent = `${String(ix + 1).padStart(2, "0")} · ${s.short}`;
   $("ex-kicker").textContent = `${ex.kicker.replace(/^Sector \d+ · /, "")} · ${s.era}`; // the bar above already names the sector
   $("ex-title").textContent = ex.title;
   // Headline logos (WSOP, 2 Hand Hold'em) sit beside the title as the exhibit's emblem.
@@ -291,7 +447,9 @@ function openExhibit(s) {
   if (logo) { em.src = s.key.src; em.alt = s.key.alt; }
   $("ex-lede").textContent = ex.lede;
   $("ex-body").replaceChildren(...renderExhibitBody(s));
+  placeLead();
   $("ex-foot").replaceChildren(footer(s));
+  syncArrows(s);
   $("exhibit").hidden = false;
   $("ex-scroll").scrollTop = 0;
   requestAnimationFrame(() => $("exhibit").classList.add("open"));
@@ -312,7 +470,7 @@ function footer(s) {
       h("div", { class: "foot-actions" },
         next ? h("button", { type: "button", class: "btn-solid", onclick: () => go(next.id, { fromTour: true }), text: `Next stop: ${next.name} →` })
              : h("button", { type: "button", class: "btn-solid", onclick: () => { tour = null; closeExhibit(); }, text: "Finish the tour" }),
-        h("button", { type: "button", class: "btn-ghost", onclick: () => { tour = null; $("ex-foot").replaceChildren(footer(s)); }, text: "Leave tour" })));
+        h("button", { type: "button", class: "btn-ghost", onclick: () => { tour = null; $("ex-foot").replaceChildren(footer(s)); syncArrows(s); }, text: "Leave tour" })));
   }
   const prev = SECTORS[(ix + SECTORS.length - 1) % SECTORS.length], next = SECTORS[(ix + 1) % SECTORS.length];
   return h("div", { class: "foot-actions spread" },
@@ -321,22 +479,74 @@ function footer(s) {
     h("button", { type: "button", class: "btn-ghost", onclick: () => go(next.id), text: `${next.short} →` }));
 }
 
+function stepTargets(s) {
+  if (tour != null) {
+    const pos = TOUR.indexOf(s.id);
+    const last = pos === TOUR.length - 1;
+    return {
+      prev: pos > 0 ? byId(TOUR[pos - 1]) : null,
+      next: last ? null : byId(TOUR[pos + 1]),
+      finish: last,
+    };
+  }
+  const ix = SECTORS.indexOf(s);
+  return {
+    prev: SECTORS[(ix + SECTORS.length - 1) % SECTORS.length],
+    next: SECTORS[(ix + 1) % SECTORS.length],
+    finish: false,
+  };
+}
+
+function syncArrows(s) {
+  const t = stepTargets(s);
+  const prev = $("ex-prev"), next = $("ex-next");
+  prev.hidden = !t.prev;
+  if (t.prev) {
+    $("ex-prev-name").textContent = t.prev.short;
+    prev.setAttribute("aria-label", `Previous: ${t.prev.name}`);
+  }
+  if (t.finish) {
+    next.hidden = false;
+    $("ex-next-name").textContent = "Finish";
+    next.setAttribute("aria-label", "Finish the tour");
+  } else if (t.next) {
+    next.hidden = false;
+    $("ex-next-name").textContent = t.next.short;
+    next.setAttribute("aria-label", `Next: ${t.next.name}`);
+  } else next.hidden = true;
+}
+
+function step(dir) {
+  const s = current && byId(current);
+  if (!s) return;
+  const t = stepTargets(s);
+  if (dir > 0 && t.finish) { tour = null; closeExhibit(); return; }
+  const dest = dir > 0 ? t.next : t.prev;
+  if (dest) go(dest.id, { fromTour: tour != null });
+}
+$("ex-prev").addEventListener("click", () => step(-1));
+$("ex-next").addEventListener("click", () => step(1));
+
 function closeExhibit() {
   clearTimeout(openTimer);
   if ($("exhibit").contains(document.activeElement)) $("sector-list").querySelector(`[data-id="${current}"]`)?.focus({ preventScroll: true });
   $("exhibit").classList.remove("open");
   setTimeout(() => { if (!$("exhibit").classList.contains("open")) $("exhibit").hidden = true; }, 280);
   setMode("explore");
+  deselect();
   if (location.hash) history.replaceState(null, "", location.pathname + location.search);
   document.title = "D22: The Living Archive";
-  if (world) { world.frame({ shiftX: 0, shiftY: 0 }); world.zoomBy(0.6); world.setIdleSpin(true); world.setBackground("none"); }
-  preview(null);
+  if (world) {
+    world.setIdleSpin(true);
+    world.setBackground("none");
+    frameOverview();
+  }
 }
 
 function deselect() {
   current = null;
   world?.setSelected(null);
-  $("readout").hidden = true;
+  hideReadout();
   syncSectorList();
 }
 
@@ -346,9 +556,15 @@ function setDrawer(open) {
   $("sectors-btn").setAttribute("aria-expanded", String(open));
   app.classList.toggle("drawer-open", open);
 }
-$("sectors-btn").addEventListener("click", () => setDrawer($("sectors-panel").hidden));
-$("sector-list").addEventListener("click", () => setDrawer(false));
-addEventListener("pointerdown", (e) => { if (!e.target.closest?.(".sectors")) setDrawer(false); });
+$("sectors-btn").addEventListener("click", (e) => {
+  e.stopPropagation();
+  setDrawer($("sectors-panel").hidden);
+});
+$("sector-list").addEventListener("click", (e) => {
+  e.stopPropagation();
+  setDrawer(false);
+});
+addEventListener("click", (e) => { if (!e.target.closest?.(".sectors")) setDrawer(false); });
 
 /* ---------- tour ---------- */
 $("tour-btn").addEventListener("click", () => { tour = 0; closeList(); go(TOUR[0], { fromTour: true }); });
@@ -392,21 +608,51 @@ function closeList() {
   if (location.hash === "#list") history.replaceState(null, "", back);
   world.setBackground(mode === "exhibit" ? "exhibit" : "none");
 }
-$("list-btn").addEventListener("click", openList);
+$("list-btn").addEventListener("click", () => { setDrawer(false); openList(); });
 $("list-close").addEventListener("click", closeList);
 
 /* ---------- artifacts ---------- */
 let toastTimer = 0;
+let toastHide = 0;
+let queuedArtifact = null;
+let shownArtifact = null;
+function hideToast() {
+  if (shownArtifact && mode !== "explore") queuedArtifact = queuedArtifact || shownArtifact;
+  const t = $("toast");
+  t.classList.remove("open");
+  t.hidden = true;
+  clearTimeout(toastTimer);
+  clearTimeout(toastHide);
+}
 function showArtifact(a) {
+  if (mode !== "explore") { queuedArtifact = a; hideToast(); return; }
+  shownArtifact = a;
+  $("toast").querySelector(".eyebrow").textContent = a.under ? "Buried artifact" : "Artifact recovered";
   $("toast-title").textContent = a.title;
   $("toast-text").textContent = a.text;
   const t = $("toast");
   t.hidden = false;
   requestAnimationFrame(() => t.classList.add("open"));
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => { t.classList.remove("open"); setTimeout(() => (t.hidden = true), 300); }, 7000);
+  clearTimeout(toastHide);
+  toastTimer = setTimeout(() => {
+    t.classList.remove("open");
+    toastHide = setTimeout(() => { t.hidden = true; }, 300);
+  }, 4500);
 }
-$("toast").addEventListener("click", () => { $("toast").classList.remove("open"); setTimeout(() => ($("toast").hidden = true), 300); });
+function flushToast() {
+  if (mode !== "explore" || !queuedArtifact) return;
+  const a = queuedArtifact;
+  queuedArtifact = null;
+  showArtifact(a);
+}
+$("toast").addEventListener("click", () => {
+  clearTimeout(toastTimer);
+  const t = $("toast");
+  t.classList.remove("open");
+  clearTimeout(toastHide);
+  toastHide = setTimeout(() => { t.hidden = true; }, 300);
+});
 
 /* ---------- keyboard ---------- */
 addEventListener("keydown", (e) => {
@@ -418,9 +664,14 @@ addEventListener("keydown", (e) => {
     if (mode !== "explore") closeExhibit();
     return;
   }
-  if (!world || !$("list-view").hidden || e.metaKey || e.ctrlKey || e.altKey) return;
+  if (!world || !$("list-view").hidden || !$("lightbox").hidden || e.metaKey || e.ctrlKey || e.altKey) return;
   const n = Number(e.key);
   if (n >= 1 && n <= SECTORS.length) { go(SECTORS[n - 1].id, { instant: mode === "exhibit" }); return; }
+  if (mode === "exhibit" && (e.key === "ArrowRight" || e.key === "ArrowLeft")) {
+    e.preventDefault();
+    step(e.key === "ArrowRight" ? 1 : -1);
+    return;
+  }
   if (e.target.closest?.(".exhibit")) return;
   if (e.key === "ArrowLeft") world.rotateBy(0.25);
   else if (e.key === "ArrowRight") world.rotateBy(-0.25);
@@ -430,7 +681,7 @@ addEventListener("keydown", (e) => {
 $("zoom-in").addEventListener("click", () => world?.zoomBy(1.3));
 $("zoom-out").addEventListener("click", () => world?.zoomBy(0.77));
 $("ex-close").addEventListener("click", closeExhibit);
-$("home-link").addEventListener("click", (e) => { e.preventDefault(); closeList(); if (mode !== "explore") closeExhibit(); deselect(); world?.overview(); });
+$("home-link").addEventListener("click", (e) => { e.preventDefault(); closeList(); if (mode !== "explore") closeExhibit(); deselect(); frameOverview(); });
 $("media-btn").addEventListener("click", (e) => { e.preventDefault(); closeList(); go("command", { instant: true }); });
 
 /* ---------- boot ---------- */
@@ -448,7 +699,7 @@ function fallback() {
   if (byId(id)) { listJump(id); history.replaceState(null, "", `#${id}`); }
 }
 async function boot() {
-  const { createWorld, webglAvailable } = await import("./world.js").catch((err) => { console.error(err); return {}; });
+    const { createWorld, webglAvailable } = await import("./world.js?v=70").catch((err) => { console.error(err); return {}; });
   if (!createWorld || !webglAvailable()) {
     fallback();
     return;
@@ -463,13 +714,27 @@ async function boot() {
         else {
           const a = ARTIFACTS.find((x) => x.id === hit.id);
           if (foundArtifacts.has(a.id)) showArtifact(a);
-          else { world.sendScoutToArtifact(a.id); $("hint").textContent = "Scout dispatched to the signal…"; }
+          else if (a.under) world.revealArtifact(a.id);
+          else { world.sendScoutToArtifact(a.id); $("hint").textContent = hintLine("scout"); }
         }
       },
-      onCameraUser: () => app.classList.add("touched"),
+      onCameraUser: () => {
+        app.classList.add("touched");
+        // Dragging or zooming leaves the last sector. The card and the list drop it too.
+        if (mode === "explore" && current) deselect();
+      },
       onFrame: () => {
         if (!world) return;
         const reading = mode === "exhibit" || app.classList.contains("listing");
+        if (mode === "explore") {
+          const under = !!world.state().under;
+          const name = under ? "Beneath the archive" : "World view";
+          if ($("view-name").textContent !== name) $("view-name").textContent = name;
+          if (under !== wasUnder) {
+            wasUnder = under;
+            $("hint").textContent = hintLine(under ? "under" : surfaceFound() >= SURFACE.length ? "done" : surfaceFound() ? "found" : undefined);
+          }
+        }
         if (!reading) placeLabels();
         if (frameN++ % 3) return;
         app.classList.toggle("zoomed", world.state().zoom > 1.35);
@@ -481,21 +746,23 @@ async function boot() {
     fallback();
     return;
   }
+  frameOverview();
   world.restoreFound([...foundArtifacts]);
-  app.classList.toggle("has-finds", foundArtifacts.size > 0); // the counter appears once there is something to count
+  app.classList.toggle("has-finds", surfaceFound() > 0);
   world.onDiscover((a) => {
     if (foundArtifacts.has(a.id)) return;
     foundArtifacts.add(a.id); persist(); syncSectorList();
-    app.classList.add("has-finds");
+    app.classList.toggle("has-finds", surfaceFound() > 0);
     showArtifact(a);
-    $("hint").textContent = foundArtifacts.size === ARTIFACTS.length ? "Every artifact recovered." : "Drag to rotate · Scroll to zoom · Click a destination";
+    $("hint").textContent = hintLine(world.state().under ? "under" : surfaceFound() >= SURFACE.length ? "done" : "found");
   });
-  if (matchMedia("(pointer: coarse)").matches) $("hint").textContent = "Drag to rotate · Pinch to zoom · Tap a destination";
+  syncHint();
   syncSectorList();
-  route();
+  try { route(); } catch (err) { console.error(err); }
   // Let the reveal be seen for a moment, then lift it off the world.
   setTimeout(() => {
     $("loading").classList.add("done");
+    if (mode === "explore") frameOverview();
     setTimeout(() => $("loading").remove(), 700);
   }, Math.max(0, (reduced ? 600 : 1500) - performance.now()));
 }

@@ -9,6 +9,7 @@ const STILLS = WORK + "/stills";
 const CHROME = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
 const PORT = 9337;
 const MODE = process.argv[2] || "stills";
+const FROM_T = parseFloat(process.argv[3] || "0");
 const STILL_TIMES = [1.2, 2.3, 2.72, 3.5, 4.7, 6.2, 7.6, 9.3, 11.0, 12.4, 14.6, 15.8, 17.15, 19.0];
 
 mkdirSync(FRAMES, { recursive: true });
@@ -121,7 +122,9 @@ async function main() {
       returnByValue: true,
     });
     const state = res.result?.value;
-    const want = MODE === "all" || STILL_TIMES.some((s) => Math.abs(s - t) < 1 / 60);
+    const isStill = STILL_TIMES.some((s) => Math.abs(s - t) < 1 / 60);
+    const wantAll = MODE === "all" && t >= FROM_T;
+    const want = wantAll || (MODE === "stills" && isStill) || (MODE === "all" && isStill && t >= FROM_T);
     if (!want) continue;
     const shot = await send("Page.captureScreenshot", {
       format: "jpeg",
@@ -130,8 +133,8 @@ async function main() {
     });
     const buf = Buffer.from(shot.data, "base64");
     const name = String(i).padStart(4, "0") + ".jpg";
-    if (MODE === "all") writeFileSync(FRAMES + "/" + name, buf);
-    if (STILL_TIMES.some((s) => Math.abs(s - t) < 1 / 60)) {
+    if (wantAll) writeFileSync(FRAMES + "/" + name, buf);
+    if (isStill) {
       writeFileSync(STILLS + "/" + t.toFixed(2) + ".jpg", buf);
       log.push({ t: +t.toFixed(2), file: t.toFixed(2) + ".jpg", state });
       console.log("still", t.toFixed(2), state && state.mode, "zoom", state && state.zoom);

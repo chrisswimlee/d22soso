@@ -65,7 +65,7 @@ function canvasTex(w, h, draw) {
   draw(g, w, h);
   const t = new THREE.CanvasTexture(c);
   t.colorSpace = THREE.SRGBColorSpace;
-  t.anisotropy = 4;
+  t.anisotropy = 8;
   return { tex: t, g, c };
 }
 
@@ -633,9 +633,14 @@ const BUILD = {
   },
 };
 
-/* One size for every sign. A flat print on a slim pole — no chassis —
-   with the sector name large enough to read from the overview. */
-const SIGN = { z: -4.6, bottom: 4.7, w: 7.1, h: 8.7 };
+/* Photo signs share one board. Logos (the chip, 2 Hand Hold'em) are a shorter
+   plate that sits on the roof. The sector name is the DOM label, not a second
+   caption painted on the picture. */
+const SIGN = { z: -4.6, bottom: 4.7, w: 8.4, h: 10.3 };
+function isMark(key) {
+  const ratio = key?.ratio || 1;
+  return key?.fit === "contain" && ratio >= 0.85 && ratio <= 1.3;
+}
 function roundPath(c, x, y, w, h, rad) {
   const r = Math.min(rad, w / 2, h / 2);
   c.beginPath();
@@ -646,38 +651,54 @@ function roundPath(c, x, y, w, h, rad) {
   c.arcTo(x, y, x + w, y, r);
   c.closePath();
 }
-function billboard(key, accent, name) {
+function billboard(key) {
   const ratio = key?.ratio || 1;
   const wide = key?.fit === "contain" && ratio > 1.25;
+  const mark = isMark(key);
   /* A horizontal photo letterboxed in the portrait board reads small.
      Give it its own wider print, tall enough to sit with the other signs. */
   const scale = key?.scale || 1;
-  const planeW = (wide ? 7.35 * ratio : SIGN.w) * scale;
-  const planeH = (wide ? 7.35 * 1.14 : SIGN.h) * scale;
-  const W = wide ? 1200 : 720;
-  const H = wide ? Math.round(W * planeH / planeW) : 880;
+  // Same height as the arena photograph. The 2 Hand Hold'em mark carries its own scale.
+  const arenaH = SIGN.h * 1.36;
+  const imageAspect = Math.max(ratio, 1);
+  const markScale = mark ? scale : 1;
+  const planeW = mark ? arenaH * imageAspect * markScale : (wide ? 8.8 * ratio : SIGN.w) * scale;
+  const planeH = mark ? arenaH * markScale : (wide ? 8.8 * 1.14 : SIGN.h) * scale;
+  const W = wide || mark ? 1200 : 1400;
+  const H = wide || mark ? Math.round(W * planeH / planeW) : Math.round(W * planeH / planeW);
   const logo = key?.fit === "contain";
+  // Never enlarge a file inside the texture. A bigger canvas than the photo just blurs it.
+  function sharpSize(img) {
+    const aspect = planeW / planeH;
+    if (!img?.naturalWidth) return [W, H];
+    if (logo) {
+      const cH = Math.max(img.naturalHeight, img.naturalWidth / aspect);
+      const cW = cH * aspect;
+      const s = Math.min(1, 1800 / Math.max(cW, cH));
+      return [Math.max(2, Math.round(cW * s)), Math.max(2, Math.round(cH * s))];
+    }
+    const zoom = key.zoom || 1;
+    const maxW = img.naturalWidth / zoom;
+    const maxH = img.naturalHeight / zoom;
+    let cW = Math.min(W, maxW);
+    let cH = cW / aspect;
+    if (cH > maxH) { cH = Math.min(maxH, H); cW = cH * aspect; }
+    return [Math.max(2, Math.round(cW)), Math.max(2, Math.round(cH))];
+  }
   const art = canvasTex(W, H, () => {});
   let imgEl = null;
   const paint = () => {
+    const [cw, ch] = sharpSize(imgEl);
+    if (art.c.width !== cw || art.c.height !== ch) { art.c.width = cw; art.c.height = ch; }
     const c = art.g;
-    c.clearRect(0, 0, W, H);
-    const label = String(name || "").toUpperCase();
-    const drawName = (y) => {
-      c.font = `700 ${Math.round(H * 0.055)}px "Space Grotesk", "Helvetica Neue", Arial, sans-serif`;
-      c.textAlign = "center";
-      c.textBaseline = "middle";
-      c.lineWidth = 12;
-      c.strokeStyle = "rgba(7,8,11,0.92)";
-      c.strokeText(label, W / 2, y);
-      c.fillStyle = "#f4f0e6";
-      c.fillText(label, W / 2, y);
-    };
+    c.imageSmoothingEnabled = true;
+    c.imageSmoothingQuality = "high";
+    c.clearRect(0, 0, cw, ch);
     /* Stroke sits just inside the photo so its outer edge meets the picture. */
     const strokeGold = (x, y, w, h, rad) => {
       if (key?.frame !== "gold") return;
       const x0 = Math.max(0, x), y0 = Math.max(0, y);
-      const x1 = Math.min(W, x + w), y1 = Math.min(H, y + h);
+      const x1 = Math.min(cw, x + w), y1 = Math.min(ch, y + h);
       const rw = x1 - x0, rh = y1 - y0;
       if (rw < 12 || rh < 12) return;
       const line = Math.max(6, Math.round(Math.min(rw, rh) * 0.016));
@@ -691,38 +712,29 @@ function billboard(key, accent, name) {
     };
     if (!logo) {
       c.save();
-      roundPath(c, 0, 0, W, H, 32);
+      roundPath(c, 0, 0, cw, ch, Math.round(Math.min(cw, ch) * 0.03));
       c.clip();
       c.fillStyle = "#0c0d11";
-      c.fillRect(0, 0, W, H);
+      c.fillRect(0, 0, cw, ch);
       if (imgEl?.naturalWidth) {
         const [px, py] = (key.pos || "50% 18%").split(" ").map((v) => parseFloat(v) / 100);
         const zoom = key.zoom || 1;
-        const k = Math.max(W / imgEl.width, H / imgEl.height) * zoom;
+        const k = Math.max(cw / imgEl.width, ch / imgEl.height) * zoom;
         const dw = imgEl.width * k, dh = imgEl.height * k;
         c.filter = "brightness(1.16) contrast(1.05)";
-        c.drawImage(imgEl, (W - dw) * px, (H - dh) * py, dw, dh);
+        c.drawImage(imgEl, (cw - dw) * px, (ch - dh) * py, dw, dh);
         c.filter = "none";
       }
-      const shade = c.createLinearGradient(0, H * 0.78, 0, H);
-      shade.addColorStop(0, "rgba(7,8,11,0)");
-      shade.addColorStop(1, "rgba(7,8,11,0.78)");
-      c.fillStyle = shade;
-      c.fillRect(0, H * 0.78, W, H * 0.22);
-      drawName(H * 0.93);
       c.restore();
-      strokeGold(0, 0, W, H, 32);
+      strokeGold(0, 0, cw, ch, Math.round(Math.min(cw, ch) * 0.03));
     } else if (imgEl?.naturalWidth) {
-      const boxH = H * 0.9;
-      const zoom = key.zoom || 1;
-      const k = Math.min((W - 8) / imgEl.width, (boxH - 8) / imgEl.height) * zoom;
+      const pad = Math.round(Math.min(cw, ch) * 0.02);
+      const zoom = Math.min(key.zoom || 1, 1);
+      const k = Math.min((cw - pad * 2) / imgEl.width, (ch - pad * 2) / imgEl.height) * zoom;
       const dw = imgEl.width * k, dh = imgEl.height * k;
-      const ix = (W - dw) / 2, iy = (boxH - dh) / 2;
+      const ix = (cw - dw) / 2, iy = (ch - dh) / 2;
       c.drawImage(imgEl, ix, iy, dw, dh);
       strokeGold(ix, iy, dw, dh, 0);
-      drawName(H * 0.95);
-    } else {
-      drawName(H * 0.88);
     }
     art.tex.needsUpdate = true;
   };
@@ -740,7 +752,10 @@ function billboard(key, accent, name) {
   pole.add(box(0.5, 0.14, 0.5, steel, 0, 0, 0));
   pole.add(cyl(0.06, 0.1, SIGN.bottom, steel, 0, 0.1, 0, 6));
   const head = new THREE.Group();
-  const face = new THREE.MeshBasicMaterial({ map: art.tex, toneMapped: false, transparent: true, depthWrite: false });
+  const face = new THREE.MeshBasicMaterial({
+    map: art.tex, toneMapped: false, transparent: true, depthWrite: false,
+    alphaTest: logo ? 0.2 : 0,
+  });
   head.add(mesh(new THREE.PlaneGeometry(planeW, planeH), face, 0, 0, 0.02, false));
   const back = mesh(new THREE.PlaneGeometry(planeW, planeH), face, 0, 0, -0.02, false);
   back.rotation.y = Math.PI;
@@ -842,11 +857,11 @@ function monument() {
   g.add(ob);
   g.add(mesh(new THREE.ConeGeometry(0.36, 0.7, 4), gold, 0, 0.7 + 5.2 + 0.35, 0).rotateY(Math.PI / 4));
   const drawPlate = (c) => {
-    c.clearRect(0, 0, 512, 128);
-    c.font = "bold 84px 'Space Grotesk', sans-serif"; c.textAlign = "center"; c.fillStyle = "#e8c44a";
-    c.shadowColor = "#e8c44a"; c.shadowBlur = 18; c.fillText("D22-soso", 256, 96, 490);
+    c.clearRect(0, 0, 1024, 256);
+    c.font = "bold 168px 'Space Grotesk', sans-serif"; c.textAlign = "center"; c.fillStyle = "#e8c44a";
+    c.shadowColor = "#e8c44a"; c.shadowBlur = 16; c.fillText("D22-soso", 512, 192, 980);
   };
-  const plate = canvasTex(512, 128, drawPlate);
+  const plate = canvasTex(1024, 256, drawPlate);
   document.fonts?.ready.then(() => { drawPlate(plate.g); plate.tex.needsUpdate = true; });
   const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: plate.tex, transparent: true, depthWrite: false, toneMapped: false }));
   sprite.scale.set(6.4, 1.6, 1); sprite.position.y = 8.3;
@@ -880,22 +895,26 @@ function scout() {
   return { g, body, legs, ring };
 }
 
-function artifactMesh() {
+function artifactMesh(under = false) {
   const g = new THREE.Group();
-  const gem = mesh(new THREE.OctahedronGeometry(0.32), mat("#4b5563", { emissive: "#38bdf8", ei: 0.25, rough: 0.3 }), 0, 0.85, 0);
+  const gemY = under ? -0.35 : 0.85;
+  const gem = mesh(new THREE.OctahedronGeometry(under ? 1.05 : 0.32), mat("#4b5563", { emissive: "#38bdf8", ei: under ? 0.7 : 0.25, rough: 0.3 }), 0, gemY, 0, !under);
   g.add(gem);
-  const beam = mesh(new THREE.CylinderGeometry(0.06, 0.25, 6, 8, 1, true), new THREE.MeshBasicMaterial({ color: "#e8c44a", transparent: true, opacity: 0, depthWrite: false, side: THREE.DoubleSide }), 0, 3.6, 0, false);
+  const beam = mesh(
+    new THREE.CylinderGeometry(under ? 0.08 : 0.06, under ? 0.18 : 0.25, under ? 1.6 : 6, 8, 1, true),
+    new THREE.MeshBasicMaterial({ color: under ? "#7dd3fc" : "#e8c44a", transparent: true, opacity: 0, depthWrite: false, side: THREE.DoubleSide, blending: under ? THREE.AdditiveBlending : THREE.NormalBlending }),
+    0, under ? -1.25 : 3.6, 0, false);
   g.add(beam);
-  return { g, gem, beam };
+  if (under) g.add(mesh(new THREE.CylinderGeometry(0.2, 0.42, 1.15, 6), mat("#2a2830", { side: THREE.DoubleSide }), 0, 0.55, 0, false));
+  return { g, gem, beam, gemBase: gemY };
 }
 
 /* ---------- world ---------- */
 export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onClick, onCameraUser, onFrame }) {
   const mobile = matchMedia("(max-width: 760px)").matches || matchMedia("(pointer: coarse)").matches;
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: !mobile && devicePixelRatio < 2, powerPreference: mobile ? "default" : "high-performance" });
-  // Quality tiers. 2: crisp + soft shadows, 1: lighter pixels + small shadow map, 0: no shadows, 1x pixels.
-  // Phones start at 1 without shadows; any device steps down if it can't hold its frame rate.
-  let tier = mobile || LIGHT ? 1 : 2;
+  // Quality tiers. 2: 2x pixels, 1: 1.5x, 0: 1x. Phones start at 2x with no shadows, and step down only after the intro if motion can't hold the frame.
+  let tier = mobile ? 2 : (LIGHT ? 1 : 2);
   const shadowsAllowed = !mobile;
   // Neutral keeps each sector's color and the gold trims true, where ACES washed them toward grey.
   renderer.toneMapping = THREE.NeutralToneMapping;
@@ -918,6 +937,10 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
   const rim = new THREE.DirectionalLight("#a78bfa", 1.2);
   rim.position.set(30, 10, -30);
   scene.add(rim);
+  // Fills the keel only after the camera swings underneath. The archive build has no point lights.
+  const keelLamp = new THREE.DirectionalLight("#d5e2ff", 0);
+  keelLamp.position.set(0, -40, 0);
+  scene.add(keelLamp);
 
   const world = new THREE.Group();
   scene.add(world);
@@ -1057,13 +1080,14 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
     const p = sectorPos[i];
     built.g.position.set(p.x, PLATEAU_TOP, p.z);
     built.g.rotation.y = Math.atan2(-p.x, -p.z); // front faces the centre
-    const sign = billboard(s.key, s.accent, s.short);
+    const sign = billboard(s.key);
     sign.pole.position.z = SIGN.z;
     built.g.add(sign.pole);
     world.add(built.g);
     built.g.updateMatrixWorld(true);
     const signAt = built.g.localToWorld(new THREE.Vector3(0, 0, SIGN.z));
-    sign.head.position.set(signAt.x, PLATEAU_TOP + SIGN.bottom + sign.h / 2 + 0.2, signAt.z);
+    const seat = SIGN.bottom;
+    sign.head.position.set(signAt.x, PLATEAU_TOP + seat + sign.h / 2 + 0.12, signAt.z);
     if (mobile) sign.head.scale.setScalar(1.02);
     world.add(sign.head);
     const hl = new THREE.Mesh(new THREE.RingGeometry(5.3, 5.6, 64), new THREE.MeshBasicMaterial({ color: s.accent, transparent: true, opacity: 0, depthWrite: false }));
@@ -1081,8 +1105,31 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
 
   const pedestals = new THREE.Group();
   world.add(pedestals);
+  // Same 3/4 the overview uses: floor tipped toward the viewer, front face turned outward.
+  function faceOut(angle) {
+    const out = polar(angle, 1);
+    const up = new THREE.Vector3(out.x * 0.22, -1, out.z * 0.22).normalize();
+    const front = new THREE.Vector3(out.x, -0.28, out.z);
+    front.addScaledVector(up, -front.dot(up)).normalize();
+    const right = new THREE.Vector3().crossVectors(up, front).normalize();
+    return new THREE.Matrix4().makeBasis(right, up, front);
+  }
+  function hangUnder(a) {
+    const p = polar(a.angle, 22.5);
+    p.y = -16.4;
+    const o = artifactMesh(true);
+    o.g.position.copy(p);
+    o.g.quaternion.setFromRotationMatrix(faceOut(a.angle));
+    o.gem.visible = false;
+    o.beam.visible = false;
+    for (const child of o.g.children) child.visible = false;
+    o.g.visible = false;
+    world.add(o.g);
+    return { ...o, a, p: o.g.position, hit: null, found: false, lit: 0, under: true };
+  }
   const artifactObjs = artifacts.map((a) => {
-    const o = artifactMesh();
+    if (a.under) return hangUnder(a);
+    const o = artifactMesh(false);
     const p = polar(a.angle, a.r);
     pedestals.add(cyl(0.3, 0.38, 0.35, mat("#2a2a30"), p.x, tileH(p.x, p.z), p.z, 6));
     o.g.position.set(p.x, tileH(p.x, p.z), p.z);
@@ -1096,6 +1143,154 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
 
   mergeStatic(pedestals, null, world);
   mergeStatic(deco, null, world);
+
+  /* Under the island: three rooms in the same miniature language as the sectors. */
+  const vault = new THREE.Group();
+  vault.visible = false;
+  const vaultRing = new THREE.Mesh(new THREE.RingGeometry(35.4, 35.9, 96), new THREE.MeshBasicMaterial({ color: "#e8c44a", transparent: true, opacity: 0.28, depthWrite: false, side: THREE.DoubleSide }));
+  vaultRing.rotation.x = Math.PI / 2;
+  vaultRing.position.y = -16.4;
+  vault.add(vaultRing);
+  const roomPaints = [];
+  function underRoom(id) {
+    const g = new THREE.Group();
+    const stone = mat("#4a4658"), stone2 = mat("#3a3748"), dark = mat("#1c1b24"), beige = mat("#d6cfba");
+    const wood = mat("#5c3d28", { rough: 0.8 }), paper = mat("#f4efe4"), ink = mat("#1c1914");
+    const steel = mat("#2b2b33"), goldM = mat("#d4af37", { metal: 0.7, rough: 0.35, emissive: "#3a2a05" });
+    const feltM = mat("#14532d", { emissive: "#14532d", ei: 0.35 });
+    if (id === "bankroll") {
+      g.add(cyl(4.6, 4.9, 0.32, mat("#1a2e24", { emissive: "#143226", ei: 0.4 }), 0, 0, 0.2, 16));
+      g.add(cyl(1.15, 1.4, 0.72, dark, 0, 0.32, 0.15, 8));
+      const felt = mesh(new THREE.CylinderGeometry(2.05, 2.05, 0.1, 24), feltM, 0, 1.08, 0.15);
+      felt.scale.set(1.5, 1, 1);
+      g.add(felt);
+      const rail = mesh(new THREE.TorusGeometry(2.05, 0.1, 6, 28), mat("#2a1a12"), 0, 1.16, 0.15);
+      rail.rotation.x = Math.PI / 2;
+      rail.scale.set(1.5, 1, 1);
+      g.add(rail);
+      const chipCols = ["#ef4444", "#111827", "#2563eb", "#f5f0e1", "#16a34a", "#e8c44a"];
+      for (let i = 0; i < 6; i++) {
+        const a = (i / 6) * Math.PI * 2 + 0.2;
+        const n = 4 + (i % 3);
+        for (let k = 0; k < n; k++) g.add(cyl(0.16, 0.16, 0.05, mat(chipCols[(i + k) % 6], { emissive: chipCols[(i + k) % 6], ei: 0.2 }), Math.cos(a) * 1.85, 1.14 + k * 0.05, 0.15 + Math.sin(a) * 1.2, 10));
+        g.add(cyl(0.22, 0.28, 0.7, steel, Math.cos(a) * 3.15, 0.32, 0.15 + Math.sin(a) * 2.15, 6));
+        g.add(box(0.5, 0.08, 0.42, mat("#3f3f46"), Math.cos(a) * 3.15, 1.02, 0.15 + Math.sin(a) * 2.15));
+      }
+      for (let i = 0; i < 5; i++) g.add(box(0.26, 0.02, 0.38, paper, -0.62 + i * 0.32, 1.16, 0.15));
+      g.add(cyl(0.05, 0.06, 2.5, dark, -3.2, 0.32, 1.5, 5));
+      g.add(mesh(new THREE.SphereGeometry(0.16, 8, 6), glow("#fff4cc", 2.2), -3.2, 2.9, 1.5, false));
+      g.add(beam([-3.2, 2.9, 1.5], [0, 1.15, 0.15], "#fff4d6", 0.08, 0.7));
+      const board = canvasTex(256, 128, () => {});
+      const paintBoard = (c, w) => {
+        c.fillStyle = "#07080b"; c.fillRect(0, 0, w, 128);
+        c.strokeStyle = "#e8c44a"; c.lineWidth = 8; c.strokeRect(6, 6, w - 12, 116);
+        c.textAlign = "center"; c.fillStyle = "#e8c44a"; c.font = "bold 36px 'Space Grotesk', sans-serif"; c.fillText("BANKROLL", w / 2, 58);
+        c.fillStyle = "#ece8dc"; c.font = "600 22px 'IBM Plex Mono', monospace"; c.fillText("+$11,464", w / 2, 96);
+      };
+      paintBoard(board.g, 256);
+      roomPaints.push(() => { paintBoard(board.g, 256); board.tex.needsUpdate = true; });
+      const boardMat = new THREE.MeshBasicMaterial({ map: board.tex, toneMapped: false, side: THREE.DoubleSide });
+      g.add(box(2.3, 1.15, 0.16, dark, 0, 1.16, 3.15));
+      const boardFace = mesh(new THREE.PlaneGeometry(2.05, 0.95), boardMat, 0, 1.78, 3.26, false);
+      boardFace.scale.x = -1;
+      g.add(boardFace);
+      for (const sx of [-1.35, 1.35]) g.add(cyl(0.06, 0.06, 1.15, dark, sx, 1.16, 3.15, 5));
+    } else if (id === "pimp") {
+      const wall = mat("#2c3236"), roof = mat("#1d2226");
+      g.add(box(5.2, 0.28, 3.6, mat("#241c33", { emissive: "#241c33", ei: 0.45 }), 0, 0, 0));
+      g.add(box(4.4, 2.15, 2.3, wall, 0, 0.28, -0.35));
+      g.add(box(4.7, 0.16, 2.6, roof, 0, 2.43, -0.35));
+      g.add(box(4.15, 0.08, 0.1, glow("#8b5cf6", 1.6), 0, 2.59, 0.85));
+      const screen = canvasTex(384, 216, () => {});
+      const paintScreen = (c, w, h) => {
+        const gr = c.createLinearGradient(0, 0, w, h);
+        gr.addColorStop(0, "#123044"); gr.addColorStop(1, "#070b10");
+        c.fillStyle = gr; c.fillRect(0, 0, w, h);
+        c.strokeStyle = "rgba(125,211,252,.35)"; c.lineWidth = 2;
+        for (let i = 0; i < 9; i++) { c.beginPath(); c.moveTo(12, 24 + i * 20); c.lineTo(w - 12, 14 + i * 20); c.stroke(); }
+        c.fillStyle = "#e8c44a";
+        c.beginPath(); c.moveTo(w * 0.58, h * 0.28); c.lineTo(w * 0.58, h * 0.72); c.lineTo(w * 0.78, h * 0.5); c.closePath(); c.fill();
+        c.fillStyle = "#7dd3fc"; c.font = "bold 42px 'Space Grotesk', sans-serif"; c.fillText("PIMPEST", 22, 64);
+        c.fillStyle = "#ece8dc"; c.font = "600 28px 'IBM Plex Mono', monospace"; c.fillText("PLAYS", 22, 102);
+      };
+      paintScreen(screen.g, 384, 216);
+      roomPaints.push(() => { paintScreen(screen.g, 384, 216); screen.tex.needsUpdate = true; });
+      const screenMat = new THREE.MeshBasicMaterial({ map: screen.tex, toneMapped: false, side: THREE.DoubleSide });
+      const screenFace = mesh(new THREE.PlaneGeometry(3.5, 1.85), screenMat, 0, 1.4, 0.82, false);
+      screenFace.scale.x = -1;
+      g.add(screenFace);
+      const crt = new THREE.Group();
+      crt.add(box(1.35, 0.08, 0.85, steel, 0, 0, 0));
+      crt.add(box(1.1, 0.78, 0.72, beige, 0, 0.08, -0.04));
+      crt.add(mesh(new THREE.PlaneGeometry(0.78, 0.52), screenMat, 0, 0.52, 0.34, false));
+      crt.position.set(-1.85, 0.28, 1.35);
+      crt.rotation.y = 0.5;
+      g.add(crt);
+      g.add(cyl(0.06, 0.08, 2.4, mat("#6b7280", { metal: 0.55 }), 1.7, 2.59, 0.15, 5));
+      g.add(mesh(new THREE.SphereGeometry(0.16, 8, 6), glow("#ef4444", 2.4), 1.7, 5.05, 0.15, false));
+      for (const rad of [0.45, 0.8]) {
+        const wave = mesh(new THREE.TorusGeometry(rad, 0.025, 4, 24), mat("#7dd3fc", { emissive: "#7dd3fc", ei: 1.4, opacity: 0.7 }), 1.7, 5.05, 0.15, false);
+        wave.rotation.x = Math.PI / 2;
+        g.add(wave);
+      }
+      for (const sx of [-1, 1]) {
+        g.add(cyl(0.04, 0.05, 1.5, dark, sx * 2.05, 0.28, 1.35, 5));
+        g.add(mesh(new THREE.SphereGeometry(0.12, 8, 6), glow("#fff7e0", 2), sx * 2.05, 1.85, 1.35, false));
+      }
+    } else {
+      const marble = mat("#a99c84"), marble2 = mat("#8b7f6a");
+      g.add(box(5.4, 0.26, 3.8, mat("#3a3228", { emissive: "#3a3228", ei: 0.35 }), 0, 0, 0));
+      g.add(box(4.6, 0.16, 2.5, wood, 0, 0.26, 0.35));
+      g.add(box(3.6, 1.7, 0.28, ink, 0, 0.42, -1.15));
+      const covers = ["#7f1d1d", "#1e3a5f", "#14532d", "#4a1d5c", "#8a6a1f"];
+      for (let i = 0; i < 5; i++) {
+        g.add(box(0.28, 0.85, 0.7, mat(covers[i]), -1.5 + i * 0.38, 0.42, -1.15));
+        g.add(box(0.06, 0.7, 0.52, paper, -1.38 + i * 0.38, 0.5, -1.15));
+      }
+      for (let i = 0; i < 5; i++) {
+        const page = box(1.85, 0.035, 2.35, i === 4 ? paper : mat("#e7dfd0"), 0.15, 0.42 + i * 0.04, 0.3);
+        page.rotation.y = (i - 2) * 0.03;
+        g.add(page);
+      }
+      const pageFace = canvasTex(220, 280, () => {});
+      const paintPage = (c, w, h) => {
+        c.fillStyle = "#f4efe4"; c.fillRect(0, 0, w, h);
+        c.fillStyle = "#1c1914"; c.fillRect(0, 0, 14, h);
+        c.fillStyle = "#1c1914"; c.font = "bold 28px 'IBM Plex Mono', monospace"; c.fillText("FADE IN.", 28, 48);
+        c.fillStyle = "#7a6854";
+        for (let i = 0; i < 8; i++) c.fillRect(28, 78 + i * 20, w - (i % 3 === 2 ? 80 : 48), 8);
+        c.fillStyle = "#8a7040"; c.font = "14px 'IBM Plex Mono', monospace"; c.fillText("2007  ·  FINALIST", 28, h - 22);
+      };
+      paintPage(pageFace.g, 220, 280);
+      roomPaints.push(() => { paintPage(pageFace.g, 220, 280); pageFace.tex.needsUpdate = true; });
+      const pagePlane = mesh(new THREE.PlaneGeometry(1.7, 2.15), new THREE.MeshBasicMaterial({ map: pageFace.tex, toneMapped: false, side: THREE.DoubleSide }), 0.15, 1.55, 1.55, false);
+      pagePlane.scale.x = -1;
+      g.add(pagePlane);
+      g.add(box(0.85, 0.7, 0.7, dark, -1.85, 0.42, 0.7));
+      g.add(cyl(0.045, 0.05, 1.35, ink, -1.7, 1.12, 1.15, 5));
+      g.add(mesh(new THREE.ConeGeometry(0.32, 0.36, 8), goldM, -1.7, 2.6, 1.15, false));
+      g.add(mesh(new THREE.SphereGeometry(0.1, 8, 6), glow("#ffd27a", 2), -1.7, 2.15, 1.15, false));
+      g.add(box(0.7, 0.1, 0.7, steel, 1.7, 0.42, 1.15));
+      g.add(box(0.7, 0.85, 0.1, steel, 1.7, 0.52, 1.5));
+      g.add(cyl(0.16, 0.18, 1.5, marble, -2.2, 0.26, -0.9, 8));
+      g.add(cyl(0.16, 0.18, 1.5, marble2, 2.2, 0.26, -0.9, 8));
+    }
+    g.scale.setScalar(2);
+    return g;
+  }
+  for (const a of artifactObjs) {
+    if (!a.under) continue;
+    a.g.add(underRoom(a.a.id));
+    const hit = new THREE.Mesh(new THREE.CircleGeometry(10, 20), new THREE.MeshBasicMaterial({ visible: false, side: THREE.DoubleSide }));
+    hit.rotation.x = -Math.PI / 2;
+    hit.position.y = 0.4;
+    hit.userData.hit = { type: "artifact", id: a.a.id };
+    a.g.add(hit);
+    a.hit = hit;
+    pickables.push(hit);
+  }
+  document.fonts?.ready?.then(() => roomPaints.forEach((paint) => paint()));
+  world.add(vault);
 
   const sc = scout();
   sc.g.position.set(0, PLAZA_TOP, 4.5);
@@ -1127,21 +1322,77 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
   /* ---------- camera ---------- */
   const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, -200, 400);
   const cur = { az: deg(200), el: deg(14), zoom: 2.6, tx: 0, tz: 0, ty: 3, shiftX: 0, shiftY: 0 };
-  // Tall phone screens look down more steeply so the island fills the height instead of leaving empty floor.
-  const OV = matchMedia("(max-aspect-ratio: 4/5)").matches ? { el: deg(50), ty: 6 } : { el: deg(36), ty: 7.5 };
+  // Tall phones look down a little steeper than the desktop, then zoom to fill the open band.
+  const OV = matchMedia("(max-aspect-ratio: 4/5)").matches ? { el: deg(38), ty: 6 } : { el: deg(36), ty: 7.5 };
   const goal = { az: deg(225), el: OV.el, zoom: 1, tx: 0, tz: 0, ty: OV.ty, shiftX: 0, shiftY: 0 };
   if (reduced) Object.assign(cur, goal);
   let introT = reduced ? 1 : 0;
   let vAz = 0, lastUser = performance.now();
+  let background = "none";
+  let underLock = false, holdUnder = false, dig = 0, underView = null;
+  function nudgeElevation(dy, dx) {
+    const delta = dy * 0.004;
+    if (introT < 1 || (background !== "none" && !underLock)) {
+      goal.el = clamp(goal.el + delta, deg(18), deg(62));
+      dig = 0;
+      return;
+    }
+    if (underLock) {
+      if (holdUnder && delta <= 0.03) return;
+      holdUnder = false;
+      const next = goal.el + delta;
+      if (next > deg(-10)) {
+        underLock = false;
+        dig = 0;
+        const back = underView;
+        underView = null;
+        goal.el = deg(22);
+        goal.ty = back?.ty ?? OV.ty;
+        if (back) {
+          goal.zoom = back.zoom;
+          goal.tx = back.tx;
+          goal.tz = back.tz;
+          goal.shiftX = back.shiftX;
+          goal.shiftY = back.shiftY;
+        }
+      } else goal.el = clamp(next, deg(-50), deg(-16));
+      return;
+    }
+    const next = goal.el + delta;
+    const pushingUp = delta < 0 && Math.abs(dx) < Math.abs(dy) * 0.5;
+    if (next < deg(18) && pushingUp) {
+      // Only the push after the view has already stopped counts, so a long orbit doesn't fall through.
+      if (goal.el <= deg(18) + 1e-4) dig += -delta;
+      goal.el = deg(18);
+      if (dig > 0.45) {
+        underLock = true;
+        holdUnder = true;
+        dig = 0;
+        underView = { zoom: goal.zoom, ty: goal.ty, tx: goal.tx, tz: goal.tz, shiftX: goal.shiftX, shiftY: goal.shiftY };
+        goal.el = deg(-32);
+        goal.ty = -14;
+        goal.tx = 0; goal.tz = 0;
+        goal.shiftX = 0; goal.shiftY = 0;
+        goal.zoom = 0.55;
+      }
+    } else {
+      dig = 0;
+      goal.el = clamp(next, deg(18), deg(62));
+    }
+  }
   let width = 1, height = 1;
 
   function resize() {
     width = canvas.clientWidth; height = canvas.clientHeight;
     renderer.setSize(width, height, false);
   }
-  function applyCamera() {
-    const aspect = width / height;
+  function viewSpan() {
+    const aspect = width / Math.max(1, height);
     const fit = aspect < 1 ? 49 / aspect : 44; // whole island in view, edge to edge on phones
+    return { aspect, fit, viewW: fit * aspect };
+  }
+  function applyCamera() {
+    const { fit, aspect } = viewSpan();
     const h = fit / cur.zoom, w = h * aspect;
     const ox = cur.shiftX * w, oy = cur.shiftY * h;
     camera.left = -w / 2 - ox; camera.right = w / 2 - ox; camera.top = h / 2 - oy; camera.bottom = -h / 2 - oy;
@@ -1157,7 +1408,13 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
     const rect = canvas.getBoundingClientRect();
     ndc.set(((cx - rect.left) / rect.width) * 2 - 1, -((cy - rect.top) / rect.height) * 2 + 1);
     ray.setFromCamera(ndc, camera);
-    const h = ray.intersectObjects(pickables, false)[0];
+    const hits = ray.intersectObjects(pickables, false);
+    const h = hits.find((i) => {
+      const hit = i.object.userData.hit;
+      if (hit?.type === "sector" && cur.el < 0) return false;
+      if (hit?.type === "artifact" && cur.el >= 0 && artifactObjs.some((o) => o.under && o.a.id === hit.id)) return false;
+      return !!hit;
+    });
     return h ? h.object.userData.hit : null;
   }
   const ptrs = new Map();
@@ -1165,7 +1422,7 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
   const userMoved = () => { lastUser = performance.now(); onCameraUser?.(); };
 
   canvas.addEventListener("pointerdown", (e) => {
-    canvas.setPointerCapture(e.pointerId);
+    try { canvas.setPointerCapture(e.pointerId); } catch {}
     ptrs.set(e.pointerId, { x: e.clientX, y: e.clientY });
     if (ptrs.size === 2) {
       const [a, b] = [...ptrs.values()];
@@ -1208,7 +1465,7 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
     else {
       const k = 0.0065;
       goal.az -= dx * k; vAz = -dx * k;
-      goal.el = clamp(goal.el + dy * 0.004, deg(18), deg(62));
+      nudgeElevation(dy, dx);
     }
     userMoved();
   });
@@ -1218,6 +1475,8 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
     if (!drag) return;
     const d = drag; drag = null;
     canvas.style.cursor = "grab";
+    if (!underLock) dig = 0;
+    holdUnder = false;
     if (!d.moved && e.type === "pointerup") onClick?.(pick(e.clientX, e.clientY), e);
   };
   canvas.addEventListener("pointerup", end);
@@ -1234,15 +1493,17 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
     const h = (camera.top - camera.bottom), unit = h / height;
     const right = new THREE.Vector3(Math.cos(cur.az), 0, -Math.sin(cur.az));
     const fwd = new THREE.Vector3(-Math.sin(cur.az), 0, -Math.cos(cur.az));
-    goal.tx -= (right.x * dx - fwd.x * dy / Math.sin(cur.el)) * unit;
-    goal.tz -= (right.z * dx - fwd.z * dy / Math.sin(cur.el)) * unit;
+    const pitch = Math.sin(cur.el);
+    const sy = Math.abs(pitch) < 0.25 ? (pitch < 0 ? -0.25 : 0.25) : pitch;
+    goal.tx -= (right.x * dx - fwd.x * dy / sy) * unit;
+    goal.tz -= (right.z * dx - fwd.z * dy / sy) * unit;
     const d = Math.hypot(goal.tx, goal.tz);
     if (d > R * 0.8) { goal.tx *= (R * 0.8) / d; goal.tz *= (R * 0.8) / d; }
   }
 
   /* ---------- loop ---------- */
   let running = true;
-  let lastRender = 0, background = "none", shadowTick = 0;
+  let lastRender = 0, shadowTick = 0;
   const samples = [];
   let raf = 0;
   const settled = () =>
@@ -1260,9 +1521,29 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
     if (!raf && running && fpsCap()) raf = requestAnimationFrame(frame);
   }
   const tmp = new THREE.Vector3();
+  const screenPt = new THREE.Vector3();
+  // The sign board, in pixels. Captions and the board itself both use this, so a name cannot linger after its sign has left.
+  function measureSign(o) {
+    o.head.getWorldPosition(screenPt);
+    screenPt.project(camera);
+    const x = (screenPt.x * 0.5 + 0.5) * width;
+    const y = (-screenPt.y * 0.5 + 0.5) * height;
+    const orthoH = Math.max(1e-6, camera.top - camera.bottom);
+    const px = height / orthoH;
+    const halfW = (o.signW * Math.abs(o.head.scale.x) * px) / 2;
+    const halfH = (o.signH * Math.abs(o.head.scale.y) * px) / 2;
+    const inDepth = screenPt.z >= -1 && screenPt.z <= 1;
+    return {
+      x, y, halfW, halfH, z: screenPt.z,
+      centerIn: inDepth && x >= 0 && x <= width && y >= 0 && y <= height,
+      fullyIn: inDepth && x - halfW >= 1 && x + halfW <= width - 1 && y - halfH >= 1 && y + halfH <= height - 1,
+      intersects: inDepth && x + halfW > 0 && x - halfW < width && y + halfH > 0 && y - halfH < height,
+    };
+  }
   const gemFound = glow("#e8c44a", 2);
   const gemHover = mat("#64748b", { emissive: "#38bdf8", ei: 0.9, rough: 0.3 });
   const gemIdle = mat("#4b5563", { emissive: "#38bdf8", ei: 0.25, rough: 0.3 });
+  const gemBuried = mat("#e0f2fe", { emissive: "#7dd3fc", ei: 2.4, rough: 0.15 });
   function frame(stamp) {
     raf = 0;
     if (!running) return;
@@ -1273,7 +1554,7 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
     if (lastRender && now - lastRender < 1000 / fps - 4) return;
     const raw = lastRender ? Math.min((now - lastRender) / 1000, 0.25) : 0.016;
     // Adaptive quality: step down if motion can't hold its budget, or a resting frame runs long.
-    if (tier > 0 && lastRender) {
+    if (tier > 0 && introT >= 1 && lastRender) {
       const frameMs = now - lastRender;
       if (fps === 60 || frameMs > 42) {
         samples.push(frameMs);
@@ -1292,8 +1573,17 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
     if (introT < 1) {
       introT = Math.min(1, introT + raw / 3.2);
       const k = ease(introT);
-      cur.az = lerp(deg(200), goal.az, k); cur.el = lerp(deg(14), goal.el, k); cur.zoom = lerp(2.6, goal.zoom, k); cur.ty = lerp(3, goal.ty, k);
+      cur.az = lerp(deg(200), goal.az, k);
+      // Phones open on the fitted overview. A zoom-in from 2.6 crops the signs before the loader lifts.
+      if (mobile) {
+        cur.el = goal.el; cur.zoom = goal.zoom; cur.ty = goal.ty;
+        cur.shiftX = goal.shiftX; cur.shiftY = goal.shiftY;
+      } else {
+        cur.el = lerp(deg(14), goal.el, k); cur.zoom = lerp(2.6, goal.zoom, k); cur.ty = lerp(3, goal.ty, k);
+        cur.shiftX = lerp(0, goal.shiftX, k); cur.shiftY = lerp(0, goal.shiftY, k);
+      }
     } else {
+      if (underLock && goal.el > deg(2)) underLock = false;
       if (!drag && !reduced) { goal.az += vAz * raw * 60; vAz *= Math.pow(0.92, raw * 60); if (Math.abs(vAz) < 1e-4) vAz = 0; }
       if (!reduced && !drag && !pinch && now - lastUser > 9000 && !route.length && idleSpin && background === "none") { cur.az += dt * 0.04; goal.az += dt * 0.04; }
       const k = reduced ? 1 : 1 - Math.exp(-raw * 5);
@@ -1306,7 +1596,13 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
     for (const o of sectorObjs) {
       o.head.rotation.y = cur.az; o.head.rotation.x = -cur.el;
       o.anim(t, dt);
-      const want = o.s.id === selected ? 0.95 : o.s.id === (hover && hover.id) ? 0.7 : 0;
+      if (width > 1 && height > 1) {
+        const vis = measureSign(o);
+        o.onscreen = vis;
+        o.head.visible = cur.el < deg(-4) ? false : (vis.fullyIn || o.s.id === selected);
+      }
+      const ring = selected || highlight;
+      const want = o.s.id === ring ? 0.95 : 0;
       o.hl.material.opacity = lerp(o.hl.material.opacity, want * (0.75 + 0.25 * Math.sin(t * 4)), 0.2);
       o.hl.visible = o.hl.material.opacity > 0.01;
     }
@@ -1317,9 +1613,23 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
       });
       pulseMesh.instanceMatrix.needsUpdate = true;
     }
+    const underReveal = clamp((deg(-6) - cur.el) / deg(14), 0, 1);
+    keelLamp.intensity = underReveal * 5;
+    vault.visible = underReveal > 0.08;
     for (const a of artifactObjs) {
+      if (!a.under) continue;
+      const show = underReveal > 0.2;
+      a.g.visible = show;
+      if (a.hit) a.hit.visible = show;
+      a.g.scale.setScalar(1);
+    }
+    for (const a of artifactObjs) {
+      if (a.under) {
+        a.beam.visible = false;
+        continue;
+      }
       a.gem.rotation.y = t * (a.found ? 1.2 : 0.4);
-      a.gem.position.y = 0.85 + Math.sin(t * 1.5 + a.p.x) * (a.found ? 0.12 : 0.04);
+      a.gem.position.y = a.gemBase + Math.sin(t * 1.5 + a.p.x) * (a.found ? 0.12 : 0.04);
       a.lit = lerp(a.lit, a.found ? 1 : 0, 0.05);
       const gemMat = a.found ? gemFound : a.a.id === (hover && hover.id) ? gemHover : gemIdle;
       if (a.gem.material !== gemMat) a.gem.material = gemMat;
@@ -1353,7 +1663,7 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
 
     // Artifacts light up as the scout passes.
     for (const a of artifactObjs) {
-      if (!a.found && Math.hypot(sc.g.position.x - a.p.x, sc.g.position.z - a.p.z) < 2.6) discover(a.a.id, true);
+      if (!a.found && !a.under && Math.hypot(sc.g.position.x - a.p.x, sc.g.position.z - a.p.z) < 2.6) discover(a.a.id, true);
     }
 
     // Directional shadows don't change when only the camera orbits. Refresh while something in the scene moves.
@@ -1363,7 +1673,7 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
     onFrame?.();
   }
 
-  let selected = null, idleSpin = true, onDiscover = null;
+  let selected = null, highlight = null, idleSpin = true, onDiscover = null;
   function discover(id, byScout) {
     const a = artifactObjs.find((o) => o.a.id === id);
     if (!a || a.found) return;
@@ -1396,23 +1706,55 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
   const st = {
     R, scout: {},
     sectors: sectorObjs.map((o) => ({ id: o.s.id, x: o.p.x, z: o.p.z, accent: o.s.accent })),
-    artifacts: artifactObjs.map((a) => ({ id: a.a.id, x: a.p.x, z: a.p.z, found: a.found })),
+    artifacts: artifactObjs.map((a) => ({ id: a.a.id, x: a.p.x, z: a.p.z, found: a.found, under: !!a.under })),
   };
+  /* Sign boards face the camera, so their screen size is their plane size. */
+  function signSpan(az, el, ty) {
+    const ox = Math.sin(az) * Math.cos(el), oy = Math.sin(el), oz = Math.cos(az) * Math.cos(el);
+    const fx = -ox, fy = -oy, fz = -oz;
+    let rx = -fz, ry = 0, rz = fx;
+    const rl = Math.hypot(rx, ry, rz) || 1;
+    rx /= rl; ry /= rl; rz /= rl;
+    const ux = ry * fz - rz * fy, uy = rz * fx - rx * fz, uz = rx * fy - ry * fx;
+    let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+    for (const o of sectorObjs) {
+      const p = o.head.position;
+      const sx = o.signW * Math.abs(o.head.scale.x);
+      const sy = o.signH * Math.abs(o.head.scale.y);
+      const dx = p.x, dy = p.y - ty, dz = p.z;
+      const cx = dx * rx + dy * ry + dz * rz;
+      const cy = dx * ux + dy * uy + dz * uz;
+      minX = Math.min(minX, cx - sx / 2); maxX = Math.max(maxX, cx + sx / 2);
+      minY = Math.min(minY, cy - sy / 2); maxY = Math.max(maxY, cy + sy / 2);
+    }
+    return { spanX: maxX - minX, spanY: maxY - minY };
+  }
   return {
     /* Camera framing for a sector. `clear` is the screen rect the sign and
        its building must fit in, so the exhibit sheet never covers them. */
     focusSector(id, clear) {
       const o = sectorObjs.find((x) => x.s.id === id);
       if (!o) return;
+      if (clear && ("zoom" in clear || "shiftY" in clear || "shiftX" in clear)) {
+        const { shiftX = 0, shiftY = 0, zoom = 2.3 } = clear;
+        goal.tx = o.p.x * 0.92; goal.tz = o.p.z * 0.92; goal.ty = PLATEAU_TOP + (SIGN.bottom + o.signH) * 0.45;
+        let az = Math.atan2(-o.p.x, -o.p.z) + 0.75;
+        while (az - cur.az > Math.PI) az -= Math.PI * 2;
+        while (az - cur.az < -Math.PI) az += Math.PI * 2;
+        goal.az = az; goal.el = deg(34); goal.zoom = zoom; goal.shiftX = shiftX; goal.shiftY = shiftY;
+        introT = 1; vAz = 0;
+        return;
+      }
       const sy = o.head.scale.y || 1, sx = o.head.scale.x || 1;
       const signTop = o.head.position.y + (o.signH * sy) / 2;
       const baseY = PLATEAU_TOP;
       const stack = signTop - baseY;
-      const spanY = stack * 1.38;
-      const spanX = Math.max((o.signW || SIGN.w) * sx, 10.5) * 1.08;
       const aspect = width / Math.max(1, height);
       const fit = aspect < 1 ? 49 / aspect : 44;
       const box = clear || { cx: width / 2, cy: height / 2, w: width, h: height };
+      const tight = box.h < height * 0.5; // the phone sheet leaves only a band above it
+      const spanY = stack * (tight ? 1.48 : 1.38);
+      const spanX = Math.max((o.signW || SIGN.w) * sx, 10.5) * (tight ? 1.12 : 1.08);
       const zoomY = fit * (box.h / Math.max(1, height)) / spanY;
       const zoomX = fit * aspect * (box.w / Math.max(1, width)) / spanX;
       goal.tx = o.p.x;
@@ -1429,8 +1771,29 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
       introT = 1; vAz = 0;
     },
     frame({ shiftX = 0, shiftY = 0 } = {}) { goal.shiftX = shiftX; goal.shiftY = shiftY; },
-    overview() {
-      goal.tx = 0; goal.tz = 0; goal.ty = OV.ty; goal.zoom = 1; goal.el = OV.el; goal.shiftX = 0; goal.shiftY = 0;
+    overview(clear) {
+      goal.tx = 0; goal.tz = 0; goal.ty = OV.ty; goal.el = OV.el;
+      let fracX = 1, fracY = 1;
+      if (clear && width > 1 && height > 1) {
+        goal.shiftX = clear.cx / width - 0.5;
+        goal.shiftY = 0.5 - clear.cy / height - 0.045;
+        fracX = clamp(clear.w / width, 0.35, 1);
+        fracY = clamp(clear.h / height, 0.35, 1);
+      } else {
+        goal.shiftX = 0; goal.shiftY = 0;
+      }
+      // Fit the widest arrangement of signs, so a turn never slices a photograph.
+      const { fit, aspect } = viewSpan();
+      let spanX = 1, spanY = 1;
+      for (let i = 0; i < 8; i++) {
+        const box = signSpan(goal.az + (i * Math.PI) / 4, goal.el, goal.ty);
+        spanX = Math.max(spanX, box.spanX);
+        spanY = Math.max(spanY, box.spanY);
+      }
+      const pad = 1.14;
+      const zoomX = (fit * aspect * fracX) / (spanX * pad);
+      const zoomY = (fit * fracY) / (spanY * pad);
+      goal.zoom = clamp(Math.min(zoomX, zoomY), 0.4, 1);
     },
     zoomBy(f) { goal.zoom = clamp(goal.zoom * f, 0.7, 3.6); userMoved(); },
     rotateBy(a) { goal.az += a; userMoved(); },
@@ -1444,7 +1807,13 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
       const dir = a.p.clone().normalize();
       planRoute(a.p.clone().sub(dir.multiplyScalar(1.2))); onArrive = cb;
     },
-    setSelected(id) { selected = id; },
+    revealArtifact(id) { discover(id, false); },
+    setSelected(id) { selected = id; highlight = null; },
+    setHighlight(id) { if (!selected) highlight = id; },
+    signOnScreen(id) {
+      const o = sectorObjs.find((x) => x.s.id === id);
+      return o?.onscreen || { centerIn: false, fullyIn: false, intersects: false };
+    },
     /* "none" | "exhibit" (world partly covered: run slower) | "list" (world hidden: stop) */
     setBackground(v) { background = v; samples.length = 0; schedule(); },
     setIdleSpin(on) { idleSpin = on; },
@@ -1455,7 +1824,7 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
       if (kind === "sector" || kind === "signBase") {
         // The board faces the camera square-on, so its edges sit along the camera's up axis.
         const o = sectorObjs.find((x) => x.s.id === id), up = camUp.set(0, 1, 0).applyQuaternion(camera.quaternion);
-        v = proj.copy(o.head.position).addScaledVector(up, kind === "sector" ? (o.signH / 2) * o.head.scale.y + 0.5 : -((o.signH / 2) * o.head.scale.y + 0.25));
+        v = proj.copy(o.head.position).addScaledVector(up, kind === "sector" ? (o.signH / 2) * o.head.scale.y + 0.5 : -((o.signH / 2) * o.head.scale.y + 1.45));
       }
       else { const a = artifactObjs.find((x) => x.a.id === id); v = proj.set(a.p.x, a.g.position.y + 2, a.p.z); }
       v.project(camera);
@@ -1464,6 +1833,7 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
     state() {
       st.az = cur.az; st.zoom = cur.zoom; st.tx = cur.tx; st.tz = cur.tz;
       st.scout.x = sc.g.position.x; st.scout.z = sc.g.position.z;
+      st.under = cur.el < deg(-6);
       artifactObjs.forEach((a, i) => (st.artifacts[i].found = a.found));
       return st;
     },
