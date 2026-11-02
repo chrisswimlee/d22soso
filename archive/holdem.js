@@ -2,6 +2,14 @@
 const RANKS = "23456789TJQKA";
 const SUITS = ["♠", "♥", "♦", "♣"];
 const NAMES = ["High card", "Pair", "Two pair", "Three of a kind", "Straight", "Flush", "Full house", "Four of a kind", "Straight flush"];
+const DEFAULT_STRINGS = {
+  playable: "Playable · 2 Hand Hold’em™", dealAgain: "Deal again", dealer: "Dealer", board: "Board", your4: "Your 4",
+  hand1: "Hand 1", hand2: "Hand 2", showTurnRiver: "Show the turn & river",
+  pickTwo: "Tap two cards for Hand 1. The other two become Hand 2.", bothSet: "Both hands set. Play them against the dealer.",
+  beats: "beats the dealer", loses: "loses", push: "push", dealerMakes: "Dealer makes {hand}.",
+  bothWin: "Both hands win.", splitWin: "You split the action: one hand wins.", notThisTime: "Not this time.",
+  suits: ["spades", "hearts", "diamonds", "clubs"], of: "of", categories: NAMES,
+};
 
 function deck() {
   const d = [];
@@ -43,27 +51,35 @@ function best(cards) {
   }
   return top;
 }
-const category = (score) => NAMES[Math.floor(score / Math.pow(15, 5))];
+const category = (score, cats = NAMES) => cats[Math.floor(score / Math.pow(15, 5))];
 
-function cardEl(c, opts = {}) {
+function cardEl(c, opts = {}, S = DEFAULT_STRINGS) {
   const el = document.createElement(opts.button ? "button" : "span");
   if (opts.button) el.type = "button";
   el.className = "card" + (c && (c.s === 1 || c.s === 2) ? " red" : "") + (c ? "" : " back");
   el.innerHTML = c ? `<b>${RANKS[c.r - 2].replace("T", "10")}</b><i>${SUITS[c.s]}</i>` : "";
-  if (c) el.setAttribute("aria-label", `${RANKS[c.r - 2].replace("T", "10")} of ${["spades", "hearts", "diamonds", "clubs"][c.s]}`);
+  if (c) {
+    const rank = RANKS[c.r - 2].replace("T", "10");
+    el.setAttribute("aria-label", S.of ? `${rank} ${S.of} ${S.suits[c.s]}` : `${rank} ${S.suits[c.s]}`);
+  }
   return el;
 }
 
-export function mountDemo(root) {
+export function mountDemo(root, strings) {
+  const S = { ...DEFAULT_STRINGS, ...(strings || {}) };
   root.classList.add("hh");
   root.innerHTML = `
-    <div class="hh-head"><p class="mono kicker">Playable · 2 Hand Hold’em™</p><button type="button" class="hh-deal btn-ghost">Deal again</button></div>
-    <div class="hh-row"><span class="hh-label mono">Dealer</span><div class="hh-cards" data-dealer></div></div>
-    <div class="hh-row"><span class="hh-label mono">Board</span><div class="hh-cards" data-board></div></div>
-    <div class="hh-row"><span class="hh-label mono">Your 4</span><div class="hh-cards" data-hole></div></div>
-    <div class="hh-hands"><div class="hh-hand" data-h1><span class="mono">Hand 1</span><div class="hh-cards"></div><p></p></div><div class="hh-hand" data-h2><span class="mono">Hand 2</span><div class="hh-cards"></div><p></p></div></div>
+    <div class="hh-head"><p class="mono kicker"></p><button type="button" class="hh-deal btn-ghost"></button></div>
+    <div class="hh-row"><span class="hh-label mono" data-l="dealer"></span><div class="hh-cards" data-dealer></div></div>
+    <div class="hh-row"><span class="hh-label mono" data-l="board"></span><div class="hh-cards" data-board></div></div>
+    <div class="hh-row"><span class="hh-label mono" data-l="your4"></span><div class="hh-cards" data-hole></div></div>
+    <div class="hh-hands"><div class="hh-hand" data-h1><span class="mono" data-l="hand1"></span><div class="hh-cards"></div><p></p></div><div class="hh-hand" data-h2><span class="mono" data-l="hand2"></span><div class="hh-cards"></div><p></p></div></div>
     <p class="hh-msg" aria-live="polite"></p>
-    <button type="button" class="hh-go btn-solid" disabled>Show the turn & river</button>`;
+    <button type="button" class="hh-go btn-solid" disabled></button>`;
+  root.querySelector(".hh-head .kicker").textContent = S.playable;
+  root.querySelector(".hh-deal").textContent = S.dealAgain;
+  root.querySelectorAll("[data-l]").forEach((el) => { el.textContent = S[el.dataset.l]; });
+  root.querySelector(".hh-go").textContent = S.showTurnRiver;
   const $ = (s) => root.querySelector(s);
   let st;
 
@@ -74,10 +90,10 @@ export function mountDemo(root) {
   }
   function render() {
     const { hole, dealer, board, pick, done } = st;
-    $("[data-dealer]").replaceChildren(...dealer.map((c) => cardEl(done ? c : null)));
-    $("[data-board]").replaceChildren(...board.map((c, i) => cardEl(i < 3 || done ? c : null)));
+    $("[data-dealer]").replaceChildren(...dealer.map((c) => cardEl(done ? c : null, {}, S)));
+    $("[data-board]").replaceChildren(...board.map((c, i) => cardEl(i < 3 || done ? c : null, {}, S)));
     $("[data-hole]").replaceChildren(...hole.map((c, i) => {
-      const b = cardEl(c, { button: true });
+      const b = cardEl(c, { button: true }, S);
       b.classList.toggle("picked", pick.includes(i));
       b.disabled = done;
       b.addEventListener("click", () => {
@@ -89,26 +105,27 @@ export function mountDemo(root) {
     }));
     const h1 = pick.map((i) => hole[i]);
     const h2 = pick.length === 2 ? hole.filter((_, i) => !pick.includes(i)) : [];
-    $("[data-h1] .hh-cards").replaceChildren(...h1.map((c) => cardEl(c)));
-    $("[data-h2] .hh-cards").replaceChildren(...h2.map((c) => cardEl(c)));
+    $("[data-h1] .hh-cards").replaceChildren(...h1.map((c) => cardEl(c, {}, S)));
+    $("[data-h2] .hh-cards").replaceChildren(...h2.map((c) => cardEl(c, {}, S)));
     $(".hh-go").disabled = pick.length !== 2 || done;
     const msg = $(".hh-msg");
     for (const sel of ["[data-h1] p", "[data-h2] p"]) $(sel).textContent = "";
-    root.querySelectorAll(".hh-hand").forEach((h) => h.classList.remove("win", "lose", "push"));
+    root.querySelectorAll(".hh-hand").forEach((hh) => hh.classList.remove("win", "lose", "push"));
     if (!done) {
-      msg.textContent = pick.length < 2 ? "Tap two cards for Hand 1. The other two become Hand 2." : "Both hands set. Play them against the dealer.";
+      msg.textContent = pick.length < 2 ? S.pickTwo : S.bothSet;
       return;
     }
     const dealerBest = best([...dealer, ...board]);
     let wins = 0;
-    [[h1, "[data-h1]"], [h2, "[data-h2]"]].forEach(([h, sel]) => {
-      const s = best([...h, ...board]);
+    [[h1, "[data-h1]"], [h2, "[data-h2]"]].forEach(([hand, sel]) => {
+      const s = best([...hand, ...board]);
       const res = s > dealerBest ? "win" : s < dealerBest ? "lose" : "push";
       if (res === "win") wins++;
       root.querySelector(sel).classList.add(res);
-      $(`${sel} p`).textContent = `${category(s)} · ${res === "win" ? "beats the dealer" : res === "lose" ? "loses" : "push"}`;
+      $(`${sel} p`).textContent = `${category(s, S.categories)} · ${res === "win" ? S.beats : res === "lose" ? S.loses : S.push}`;
     });
-    msg.textContent = `Dealer makes ${category(dealerBest).toLowerCase()}. ${wins === 2 ? "Both hands win." : wins === 1 ? "You split the action: one hand wins." : "Not this time."}`;
+    const dealerHand = category(dealerBest, S.categories);
+    msg.textContent = `${S.dealerMakes.replace("{hand}", dealerHand)} ${wins === 2 ? S.bothWin : wins === 1 ? S.splitWin : S.notThisTime}`;
   }
   $(".hh-go").addEventListener("click", () => { st.done = true; render(); });
   $(".hh-deal").addEventListener("click", deal);

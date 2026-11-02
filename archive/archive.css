@@ -54,10 +54,10 @@ button { font: inherit; color: inherit; touch-action: manipulation; }
 [data-mode="exhibit"] .label, [data-mode="exhibit"] .label.minor { opacity: 0; pointer-events: none; }
 
 /* Top deck */
-.deck-top { position: absolute; z-index: 4; top: 0; left: 0; right: 0; display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; padding: calc(14px + env(safe-area-inset-top, 0px)) var(--gut-r) 14px var(--gut); pointer-events: none; background: linear-gradient(rgba(7, 8, 11, 0.92), transparent); }
+.deck-top { position: absolute; z-index: 4; top: 0; left: 0; right: 0; display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; padding: calc(14px + env(safe-area-inset-top, 0px)) var(--gut-r) 14px var(--gut); pointer-events: none; background: linear-gradient(#07080b 0%, #07080b 78%, transparent 100%); }
 .deck-top > * { pointer-events: auto; }
 .brand h1 { font-size: 30px; letter-spacing: -0.015em; margin-top: 6px; }
-.intro { margin: 6px 0 0; font-size: 15px; color: var(--ink); opacity: 0.86; transition: opacity 0.3s; }
+.intro { margin: 6px 0 0; font-size: 15px; color: var(--ink); opacity: 0.86; transition: opacity 0.3s; max-width: 34em; }
 .nowrap { white-space: nowrap; }
 .brand h1 { transition: opacity 0.3s; }
 /* While reading an exhibit the header shrinks to its crumb and name, clear of the focused sign. */
@@ -83,6 +83,22 @@ button { font: inherit; color: inherit; touch-action: manipulation; }
     margin-top: 2px;
   }
 }
+/* Language switcher (EN / 한국어 / 中文) */
+.lang-switch { display: flex; flex: none; gap: 2px; padding: 3px; background: rgba(12, 13, 17, 0.92); border: 1px solid var(--rule-soft); border-radius: 999px; }
+.lang-switch button { min-height: 30px; padding: 0 11px; border: 0; border-radius: 999px; background: transparent; color: var(--small); font: 600 12px/1 var(--body); cursor: pointer; white-space: nowrap; }
+.lang-switch button:hover { color: var(--ink); }
+.lang-switch button.on { background: var(--gold); color: #0b0b0b; }
+/* CJK: swap in the Noto faces loaded alongside the Latin ones, and ease the
+   wide Latin tracking that would otherwise space Hangul/Hanzi apart. */
+html[lang="ko"] { --display: "Space Grotesk", "Noto Sans KR", "Helvetica Neue", Arial, sans-serif; --body: "IBM Plex Sans", "Noto Sans KR", "Helvetica Neue", Arial, sans-serif; }
+html[lang="zh-Hans"] { --display: "Space Grotesk", "Noto Sans SC", "Helvetica Neue", Arial, sans-serif; --body: "IBM Plex Sans", "Noto Sans SC", "Helvetica Neue", Arial, sans-serif; }
+html[lang="ko"] .eyebrow, html[lang="zh-Hans"] .eyebrow,
+html[lang="ko"] .kicker, html[lang="zh-Hans"] .kicker,
+html[lang="ko"] .sec, html[lang="zh-Hans"] .sec { letter-spacing: 0.05em; }
+html[lang="ko"] .btn-solid, html[lang="zh-Hans"] .btn-solid,
+html[lang="ko"] .btn-ghost, html[lang="zh-Hans"] .btn-ghost,
+html[lang="ko"] .btn-link, html[lang="zh-Hans"] .btn-link,
+html[lang="ko"] .arrow-btn, html[lang="zh-Hans"] .arrow-btn { letter-spacing: 0.02em; text-transform: none; }
 .btn-ghost.quiet { border-color: transparent; background: transparent; color: var(--small); }
 .btn-ghost.quiet:hover { color: var(--ink); border-color: transparent; }
 .brand h1 a { color: var(--ink); text-decoration: none; }
@@ -130,7 +146,7 @@ button { font: inherit; color: inherit; touch-action: manipulation; }
 .finds-hint { font-size: 13px; line-height: 1.35; letter-spacing: 0.01em; color: #f7f4ec; }
 .zoom-btns { display: flex; gap: 4px; }
 .zoom-btns button { width: 30px; height: 30px; border: 1px solid var(--rule); background: rgba(7, 8, 11, 0.8); border-radius: 3px; cursor: pointer; font-size: 16px; }
-.hint { position: absolute; z-index: 4; left: 50%; transform: translateX(-50%); bottom: calc(40px + env(safe-area-inset-bottom, 0px)); margin: 0; padding: 8px 16px; font-size: 15px; color: #f7f4ec; background: rgba(7, 8, 11, 0.9); border-radius: 999px; white-space: nowrap; pointer-events: none; }
+.hint { position: absolute; z-index: 4; left: 132px; right: 248px; bottom: calc(40px + env(safe-area-inset-bottom, 0px)); margin: 0; padding: 8px 16px; font-size: 15px; color: #f7f4ec; background: rgba(7, 8, 11, 0.9); border-radius: 999px; text-align: center; pointer-events: none; }
 .touched .hint, .app:has(.readout:not([hidden])) .hint { opacity: 0; }
 .credit { position: absolute; z-index: 4; left: 50%; bottom: calc(6px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); padding: 16px 14px 0; font-size: 12px; line-height: 1; letter-spacing: 0.08em; color: var(--small); text-decoration: none; text-shadow: 0 1px 2px #07080b, 0 0 10px #07080b; white-space: nowrap; }
 .credit:hover { color: var(--ink); }
@@ -175,6 +191,14 @@ button { font: inherit; color: inherit; touch-action: manipulation; }
 
 .gallery { display: grid; gap: 10px; }
 .gallery.n2 { grid-template-columns: 1fr 1fr; }
+.gallery figure.has-path { grid-column: 1 / -1; }
+.gallery figure.has-path + figure { max-width: 280px; }
+.path { list-style: none; display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 0; margin: 0 0 8px; padding: 0; }
+.path li { display: inline-flex; align-items: baseline; gap: 8px; font: 600 16px/1.35 var(--display); color: var(--ink); }
+.path li:not(:last-child)::after { content: "→"; margin: 0 10px 0 8px; color: var(--gold-text); font-weight: 500; }
+.path li.key { color: var(--gold-text); }
+.path-source { display: inline-flex; margin: 0; padding: 0; border: 0; background: none; color: var(--gold-text); font: 600 13px/1.4 var(--mono); letter-spacing: 0.04em; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+.path-source:hover { color: var(--ink); }
 .gallery.n3 { grid-template-columns: 1.3fr 1fr 1fr; }
 /* The drawer is narrower than the index: one lead photo, then a pair with room for a caption. */
 .exhibit .gallery.n3 { grid-template-columns: 1fr 1fr; }
@@ -342,7 +366,7 @@ button.card.picked { transform: translateY(-6px); outline: 2px solid var(--gold-
 }
 
 /* Header portrait: the trophy photo stays beside his name. */
-.brand { display: grid; grid-template-columns: auto 1fr; column-gap: 14px; align-items: start; }
+.brand { display: grid; grid-template-columns: auto 1fr; column-gap: 14px; align-items: start; max-width: min(40rem, calc(50vw - 8px)); }
 .brand > :not(.portrait) { grid-column: 2; }
 .portrait { grid-row: 1 / span 4; display: block; width: 76px; aspect-ratio: 4 / 5; border: 2px solid var(--gold); border-radius: var(--r); overflow: hidden; box-shadow: 0 0 24px rgba(232, 196, 74, 0.2); transition: transform 0.2s, opacity 0.3s; }
 .portrait:hover { transform: translateY(-2px); }
@@ -355,11 +379,13 @@ button.card.picked { transform: translateY(-6px); outline: 2px solid var(--gold-
 }
 /* The minimap still owns the bottom-right. Keep the hint in the gap until the visitor moves. */
 @media (max-width: 1180px) and (min-width: 761px) {
-  .hint { left: 16px; right: 250px; width: auto; transform: none; text-align: center; }
+  .hint { left: 16px; right: 250px; }
 }
 
 /* Phones */
 @media (max-width: 760px) {
+  .lang-switch { grid-column: 1 / -1; grid-row: 4; justify-self: start; margin-top: 6px; }
+  .lang-switch button { min-height: 28px; padding: 0 9px; font-size: 11px; }
   .deck-top { flex-wrap: wrap; gap: 6px; padding: calc(8px + env(safe-area-inset-top, 0px)) 12px 8px; background: #07080b; }
   .credit { display: none; }
   .brand h1 { font-size: 18px; }

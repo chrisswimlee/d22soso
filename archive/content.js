@@ -28,7 +28,7 @@ export const SECTORS = [
         {
           type: "gallery",
           items: [
-            { hero: true, src: img("sc-championship-900"), alt: "Archive page of the first official Brood War world championship bracket", caption: "The Season 1 bracket.", pos: "50% 0%" },
+            { hero: true, src: img("sc-championship-900"), alt: "Archive page of the first official Brood War world championship bracket", caption: "Original bracket page", rounds: ["Nautosoft", "Shin Ju Young", "Guillaume “Grrrr…” Patry", "Crexis (Chris Low)"] },
             { src: img("champ-pgl-1080"), alt: "Wayne Chiang with his 1999 StarCraft trophies", caption: "The 1999 trophies.", pos: "50% 25%" },
           ],
         },

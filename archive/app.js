@@ -1,6 +1,15 @@
 /* D22: The Living Archive — modes, HUD, exhibits, tour, and fallbacks around the 3D world. */
-import { SECTORS, TOUR, ARTIFACTS, EMAIL } from "./content.js?v=12";
-import { mountDemo } from "./holdem.js";
+import { SECTORS as BASE_SECTORS, TOUR, ARTIFACTS as BASE_ARTIFACTS, EMAIL } from "./content.js?v=14";
+import { mountDemo } from "./holdem.js?v=2";
+import { LOCALES, UI, detectLocale, persistLocale, makeT, localizeSectors, localizeArtifacts } from "./i18n.js?v=5";
+
+/* ---------- localisation (EN source, KO / ZH overlays from i18n.js) ---------- */
+let locale = detectLocale();
+try { if (new URLSearchParams(location.search).get("lang")) persistLocale(locale); } catch {}
+let t = makeT(locale);
+let SECTORS = localizeSectors(BASE_SECTORS, locale);
+let ARTIFACTS = localizeArtifacts(BASE_ARTIFACTS, locale);
+const holdemStrings = () => (UI[locale] || UI.en).holdem;
 
 const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const phoneMQ = matchMedia("(max-width: 760px)");
@@ -40,7 +49,7 @@ function h(tag, attrs = {}, ...kids) {
     else if (k.startsWith("on")) el.addEventListener(k.slice(2), v);
     else el.setAttribute(k, v === true ? "" : v);
   }
-  for (const kid of kids.flat()) if (kid != null) el.append(kid);
+  for (const kid of kids.flat()) if (kid != null && kid !== false) el.append(kid);
   return el;
 }
 const ext = (href) => /^https?:/.test(href) ? { target: "_blank", rel: "noopener noreferrer" } : {};
@@ -48,10 +57,14 @@ const ext = (href) => /^https?:/.test(href) ? { target: "_blank", rel: "noopener
 /* ---------- exhibit blocks ---------- */
 const BLOCKS = {
   gallery: (b) => h("div", { class: `gallery n${b.items.length}` }, b.items.map((it) =>
-    h("figure", {},
-      h("button", { type: "button", class: ["zoomable", it.hero ? "hero" : "", it.fit === "contain" ? "contain" : ""].filter(Boolean).join(" "), "aria-label": `Enlarge: ${it.alt}`, onclick: () => lightbox(it) },
-        h("img", { src: it.src, alt: it.alt, loading: "lazy", decoding: "async", style: `object-position:${it.pos || "50% 50%"};object-fit:${it.fit || "cover"}` })),
-      it.caption && h("figcaption", { text: it.caption })))),
+    h("figure", { class: it.rounds ? "has-path" : "" },
+      it.rounds && h("ol", { class: "path" }, it.rounds.map((name, i, arr) =>
+        h("li", { class: i === arr.length - 1 ? "key" : "" }, h("span", { text: name })))),
+      it.rounds
+        ? h("button", { type: "button", class: "path-source", onclick: () => lightbox(it), text: it.caption })
+        : h("button", { type: "button", class: ["zoomable", it.hero ? "hero" : "", it.fit === "contain" ? "contain" : ""].filter(Boolean).join(" "), "aria-label": t("enlarge", { alt: it.alt }), onclick: () => lightbox(it) },
+          h("img", { src: it.src, alt: it.alt, loading: "lazy", decoding: "async", style: `object-position:${it.pos || "50% 50%"};object-fit:${it.fit || "cover"}` })),
+      !it.rounds && it.caption && h("figcaption", { text: it.caption })))),
   story: (b) => h("section", { class: "story" }, b.title && h("h3", { class: "sec mono", text: b.title }), b.text.map((t) => h("p", { text: t }))),
   quote: (b) => h("blockquote", { class: "quote" }, h("p", { text: b.text }), h("cite", { class: "mono", text: b.cite })),
   timeline: (b) => h("section", {}, b.title && h("h3", { class: "sec mono", text: b.title }),
@@ -68,27 +81,27 @@ const BLOCKS = {
       h("span", { class: "mono ch", text: `CH ${String(i + 1).padStart(2, "0")}` }), h("strong", { text: m.title }), h("span", { class: "mono", text: m.source }))))),
   steps: (b) => h("section", {}, h("h3", { class: "sec mono", text: b.title }),
     h("ol", { class: "steps" }, b.items.map(([k, v]) => h("li", {}, h("strong", { text: k }), h("span", { text: v }))))),
-  demo: () => { const el = h("section", { class: "demo" }); mountDemo(el); return el; },
+  demo: () => { const el = h("section", { class: "demo" }); mountDemo(el, holdemStrings()); return el; },
   book: (b) => {
-    const book = h("button", { type: "button", class: "book", "aria-label": "Open the book", "aria-pressed": "false" },
+    const book = h("button", { type: "button", class: "book", "aria-label": t("openBook"), "aria-pressed": "false" },
       h("span", { class: "book-inside" },
-        h("span", { class: "mono", text: "Chapter one" }),
-        h("strong", { text: "Because the most important bet you’ll ever make… is on you." }),
-        h("span", { text: "Business decisions, poker, and the age of AI, from a Fortune 500 executive and a world champion." })),
-      h("span", { class: "book-cover" }, h("img", { src: b.cover, alt: "Cover of Betting on Yourself by Joe Matton and Wayne Chiang" })));
+        h("span", { class: "mono", text: t("chapterOne") }),
+        h("strong", { text: t("bookQuote") }),
+        h("span", { text: t("bookDesc") })),
+      h("span", { class: "book-cover" }, h("img", { src: b.cover, alt: t("bookCoverAlt") })));
     book.addEventListener("click", () => { const open = book.classList.toggle("open"); book.setAttribute("aria-pressed", String(open)); });
-    return h("div", { class: "book-stage" }, book, h("p", { class: "mono hint-inline", text: "Tap the book to open it" }));
+    return h("div", { class: "book-stage" }, book, h("p", { class: "mono hint-inline", text: t("tapBook") }));
   },
   contact: () => {
     const status = h("span", { class: "mono copy-status", "aria-live": "polite" });
-    const copy = h("button", { type: "button", class: "btn-ghost", text: "Copy email", onclick: async () => {
-      try { await navigator.clipboard.writeText(EMAIL); status.textContent = "Copied"; }
-      catch { getSelection().selectAllChildren(addr); status.textContent = "Selected. Press copy."; }
+    const copy = h("button", { type: "button", class: "btn-ghost", text: t("copyEmail"), onclick: async () => {
+      try { await navigator.clipboard.writeText(EMAIL); status.textContent = t("copied"); }
+      catch { getSelection().selectAllChildren(addr); status.textContent = t("selectedCopy"); }
     } });
     const addr = h("strong", { class: "email", text: EMAIL });
     return h("section", { class: "contact" },
-      h("p", { class: "mono eyebrow", text: "Primary business channel · licensing · press · talent" }),
-      addr, h("p", { class: "contact-actions" }, h("a", { class: "btn-solid", href: `mailto:${EMAIL}`, text: "Email Wayne" }), copy, status));
+      h("p", { class: "mono eyebrow", text: t("contactEyebrow") }),
+      addr, h("p", { class: "contact-actions" }, h("a", { class: "btn-solid", href: `mailto:${EMAIL}`, text: t("emailWayne") }), copy, status));
   },
   downloads: (b) => h("section", {}, h("h3", { class: "sec mono", text: b.title }),
     h("ul", { class: "downloads" }, b.items.map((d) => h("li", {}, h("a", { href: d.href, download: true, text: d.label }))))),
@@ -114,14 +127,16 @@ $("lightbox").addEventListener("click", closeLightbox);
 
 /* ---------- HUD ---------- */
 const list = $("sector-list");
-SECTORS.forEach((s, i) => {
-  list.append(h("li", {}, h("button", { type: "button", "data-id": s.id, style: `--accent:${s.accent}`, onclick: () => go(s.id), onmouseenter: () => preview(s.id), onmouseleave: () => preview(null) },
-    h("span", { class: "idx mono", text: String(i + 1).padStart(2, "0") }),
-    h("span", { class: "nm" }, h("strong", { text: s.name.replace(/^The /, "") }), h("span", { class: "mono", text: s.era })))));
-});
+function buildSectorList() {
+  list.replaceChildren(...SECTORS.map((s, i) =>
+    h("li", {}, h("button", { type: "button", "data-id": s.id, style: `--accent:${s.accent}`, onclick: () => go(s.id), onmouseenter: () => preview(s.id), onmouseleave: () => preview(null) },
+      h("span", { class: "idx mono", text: String(i + 1).padStart(2, "0") }),
+      h("span", { class: "nm" }, h("strong", { text: s.name.replace(/^The /, "") }), h("span", { class: "mono", text: s.era }))))));
+}
+buildSectorList();
 $("sector-count").textContent = String(SECTORS.length).padStart(2, "0");
 $("art-total").textContent = SURFACE.length;
-$("finds-hint").textContent = `Explore to find ${SURFACE.length} artifacts`;
+$("finds-hint").textContent = t("findsHint", { n: SURFACE.length });
 
 function shownSelection() {
   if (mode !== "explore") return current;
@@ -142,8 +157,8 @@ function setMode(m) {
   mode = m;
   app.dataset.mode = m;
   headerH = 0;
-  $("mode").textContent = { explore: "Exploration", travel: "Travel", exhibit: "Exhibit" }[m];
-  $("view-name").textContent = m === "exhibit" && current ? byId(current).short : "World view";
+  $("mode").textContent = { explore: t("exploration"), travel: t("travel"), exhibit: t("exhibitMode") }[m];
+  $("view-name").textContent = m === "exhibit" && current ? byId(current).short : t("worldView");
   if (m === "explore") flushToast();
   else hideToast();
 }
@@ -165,9 +180,9 @@ function preview(id, kind = "sector") {
   if (kind === "artifact") {
     const a = ARTIFACTS.find((x) => x.id === id);
     const found = foundArtifacts.has(id);
-    $("readout-kicker").textContent = found ? "Artifact recovered" : "Unidentified artifact";
-    $("readout-name").textContent = found ? a.title : "Signal detected";
-    $("readout-tag").textContent = found ? "Click to read again" : a.under ? "Click to recover" : "Click to send the scout";
+    $("readout-kicker").textContent = found ? t("artifactRecovered") : t("unidentifiedArtifact");
+    $("readout-name").textContent = found ? a.title : t("signalDetected");
+    $("readout-tag").textContent = found ? t("clickReadAgain") : a.under ? t("clickRecover") : t("clickSendScout");
     $("readout-go").hidden = true;
     r.style.setProperty("--accent", "#38bdf8");
     r.hidden = false;
@@ -183,7 +198,7 @@ function preview(id, kind = "sector") {
   syncSectorList();
 }
 function fillReadout(s) {
-  $("readout-kicker").textContent = s.id === current ? s.short : "Destination";
+  $("readout-kicker").textContent = s.id === current ? s.short : t("destination");
   $("readout-name").textContent = s.name;
   $("readout-tag").textContent = s.tagline;
   $("readout-go").hidden = false;
@@ -193,13 +208,17 @@ function fillReadout(s) {
 
 /* ---------- labels over the world ---------- */
 const labelsEl = $("labels");
-const labels = SECTORS.map((s, i) => {
-  const el = h("button", { type: "button", class: "label off", style: `--accent:${s.accent}`, onclick: () => go(s.id), onmouseenter: () => preview(s.id), onmouseleave: () => preview(null), tabindex: "-1" },
-    h("span", { class: "mono idx", text: String(i + 1).padStart(2, "0") }), h("strong", { text: s.short }));
-  labelsEl.append(el);
-  const l = { s, el, at: "", on: false, z: "", w: 0, h: 0, hide: true };
-  return l;
-});
+let labels = [];
+function buildLabels() {
+  labelsEl.replaceChildren();
+  labels = SECTORS.map((s, i) => {
+    const el = h("button", { type: "button", class: "label off", tabindex: "-1", style: `--accent:${s.accent}`, onclick: () => go(s.id), onmouseenter: () => preview(s.id), onmouseleave: () => preview(null) },
+      h("span", { class: "mono idx", text: String(i + 1).padStart(2, "0") }), h("strong", { text: s.short }));
+    labelsEl.append(el);
+    return { s, el, at: "", on: false, z: "", w: 0, h: 0, hide: true };
+  });
+}
+buildLabels();
 let headerH = 0;
 let sat = 0;
 let frameTimer = 0;
@@ -220,7 +239,7 @@ addEventListener("resize", () => {
     syncHint();
     if (mode === "exhibit") placeLead();
     if (current && (mode === "exhibit" || mode === "travel")) world.focusSector(current, clearFrame());
-    else if (mode === "explore" && phoneMQ.matches) frameOverview();
+    else if (mode === "explore") frameOverview();
   }, 150);
 });
 // Runs on every rendered frame, so it only touches the DOM when something changed.
@@ -253,7 +272,7 @@ function onOtherSign(id, x, y, w, h) {
 }
 function placeLabels() {
   if (world.state().under) {
-    for (const l of labels) if (!l.hide) { l.el.classList.add("off"); l.hide = true; }
+    for (const l of labels) if (!l.hide) { l.el.classList.add("off"); l.hide = true; l.el.tabIndex = -1; }
     return;
   }
   if (!headerH) {
@@ -270,16 +289,22 @@ function placeLabels() {
     }
     const vis = world.signOnScreen(l.s.id);
     const halfH = vis.halfH || 0;
-    const x = vis.x;
-    // Just under the board. If the dock or another sign is there, sit on the board itself.
-    // Never slide the name sideways, and never park it in the sky above the sign.
+    const halfW = vis.halfW || 0;
+    let x = vis.x;
+    // Just under the board. If that spot is taken, sit on the board, then beside it.
     let y = (vis.y ?? 0) + halfH + 2;
     let hide = !vis.fullyIn;
-    const blocked = (yy) => onOtherSign(l.s.id, x, yy, l.w, l.h) || hitsChrome(x, yy, l.w, l.h, rects) || yy < headerH || yy + l.h > H - 6;
-    if (!hide && blocked(y)) y = (vis.y ?? 0) + halfH - l.h - 2;
-    if (!hide && blocked(y)) hide = true;
-    if (!hide && (x - l.w / 2 < 6 || x + l.w / 2 > W - 6)) hide = true;
-    if (hide !== l.hide) { l.el.classList.toggle("off", hide); l.hide = hide; }
+    const blockedAt = (xx, yy) => onOtherSign(l.s.id, xx, yy, l.w, l.h) || hitsChrome(xx, yy, l.w, l.h, rects) || yy < headerH || yy + l.h > H - 6 || xx - l.w / 2 < 6 || xx + l.w / 2 > W - 6;
+    if (!hide && blockedAt(x, y)) y = (vis.y ?? 0) - l.h - 4;
+    if (!hide && blockedAt(x, y)) {
+      const outward = x < W / 2 ? -1 : 1;
+      const beside = (dir) => vis.x + dir * (halfW + l.w / 2 + 10);
+      x = beside(outward);
+      y = (vis.y ?? 0) - l.h / 2;
+      if (blockedAt(x, y)) x = beside(-outward);
+    }
+    if (!hide && blockedAt(x, y)) hide = true;
+    if (hide !== l.hide) { l.el.classList.toggle("off", hide); l.hide = hide; l.el.tabIndex = hide ? -1 : 0; }
     if (hide) continue;
     const at = `translate(${Math.round(x)}px, ${Math.round(y)}px) translate(-50%, 0)`;
     if (at !== l.at) { l.el.style.transform = at; l.at = at; }
@@ -341,51 +366,47 @@ mm.addEventListener("click", (e) => {
 
 /* ---------- modes ---------- */
 /* Screen area left clear of the exhibit sheet, header, and edges. */
-/* On a phone the header and the bottom dock cover the canvas. Keep the island in the open band. */
+/* Keep every sign in the band the header and the bottom dock leave open. */
 function exploreClear() {
-  if (!phoneMQ.matches) return null;
   const deck = document.querySelector(".deck-top");
   const deckShown = deck && getComputedStyle(deck).display !== "none";
   const top = (deckShown ? deck.getBoundingClientRect().height : sat) + 8;
   const hint = $("hint");
-  const hintShown = hint && !hint.hidden && getComputedStyle(hint).display !== "none";
-  const btn = $("sectors-btn").getBoundingClientRect();
-  const inst = document.querySelector(".instruments").getBoundingClientRect();
-  let dockTop = inst.height > 8 ? Math.min(btn.top, inst.top) : btn.top;
-  if (hintShown) dockTop = Math.min(dockTop, hint.getBoundingClientRect().top);
-  const bottom = Math.max(56, innerHeight - dockTop + 6);
-  const height = Math.max(180, innerHeight - top - bottom);
-  return { cx: innerWidth / 2, cy: top + height / 2, w: Math.max(140, innerWidth - 16), h: height };
+  const hintShown = hint && !hint.hidden && getComputedStyle(hint).display !== "none" && parseFloat(getComputedStyle(hint).opacity) > 0.4;
+  if (phoneMQ.matches) {
+    const btn = $("sectors-btn").getBoundingClientRect();
+    const inst = document.querySelector(".instruments").getBoundingClientRect();
+    let dockTop = inst.height > 8 ? Math.min(btn.top, inst.top) : btn.top;
+    if (hintShown) dockTop = Math.min(dockTop, hint.getBoundingClientRect().top);
+    const bottom = Math.max(56, innerHeight - dockTop + 6);
+    const height = Math.max(180, innerHeight - top - bottom);
+    return { cx: innerWidth / 2, cy: top + height / 2, w: Math.max(140, innerWidth - 16), h: height };
+  }
+  const bottom = hintShown ? Math.max(48, innerHeight - hint.getBoundingClientRect().top + 6) : 36;
+  const height = Math.max(220, innerHeight - top - bottom);
+  return { cx: innerWidth / 2, cy: top + height / 2, w: Math.max(280, innerWidth - 36), h: height };
 }
-/* On a phone the lead portrait sits between the title and the lede, so the face is in the first screen. */
+/* The thesis stays under the title. The photograph follows it, in the body. */
 function placeLead() {
-  const head = document.querySelector(".exhibit .ex-head");
   const body = $("ex-body");
-  const lede = head?.querySelector(".lede");
-  if (!lede || !body) return;
-  const first = body.firstElementChild;
-  const parked = head.querySelector(".gallery");
-  const lead = (first?.classList.contains("gallery") && first) || parked;
-  if (!lead) return;
-  if (phoneMQ.matches) lede.before(lead);
-  else if (lead.parentElement !== body) body.prepend(lead);
+  const parked = document.querySelector(".exhibit .ex-head .gallery");
+  if (!parked || !body) return;
+  body.prepend(parked);
 }
 function hintLine(kind) {
   const touch = phoneMQ.matches || matchMedia("(pointer: coarse)").matches;
-  if (kind === "under") return "Drag down to return";
-  if (kind === "done") return buriedLeft() ? "Drag up, past the stop." : "Every artifact recovered.";
-  if (kind === "scout") return "Scout dispatched to the signal…";
-  if (kind === "found") return touch ? "Drag to rotate · Pinch to zoom · Tap a sign" : "Drag to rotate · Scroll to zoom · Click a destination";
-  return touch ? "Drag to rotate · Pinch to zoom · Tap a sign" : "Drag to rotate · Scroll to zoom · Click a sign to enter";
+  if (kind === "under") return t("hintUnder");
+  if (kind === "done") return buriedLeft() ? t("hintDoneBuried") : t("hintDone");
+  if (kind === "scout") return t("hintScout");
+  if (kind === "found") return touch ? t("hintFoundTouch") : t("hintFound");
+  return touch ? t("hintExploreTouch") : t("hintExplore");
 }
 function syncHint() {
   const under = !!(world && world.state().under);
   $("hint").textContent = hintLine(under ? "under" : surfaceFound() >= SURFACE.length ? "done" : undefined);
 }
-function frameOverview() {
-  const clear = exploreClear();
-  if (clear) world?.overview(clear);
-  else world?.overview();
+function frameOverview({ home = false } = {}) {
+  world?.overview(exploreClear(), { home });
 }
 
 function clearFrame() {
@@ -439,7 +460,7 @@ function openExhibit(s) {
   const ix = SECTORS.indexOf(s);
   $("exhibit").style.setProperty("--accent", s.accent);
   $("ex-crumb").textContent = `${String(ix + 1).padStart(2, "0")} · ${s.short}`;
-  $("ex-kicker").textContent = `${ex.kicker.replace(/^Sector \d+ · /, "")} · ${s.era}`; // the bar above already names the sector
+  $("ex-kicker").textContent = `${ex.kicker.replace(/^[^·]+·\s*/, "")} · ${s.era}`; // the bar above already names the sector
   $("ex-title").textContent = ex.title;
   // Headline logos (WSOP, 2 Hand Hold'em) sit beside the title as the exhibit's emblem.
   const em = $("ex-emblem"), logo = s.key?.hero && s.key.fit === "contain";
@@ -455,7 +476,7 @@ function openExhibit(s) {
   requestAnimationFrame(() => $("exhibit").classList.add("open"));
   $("ex-title").focus({ preventScroll: true });
   if (location.hash !== `#${s.id}`) history.replaceState(null, "", `#${s.id}`);
-  document.title = `${s.name} · D22: The Living Archive`;
+  document.title = t("exhibitTitle", { name: s.name });
   syncSectorList();
   if (world) { world.focusSector(s.id, clearFrame()); world.setBackground("exhibit"); }
 }
@@ -466,17 +487,17 @@ function footer(s) {
     const pos = TOUR.indexOf(s.id);
     const next = TOUR[pos + 1] && byId(TOUR[pos + 1]);
     return h("div", { class: "tour-foot" },
-      h("p", { class: "mono eyebrow", text: `Guided tour · stop ${pos + 1} of ${TOUR.length}` }),
+      h("p", { class: "mono eyebrow", text: t("guidedTourStop", { pos: pos + 1, total: TOUR.length }) }),
       h("div", { class: "foot-actions" },
-        next ? h("button", { type: "button", class: "btn-solid", onclick: () => go(next.id, { fromTour: true }), text: `Next stop: ${next.name} →` })
-             : h("button", { type: "button", class: "btn-solid", onclick: () => { tour = null; closeExhibit(); }, text: "Finish the tour" }),
-        h("button", { type: "button", class: "btn-ghost", onclick: () => { tour = null; $("ex-foot").replaceChildren(footer(s)); syncArrows(s); }, text: "Leave tour" })));
+        next ? h("button", { type: "button", class: "btn-solid", onclick: () => go(next.id, { fromTour: true }), text: t("nextStop", { name: next.name }) })
+             : h("button", { type: "button", class: "btn-solid", onclick: () => { tour = null; closeExhibit(); }, text: t("finishTour") }),
+        h("button", { type: "button", class: "btn-ghost", onclick: () => { tour = null; $("ex-foot").replaceChildren(footer(s)); syncArrows(s); }, text: t("leaveTour") })));
   }
   const prev = SECTORS[(ix + SECTORS.length - 1) % SECTORS.length], next = SECTORS[(ix + 1) % SECTORS.length];
   return h("div", { class: "foot-actions spread" },
-    h("button", { type: "button", class: "btn-ghost", onclick: () => go(prev.id), text: `← ${prev.short}` }),
-    h("button", { type: "button", class: "btn-ghost", onclick: closeExhibit, text: "Back to the world" }),
-    h("button", { type: "button", class: "btn-ghost", onclick: () => go(next.id), text: `${next.short} →` }));
+    h("button", { type: "button", class: "btn-ghost", onclick: () => go(prev.id), text: t("prevName", { name: prev.short }) }),
+    h("button", { type: "button", class: "btn-ghost", onclick: closeExhibit, text: t("backToWorld") }),
+    h("button", { type: "button", class: "btn-ghost", onclick: () => go(next.id), text: t("nextName", { name: next.short }) }));
 }
 
 function stepTargets(s) {
@@ -498,21 +519,21 @@ function stepTargets(s) {
 }
 
 function syncArrows(s) {
-  const t = stepTargets(s);
+  const tg = stepTargets(s);
   const prev = $("ex-prev"), next = $("ex-next");
-  prev.hidden = !t.prev;
-  if (t.prev) {
-    $("ex-prev-name").textContent = t.prev.short;
-    prev.setAttribute("aria-label", `Previous: ${t.prev.name}`);
+  prev.hidden = !tg.prev;
+  if (tg.prev) {
+    $("ex-prev-name").textContent = tg.prev.short;
+    prev.setAttribute("aria-label", t("previous", { name: tg.prev.name }));
   }
-  if (t.finish) {
+  if (tg.finish) {
     next.hidden = false;
-    $("ex-next-name").textContent = "Finish";
-    next.setAttribute("aria-label", "Finish the tour");
-  } else if (t.next) {
+    $("ex-next-name").textContent = t("finish");
+    next.setAttribute("aria-label", t("finishTour"));
+  } else if (tg.next) {
     next.hidden = false;
-    $("ex-next-name").textContent = t.next.short;
-    next.setAttribute("aria-label", `Next: ${t.next.name}`);
+    $("ex-next-name").textContent = tg.next.short;
+    next.setAttribute("aria-label", t("next", { name: tg.next.name }));
   } else next.hidden = true;
 }
 
@@ -529,17 +550,21 @@ $("ex-next").addEventListener("click", () => step(1));
 
 function closeExhibit() {
   clearTimeout(openTimer);
-  if ($("exhibit").contains(document.activeElement)) $("sector-list").querySelector(`[data-id="${current}"]`)?.focus({ preventScroll: true });
+  if ($("exhibit").contains(document.activeElement)) {
+    const drawerOpen = !$("sectors-panel").hidden;
+    const backTo = drawerOpen ? $("sector-list").querySelector(`[data-id="${current}"]`) : $("sectors-btn");
+    backTo?.focus({ preventScroll: true });
+  }
   $("exhibit").classList.remove("open");
   setTimeout(() => { if (!$("exhibit").classList.contains("open")) $("exhibit").hidden = true; }, 280);
   setMode("explore");
   deselect();
   if (location.hash) history.replaceState(null, "", location.pathname + location.search);
-  document.title = "D22: The Living Archive";
+  document.title = t("siteTitle");
   if (world) {
     world.setIdleSpin(true);
     world.setBackground("none");
-    frameOverview();
+    frameOverview({ home: true });
   }
 }
 
@@ -582,6 +607,7 @@ function buildList() {
     h("p", { class: "lede", text: s.exhibit.lede }),
     renderExhibitBody(s))));
   // Light up the chip for the exhibit being read.
+  listObserver?.disconnect();
   const chips = [...$("list-nav").children];
   const seen = new IntersectionObserver((entries) => {
     const e = entries.find((x) => x.isIntersecting);
@@ -591,7 +617,9 @@ function buildList() {
     if (nav.scrollWidth > nav.clientWidth) nav.scrollTo({ left: on.offsetLeft - 16, behavior: reduced ? "auto" : "smooth" });
   }, { root: $("list-view"), rootMargin: "-30% 0px -60% 0px" });
   for (const a of $("list-body").children) seen.observe(a);
+  listObserver = seen;
 }
+let listObserver = null;
 let listBuilt = false;
 function openList() {
   if (!listBuilt) { buildList(); listBuilt = true; }
@@ -627,7 +655,7 @@ function hideToast() {
 function showArtifact(a) {
   if (mode !== "explore") { queuedArtifact = a; hideToast(); return; }
   shownArtifact = a;
-  $("toast").querySelector(".eyebrow").textContent = a.under ? "Buried artifact" : "Artifact recovered";
+  $("toast").querySelector(".eyebrow").textContent = a.under ? t("buriedArtifact") : t("artifactRecovered");
   $("toast-title").textContent = a.title;
   $("toast-text").textContent = a.text;
   const t = $("toast");
@@ -681,8 +709,56 @@ addEventListener("keydown", (e) => {
 $("zoom-in").addEventListener("click", () => world?.zoomBy(1.3));
 $("zoom-out").addEventListener("click", () => world?.zoomBy(0.77));
 $("ex-close").addEventListener("click", closeExhibit);
-$("home-link").addEventListener("click", (e) => { e.preventDefault(); closeList(); if (mode !== "explore") closeExhibit(); deselect(); frameOverview(); });
+$("home-link").addEventListener("click", (e) => { e.preventDefault(); closeList(); if (mode !== "explore") closeExhibit(); deselect(); frameOverview({ home: true }); });
 $("media-btn").addEventListener("click", (e) => { e.preventDefault(); closeList(); go("command", { instant: true }); });
+
+/* ---------- language switching ---------- */
+function applyI18n() {
+  document.documentElement.lang = locale === "zh" ? "zh-Hans" : locale;
+  document.querySelector('meta[name="description"]')?.setAttribute("content", t("metaDescription"));
+  $("world")?.setAttribute("aria-label", t("canvasLabel"));
+  document.querySelectorAll("[data-i18n]").forEach((el) => { el.textContent = t(el.dataset.i18n); });
+  document.querySelectorAll("[data-i18n-aria]").forEach((el) => el.setAttribute("aria-label", t(el.dataset.i18nAria)));
+  document.querySelectorAll("[data-i18n-alt]").forEach((el) => el.setAttribute("alt", t(el.dataset.i18nAlt)));
+  const switcher = $("lang-switch");
+  if (switcher) {
+    switcher.setAttribute("aria-label", t("language"));
+    switcher.querySelectorAll("[data-lang]").forEach((b) => {
+      const on = b.dataset.lang === locale;
+      b.classList.toggle("on", on);
+      b.setAttribute("aria-pressed", String(on));
+    });
+  }
+  document.title = mode === "exhibit" && current ? t("exhibitTitle", { name: byId(current).name }) : `Wayne “D22-soso” Chiang · ${t("livingArchive")}`;
+  buildSectorList();
+  buildLabels();
+  $("sector-count").textContent = String(SECTORS.length).padStart(2, "0");
+  $("art-total").textContent = SURFACE.length;
+  $("finds-hint").textContent = t("findsHint", { n: SURFACE.length });
+  $("mode").textContent = { explore: t("exploration"), travel: t("travel"), exhibit: t("exhibitMode") }[mode];
+  if (mode === "exhibit" && current) $("view-name").textContent = byId(current).short;
+  else if (mode === "explore") $("view-name").textContent = t("worldView");
+  syncSectorList();
+  syncHint();
+  if (readoutFor) preview(readoutFor.id, readoutFor.kind);
+  if (listBuilt) buildList();
+  if (mode === "exhibit" && current && !$("exhibit").hidden) {
+    const sc = $("ex-scroll").scrollTop;
+    openExhibit(byId(current));
+    $("ex-scroll").scrollTop = sc;
+    document.querySelector(`[data-lang="${locale}"]`)?.focus({ preventScroll: true });
+  }
+}
+function setLocale(code) {
+  if (!LOCALES.some((l) => l.code === code) || code === locale) return;
+  locale = code;
+  persistLocale(code);
+  t = makeT(locale);
+  SECTORS = localizeSectors(BASE_SECTORS, locale);
+  ARTIFACTS = localizeArtifacts(BASE_ARTIFACTS, locale);
+  applyI18n();
+}
+document.querySelectorAll("[data-lang]").forEach((b) => b.addEventListener("click", () => setLocale(b.dataset.lang)));
 
 /* ---------- boot ---------- */
 function route() {
@@ -699,7 +775,7 @@ function fallback() {
   if (byId(id)) { listJump(id); history.replaceState(null, "", `#${id}`); }
 }
 async function boot() {
-    const { createWorld, webglAvailable } = await import("./world.js?v=70").catch((err) => { console.error(err); return {}; });
+    const { createWorld, webglAvailable } = await import("./world.js?v=74").catch((err) => { console.error(err); return {}; });
   if (!createWorld || !webglAvailable()) {
     fallback();
     return;
@@ -728,7 +804,7 @@ async function boot() {
         const reading = mode === "exhibit" || app.classList.contains("listing");
         if (mode === "explore") {
           const under = !!world.state().under;
-          const name = under ? "Beneath the archive" : "World view";
+          const name = under ? t("beneathArchive") : t("worldView");
           if ($("view-name").textContent !== name) $("view-name").textContent = name;
           if (under !== wasUnder) {
             wasUnder = under;
@@ -746,7 +822,7 @@ async function boot() {
     fallback();
     return;
   }
-  frameOverview();
+  frameOverview({ home: true });
   world.restoreFound([...foundArtifacts]);
   app.classList.toggle("has-finds", surfaceFound() > 0);
   world.onDiscover((a) => {
@@ -773,4 +849,5 @@ addEventListener("hashchange", () => {
   if (byId(id)) { if (id !== current || mode === "explore") go(id); }
   else if (mode !== "explore") closeExhibit();
 });
+applyI18n();
 boot();

@@ -902,7 +902,10 @@ function artifactMesh(under = false) {
   g.add(gem);
   const beam = mesh(
     new THREE.CylinderGeometry(under ? 0.08 : 0.06, under ? 0.18 : 0.25, under ? 1.6 : 6, 8, 1, true),
-    new THREE.MeshBasicMaterial({ color: under ? "#7dd3fc" : "#e8c44a", transparent: true, opacity: 0, depthWrite: false, side: THREE.DoubleSide, blending: under ? THREE.AdditiveBlending : THREE.NormalBlending }),
+    new THREE.MeshBasicMaterial({
+      color: under ? "#7dd3fc" : "#e8c44a", transparent: true, opacity: 0, depthWrite: false, side: THREE.DoubleSide,
+      ...(under ? { blending: THREE.AdditiveBlending } : {}),
+    }),
     0, under ? -1.25 : 3.6, 0, false);
   g.add(beam);
   if (under) g.add(mesh(new THREE.CylinderGeometry(0.2, 0.42, 1.15, 6), mat("#2a2830", { side: THREE.DoubleSide }), 0, 0.55, 0, false));
@@ -1330,6 +1333,8 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
   let vAz = 0, lastUser = performance.now();
   let background = "none";
   let underLock = false, holdUnder = false, dig = 0, underView = null;
+  let fitted = true;
+  let band = null;
   function nudgeElevation(dy, dx) {
     const delta = dy * 0.004;
     if (introT < 1 || (background !== "none" && !underLock)) {
@@ -1419,7 +1424,7 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
   }
   const ptrs = new Map();
   let drag = null, pinch = null, hover = null, hoverAt = null;
-  const userMoved = () => { lastUser = performance.now(); onCameraUser?.(); };
+  const userMoved = () => { lastUser = performance.now(); fitted = false; onCameraUser?.(); };
 
   canvas.addEventListener("pointerdown", (e) => {
     try { canvas.setPointerCapture(e.pointerId); } catch {}
@@ -1570,6 +1575,7 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
     const dt = Math.min(raw, 0.05);
     const t = reduced ? 0 : now / 1000;
 
+    if (fitted && !drag && !pinch && introT >= 1 && background === "none" && goal.el > 0 && Math.hypot(goal.tx, goal.tz) < 0.5) fitAngle(goal.az);
     if (introT < 1) {
       introT = Math.min(1, introT + raw / 3.2);
       const k = ease(introT);
@@ -1727,14 +1733,37 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
       minX = Math.min(minX, cx - sx / 2); maxX = Math.max(maxX, cx + sx / 2);
       minY = Math.min(minY, cy - sy / 2); maxY = Math.max(maxY, cy + sy / 2);
     }
-    return { spanX: maxX - minX, spanY: maxY - minY };
+    return { minX, maxX, minY, maxY, spanX: maxX - minX, spanY: maxY - minY };
   }
+  /* Frame whichever way the island is turned: the sign box fills the open band,
+     and the next turn is framed the same way, so a photograph is not left in the sky. */
+  function fitAngle(az) {
+    const box = signSpan(az, goal.el, goal.ty);
+    const midX = (box.minX + box.maxX) / 2;
+    const midY = (box.minY + box.maxY) / 2;
+    const { fit, aspect } = viewSpan();
+    const b = band && band.w > 1 ? band : { cx: width / 2, cy: height / 2, w: width, h: height };
+    const fracX = clamp(b.w / Math.max(1, width), 0.35, 1);
+    const fracY = clamp(b.h / Math.max(1, height), 0.35, 1);
+    const pad = 1.08;
+    const reachX = Math.max(1, box.spanX / 2);
+    const reachY = Math.max(1, box.spanY / 2);
+    const zoomX = (fit * aspect * fracX) / (2 * reachX * pad);
+    const zoomY = (fit * fracY) / (2 * reachY * pad);
+    goal.zoom = clamp(Math.min(zoomX, zoomY), 0.22, 1.35);
+    const viewW = (fit * aspect) / goal.zoom;
+    const viewH = fit / goal.zoom;
+    goal.shiftX = (b.cx / Math.max(1, width) - 0.5) - midX / viewW;
+    goal.shiftY = (0.5 - b.cy / Math.max(1, height)) - midY / viewH;
+  }
+  const HOME_AZ = deg(225);
   return {
     /* Camera framing for a sector. `clear` is the screen rect the sign and
        its building must fit in, so the exhibit sheet never covers them. */
     focusSector(id, clear) {
       const o = sectorObjs.find((x) => x.s.id === id);
       if (!o) return;
+      fitted = false;
       if (clear && ("zoom" in clear || "shiftY" in clear || "shiftX" in clear)) {
         const { shiftX = 0, shiftY = 0, zoom = 2.3 } = clear;
         goal.tx = o.p.x * 0.92; goal.tz = o.p.z * 0.92; goal.ty = PLATEAU_TOP + (SIGN.bottom + o.signH) * 0.45;
@@ -1771,32 +1800,21 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
       introT = 1; vAz = 0;
     },
     frame({ shiftX = 0, shiftY = 0 } = {}) { goal.shiftX = shiftX; goal.shiftY = shiftY; },
-    overview(clear) {
+    /* `home` returns to the opening angle. fitAngle centers that turn's sign box in the open band. */
+    overview(clear, { home = false } = {}) {
+      if (home) {
+        let az = HOME_AZ;
+        while (az - cur.az > Math.PI) az -= Math.PI * 2;
+        while (az - cur.az < -Math.PI) az += Math.PI * 2;
+        goal.az = az;
+      }
       goal.tx = 0; goal.tz = 0; goal.ty = OV.ty; goal.el = OV.el;
-      let fracX = 1, fracY = 1;
-      if (clear && width > 1 && height > 1) {
-        goal.shiftX = clear.cx / width - 0.5;
-        goal.shiftY = 0.5 - clear.cy / height - 0.045;
-        fracX = clamp(clear.w / width, 0.35, 1);
-        fracY = clamp(clear.h / height, 0.35, 1);
-      } else {
-        goal.shiftX = 0; goal.shiftY = 0;
-      }
-      // Fit the widest arrangement of signs, so a turn never slices a photograph.
-      const { fit, aspect } = viewSpan();
-      let spanX = 1, spanY = 1;
-      for (let i = 0; i < 8; i++) {
-        const box = signSpan(goal.az + (i * Math.PI) / 4, goal.el, goal.ty);
-        spanX = Math.max(spanX, box.spanX);
-        spanY = Math.max(spanY, box.spanY);
-      }
-      const pad = 1.14;
-      const zoomX = (fit * aspect * fracX) / (spanX * pad);
-      const zoomY = (fit * fracY) / (spanY * pad);
-      goal.zoom = clamp(Math.min(zoomX, zoomY), 0.4, 1);
+      band = clear && width > 1 && height > 1 ? clear : null;
+      fitted = true;
+      fitAngle(goal.az);
     },
     zoomBy(f) { goal.zoom = clamp(goal.zoom * f, 0.7, 3.6); userMoved(); },
-    rotateBy(a) { goal.az += a; userMoved(); },
+    rotateBy(a) { goal.az += a; userMoved(); fitted = true; },
     lookAt(x, z) { goal.tx = clamp(x, -R, R); goal.tz = clamp(z, -R, R); userMoved(); },
     sendScoutToSector(id, cb) {
       const o = sectorObjs.find((x) => x.s.id === id);
