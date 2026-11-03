@@ -1,7 +1,7 @@
 /* D22: The Living Archive — modes, HUD, exhibits, tour, and fallbacks around the 3D world. */
-import { SECTORS as BASE_SECTORS, TOUR, ARTIFACTS as BASE_ARTIFACTS, EMAIL } from "./content.js?v=14";
+import { SECTORS as BASE_SECTORS, TOUR, ARTIFACTS as BASE_ARTIFACTS, EMAIL } from "./content.js?v=15";
 import { mountDemo } from "./holdem.js?v=2";
-import { LOCALES, UI, detectLocale, persistLocale, makeT, localizeSectors, localizeArtifacts } from "./i18n.js?v=5";
+import { LOCALES, UI, detectLocale, persistLocale, makeT, localizeSectors, localizeArtifacts } from "./i18n.js?v=6";
 
 /* ---------- localisation (EN source, KO / ZH overlays from i18n.js) ---------- */
 let locale = detectLocale();
@@ -291,11 +291,12 @@ function placeLabels() {
     const halfH = vis.halfH || 0;
     const halfW = vis.halfW || 0;
     let x = vis.x;
-    // Just under the board. If that spot is taken, sit on the board, then beside it.
+    /* Just under the board. If that spot is taken, just over it, then beside it.
+       Only as a last resort does the name sit on the picture, and then on its own plate. */
     let y = (vis.y ?? 0) + halfH + 2;
-    let hide = !vis.fullyIn;
+    let hide = !vis.fullyIn, plate = false;
     const blockedAt = (xx, yy) => onOtherSign(l.s.id, xx, yy, l.w, l.h) || hitsChrome(xx, yy, l.w, l.h, rects) || yy < headerH || yy + l.h > H - 6 || xx - l.w / 2 < 6 || xx + l.w / 2 > W - 6;
-    if (!hide && blockedAt(x, y)) y = (vis.y ?? 0) - l.h - 4;
+    if (!hide && blockedAt(x, y)) y = (vis.y ?? 0) - halfH - l.h - 4;
     if (!hide && blockedAt(x, y)) {
       const outward = x < W / 2 ? -1 : 1;
       const beside = (dir) => vis.x + dir * (halfW + l.w / 2 + 10);
@@ -303,8 +304,12 @@ function placeLabels() {
       y = (vis.y ?? 0) - l.h / 2;
       if (blockedAt(x, y)) x = beside(-outward);
     }
-    if (!hide && blockedAt(x, y)) hide = true;
-    if (hide !== l.hide) { l.el.classList.toggle("off", hide); l.hide = hide; l.el.tabIndex = hide ? -1 : 0; }
+    if (!hide && blockedAt(x, y)) {
+      x = vis.x; y = (vis.y ?? 0) + halfH - l.h - 8; plate = true;
+      if (hitsChrome(x, y, l.w, l.h, rects) || y < headerH || y + l.h > H - 6 || x - l.w / 2 < 6 || x + l.w / 2 > W - 6) hide = true;
+    }
+    if (plate !== l.plate) { l.el.classList.toggle("plate", plate); l.plate = plate; }
+    if (hide !== l.hide) { l.el.classList.toggle("off", hide); l.hide = hide; }
     if (hide) continue;
     const at = `translate(${Math.round(x)}px, ${Math.round(y)}px) translate(-50%, 0)`;
     if (at !== l.at) { l.el.style.transform = at; l.at = at; }
@@ -415,7 +420,7 @@ function clearFrame() {
   const deckShown = deck && getComputedStyle(deck).display !== "none";
   const header = deckShown ? deck.getBoundingClientRect().height : 0;
   if (phoneMQ.matches) {
-    const sheetTop = H * 0.38;
+    const sheetTop = halfTop();
     const top = Math.max(header, sat) + 18;
     const height = Math.max(120, sheetTop - top - 14);
     return { cx: W / 2, cy: top + height / 2, w: Math.max(140, W - 20), h: height };
@@ -471,6 +476,8 @@ function openExhibit(s) {
   placeLead();
   $("ex-foot").replaceChildren(footer(s));
   syncArrows(s);
+  // Stepping to the next sector while reading full screen keeps the sheet where it is.
+  if ($("exhibit").hidden || !$("exhibit").classList.contains("open")) setFull(false);
   $("exhibit").hidden = false;
   $("ex-scroll").scrollTop = 0;
   requestAnimationFrame(() => $("exhibit").classList.add("open"));
@@ -478,7 +485,73 @@ function openExhibit(s) {
   if (location.hash !== `#${s.id}`) history.replaceState(null, "", `#${s.id}`);
   document.title = t("exhibitTitle", { name: s.name });
   syncSectorList();
-  if (world) { world.focusSector(s.id, clearFrame()); world.setBackground("exhibit"); }
+  if (world) { world.focusSector(s.id, clearFrame()); world.setBackground($("exhibit").classList.contains("full") ? "list" : "exhibit"); }
+}
+
+/* ---------- phone sheet: pull up to read full screen, pull down to let go ---------- */
+// Where the half-height sheet rests. Read from the CSS (38vh), which on iPhones is not 38% of innerHeight.
+const halfProbe = Object.assign(document.createElement("div"), { style: "position:fixed;top:0;height:38vh;width:0;visibility:hidden;pointer-events:none" });
+document.body.append(halfProbe);
+function halfTop() { return halfProbe.offsetHeight || innerHeight * 0.38; }
+const sheet = $("exhibit"), sheetScroll = $("ex-scroll");
+function setFull(on) {
+  const sheet = $("exhibit");
+  if (!phoneMQ.matches) on = false;
+  if (sheet.classList.contains("full") === on) return;
+  sheet.classList.toggle("full", on);
+  // Full screen, the sheet is the only thing in view, so it says so to screen readers.
+  if (on) { sheet.setAttribute("role", "dialog"); sheet.setAttribute("aria-modal", "true"); }
+  else { sheet.removeAttribute("role"); sheet.removeAttribute("aria-modal"); }
+  // Nothing of the world shows behind a full sheet, so let it rest.
+  if (world && mode === "exhibit") world.setBackground(on ? "list" : "exhibit");
+}
+sheetScroll.addEventListener("scroll", () => {
+  if (phoneMQ.matches && mode === "exhibit" && !sheet.classList.contains("full") && sheetScroll.scrollTop > 24) setFull(true);
+}, { passive: true });
+phoneMQ.addEventListener?.("change", () => setFull(false));
+{
+  let pull = null;
+  const restTop = () => sheet.getBoundingClientRect().top;
+  sheet.addEventListener("touchstart", (e) => {
+    if (!phoneMQ.matches || e.touches.length !== 1 || e.target.closest(".ex-nav, .demo, .lightbox")) return;
+    const onBar = !!e.target.closest(".exhibit-bar");
+    if (!onBar && sheetScroll.scrollTop > 0) return;
+    pull = { y0: e.touches[0].clientY, top0: restTop(), onBar, moved: false, last: e.touches[0].clientY, t: performance.now(), v: 0 };
+  }, { passive: true });
+  sheet.addEventListener("touchmove", (e) => {
+    if (!pull) return;
+    const y = e.touches[0].clientY, dy = y - pull.y0;
+    // From the text, only a downward pull moves the sheet. An upward swipe scrolls, and the scroll opens it fully.
+    if (!pull.moved) {
+      if (Math.abs(dy) < 8) return;
+      // Short exhibits have nothing to scroll, so an upward swipe on their text lifts the sheet directly.
+      const canScroll = sheetScroll.scrollHeight > sheetScroll.clientHeight + 4;
+      if (!pull.onBar && ((dy < 0 && canScroll) || sheetScroll.scrollTop > 0)) { pull = null; return; }
+      pull.moved = true;
+      sheet.classList.add("dragging");
+    }
+    e.preventDefault();
+    const now = performance.now();
+    pull.v = (y - pull.last) / Math.max(1, now - pull.t);
+    pull.last = y; pull.t = now;
+    const top = clamp(pull.top0 + dy, sat, innerHeight - 80);
+    sheet.style.top = `${top}px`;
+  }, { passive: false });
+  const release = () => {
+    if (!pull) return;
+    const p = pull; pull = null;
+    if (!p.moved) return;
+    const top = restTop();
+    sheet.classList.remove("dragging");
+    sheet.style.top = "";
+    const H = innerHeight, half = halfTop(), full = sheet.classList.contains("full");
+    const flingDown = p.v > 0.6, flingUp = p.v < -0.6;
+    if (top > (full ? H * 0.62 : half + 90) || (flingDown && top > half - 20)) closeExhibit();
+    else if (flingUp || top < half * 0.6) setFull(true);
+    else if (full && (flingDown || top > half * 0.6)) { setFull(false); sheetScroll.scrollTop = 0; }
+  };
+  sheet.addEventListener("touchend", release);
+  sheet.addEventListener("touchcancel", release);
 }
 
 function footer(s) {
@@ -556,7 +629,7 @@ function closeExhibit() {
     backTo?.focus({ preventScroll: true });
   }
   $("exhibit").classList.remove("open");
-  setTimeout(() => { if (!$("exhibit").classList.contains("open")) $("exhibit").hidden = true; }, 280);
+  setTimeout(() => { if (!$("exhibit").classList.contains("open")) { $("exhibit").hidden = true; setFull(false); } }, 280);
   setMode("explore");
   deselect();
   if (location.hash) history.replaceState(null, "", location.pathname + location.search);
@@ -584,6 +657,14 @@ function setDrawer(open) {
 $("sectors-btn").addEventListener("click", (e) => {
   e.stopPropagation();
   setDrawer($("sectors-panel").hidden);
+});
+/* The floating sign names are pointer-only; the sector list is the keyboard route to every exhibit. */
+$("skip-link").addEventListener("click", (e) => {
+  e.preventDefault();
+  e.stopPropagation();
+  if (mode === "exhibit") closeExhibit();
+  setDrawer(true);
+  ($("sector-list").querySelector("a, button") || $("sectors-btn")).focus();
 });
 $("sector-list").addEventListener("click", (e) => {
   e.stopPropagation();
@@ -658,14 +739,14 @@ function showArtifact(a) {
   $("toast").querySelector(".eyebrow").textContent = a.under ? t("buriedArtifact") : t("artifactRecovered");
   $("toast-title").textContent = a.title;
   $("toast-text").textContent = a.text;
-  const t = $("toast");
-  t.hidden = false;
-  requestAnimationFrame(() => t.classList.add("open"));
+  const toast = $("toast");
+  toast.hidden = false;
+  requestAnimationFrame(() => toast.classList.add("open"));
   clearTimeout(toastTimer);
   clearTimeout(toastHide);
   toastTimer = setTimeout(() => {
-    t.classList.remove("open");
-    toastHide = setTimeout(() => { t.hidden = true; }, 300);
+    toast.classList.remove("open");
+    toastHide = setTimeout(() => { toast.hidden = true; }, 300);
   }, 4500);
 }
 function flushToast() {
@@ -775,7 +856,7 @@ function fallback() {
   if (byId(id)) { listJump(id); history.replaceState(null, "", `#${id}`); }
 }
 async function boot() {
-    const { createWorld, webglAvailable } = await import("./world.js?v=74").catch((err) => { console.error(err); return {}; });
+    const { createWorld, webglAvailable } = await import("./world.js?v=77").catch((err) => { console.error(err); return {}; });
   if (!createWorld || !webglAvailable()) {
     fallback();
     return;
@@ -835,12 +916,13 @@ async function boot() {
   syncHint();
   syncSectorList();
   try { route(); } catch (err) { console.error(err); }
-  // Let the reveal be seen for a moment, then lift it off the world.
-  setTimeout(() => {
+  // Let the reveal be seen for a moment, and until the first frame is drawn, then lift it off the world.
+  const firstFrame = Promise.race([world.ready, new Promise((r) => setTimeout(r, 6000))]);
+  firstFrame.then(() => setTimeout(() => {
     $("loading").classList.add("done");
     if (mode === "explore") frameOverview();
     setTimeout(() => $("loading").remove(), 700);
-  }, Math.max(0, (reduced ? 600 : 1500) - performance.now()));
+  }, Math.max(0, (reduced ? 600 : 1500) - performance.now())));
 }
 addEventListener("hashchange", () => {
   const id = location.hash.slice(1);

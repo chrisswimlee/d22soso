@@ -45,9 +45,14 @@ button { font: inherit; color: inherit; touch-action: manipulation; }
 #world { position: absolute; inset: 0; width: 100%; height: 100%; display: block; cursor: grab; touch-action: none; outline: none; }
 
 /* Labels pinned over buildings. Off-screen captions are hidden, not clamped onto the chrome. */
+/* Off screen until it has keyboard focus, then the first thing on the page. */
+.skip-link { position: fixed; top: 8px; left: 8px; z-index: 50; padding: 10px 14px; background: var(--gold); color: #07080b; font: 600 14px var(--display); border-radius: var(--r); text-decoration: none; transform: translateY(-160%); }
+.skip-link:focus { transform: none; outline: 2px solid #fff; outline-offset: 2px; }
 .labels { position: absolute; inset: 0; z-index: 1; pointer-events: none; overflow: hidden; }
 .label { position: absolute; left: 0; top: 0; display: grid; grid-template-columns: auto auto; column-gap: 6px; align-items: baseline; padding: 3px 2px 4px; border: 0; background: none; pointer-events: auto; cursor: pointer; text-shadow: 0 1px 2px #07080b, 0 0 10px #07080b; will-change: transform; }
 .label.off { visibility: hidden; pointer-events: none; }
+/* Last resort on the picture: a dark plate, so the name never reads across the photograph's own type. */
+.label.plate { padding: 3px 8px 4px; background: rgba(7, 8, 11, 0.86); border-radius: var(--r); text-shadow: none; }
 .label .idx { font-size: 12px; color: color-mix(in srgb, var(--accent) 55%, #fff); }
 .label strong { font: 600 16px/1.1 var(--display); letter-spacing: -0.01em; color: #f4f0e6; }
 .label.on strong, .label:hover strong { color: #fff; }
@@ -193,6 +198,16 @@ html[lang="ko"] .arrow-btn, html[lang="zh-Hans"] .arrow-btn { letter-spacing: 0.
 .gallery.n2 { grid-template-columns: 1fr 1fr; }
 .gallery figure.has-path { grid-column: 1 / -1; }
 .gallery figure.has-path + figure { max-width: 280px; }
+/* The bracket path reads down the left, the trophy fills the right, so neither leaves an empty half. */
+.gallery.n2:has(figure.has-path) { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+.gallery.n2 figure.has-path { grid-column: auto; align-self: center; }
+.gallery.n2 figure.has-path + figure { max-width: none; }
+.gallery.n2 figure.has-path .path { flex-direction: column; gap: 0; margin-bottom: 14px; border-left: 2px solid var(--rule-soft); padding-left: 14px; }
+.gallery.n2 figure.has-path .path li { padding: 5px 0; }
+@media (max-width: 760px) { .gallery.n2 figure.has-path .path li { font-size: 15px; padding: 4px 0; } .gallery.n2:has(figure.has-path) { gap: 14px; } }
+.gallery.n2 figure.has-path .path li:not(:last-child)::after { content: none; }
+.gallery.n2 figure.has-path .path li.key { position: relative; }
+.gallery.n2 figure.has-path .path li.key::before { content: ""; position: absolute; left: -17px; top: 6px; bottom: 6px; width: 2px; background: var(--gold); }
 .path { list-style: none; display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 0; margin: 0 0 8px; padding: 0; }
 .path li { display: inline-flex; align-items: baseline; gap: 8px; font: 600 16px/1.35 var(--display); color: var(--ink); }
 .path li:not(:last-child)::after { content: "→"; margin: 0 10px 0 8px; color: var(--gold-text); font-weight: 500; }
@@ -429,7 +444,12 @@ button.card.picked { transform: translateY(-6px); outline: 2px solid var(--gold-
   .readout-tag { margin: 0; font-size: 12px; }
   #readout-go { grid-column: 2; grid-row: 1 / span 3; }
   .readout::before, .readout::after { display: none; }
-  .exhibit { top: 38vh; left: 0; right: 0; bottom: 0; width: auto; border-radius: 14px 14px 0 0; transform: translateY(24px); border-left: 0; border-right: 0; border-bottom: 0; padding-bottom: 0; }
+  .exhibit { top: 38vh; left: 0; right: 0; bottom: 0; width: auto; border-radius: 14px 14px 0 0; transform: translateY(24px); border-left: 0; border-right: 0; border-bottom: 0; padding-bottom: 0; transition: opacity 0.35s, transform 0.35s, top 0.32s cubic-bezier(0.2, 0.8, 0.2, 1), border-radius 0.32s; touch-action: pan-y; }
+  /* Reading further pulls the sheet up over the whole screen. Pulling down from the top of the text lets it go. */
+  .exhibit.full { top: env(safe-area-inset-top, 0px); border-radius: 0; }
+  .exhibit.dragging { transition: none; }
+  .exhibit::before { content: ""; position: absolute; top: 6px; left: 50%; width: 36px; height: 4px; margin-left: -18px; border-radius: 2px; background: rgba(236, 232, 220, 0.28); pointer-events: none; }
+  .exhibit-bar { padding-top: 14px; cursor: grab; }
   .ex-nav { padding: 10px var(--gut) calc(10px + env(safe-area-inset-bottom, 0px)); }
   /* The sheet is the page. Drop the header so the building keeps the space above it. */
   [data-mode="exhibit"] .deck-top, [data-mode="travel"] .deck-top { display: none; }

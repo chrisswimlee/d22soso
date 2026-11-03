@@ -79,16 +79,17 @@
     html[lang="ko"] { --body: "Noto Sans KR", "IBM Plex Sans", "Helvetica Neue", Arial, sans-serif; }
     html[lang="zh-Hans"] { --body: "Noto Sans SC", "IBM Plex Sans", "Helvetica Neue", Arial, sans-serif; }
   </style>
-  <link rel="stylesheet" href="archive/archive.css?v=18" />
+  <link rel="stylesheet" href="archive/archive.css?v=22" />
   <link rel="preload" as="image" href="assets/img/champ-trophy-640.webp" />
   <script type="importmap">{ "imports": { "three": "./vendor/three/three.archive.min.js" } }</script>
   <link rel="modulepreload" href="./vendor/three/three.archive.min.js" />
-  <link rel="modulepreload" href="archive/world.js?v=74" />
+  <link rel="modulepreload" href="archive/world.js?v=77" />
 </head>
 <body>
-  <div class="app" id="app" data-mode="explore">
+  <a class="skip-link" href="#sector-list" id="skip-link" data-i18n="skipToSectors">Skip to the sector list</a>
+  <main class="app" id="app" data-mode="explore">
     <canvas id="world" data-i18n-aria="canvasLabel" aria-label="Interactive 3D map of Wayne Chiang’s archive. Use the sector list to open any exhibit."></canvas>
-    <div class="labels" id="labels"></div>
+    <div class="labels" id="labels" aria-hidden="true"></div>
 
     <header class="deck-top">
       <div class="brand">
@@ -197,9 +198,9 @@
         </div>
       </div>
     </div>
-  </div>
+  </main>
 
-  <noscript><p style="padding:24px;color:#ece8dc;background:#07080b"><span data-i18n="noscript">This archive needs JavaScript. Visit the</span> <a href="classic.html" style="color:#e8c44a" data-i18n="noscriptLink">classic site</a>.</p></noscript>
-  <script type="module" src="archive/app.js?v=88"></script>
+  <noscript><p style="padding:24px;color:#ece8dc;background:#07080b"><span data-i18n="noscript">This archive needs JavaScript. Visit the</span> <a href="classic.html" style="color:#e8c44a" data-i18n="noscriptLink">classic site</a>.</p><nav aria-label="Exhibits" style="padding:0 24px 24px;background:#07080b"><a href="/arena/" style="color:#e8c44a">Championship Arena</a> · <a href="/garden/" style="color:#e8c44a">Strategy Garden</a> · <a href="/broadcast/" style="color:#e8c44a">Broadcast Station</a> · <a href="/foundry/" style="color:#e8c44a">Invention Foundry</a> · <a href="/library/" style="color:#e8c44a">Library</a> · <a href="/command/" style="color:#e8c44a">Command Center</a></nav></noscript>
+  <script type="module" src="archive/app.js?v=92"></script>
 </body>
 </html>

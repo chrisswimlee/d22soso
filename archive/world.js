@@ -637,6 +637,7 @@ const BUILD = {
    plate that sits on the roof. The sector name is the DOM label, not a second
    caption painted on the picture. */
 const SIGN = { z: -4.6, bottom: 4.7, w: 8.4, h: 10.3 };
+const MOBILE_SIGN_AREA = 92;
 function isMark(key) {
   const ratio = key?.ratio || 1;
   return key?.fit === "contain" && ratio >= 0.85 && ratio <= 1.3;
@@ -651,7 +652,10 @@ function roundPath(c, x, y, w, h, rad) {
   c.arcTo(x, y, x + w, y, r);
   c.closePath();
 }
-function billboard(key) {
+/* Phones get a smaller cut of each sign photo (`-m.webp`), made for boards that are a few hundred pixels tall. */
+const PHONE = matchMedia("(max-width: 760px)").matches || matchMedia("(pointer: coarse)").matches;
+const signSrc = (key) => PHONE && key.m ? key.src.replace(/\.webp(\?|$)/, "-m.webp$1") : key.src;
+function billboard(key, { defer = false } = {}) {
   const ratio = key?.ratio || 1;
   const wide = key?.fit === "contain" && ratio > 1.25;
   const mark = isMark(key);
@@ -663,7 +667,8 @@ function billboard(key) {
   const imageAspect = Math.max(ratio, 1);
   const markScale = mark ? scale : 1;
   const planeW = mark ? arenaH * imageAspect * markScale : (wide ? 8.8 * ratio : SIGN.w) * scale;
-  const planeH = mark ? arenaH * markScale : (wide ? 8.8 * 1.14 : SIGN.h) * scale;
+  // A wide print is cut to the picture's own shape, so it fills its board with no empty bands.
+  const planeH = mark ? arenaH * markScale : (wide ? 8.8 : SIGN.h) * scale;
   const W = wide || mark ? 1200 : 1400;
   const H = wide || mark ? Math.round(W * planeH / planeW) : Math.round(W * planeH / planeW);
   const logo = key?.fit === "contain";
@@ -689,7 +694,9 @@ function billboard(key) {
   let imgEl = null;
   const paint = () => {
     const [cw, ch] = sharpSize(imgEl);
-    if (art.c.width !== cw || art.c.height !== ch) { art.c.width = cw; art.c.height = ch; }
+    /* The GPU copy was allocated at the old size. Resizing the canvas without freeing it makes the
+       browser copy the photo into the wrong-sized texture, and the board shows part of it or nothing. */
+    if (art.c.width !== cw || art.c.height !== ch) { art.c.width = cw; art.c.height = ch; art.tex.dispose(); }
     const c = art.g;
     c.imageSmoothingEnabled = true;
     c.imageSmoothingQuality = "high";
@@ -739,12 +746,15 @@ function billboard(key) {
     art.tex.needsUpdate = true;
   };
   paint();
-  if (key?.src) {
+  // Signs other than the Arena wait until the first frame is up, so their photos don't compete with it.
+  const load = () => {
+    if (!key?.src || imgEl) return;
     imgEl = new Image();
     imgEl.decoding = "async";
     imgEl.onload = paint;
-    imgEl.src = key.src;
-  }
+    imgEl.src = signSrc(key);
+  };
+  if (!defer) load();
   document.fonts?.ready?.then(paint);
 
   const steel = mat("#2b2b33", { metal: 0.45, rough: 0.55 });
@@ -761,7 +771,10 @@ function billboard(key) {
   back.rotation.y = Math.PI;
   head.add(back);
   head.rotation.order = "YXZ";
-  return { pole, head, h: planeH, w: planeW };
+  // How much picture the board actually shows. A contained logo or cover leaves clear margins.
+  const pw = logo ? Math.min(planeW, planeH * ratio) : planeW;
+  const ph = logo ? pw / ratio : planeH;
+  return { pole, head, h: planeH, w: planeW, shown: pw * ph, load };
 }
 
 /* Bake every part of a structure that never moves into one mesh per material.
@@ -1083,7 +1096,7 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
     const p = sectorPos[i];
     built.g.position.set(p.x, PLATEAU_TOP, p.z);
     built.g.rotation.y = Math.atan2(-p.x, -p.z); // front faces the centre
-    const sign = billboard(s.key);
+    const sign = billboard(s.key, { defer: !(s.key?.hero && s.key.fit !== "contain") });
     sign.pole.position.z = SIGN.z;
     built.g.add(sign.pole);
     world.add(built.g);
@@ -1091,7 +1104,9 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
     const signAt = built.g.localToWorld(new THREE.Vector3(0, 0, SIGN.z));
     const seat = SIGN.bottom;
     sign.head.position.set(signAt.x, PLATEAU_TOP + seat + sign.h / 2 + 0.12, signAt.z);
-    if (mobile) sign.head.scale.setScalar(1.02);
+    /* On a phone the island is small, so the desktop's size hierarchy leaves the cover and photos
+       tiny beside the Arena. Every board shows about the same amount of picture; the Arena stays a step larger. */
+    if (mobile) sign.head.scale.setScalar(clamp(Math.sqrt(MOBILE_SIGN_AREA / sign.shown) * (s.key?.hero && s.key.fit !== "contain" ? 1.18 : 1), 0.6, 1.6));
     world.add(sign.head);
     const hl = new THREE.Mesh(new THREE.RingGeometry(5.3, 5.6, 64), new THREE.MeshBasicMaterial({ color: s.accent, transparent: true, opacity: 0, depthWrite: false }));
     hl.rotation.x = -Math.PI / 2; hl.position.set(p.x, PLATEAU_TOP + 0.06, p.z);
@@ -1100,7 +1115,7 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
     hit.position.set(p.x, PLATEAU_TOP + 4.5, p.z);
     hit.userData.hit = { type: "sector", id: s.id };
     world.add(hit); pickables.push(hit);
-    return { ...built, s, p, hl, head: sign.head, signH: sign.h, signW: sign.w, approach: polar(s.angle, APPROACH_R) };
+    return { ...built, s, p, hl, head: sign.head, signH: sign.h, signW: sign.w, loadSign: sign.load, approach: polar(s.angle, APPROACH_R) };
   });
 
   mergeStatic(mon.g, mon.anim, world);
@@ -1335,6 +1350,11 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
   let underLock = false, holdUnder = false, dig = 0, underView = null;
   let fitted = true;
   let band = null;
+  /* A zoom the visitor chose rides on top of the fitted frame, so a turn keeps it.
+     A tilt they chose turns off the tall-screen tilt below. Both reset on overview(). */
+  let zoomBias = 1, fitBase = 1, userTilted = false;
+  const minZoom = () => Math.min(0.7, fitBase * 0.7);
+  const keepZoom = () => { if (Math.hypot(goal.tx, goal.tz) < 0.5) zoomBias = clamp(goal.zoom / fitBase, 0.5, 3.6); };
   function nudgeElevation(dy, dx) {
     const delta = dy * 0.004;
     if (introT < 1 || (background !== "none" && !underLock)) {
@@ -1442,7 +1462,8 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
     if (ptrs.has(e.pointerId)) ptrs.set(e.pointerId, { x: e.clientX, y: e.clientY });
     if (pinch && ptrs.size >= 2) {
       const [a, b] = [...ptrs.values()];
-      goal.zoom = clamp(pinch.z0 * Math.hypot(a.x - b.x, a.y - b.y) / pinch.d0, 0.7, 3.6);
+      goal.zoom = clamp(pinch.z0 * Math.hypot(a.x - b.x, a.y - b.y) / pinch.d0, minZoom(), 3.6);
+      keepZoom();
       const mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2;
       panBy(mx - pinch.mx, my - pinch.my); pinch.mx = mx; pinch.my = my;
       userMoved(); return;
@@ -1470,6 +1491,7 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
     else {
       const k = 0.0065;
       goal.az -= dx * k; vAz = -dx * k;
+      if (Math.abs(dy) > 1) userTilted = true;
       nudgeElevation(dy, dx);
     }
     userMoved();
@@ -1490,7 +1512,8 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
   canvas.addEventListener("contextmenu", (e) => e.preventDefault());
   canvas.addEventListener("wheel", (e) => {
     e.preventDefault();
-    goal.zoom = clamp(goal.zoom * Math.exp(-e.deltaY * 0.0015), 0.7, 3.6);
+    goal.zoom = clamp(goal.zoom * Math.exp(-e.deltaY * 0.0015), minZoom(), 3.6);
+    keepZoom();
     userMoved();
   }, { passive: false });
 
@@ -1522,8 +1545,9 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
     if (background === "exhibit") return mobile ? 12 : 20;
     return reduced ? 8 : mobile ? 24 : 30;
   }
+  let ready = false;
   function schedule() {
-    if (!raf && running && fpsCap()) raf = requestAnimationFrame(frame);
+    if (!raf && running && ready && fpsCap()) raf = requestAnimationFrame(frame);
   }
   const tmp = new THREE.Vector3();
   const screenPt = new THREE.Vector3();
@@ -1551,7 +1575,7 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
   const gemBuried = mat("#e0f2fe", { emissive: "#7dd3fc", ei: 2.4, rough: 0.15 });
   function frame(stamp) {
     raf = 0;
-    if (!running) return;
+    if (!running || !ready) return;
     const fps = fpsCap();
     if (!fps) return;
     schedule();
@@ -1706,7 +1730,17 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
     samples.length = 0;
     if (running) schedule();
   });
-  resize(); applyCamera(); frame();
+  resize(); applyCamera();
+  /* Compile the shaders before the first frame, in parallel where the browser allows it, so that frame
+     does not freeze the page. The loading screen covers the wait. Then the other sign photos come in. */
+  const compiled = (renderer.compileAsync ? renderer.compileAsync(scene, camera) : Promise.resolve())
+    .catch(() => {})
+    .then(() => {
+      ready = true;
+      lastRender = 0;
+      frame();
+      setTimeout(() => sectorObjs.forEach((o) => o.loadSign()), 120);
+    });
 
   const proj = new THREE.Vector3(), camUp = new THREE.Vector3();
   const st = {
@@ -1738,26 +1772,47 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
   /* Frame whichever way the island is turned: the sign box fills the open band,
      and the next turn is framed the same way, so a photograph is not left in the sky. */
   function fitAngle(az) {
-    const box = signSpan(az, goal.el, goal.ty);
-    const midX = (box.minX + box.maxX) / 2;
-    const midY = (box.minY + box.maxY) / 2;
     const { fit, aspect } = viewSpan();
     const b = band && band.w > 1 ? band : { cx: width / 2, cy: height / 2, w: width, h: height };
     const fracX = clamp(b.w / Math.max(1, width), 0.35, 1);
     const fracY = clamp(b.h / Math.max(1, height), 0.35, 1);
-    const pad = 1.08;
-    const reachX = Math.max(1, box.spanX / 2);
-    const reachY = Math.max(1, box.spanY / 2);
-    const zoomX = (fit * aspect * fracX) / (2 * reachX * pad);
-    const zoomY = (fit * fracY) / (2 * reachY * pad);
-    goal.zoom = clamp(Math.min(zoomX, zoomY), 0.22, 1.35);
+    // A tall band keeps a wider margin at the sides, so the outer names clear the 16px gutter.
+    const tall = b.h > b.w * 1.15;
+    const padX = tall ? 1.13 : 1.08, padY = 1.08;
+    const zooms = (box) => [
+      (fit * aspect * fracX) / (2 * Math.max(1, box.spanX / 2) * padX),
+      (fit * fracY) / (2 * Math.max(1, box.spanY / 2) * padY),
+    ];
+    const autoTilt = tall && !userTilted && goal.el > 0;
+    if (autoTilt) goal.el = OV.el;
+    let box = signSpan(az, goal.el, goal.ty);
+    let [zoomX, zoomY] = zooms(box);
+    /* On a tall screen the signs meet the side edges first and leave sky above the island.
+       Look down a little steeper, which spreads the signs down the band, until the box fills it. */
+    if (autoTilt && zoomY > zoomX * 1.08) {
+      for (let el = OV.el + deg(2); el <= deg(52) + 1e-6; el += deg(2)) {
+        const next = signSpan(az, el, goal.ty);
+        const [zx, zy] = zooms(next);
+        if (zy < zx * 0.98) break;
+        goal.el = el; box = next; zoomX = zx; zoomY = zy;
+        if (zy <= zx * 1.08) break;
+      }
+    }
+    const midX = (box.minX + box.maxX) / 2;
+    const midY = (box.minY + box.maxY) / 2;
+    fitBase = clamp(Math.min(zoomX, zoomY), 0.22, 1.35);
+    goal.zoom = clamp(fitBase * zoomBias, 0.22, 3.6);
     const viewW = (fit * aspect) / goal.zoom;
     const viewH = fit / goal.zoom;
+    // Whatever band the signs cannot fill on a tall screen goes mostly below them, by the hint, not into the sky.
+    const boxPx = (box.spanY / viewH) * height;
+    const cy = tall ? b.cy - b.h / 2 + Math.max(0, b.h - boxPx) * 0.38 + boxPx / 2 : b.cy;
     goal.shiftX = (b.cx / Math.max(1, width) - 0.5) - midX / viewW;
-    goal.shiftY = (0.5 - b.cy / Math.max(1, height)) - midY / viewH;
+    goal.shiftY = (0.5 - cy / Math.max(1, height)) - midY / viewH;
   }
   const HOME_AZ = deg(225);
   return {
+    ready: compiled,
     /* Camera framing for a sector. `clear` is the screen rect the sign and
        its building must fit in, so the exhibit sheet never covers them. */
     focusSector(id, clear) {
@@ -1809,12 +1864,14 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
         goal.az = az;
       }
       goal.tx = 0; goal.tz = 0; goal.ty = OV.ty; goal.el = OV.el;
+      zoomBias = 1; userTilted = false;
       band = clear && width > 1 && height > 1 ? clear : null;
       fitted = true;
       fitAngle(goal.az);
     },
-    zoomBy(f) { goal.zoom = clamp(goal.zoom * f, 0.7, 3.6); userMoved(); },
-    rotateBy(a) { goal.az += a; userMoved(); fitted = true; },
+    zoomBy(f) { goal.zoom = clamp(goal.zoom * f, minZoom(), 3.6); keepZoom(); userMoved(); },
+    // A turn re-frames the signs at the visitor's own zoom, unless they have panned away.
+    rotateBy(a) { goal.az += a; userMoved(); fitted = Math.hypot(goal.tx, goal.tz) < 0.5; },
     lookAt(x, z) { goal.tx = clamp(x, -R, R); goal.tz = clamp(z, -R, R); userMoved(); },
     sendScoutToSector(id, cb) {
       const o = sectorObjs.find((x) => x.s.id === id);
@@ -1858,9 +1915,8 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
   };
 }
 
+/* A cheap check only. Creating a throwaway context here cost ~200 ms; if the real one fails,
+   createWorld throws and the app falls back to the list. */
 export function webglAvailable() {
-  try {
-    const c = document.createElement("canvas");
-    return !!(window.WebGLRenderingContext && (c.getContext("webgl2") || c.getContext("webgl")));
-  } catch { return false; }
+  return !!(window.WebGL2RenderingContext || window.WebGLRenderingContext);
 }
