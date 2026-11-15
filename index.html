@@ -79,11 +79,11 @@
     html[lang="ko"] { --body: "Noto Sans KR", "IBM Plex Sans", "Helvetica Neue", Arial, sans-serif; }
     html[lang="zh-Hans"] { --body: "Noto Sans SC", "IBM Plex Sans", "Helvetica Neue", Arial, sans-serif; }
   </style>
-  <link rel="stylesheet" href="archive/archive.css?v=22" />
+  <link rel="stylesheet" href="archive/archive.css?v=28" />
   <link rel="preload" as="image" href="assets/img/champ-trophy-640.webp" />
   <script type="importmap">{ "imports": { "three": "./vendor/three/three.archive.min.js" } }</script>
   <link rel="modulepreload" href="./vendor/three/three.archive.min.js" />
-  <link rel="modulepreload" href="archive/world.js?v=77" />
+  <link rel="modulepreload" href="archive/world.js?v=81" />
 </head>
 <body>
   <a class="skip-link" href="#sector-list" id="skip-link" data-i18n="skipToSectors">Skip to the sector list</a>
@@ -99,10 +99,16 @@
         <p class="intro"><span data-i18n="introLead">First Brood War World Champion, 1999</span><span class="wide-only"> · <span class="nowrap" data-i18n="introWsop">WSOP Talent Manager</span> · <span class="nowrap" data-i18n="introInventor">Inventor of 2 Hand Hold’em</span></span></p>
         <button type="button" class="btn-cta" id="tour-btn"><span data-i18n="startTour">Start the tour</span> <span aria-hidden="true">→</span></button>
       </div>
+      <div class="deck-actions">
+      <button type="button" class="sound-btn" id="sound-btn" aria-pressed="false" data-i18n-aria="soundEffects" aria-label="Sound effects">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z" fill="currentColor"/><path class="waves" d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path class="mute" d="M16 9.5l5 5M21 9.5l-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        <span data-i18n="sound">Sound</span>
+      </button>
       <div class="lang-switch" id="lang-switch" role="group" aria-label="Language">
         <button type="button" data-lang="en" aria-pressed="true">EN</button>
         <button type="button" data-lang="ko" aria-pressed="false">한국어</button>
         <button type="button" data-lang="zh" aria-pressed="false">中文</button>
+      </div>
       </div>
     </header>
 
@@ -150,6 +156,7 @@
         <p class="mono eyebrow" id="ex-crumb"></p>
         <button type="button" class="icon-btn" id="ex-close" data-i18n-aria="backToWorld" aria-label="Back to the world">×</button>
       </div>
+      <div class="ex-progress" id="ex-progress" aria-hidden="true"></div>
       <div class="exhibit-scroll" id="ex-scroll">
         <header class="ex-head">
           <img class="emblem" id="ex-emblem" alt="" decoding="async" hidden />
@@ -201,6 +208,6 @@
   </main>
 
   <noscript><p style="padding:24px;color:#ece8dc;background:#07080b"><span data-i18n="noscript">This archive needs JavaScript. Visit the</span> <a href="classic.html" style="color:#e8c44a" data-i18n="noscriptLink">classic site</a>.</p><nav aria-label="Exhibits" style="padding:0 24px 24px;background:#07080b"><a href="/arena/" style="color:#e8c44a">Championship Arena</a> · <a href="/garden/" style="color:#e8c44a">Strategy Garden</a> · <a href="/broadcast/" style="color:#e8c44a">Broadcast Station</a> · <a href="/foundry/" style="color:#e8c44a">Invention Foundry</a> · <a href="/library/" style="color:#e8c44a">Library</a> · <a href="/command/" style="color:#e8c44a">Command Center</a></nav></noscript>
-  <script type="module" src="archive/app.js?v=92"></script>
+  <script type="module" src="archive/app.js?v=98"></script>
 </body>
 </html>

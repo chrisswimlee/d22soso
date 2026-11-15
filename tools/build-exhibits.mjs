@@ -4,10 +4,20 @@
    Run from the repo root after changing content.js:  node tools/build-exhibits.mjs */
 import { mkdir, writeFile, readFile } from "node:fs/promises";
 import { SECTORS, EMAIL } from "../archive/content.js";
-import { UI } from "../archive/i18n.js";
+import { UI, LOCALES, localizeSectors } from "../archive/i18n.js";
 
 const SITE = "https://d22soso.com";
-const ui = UI.en;
+let ui = UI.en;
+const HTML_LANG = { en: "en", ko: "ko", zh: "zh-Hans" };
+// Page chrome. Exhibit text itself comes from content.js and its translations in i18n.js.
+const CHROME = {
+  en: { open: "Open in the 3D archive", skip: "Skip to the exhibit", six: "six exhibits", archive: "The 3D archive", demo: "A playable 2 Hand Hold’em demo is in the <a href=\"{href}\">3D archive</a>.", exhibits: "Exhibits", language: "Language" },
+  ko: { open: "3D 아카이브에서 열기", skip: "전시 내용으로 건너뛰기", six: "여섯 개의 전시", archive: "3D 아카이브", demo: "플레이 가능한 2 Hand Hold’em 데모는 <a href=\"{href}\">3D 아카이브</a>에 있습니다.", exhibits: "전시", language: "언어" },
+  zh: { open: "在3D档案馆中打开", skip: "跳到展区内容", six: "六个展区", archive: "3D档案馆", demo: "可试玩的 2 Hand Hold’em 演示在<a href=\"{href}\">3D档案馆</a>中。", exhibits: "展区", language: "语言" },
+};
+let loc = "en", chrome = CHROME.en;
+const pathFor = (l, id) => (l === "en" ? `/${id}/` : `/${l}/${id}/`);
+const worldFor = (l, id) => (l === "en" ? `/#${id}` : `/?lang=${l}#${id}`);
 const esc = (v) => String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 // content.js paths are written for the root page ("../assets/…" resolves to /assets/…). Make them absolute.
 const abs = (p) => (/^https?:/.test(p) ? p : "/" + String(p).replace(/^(\.\.\/|\.\/)+/, ""));
@@ -26,7 +36,7 @@ const BLOCKS = {
   media: (b) => `<section><h2>${esc(b.title)}</h2><ul class="cards">${b.items.map((m) => `<li><a href="${esc(m.href)}"${ext(m.href)}><strong>${esc(m.title)}</strong><span>${esc(m.source)}</span></a></li>`).join("")}</ul></section>`,
   monitors: (b) => BLOCKS.media(b),
   steps: (b) => `<section><h2>${esc(b.title)}</h2><ol class="steps">${b.items.map(([k, v]) => `<li><strong>${esc(k)}</strong> ${esc(v)}</li>`).join("")}</ol></section>`,
-  demo: () => `<p class="note">A playable 2 Hand Hold’em demo is in the <a href="/#foundry">3D archive</a>.</p>`,
+  demo: () => `<p class="note">${chrome.demo.replace("{href}", worldFor(loc, "foundry"))}</p>`,
   book: (b) => `<figure class="book"><img src="${esc(abs(b.cover))}" alt="${esc(ui.bookCoverAlt)}" loading="lazy" /><figcaption><strong>${esc(ui.bookQuote)}</strong> ${esc(ui.bookDesc)}</figcaption></figure>`,
   contact: () => `<section class="contact"><p class="eyebrow">${esc(ui.contactEyebrow)}</p><p><a href="mailto:${esc(EMAIL)}">${esc(EMAIL)}</a></p></section>`,
   downloads: (b) => `<section><h2>${esc(b.title)}</h2><ul class="links">${b.items.map((d) => `<li><a href="${esc(abs(d.href))}" download>${esc(d.label)}</a></li>`).join("")}</ul></section>`,
@@ -37,9 +47,11 @@ const CSS = `:root{--bg:#07080b;--panel:#101116;--ink:#ece8dc;--small:#b9b4a8;--
 a{color:var(--gold)}a:hover{color:#fff}.skip{position:absolute;left:8px;top:-60px;background:var(--gold);color:#07080b;padding:8px 12px;border-radius:6px}.skip:focus{top:8px}
 .wrap{max-width:760px;margin:0 auto;padding:0 20px}header.top{border-bottom:1px solid var(--rule);padding:16px 0}header.top .wrap{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
 .brand{font:600 17px var(--display);color:var(--ink);text-decoration:none}.cta{display:inline-block;background:var(--gold);color:#07080b;font:600 13px var(--mono);letter-spacing:.06em;text-transform:uppercase;padding:10px 14px;border-radius:6px;text-decoration:none}.cta:hover{color:#07080b;background:#f3d571}
-main{padding:40px 0 56px}.kicker,.eyebrow{font:500 12px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--gold)}h1{font:700 clamp(30px,6vw,46px)/1.08 var(--display);margin:8px 0 16px;letter-spacing:-.02em}
+main{padding:40px 0 56px}.head{display:grid;grid-template-columns:minmax(0,1fr) 200px;gap:28px;align-items:start}.head:not(:has(figure)){grid-template-columns:1fr}.hero{margin:6px 0 0;border:2px solid var(--gold);border-radius:8px;overflow:hidden;background:radial-gradient(circle,#1f2a24,#0c0d11);box-shadow:0 0 28px rgba(232,196,74,.16)}.hero img{width:100%;aspect-ratio:4/5;object-fit:cover;border-radius:0;display:block}.hero.logo img{object-fit:contain;padding:14px;background:none}.hero.wide img{aspect-ratio:16/9}
+.langs{display:flex;gap:10px;font:500 13px var(--mono)}.langs [aria-current]{color:var(--ink);text-decoration:none}.kicker,.eyebrow{font:500 12px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--gold)}h1{font:700 clamp(30px,6vw,46px)/1.08 var(--display);margin:8px 0 16px;letter-spacing:-.02em}
 h2{font:600 13px var(--mono);letter-spacing:.12em;text-transform:uppercase;margin:40px 0 12px;padding-bottom:8px;border-bottom:1px solid var(--rule)}.lede{font-size:19px;color:var(--ink)}p{max-width:66ch}
-.gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin:24px 0}figure{margin:0}figure img{width:100%;aspect-ratio:4/5;object-fit:cover;border-radius:6px;background:#000;display:block}figcaption{font-size:14px;color:var(--small);margin-top:6px}
+.gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin:24px 0}figure{margin:0}figure img{width:100%;height:auto;border-radius:6px;background:#000;display:block}.gallery figure img{max-height:560px;object-fit:cover}
+html[lang="ko"] body{word-break:keep-all;overflow-wrap:anywhere}figcaption{font-size:14px;color:var(--small);margin-top:6px}
 .path ol{list-style:none;margin:0 0 8px;padding:0 0 0 14px;border-left:2px solid var(--rule)}.path li{font:600 17px/1.9 var(--display)}.path li:last-child{color:var(--gold)}
 blockquote{margin:28px 0;padding:4px 0 4px 18px;border-left:3px solid var(--gold);font-size:19px}cite{display:block;font:500 12px var(--mono);color:var(--small);font-style:normal;margin-top:6px}
 .timeline{list-style:none;padding:0;margin:0}.timeline li{display:grid;grid-template-columns:96px 1fr;gap:12px;padding:8px 0;border-bottom:1px solid var(--rule)}.timeline li span:first-child{font:500 13px var(--mono);color:var(--small)}.timeline li.key span:last-child{color:var(--gold)}
@@ -48,34 +60,43 @@ blockquote{margin:28px 0;padding:4px 0 4px 18px;border-left:3px solid var(--gold
 .steps{padding-left:20px}.steps li{margin:6px 0}.book{display:grid;grid-template-columns:160px 1fr;gap:18px;align-items:center;margin:24px 0}.book img{aspect-ratio:2/3}.note{color:var(--small)}
 nav.exhibits{border-top:1px solid var(--rule);padding:24px 20px 40px}nav.exhibits ol{list-style:none;padding:0;margin:12px 0 0;display:flex;flex-wrap:wrap;gap:8px 18px;font:500 14px var(--mono)}nav.exhibits [aria-current]{color:var(--ink);text-decoration:none}
 footer{font:500 13px var(--mono);color:var(--small);padding-bottom:40px}
-@media (max-width:560px){.facts div,.book{grid-template-columns:1fr}.timeline li{grid-template-columns:80px 1fr}body{font-size:16px}}`;
+@media (max-width:560px){.head{grid-template-columns:1fr;gap:16px}.hero{max-width:200px;order:-1}.hero.wide{max-width:none}.facts div,.book{grid-template-columns:1fr}.timeline li{grid-template-columns:80px 1fr}body{font-size:16px}}`;
 
-function page(s, i) {
+function page(s, i, SECTORS) {
   const ex = s.exhibit;
-  const url = `${SITE}/${s.id}/`;
+  const url = `${SITE}${pathFor(loc, s.id)}`;
   const title = `${ex.title} · ${s.name.replace(/^The /, "")} · Wayne “D22-soso” Chiang`;
+  const k = s.key || {};
+  const heroSrc = k.src ? abs(k.m ? k.src.replace(/\.webp(\?|$)/, "-m.webp$1") : k.src) : "";
+  const heroClass = k.fit === "contain" && (k.ratio || 1) <= 1.3 ? "hero logo" : (k.ratio || 1) > 1.3 ? "hero wide" : "hero";
+  // A wide poster is the exhibit's own lead photo a few lines below, so it is not shown twice.
+  const hero = heroSrc && heroClass !== "hero wide" ? `<figure class="${heroClass}"><img src="${esc(heroSrc)}" alt="${esc(k.alt)}" style="object-position:${esc(k.pos || "50% 30%")}" fetchpriority="high" /></figure>` : "";
+  const alternates = LOCALES.map((l) => `<link rel="alternate" hreflang="${HTML_LANG[l.code]}" href="${SITE}${pathFor(l.code, s.id)}" />`).join("\n") +
+    `\n<link rel="alternate" hreflang="x-default" href="${SITE}${pathFor("en", s.id)}" />`;
+  const langs = `<nav class="langs" aria-label="${esc(chrome.language)}">${LOCALES.map((l) => `<a href="${pathFor(l.code, s.id)}" hreflang="${HTML_LANG[l.code]}" lang="${HTML_LANG[l.code]}"${l.code === loc ? ' aria-current="page"' : ""}>${esc(l.label)}</a>`).join("")}</nav>`;
   const desc = ex.lede.length > 300 ? ex.lede.slice(0, 297).replace(/\s+\S*$/, "") + "…" : ex.lede;
   const image = s.key?.src ? full(s.key.src.replace(/\?.*$/, "")) : `${SITE}/assets/img/og-living-archive.jpg`;
   const prev = SECTORS[(i - 1 + SECTORS.length) % SECTORS.length], next = SECTORS[(i + 1) % SECTORS.length];
   const ld = {
     "@context": "https://schema.org",
     "@graph": [
-      { "@type": "WebPage", "@id": url, url, name: title, description: desc, image, inLanguage: "en",
+      { "@type": "WebPage", "@id": url, url, name: title, description: desc, image, inLanguage: HTML_LANG[loc],
         isPartOf: { "@type": "WebSite", name: "D22-soso", url: `${SITE}/` },
         about: { "@type": "Person", name: "Wayne Chiang", alternateName: "D22-soso", url: `${SITE}/` } },
       { "@type": "BreadcrumbList", itemListElement: [
-        { "@type": "ListItem", position: 1, name: "The Living Archive", item: `${SITE}/` },
+        { "@type": "ListItem", position: 1, name: ui.livingArchive, item: `${SITE}/${loc === "en" ? "" : `?lang=${loc}`}` },
         { "@type": "ListItem", position: 2, name: s.name, item: url } ] },
     ],
   };
   return `<!doctype html>
-<html lang="en">
+<html lang="${HTML_LANG[loc]}">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>${esc(title)}</title>
 <meta name="description" content="${esc(desc)}" />
 <link rel="canonical" href="${url}" />
+${alternates}
 <meta property="og:type" content="article" />
 <meta property="og:url" content="${url}" />
 <meta property="og:site_name" content="D22-soso" />
@@ -92,36 +113,43 @@ function page(s, i) {
 <script type="application/ld+json">${JSON.stringify(ld)}</script>
 </head>
 <body>
-<a class="skip" href="#content">Skip to the exhibit</a>
-<header class="top"><div class="wrap"><a class="brand" href="/">Wayne “D22-soso” Chiang</a><a class="cta" href="/#${s.id}">Open in the 3D archive →</a></div></header>
+<a class="skip" href="#content">${esc(chrome.skip)}</a>
+<header class="top"><div class="wrap"><a class="brand" href="${loc === "en" ? "/" : `/?lang=${loc}`}">Wayne “D22-soso” Chiang</a>${langs}<a class="cta" href="${worldFor(loc, s.id)}">${esc(chrome.open)} →</a></div></header>
 <main id="content" class="wrap">
+<div class="head"><div>
 <p class="kicker">${esc(ex.kicker)} · ${esc(s.era)}</p>
 <h1>${esc(ex.title)}</h1>
 <p class="lede">${esc(ex.lede)}</p>
+</div>${hero}</div>
 ${ex.blocks.map((b) => (BLOCKS[b.type] ? BLOCKS[b.type](b) : "")).join("\n")}
 </main>
-<nav class="exhibits wrap" aria-label="Exhibits">
-<p class="eyebrow">The Living Archive · six exhibits</p>
-<ol>${SECTORS.map((x) => `<li><a href="/${x.id}/"${x.id === s.id ? ' aria-current="page"' : ""}>${esc(x.name)}</a></li>`).join("")}</ol>
-<p><a href="/${prev.id}/" rel="prev">← ${esc(prev.short)}</a> · <a href="/${next.id}/" rel="next">${esc(next.short)} →</a></p>
+<nav class="exhibits wrap" aria-label="${esc(chrome.exhibits)}">
+<p class="eyebrow">${esc(ui.livingArchive)} · ${esc(chrome.six)}</p>
+<ol>${SECTORS.map((x) => `<li><a href="${pathFor(loc, x.id)}"${x.id === s.id ? ' aria-current="page"' : ""}>${esc(x.name)}</a></li>`).join("")}</ol>
+<p><a href="${pathFor(loc, prev.id)}" rel="prev">← ${esc(prev.short)}</a> · <a href="${pathFor(loc, next.id)}" rel="next">${esc(next.short)} →</a></p>
 </nav>
-<footer class="wrap"><a href="/">The 3D archive</a> · <a href="/classic.html">Classic site</a> · <a href="https://chrisswimlee.com" target="_blank" rel="noopener noreferrer">Designed by chrisswimlee</a></footer>
+<footer class="wrap"><a href="${loc === "en" ? "/" : `/?lang=${loc}`}">${esc(chrome.archive)}</a> · <a href="/classic.html">${esc(ui.classicSite)}</a> · <a href="https://chrisswimlee.com" target="_blank" rel="noopener noreferrer">${esc(ui.designedBy || "Designed by chrisswimlee")}</a></footer>
 </body>
 </html>
 `;
 }
 
-for (const [i, s] of SECTORS.entries()) {
-  await mkdir(s.id, { recursive: true });
-  await writeFile(`${s.id}/index.html`, page(s, i));
-  console.log(`wrote ${s.id}/index.html`);
+for (const { code } of LOCALES) {
+  loc = code; chrome = CHROME[code]; ui = { ...UI.en, ...UI[code] };
+  const sectors = localizeSectors(SECTORS, code);
+  for (const [i, s] of sectors.entries()) {
+    const dir = pathFor(code, s.id).slice(1);
+    await mkdir(dir, { recursive: true });
+    await writeFile(`${dir}index.html`, page(s, i, sectors));
+    console.log(`wrote ${dir}index.html`);
+  }
 }
 
 // Keep the sitemap in step: one entry per exhibit page, dated today.
 const today = new Date().toISOString().slice(0, 10);
 let map = await readFile("sitemap.xml", "utf8");
-map = map.replace(/\s*<url>\s*<loc>https:\/\/d22soso\.com\/(arena|garden|broadcast|foundry|library|command)\/<\/loc>[\s\S]*?<\/url>/g, "");
-const entries = SECTORS.map((s) => `  <url>\n    <loc>${SITE}/${s.id}/</loc>\n    <lastmod>${today}</lastmod>\n    <changefreq>monthly</changefreq>\n    <priority>0.8</priority>\n  </url>`).join("\n");
+map = map.replace(/\s*<url>\s*<loc>https:\/\/d22soso\.com\/((ko|zh)\/)?(arena|garden|broadcast|foundry|library|command)\/<\/loc>[\s\S]*?<\/url>/g, "");
+const entries = LOCALES.flatMap(({ code }) => SECTORS.map((s) => `  <url>\n    <loc>${SITE}${pathFor(code, s.id)}</loc>\n    <lastmod>${today}</lastmod>\n    <changefreq>monthly</changefreq>\n    <priority>${code === "en" ? "0.8" : "0.7"}</priority>\n  </url>`)).join("\n");
 map = map.replace("</urlset>", `${entries}\n</urlset>`);
 await writeFile("sitemap.xml", map);
 console.log("updated sitemap.xml");

@@ -45,11 +45,15 @@ button { font: inherit; color: inherit; touch-action: manipulation; }
 #world { position: absolute; inset: 0; width: 100%; height: 100%; display: block; cursor: grab; touch-action: none; outline: none; }
 
 /* Labels pinned over buildings. Off-screen captions are hidden, not clamped onto the chrome. */
+/* Korean breaks between words, not inside them. */
+html[lang="ko"] body { word-break: keep-all; overflow-wrap: anywhere; }
+.sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
 /* Off screen until it has keyboard focus, then the first thing on the page. */
 .skip-link { position: fixed; top: 8px; left: 8px; z-index: 50; padding: 10px 14px; background: var(--gold); color: #07080b; font: 600 14px var(--display); border-radius: var(--r); text-decoration: none; transform: translateY(-160%); }
 .skip-link:focus { transform: none; outline: 2px solid #fff; outline-offset: 2px; }
 .labels { position: absolute; inset: 0; z-index: 1; pointer-events: none; overflow: hidden; }
-.label { position: absolute; left: 0; top: 0; display: grid; grid-template-columns: auto auto; column-gap: 6px; align-items: baseline; padding: 3px 2px 4px; border: 0; background: none; pointer-events: auto; cursor: pointer; text-shadow: 0 1px 2px #07080b, 0 0 10px #07080b; will-change: transform; }
+/* Every name carries its own dark plate, so it reads the same over a building, a photograph or open sky. */
+.label { position: absolute; left: 0; top: 0; display: grid; grid-template-columns: auto auto; column-gap: 6px; align-items: baseline; padding: 3px 8px 4px; border: 0; border-radius: var(--r); background: rgba(7, 8, 11, 0.74); pointer-events: auto; cursor: pointer; will-change: transform; }
 .label.off { visibility: hidden; pointer-events: none; }
 /* Last resort on the picture: a dark plate, so the name never reads across the photograph's own type. */
 .label.plate { padding: 3px 8px 4px; background: rgba(7, 8, 11, 0.86); border-radius: var(--r); text-shadow: none; }
@@ -88,6 +92,25 @@ button { font: inherit; color: inherit; touch-action: manipulation; }
     margin-top: 2px;
   }
 }
+/* Sound toggle and language switcher sit together at the top right. */
+.deck-actions { display: flex; align-items: center; gap: 8px; pointer-events: auto; }
+.sound-btn { display: inline-flex; align-items: center; gap: 6px; min-height: 38px; padding: 0 12px 0 10px; background: rgba(12, 13, 17, 0.92); border: 1px solid var(--rule-soft); border-radius: 999px; color: var(--small); font: 600 12px/1 var(--body); cursor: pointer; }
+.sound-btn svg { width: 18px; height: 18px; }
+.sound-btn .waves { display: none; }
+.sound-btn.on { color: var(--gold); border-color: color-mix(in srgb, var(--gold) 45%, transparent); }
+.sound-btn.on .waves { display: inline; }
+.sound-btn.on .mute { display: none; }
+.sound-btn:hover { color: var(--ink); }
+/* Reading progress: under each sign name, in the sector list, and along the top of the open sheet. */
+.label .bar { grid-column: 1 / -1; height: 3px; margin-top: 3px; border-radius: 2px; background: rgba(236, 232, 220, 0.16); overflow: hidden; }
+.label .bar::before { content: ""; display: block; height: 100%; width: var(--p, 0%); background: var(--accent); transition: width 0.4s; }
+.label .bar.full::before { background: var(--gold); }
+.sectors .nm .prog { font-size: 11px; color: var(--small); letter-spacing: 0.02em; }
+#sector-list button { position: relative; }
+#sector-list button .bar { position: absolute; left: 0; right: 0; bottom: 0; height: 2px; background: rgba(236, 232, 220, 0.08); }
+#sector-list button .bar::before { content: ""; display: block; height: 100%; width: var(--p, 0%); background: var(--accent); }
+.ex-progress { height: 3px; background: rgba(236, 232, 220, 0.08); flex: none; }
+.ex-progress::before { content: ""; display: block; height: 100%; width: var(--p, 0%); background: var(--accent); transition: width 0.3s; }
 /* Language switcher (EN / 한국어 / 中文) */
 .lang-switch { display: flex; flex: none; gap: 2px; padding: 3px; background: rgba(12, 13, 17, 0.92); border: 1px solid var(--rule-soft); border-radius: 999px; }
 .lang-switch button { min-height: 30px; padding: 0 11px; border: 0; border-radius: 999px; background: transparent; color: var(--small); font: 600 12px/1 var(--body); cursor: pointer; white-space: nowrap; }
@@ -115,8 +138,9 @@ html[lang="ko"] .arrow-btn, html[lang="zh-Hans"] .arrow-btn { letter-spacing: 0.
 .sectors-panel { width: 100%; padding: 12px 8px 8px; background: #0c0d11; border: 1px solid var(--rule-soft); border-top: 1px solid var(--rule); border-radius: var(--r); }
 .sectors-btn { background: #0c0d11; }
 .sectors-panel .eyebrow { padding: 0 4px; font-size: 13px; color: #f3efe4; }
-.sectors-btn span { transition: transform 0.2s; }
-.sectors-btn[aria-expanded="true"] span { transform: rotate(180deg); }
+/* Only the caret turns over when the list is open, not the word beside it. */
+.sectors-btn span.mono { display: inline-block; transition: transform 0.2s; }
+.sectors-btn[aria-expanded="true"] span.mono { transform: rotate(180deg); }
 .sectors .eyebrow span:first-child { color: var(--gold-text); }
 .sectors ol { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 2px; }
 .sectors-more { display: flex; flex-wrap: wrap; gap: 2px 8px; margin-top: 10px; padding: 8px 4px 2px; border-top: 1px solid var(--rule-soft); }
@@ -158,9 +182,8 @@ html[lang="ko"] .arrow-btn, html[lang="zh-Hans"] .arrow-btn { letter-spacing: 0.
 .app:has(.readout:not([hidden])) .credit,
 .app:has(.sectors-panel:not([hidden])) .credit,
 .listing .credit { opacity: 0; pointer-events: none; }
-@media (min-width: 761px) {
-  [data-mode="exhibit"] .credit { left: calc((100% - min(600px, 47vw)) / 2); }
-}
+/* With an exhibit open the sheet carries its own credit, so the one over the map steps aside. */
+[data-mode="exhibit"] .credit, [data-mode="travel"] .credit { opacity: 0; pointer-events: none; }
 
 [data-mode="exhibit"] .sectors, [data-mode="exhibit"] .hint, [data-mode="exhibit"] .instruments { opacity: 0; pointer-events: none; }
 .sectors, .hint, .instruments, .credit { transition: opacity 0.3s; }
@@ -394,12 +417,14 @@ button.card.picked { transform: translateY(-6px); outline: 2px solid var(--gold-
 }
 /* The minimap still owns the bottom-right. Keep the hint in the gap until the visitor moves. */
 @media (max-width: 1180px) and (min-width: 761px) {
-  .hint { left: 16px; right: 250px; }
+  .hint { right: 250px; }
 }
 
 /* Phones */
 @media (max-width: 760px) {
-  .lang-switch { grid-column: 1 / -1; grid-row: 4; justify-self: start; margin-top: 6px; }
+  .deck-actions { grid-column: 1 / -1; grid-row: 4; justify-self: start; margin-top: 6px; gap: 6px; }
+  .sound-btn { min-height: 34px; padding: 0 9px; }
+  .sound-btn span { display: none; }
   .lang-switch button { min-height: 28px; padding: 0 9px; font-size: 11px; }
   .deck-top { flex-wrap: wrap; gap: 6px; padding: calc(8px + env(safe-area-inset-top, 0px)) 12px 8px; background: #07080b; }
   .credit { display: none; }
@@ -409,7 +434,8 @@ button.card.picked { transform: translateY(-6px); outline: 2px solid var(--gold-
   .top-actions .btn-ghost.quiet { background: #12131a; color: #f3efe4; border-color: rgba(236, 232, 220, 0.22); }
   .list-bar { flex-wrap: wrap; }
   .list-actions { flex: 1 1 auto; justify-content: flex-end; }
-  .label { padding: 2px 0 3px; }
+  /* On a phone the names sit over busy buildings, so each gets a dark plate of its own. */
+  .label { padding: 2px 7px 3px; margin-top: 3px; background: rgba(7, 8, 11, 0.78); border-radius: 4px; text-shadow: none; }
   .label strong { font-size: 13px; }
   .btn-solid, .btn-ghost { min-height: 34px; padding: 0 10px; font-size: 12px; }
   .sectors { z-index: 5; left: 12px; right: auto; width: max-content; bottom: calc(10px + env(safe-area-inset-bottom, 0px)); }

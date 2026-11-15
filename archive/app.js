@@ -1,7 +1,8 @@
 /* D22: The Living Archive — modes, HUD, exhibits, tour, and fallbacks around the 3D world. */
-import { SECTORS as BASE_SECTORS, TOUR, ARTIFACTS as BASE_ARTIFACTS, EMAIL } from "./content.js?v=15";
+import { SECTORS as BASE_SECTORS, TOUR, CHRONO, ARTIFACTS as BASE_ARTIFACTS, EMAIL } from "./content.js?v=19";
+import { play, setSound, soundOn } from "./sound.js?v=1";
 import { mountDemo } from "./holdem.js?v=2";
-import { LOCALES, UI, detectLocale, persistLocale, makeT, localizeSectors, localizeArtifacts } from "./i18n.js?v=6";
+import { LOCALES, UI, detectLocale, persistLocale, makeT, localizeSectors, localizeArtifacts } from "./i18n.js?v=9";
 
 /* ---------- localisation (EN source, KO / ZH overlays from i18n.js) ---------- */
 let locale = detectLocale();
@@ -31,11 +32,38 @@ let wasUnder = false;
 const saved = (() => { try { return JSON.parse(localStorage.getItem(STORE) || "{}"); } catch { return {}; } })();
 const foundArtifacts = new Set(saved.artifacts || []);
 const visited = new Set(saved.visited || []);
+// How far down each exhibit the visitor has read, 0–1. Feeds the bars under the sign names and in the sector list.
+const read = saved.read && typeof saved.read === "object" ? saved.read : {};
 const SURFACE = ARTIFACTS.filter((a) => !a.under);
 const surfaceFound = () => SURFACE.reduce((n, a) => n + (foundArtifacts.has(a.id) ? 1 : 0), 0);
 const buriedLeft = () => ARTIFACTS.some((a) => a.under && !foundArtifacts.has(a.id));
+/* ---------- progress: reading per exhibit, artifacts per sector ---------- */
+const readPct = (id) => Math.round(Math.min(1, read[id] || 0) * 100);
+const sectorArtifacts = (id) => ARTIFACTS.filter((a) => a.sector === id);
+function syncProgress() {
+  for (const l of labels) {
+    l.bar.style.setProperty("--p", `${readPct(l.s.id)}%`);
+    l.bar.classList.toggle("full", readPct(l.s.id) >= 100);
+  }
+  list.querySelectorAll("button[data-id]").forEach((b) => {
+    const id = b.dataset.id, arts = sectorArtifacts(id), found = arts.filter((a) => foundArtifacts.has(a.id)).length;
+    const pct = readPct(id);
+    b.style.setProperty("--p", `${pct}%`);
+    // "◆ 1/3" on screen; screen readers hear the word "Artifacts" instead of the symbol.
+    b.querySelector(".prog").replaceChildren(t("explored", { n: pct }), ...(arts.length ? [" · ",
+      h("span", { "aria-hidden": "true", text: "◆ " }), h("span", { class: "sr-only", text: `${t("artifacts")} ` }), `${found}/${arts.length}`] : []));
+  });
+  if (current && mode === "exhibit") $("ex-progress").style.setProperty("--p", `${readPct(current)}%`);
+}
+function markRead() {
+  if (!current || mode !== "exhibit") return;
+  const el = $("ex-scroll");
+  const f = el.scrollHeight <= el.clientHeight + 4 ? 1 : (el.scrollTop + el.clientHeight) / el.scrollHeight;
+  const v = f > 0.97 ? 1 : f;
+  if (v > (read[current] || 0) + 0.01 || (v === 1 && read[current] !== 1)) { read[current] = Math.round(v * 100) / 100; persist(); syncProgress(); }
+}
 function persist() {
-  try { localStorage.setItem(STORE, JSON.stringify({ artifacts: [...foundArtifacts], visited: [...visited] })); } catch {}
+  try { localStorage.setItem(STORE, JSON.stringify({ artifacts: [...foundArtifacts], visited: [...visited], read })); } catch {}
 }
 
 /* ---------- small DOM helpers ---------- */
@@ -131,7 +159,9 @@ function buildSectorList() {
   list.replaceChildren(...SECTORS.map((s, i) =>
     h("li", {}, h("button", { type: "button", "data-id": s.id, style: `--accent:${s.accent}`, onclick: () => go(s.id), onmouseenter: () => preview(s.id), onmouseleave: () => preview(null) },
       h("span", { class: "idx mono", text: String(i + 1).padStart(2, "0") }),
-      h("span", { class: "nm" }, h("strong", { text: s.name.replace(/^The /, "") }), h("span", { class: "mono", text: s.era }))))));
+      h("span", { class: "nm" }, h("strong", { text: s.name.replace(/^The /, "") }), h("span", { class: "mono", text: s.era }),
+        h("span", { class: "prog mono" })),
+      h("span", { class: "bar", "aria-hidden": "true" })))));
 }
 buildSectorList();
 $("sector-count").textContent = String(SECTORS.length).padStart(2, "0");
@@ -214,11 +244,14 @@ function buildLabels() {
   labels = SECTORS.map((s, i) => {
     const el = h("button", { type: "button", class: "label off", tabindex: "-1", style: `--accent:${s.accent}`, onclick: () => go(s.id), onmouseenter: () => preview(s.id), onmouseleave: () => preview(null) },
       h("span", { class: "mono idx", text: String(i + 1).padStart(2, "0") }), h("strong", { text: s.short }));
+    const bar = h("span", { class: "bar" });
+    el.append(bar);
     labelsEl.append(el);
-    return { s, el, at: "", on: false, z: "", w: 0, h: 0, hide: true };
+    return { s, el, bar, at: "", on: false, z: "", w: 0, h: 0, hide: true };
   });
 }
 buildLabels();
+syncProgress();
 let headerH = 0;
 let sat = 0;
 let frameTimer = 0;
@@ -436,6 +469,7 @@ function clearFrame() {
 function go(id, { fromTour = false, instant = false } = {}) {
   const s = byId(id);
   if (!s) return;
+  if (mode === "explore") play("select");
   if (!fromTour) tour = null;
   current = id;
   clearTimeout(openTimer);
@@ -457,8 +491,10 @@ function go(id, { fromTour = false, instant = false } = {}) {
 }
 
 function openExhibit(s) {
+  if (mode !== "exhibit") play("open"); else play("select");
   current = s.id;
   visited.add(s.id); persist();
+  world?.setTrail(visited);
   setMode("exhibit");
   hideReadout();
   const ex = s.exhibit;
@@ -468,9 +504,8 @@ function openExhibit(s) {
   $("ex-kicker").textContent = `${ex.kicker.replace(/^[^·]+·\s*/, "")} · ${s.era}`; // the bar above already names the sector
   $("ex-title").textContent = ex.title;
   // Headline logos (WSOP, 2 Hand Hold'em) sit beside the title as the exhibit's emblem.
-  const em = $("ex-emblem"), logo = s.key?.hero && s.key.fit === "contain";
-  em.hidden = !logo;
-  if (logo) { em.src = s.key.src; em.alt = s.key.alt; }
+  // The map already shows the sector's logo large above the sheet, so the sheet leads with the title.
+  $("ex-emblem").hidden = true;
   $("ex-lede").textContent = ex.lede;
   $("ex-body").replaceChildren(...renderExhibitBody(s));
   placeLead();
@@ -486,6 +521,8 @@ function openExhibit(s) {
   document.title = t("exhibitTitle", { name: s.name });
   syncSectorList();
   if (world) { world.focusSector(s.id, clearFrame()); world.setBackground($("exhibit").classList.contains("full") ? "list" : "exhibit"); }
+  syncProgress();
+  requestAnimationFrame(markRead);
 }
 
 /* ---------- phone sheet: pull up to read full screen, pull down to let go ---------- */
@@ -505,6 +542,7 @@ function setFull(on) {
   // Nothing of the world shows behind a full sheet, so let it rest.
   if (world && mode === "exhibit") world.setBackground(on ? "list" : "exhibit");
 }
+sheetScroll.addEventListener("scroll", markRead, { passive: true });
 sheetScroll.addEventListener("scroll", () => {
   if (phoneMQ.matches && mode === "exhibit" && !sheet.classList.contains("full") && sheetScroll.scrollTop > 24) setFull(true);
 }, { passive: true });
@@ -623,6 +661,7 @@ $("ex-next").addEventListener("click", () => step(1));
 
 function closeExhibit() {
   clearTimeout(openTimer);
+  if (mode === "exhibit") play("close");
   if ($("exhibit").contains(document.activeElement)) {
     const drawerOpen = !$("sectors-panel").hidden;
     const backTo = drawerOpen ? $("sector-list").querySelector(`[data-id="${current}"]`) : $("sectors-btn");
@@ -787,6 +826,11 @@ addEventListener("keydown", (e) => {
   else if (e.key === "+" || e.key === "=") world.zoomBy(1.25);
   else if (e.key === "-") world.zoomBy(0.8);
 });
+/* ---------- sound: off by default, remembered per browser ---------- */
+const soundBtn = $("sound-btn");
+const syncSound = () => { soundBtn.setAttribute("aria-pressed", String(soundOn())); soundBtn.classList.toggle("on", soundOn()); };
+soundBtn.addEventListener("click", () => { setSound(!soundOn()); syncSound(); });
+syncSound();
 $("zoom-in").addEventListener("click", () => world?.zoomBy(1.3));
 $("zoom-out").addEventListener("click", () => world?.zoomBy(0.77));
 $("ex-close").addEventListener("click", closeExhibit);
@@ -813,6 +857,7 @@ function applyI18n() {
   document.title = mode === "exhibit" && current ? t("exhibitTitle", { name: byId(current).name }) : `Wayne “D22-soso” Chiang · ${t("livingArchive")}`;
   buildSectorList();
   buildLabels();
+  syncProgress();
   $("sector-count").textContent = String(SECTORS.length).padStart(2, "0");
   $("art-total").textContent = SURFACE.length;
   $("finds-hint").textContent = t("findsHint", { n: SURFACE.length });
@@ -856,14 +901,14 @@ function fallback() {
   if (byId(id)) { listJump(id); history.replaceState(null, "", `#${id}`); }
 }
 async function boot() {
-    const { createWorld, webglAvailable } = await import("./world.js?v=77").catch((err) => { console.error(err); return {}; });
+    const { createWorld, webglAvailable } = await import("./world.js?v=81").catch((err) => { console.error(err); return {}; });
   if (!createWorld || !webglAvailable()) {
     fallback();
     return;
   }
   try {
     world = createWorld({
-      canvas: $("world"), sectors: SECTORS, artifacts: ARTIFACTS, reduced,
+      canvas: $("world"), sectors: SECTORS, artifacts: ARTIFACTS, chrono: CHRONO, reduced,
       onHover: (hit) => { preview(hit ? hit.id : null, hit?.type); },
       onClick: (hit) => {
         if (!hit) { if (mode === "explore") deselect(); return; }
@@ -908,13 +953,15 @@ async function boot() {
   app.classList.toggle("has-finds", surfaceFound() > 0);
   world.onDiscover((a) => {
     if (foundArtifacts.has(a.id)) return;
-    foundArtifacts.add(a.id); persist(); syncSectorList();
+    foundArtifacts.add(a.id); persist(); syncSectorList(); syncProgress();
+    play("find");
     app.classList.toggle("has-finds", surfaceFound() > 0);
     showArtifact(a);
     $("hint").textContent = hintLine(world.state().under ? "under" : surfaceFound() >= SURFACE.length ? "done" : "found");
   });
   syncHint();
   syncSectorList();
+  world.setTrail(visited);
   try { route(); } catch (err) { console.error(err); }
   // Let the reveal be seen for a moment, and until the first frame is drawn, then lift it off the world.
   const firstFrame = Promise.race([world.ready, new Promise((r) => setTimeout(r, 6000))]);

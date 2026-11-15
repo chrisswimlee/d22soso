@@ -728,9 +728,17 @@ function billboard(key, { defer = false } = {}) {
         const zoom = key.zoom || 1;
         const k = Math.max(cw / imgEl.width, ch / imgEl.height) * zoom;
         const dw = imgEl.width * k, dh = imgEl.height * k;
-        c.filter = "brightness(1.16) contrast(1.05)";
+        // A photo shot on white (`dim`) is not brightened, and its edges are darkened so it sits in the night scene.
+        c.filter = key.dim ? "brightness(0.9) contrast(1.06)" : "brightness(1.16) contrast(1.05)";
         c.drawImage(imgEl, (cw - dw) * px, (ch - dh) * py, dw, dh);
         c.filter = "none";
+        if (key.dim) {
+          const v = c.createRadialGradient(cw / 2, ch * 0.45, Math.min(cw, ch) * 0.28, cw / 2, ch * 0.5, Math.max(cw, ch) * 0.72);
+          v.addColorStop(0, "rgba(7,8,11,0)");
+          v.addColorStop(1, `rgba(7,8,11,${key.dim})`);
+          c.fillStyle = v;
+          c.fillRect(0, 0, cw, ch);
+        }
       }
       c.restore();
       strokeGold(0, 0, cw, ch, Math.round(Math.min(cw, ch) * 0.03));
@@ -926,7 +934,7 @@ function artifactMesh(under = false) {
 }
 
 /* ---------- world ---------- */
-export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onClick, onCameraUser, onFrame }) {
+export function createWorld({ canvas, sectors, artifacts, chrono = [], reduced, onHover, onClick, onCameraUser, onFrame }) {
   const mobile = matchMedia("(max-width: 760px)").matches || matchMedia("(pointer: coarse)").matches;
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: !mobile && devicePixelRatio < 2, powerPreference: mobile ? "default" : "high-performance" });
   // Quality tiers. 2: 2x pixels, 1: 1.5x, 0: 1x. Phones start at 2x with no shadows, and step down only after the intro if motion can't hold the frame.
@@ -1059,6 +1067,68 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
   pulseMesh.visible = !reduced;
   world.add(pulseMesh);
   const pulsePos = new THREE.Vector3(), pulseM = new THREE.Matrix4();
+
+  /* Supply lines: one ribbon between each sector and the next in time (`chrono`), running just outside
+     the ring road. Dashes flow toward the later sector. Lines already walked hold a steady gold, the line
+     to the next unopened sector runs bright in that sector's colour, and the rest stay faint. */
+  const LINE_R = 12.3, LINE_Y = BASE_TOP + 0.2;
+  // One dash, soft at the edges, drawn once. Each line repeats it along its length and slides it forward.
+  const dashCanvas = document.createElement("canvas");
+  dashCanvas.width = 64; dashCanvas.height = 16;
+  {
+    const g = dashCanvas.getContext("2d");
+    const across = g.createLinearGradient(0, 0, 0, 16);
+    across.addColorStop(0, "rgba(255,255,255,0)"); across.addColorStop(0.5, "rgba(255,255,255,1)"); across.addColorStop(1, "rgba(255,255,255,0)");
+    g.fillStyle = across; g.globalAlpha = 0.3; g.fillRect(0, 0, 64, 16);
+    g.globalAlpha = 1; g.fillRect(24, 3, 30, 10);
+  }
+  const REPEAT = 1000; // THREE.RepeatWrapping; the trimmed three.js build leaves the constant out
+  const lines = [];
+  const chronoIdx = chrono.map((id) => sectors.findIndex((s) => s.id === id)).filter((i) => i >= 0);
+  for (let k = 0; k + 1 < chronoIdx.length; k++) {
+    const A = sectors[chronoIdx[k]], B = sectors[chronoIdx[k + 1]];
+    let span = B.angle - A.angle;
+    while (span > 180) span -= 360;
+    while (span < -180) span += 360;
+    // Start and stop a little short of each spoke, so the line meets the road rather than the building.
+    const a0 = A.angle + Math.sign(span) * 5, a1 = B.angle - Math.sign(span) * 5;
+    const steps = Math.max(8, Math.round(Math.abs(a1 - a0) / 3));
+    const pos = [], uv = [], idx = [];
+    const len = (Math.abs(a1 - a0) * Math.PI / 180) * LINE_R;
+    for (let i = 0; i <= steps; i++) {
+      const f = i / steps, ang = a0 + (a1 - a0) * f;
+      const inner = polar(ang, LINE_R - 0.32), outer = polar(ang, LINE_R + 0.32);
+      pos.push(inner.x, LINE_Y, inner.z, outer.x, LINE_Y, outer.z);
+      uv.push(f, 0, f, 1);
+      if (i < steps) { const v = i * 2; idx.push(v, v + 1, v + 2, v + 1, v + 3, v + 2); }
+    }
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute("position", new THREE.BufferAttribute(new Float32Array(pos), 3));
+    geo.setAttribute("uv", new THREE.BufferAttribute(new Float32Array(uv), 2));
+    geo.setIndex(idx);
+    const tex = new THREE.CanvasTexture(dashCanvas);
+    tex.wrapS = REPEAT;
+    tex.repeat.set(len / 1.4, 1);
+    const m = new THREE.MeshBasicMaterial({ map: tex, color: "#e8c44a", transparent: true, opacity: 0.18, depthWrite: false, side: THREE.DoubleSide, toneMapped: false });
+    const line = new THREE.Mesh(geo, m);
+    line.renderOrder = 2;
+    world.add(line);
+    lines.push({ from: A.id, to: B.id, m, accent: new THREE.Color(B.accent).multiplyScalar(1.25), want: 0.18, speed: 0.6 });
+  }
+  const gold = new THREE.Color("#e8c44a");
+  function setTrail(visited) {
+    // The next stop is the earliest sector not yet opened. Before anything is opened, the trail starts at the first line.
+    const order = chronoIdx.map((i) => sectors[i].id);
+    const next = order.find((id) => !visited.has(id));
+    lines.forEach((l, k) => {
+      const walked = visited.has(l.from) && visited.has(l.to);
+      const lead = next && (l.to === next || (k === 0 && next === order[0]));
+      l.m.color.copy(lead ? l.accent : gold);
+      l.want = lead ? 1 : walked ? 0.6 : 0.24;
+      l.speed = lead ? 1.4 : walked ? 0.35 : 0.2;
+    });
+  }
+  setTrail(new Set());
 
   /* One quiet marker in each wedge: a pad, a short lamp, a stone. No shadows. */
   const wedgePad = mat("#45423c");
@@ -1350,6 +1420,7 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
   let underLock = false, holdUnder = false, dig = 0, underView = null;
   let fitted = true;
   let band = null;
+  let focusClear = null; // the open band beside or above the exhibit sheet
   /* A zoom the visitor chose rides on top of the fitted frame, so a turn keeps it.
      A tilt they chose turns off the tall-screen tilt below. Both reset on overview(). */
   let zoomBias = 1, fitBase = 1, userTilted = false;
@@ -1425,6 +1496,8 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
     const d = 100;
     camera.position.set(cur.tx + Math.sin(cur.az) * Math.cos(cur.el) * d, cur.ty + Math.sin(cur.el) * d, cur.tz + Math.cos(cur.az) * Math.cos(cur.el) * d);
     camera.lookAt(cur.tx, cur.ty, cur.tz);
+    // Signs are measured before the render call. Bring the view matrix up to date now, or their names trail a frame behind.
+    camera.updateMatrixWorld();
   }
 
   /* ---------- input ---------- */
@@ -1622,6 +1695,11 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
     applyCamera();
 
     mon.anim(t);
+    for (const l of lines) {
+      // Dashes move toward the later sector: the texture slides back along the line.
+      if (!reduced) l.m.map.offset.x -= dt * l.speed;
+      l.m.opacity = lerp(l.m.opacity, l.want, 0.08);
+    }
     mon.sprite.material.opacity = lerp(mon.sprite.material.opacity, selected ? 0 : 1, 0.1);
     for (const o of sectorObjs) {
       o.head.rotation.y = cur.az; o.head.rotation.x = -cur.el;
@@ -1629,7 +1707,11 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
       if (width > 1 && height > 1) {
         const vis = measureSign(o);
         o.onscreen = vis;
-        o.head.visible = cur.el < deg(-4) ? false : (vis.fullyIn || o.s.id === selected);
+        // With an exhibit open, a neighbouring sign that the sheet would cut through is put away.
+        const cut = background === "exhibit" && focusClear && o.s.id !== selected &&
+          (vis.y + vis.halfH > focusClear.cy + focusClear.h / 2 + 6 || vis.y - vis.halfH < focusClear.cy - focusClear.h / 2 - 6 ||
+           vis.x + vis.halfW > focusClear.cx + focusClear.w / 2 + 6 || vis.x - vis.halfW < focusClear.cx - focusClear.w / 2 - 6);
+        o.head.visible = cur.el < deg(-4) ? false : ((vis.fullyIn && !cut) || o.s.id === selected);
       }
       const ring = selected || highlight;
       const want = o.s.id === ring ? 0.95 : 0;
@@ -1811,6 +1893,27 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
     goal.shiftY = (0.5 - cy / Math.max(1, height)) - midY / viewH;
   }
   const HOME_AZ = deg(225);
+  /* On a tall phone the opening angle is the turn whose signs fill the screen best: the one whose
+     sign box is narrowest, so the island can be drawn larger. Measured once per screen shape. */
+  let tallHome = null;
+  function homeAz() {
+    const b = band && band.w > 1 ? band : { w: width, h: height };
+    if (!(b.h > b.w * 1.15)) return HOME_AZ;
+    const shape = `${width}x${height}:${Math.round(b.w)}x${Math.round(b.h)}`;
+    if (tallHome?.shape === shape) return tallHome.az;
+    const keep = { el: goal.el, zoom: goal.zoom, shiftX: goal.shiftX, shiftY: goal.shiftY };
+    let best = HOME_AZ, bestZoom = -1;
+    for (let d = 0; d < 360; d += 5) {
+      goal.el = OV.el;
+      fitAngle(deg(d));
+      // Prefer the designed angle unless another turn is clearly larger.
+      const z = fitBase * (d === 225 ? 1.04 : 1);
+      if (z > bestZoom) { bestZoom = z; best = deg(d); }
+    }
+    Object.assign(goal, keep);
+    tallHome = { shape, az: best };
+    return best;
+  }
   return {
     ready: compiled,
     /* Camera framing for a sector. `clear` is the screen rect the sign and
@@ -1818,6 +1921,7 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
     focusSector(id, clear) {
       const o = sectorObjs.find((x) => x.s.id === id);
       if (!o) return;
+      focusClear = clear && "cx" in clear ? clear : null;
       fitted = false;
       if (clear && ("zoom" in clear || "shiftY" in clear || "shiftX" in clear)) {
         const { shiftX = 0, shiftY = 0, zoom = 2.3 } = clear;
@@ -1857,15 +1961,15 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
     frame({ shiftX = 0, shiftY = 0 } = {}) { goal.shiftX = shiftX; goal.shiftY = shiftY; },
     /* `home` returns to the opening angle. fitAngle centers that turn's sign box in the open band. */
     overview(clear, { home = false } = {}) {
+      goal.tx = 0; goal.tz = 0; goal.ty = OV.ty; goal.el = OV.el;
+      zoomBias = 1; userTilted = false;
+      band = clear && width > 1 && height > 1 ? clear : null;
       if (home) {
-        let az = HOME_AZ;
+        let az = homeAz();
         while (az - cur.az > Math.PI) az -= Math.PI * 2;
         while (az - cur.az < -Math.PI) az += Math.PI * 2;
         goal.az = az;
       }
-      goal.tx = 0; goal.tz = 0; goal.ty = OV.ty; goal.el = OV.el;
-      zoomBias = 1; userTilted = false;
-      band = clear && width > 1 && height > 1 ? clear : null;
       fitted = true;
       fitAngle(goal.az);
     },
@@ -1885,6 +1989,7 @@ export function createWorld({ canvas, sectors, artifacts, reduced, onHover, onCl
     revealArtifact(id) { discover(id, false); },
     setSelected(id) { selected = id; highlight = null; },
     setHighlight(id) { if (!selected) highlight = id; },
+    setTrail(visited) { setTrail(visited); schedule(); },
     signOnScreen(id) {
       const o = sectorObjs.find((x) => x.s.id === id);
       return o?.onscreen || { centerIn: false, fullyIn: false, intersects: false };

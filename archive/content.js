@@ -100,6 +100,15 @@ export const SECTORS = [
           cite: "Cube Draft origins",
         },
         {
+          type: "media",
+          title: "Cube Draft on film",
+          items: [
+            { ...yt("MNjLKeA-08A"), title: "Magic History: The Cube", source: "The Tranquil Domain · the format’s oral history" },
+            { ...yt("WsLqOu5xkog"), title: "Who created Cube Draft?", source: "Brian Weissman recounts the origin · Wayne Chiang’s channel" },
+            { ...yt("FpcBooSRHQI"), title: "Kraken’s MTG Celebrity Cube Draft Tournament", source: "Kraken · live broadcast, part 1" },
+          ],
+        },
+        {
           type: "facts",
           items: [
             ["Pro Tour", "New York ’01 · Boston ’02 · qualified for three"],
@@ -118,7 +127,7 @@ export const SECTORS = [
           ],
         },
         { type: "gallery", items: [{ src: img("hearthstone-35-720"), alt: "Hearthstone Legend rank 35 screenshot", caption: "Legend #35, Standard NA." }] },
-        { type: "links", items: [{ label: "Cube Draft room", href: "../gaming.html#game-cube" }, { label: "Magic room", href: "../gaming.html#game-mtg" }] },
+        { type: "links", items: [{ label: "Cube Draft room", href: "../gaming.html#game-cube" }, { label: "Magic room", href: "../gaming.html#game-mtg" }, { label: "Kraken Celebrity Cube Draft on X", href: "https://x.com/D22_soso/status/2051916533425975574" }] },
       ],
     },
   },
@@ -203,7 +212,7 @@ export const SECTORS = [
             ["2 Hand Hold’em™", "U.S. Patents 11,117,045 · 11,731,032 · 12,005,342"],
             ["Badugi Chase™", "U.S. Patents 11,810,421 · 12,131,608 · co-inventor Charles Chang"],
             ["Side bets", "Flounder 4 · Nessie 9 · 888 Flop Bonus · Community Bonus"],
-            ["Live at", "Circa · Venetian · Commerce · Hustler · The Office · Desert Bluffs"],
+            ["Live at", "Venetian · Commerce · The Office · Silver Dollar SeaTac"],
           ],
         },
         {
@@ -261,7 +270,7 @@ export const SECTORS = [
   },
   {
     id: "command",
-    key: { m: true, src: img("wsop-boxer-sign"), ratio: 0.684, alt: "Wayne Chiang at the 2025 World Series of Poker", pos: "50% 24%", zoom: 1.15, scale: 0.78, frame: "gold" },
+    key: { m: true, dim: 0.62, src: img("wsop-boxer-sign"), ratio: 0.684, alt: "Wayne Chiang at the 2025 World Series of Poker", pos: "50% 24%", zoom: 1.15, scale: 0.78, frame: "gold" },
     name: "The Command Center",
     short: "Command",
     era: "Today",
@@ -328,16 +337,19 @@ export const SECTORS = [
 
 /* Guided tour leads with the world title, then the rest of the career. */
 export const TOUR = ["arena", "garden", "broadcast", "foundry", "library", "command"];
+/* The sectors in the order they happened: Magic (1995), StarCraft (1996), broadcasting, inventions, the book, today.
+   The supply lines on the map follow this order. */
+export const CHRONO = ["garden", "arena", "broadcast", "foundry", "library", "command"];
 
 /* Smaller stories between the sectors. Three more hang on the underside of the island. */
 export const ARTIFACTS = [
-  { id: "name", angle: 112, r: 25, title: "How he became D22", text: "Dennis “Thresh” Fong renamed him D22-soso. His rival Gadianton became D23-Gadianton." },
-  { id: "caster", angle: 68, r: 24, title: "One day late", text: "He missed PGL Season 3 registration by a single day in October 1998, so he called the matches instead and became StarCraft’s first play-by-play caster." },
-  { id: "ng", angle: 128, r: 9, title: "$250 at Neutral Ground", text: "His first StarCraft tournament win came in April 1998 at Neutral Ground Mountain View, against Jay “Gadianton” Severson." },
-  { id: "usa", angle: 52, r: 10, title: "USA vs Canada", text: "MVP of the June 1999 USA vs Canada showcase, sweeping his matches 3–0." },
-  { id: "pizza", angle: 8, r: 25, title: "Round Table Pizza", text: "Competitive Magic started at a Round Table Pizza in Palo Alto, with Brian Weissman across the table." },
-  { id: "count", angle: -58, r: 25, title: "Counted out", text: "A blackjack advantage player using Hi-Lo and Hi-Opt 1, he was banned from major Las Vegas and San Diego properties." },
-  { id: "bankroll", under: true, angle: 15, title: "Bankroll Challenge", text: "Won the streamed Global Poker Bankroll Challenge, finishing +$11,464." },
-  { id: "pimp", under: true, angle: 135, title: "Pimpest Plays", text: "At Gamers.com he ran GX StarCraft with Thresh and Calbear: battle reports after matches and Pimpest Plays, an early blueprint for esports highlight reels." },
-  { id: "script", under: true, angle: 255, title: "Screenwriter", text: "A feature screenplay of his was a finalist at the 2007 Screenwriting Expo." },
+  { id: "name", sector: "arena", angle: 112, r: 25, title: "How he became D22", text: "Dennis “Thresh” Fong renamed him D22-soso. His rival Gadianton became D23-Gadianton." },
+  { id: "caster", sector: "broadcast", angle: 68, r: 24, title: "One day late", text: "He missed PGL Season 3 registration by a single day in October 1998, so he called the matches instead and became StarCraft’s first play-by-play caster." },
+  { id: "ng", sector: "arena", angle: 128, r: 9, title: "$250 at Neutral Ground", text: "His first StarCraft tournament win came in April 1998 at Neutral Ground Mountain View, against Jay “Gadianton” Severson." },
+  { id: "usa", sector: "arena", angle: 52, r: 10, title: "USA vs Canada", text: "MVP of the June 1999 USA vs Canada showcase, sweeping his matches 3–0." },
+  { id: "pizza", sector: "garden", angle: 8, r: 25, title: "Round Table Pizza", text: "Competitive Magic started at a Round Table Pizza in Palo Alto, with Brian Weissman across the table." },
+  { id: "count", sector: "foundry", angle: -58, r: 25, title: "Counted out", text: "A blackjack advantage player using Hi-Lo and Hi-Opt 1, he was banned from major Las Vegas and San Diego properties." },
+  { id: "bankroll", sector: "broadcast", under: true, angle: 15, title: "Bankroll Challenge", text: "Won the streamed Global Poker Bankroll Challenge, finishing +$11,464." },
+  { id: "pimp", sector: "broadcast", under: true, angle: 135, title: "Pimpest Plays", text: "At Gamers.com he ran GX StarCraft with Thresh and Calbear: battle reports after matches and Pimpest Plays, an early blueprint for esports highlight reels." },
+  { id: "script", sector: "library", under: true, angle: 255, title: "Screenwriter", text: "A feature screenplay of his was a finalist at the 2007 Screenwriting Expo." },
 ];
