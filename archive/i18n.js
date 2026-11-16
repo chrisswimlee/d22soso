@@ -389,10 +389,10 @@ const SECTOR_T = {
       exhibit: { kicker: "섹터 04 · 특허 테이블 게임", title: "두 개의 핸드. 하나의 보드.", lede: "2 Hand Hold’em™은 플레이어에게 홀 카드 네 장을 주어 딜러의 단일 보드를 상대로 두 개의 독립 핸드로 나눌 수 있게 합니다. 워싱턴주 도박위원회의 인증을 받아 카지노에서 실제로 딜링되고 있습니다.", blocks: [
         {},
         { title: "2 Hand Hold’em 플레이 방법", items: [["앤티", "핸드마다 하나씩, 같은 금액의 베팅 두 개."], ["딜", "플레이어에게 홀 카드 네 장, 딜러에게 세 장, 그리고 플랍 세 장."], ["배열", "네 장을 두 장씩 두 핸드로 나눕니다."], ["체크 또는 레이즈", "각 핸드마다 독립적으로 체크하거나 앤티의 2배를 레이즈."], ["쇼다운", "턴과 리버가 열립니다. 각 핸드는 딜러와 따로 대결합니다."]] },
-        { items: [["2 Hand Hold’em™", "미국 특허 11,117,045 · 11,731,032 · 12,005,342"], ["Badugi Chase™", "미국 특허 11,810,421 · 12,131,608 · 공동 발명가 Charles Chang"], ["사이드 베팅", "Flounder 4 · Nessie 9 · 888 Flop Bonus · Community Bonus"], ["라이브 운영", "Venetian · Commerce · The Office · Silver Dollar SeaTac"]] },
+        { items: [["2 Hand Hold’em™", "미국 특허 11,117,045 · 11,731,032 · 12,005,342"], ["Badugi Chase™", "미국 특허 11,810,421 · 12,131,608 · 공동 발명가 Charles Chang"], ["사이드 베팅", "Flounder 4 · Nessie 9 · 888 Flop Bonus · Community Bonus"], ["라이브 운영", "Venetian · Commerce · The Office · Silver Dollar SeaTac · Desert Bluffs"]] },
         { title: "Badugi Chase™ · “베이비 레인보우”", text: ["카드 세 장, 그리고 체이스: 커뮤니티 카드 세 장 중 하나를 골라 네 장 바둑이를 완성합니다. 무늬와 숫자가 모두 다르면 이기고, 가장 낮은 탑 카드가 승리합니다."] },
         { items: [{ alt: "Badugi Chase 테이블 레이아웃", caption: "Badugi Chase 레이아웃." }] },
-        { items: [{ label: "play2hh.com에서 온라인 플레이" }, { label: "라이브 테이블 찾기" }, { label: "특허 11,117,045" }] },
+        { items: [{ label: "play2hh.com에서 온라인 플레이" }, { label: "라이브 테이블 찾기" }, { label: "특허 11,117,045" }, { label: "2HH 운영 장소 지도" }] },
       ] },
     },
     library: {
@@ -451,10 +451,10 @@ const SECTOR_T = {
       exhibit: { kicker: "区域 04 · 专利桌面游戏", title: "两手牌。一张牌面。", lede: "2 Hand Hold’em™ 让玩家拿到四张底牌，拆成两手独立的牌，对阵庄家的同一组公共牌。它已通过华盛顿州博彩委员会认证，并在赌场实地发牌。", blocks: [
         {},
         { title: "2 Hand Hold’em 玩法", items: [["前注", "每手一注，两注金额相等。"], ["发牌", "你拿四张底牌，庄家三张，外加三张翻牌。"], ["分牌", "将四张牌分成两手各两张。"], ["让牌或加注", "每手独立让牌，或加注前注的 2 倍。"], ["摊牌", "发出转牌与河牌，每手分别与庄家对决。"]] },
-        { items: [["2 Hand Hold’em™", "美国专利 11,117,045 · 11,731,032 · 12,005,342"], ["Badugi Chase™", "美国专利 11,810,421 · 12,131,608 · 共同发明人 Charles Chang"], ["边注", "Flounder 4 · Nessie 9 · 888 Flop Bonus · Community Bonus"], ["上桌地点", "Venetian · Commerce · The Office · Silver Dollar SeaTac"]] },
+        { items: [["2 Hand Hold’em™", "美国专利 11,117,045 · 11,731,032 · 12,005,342"], ["Badugi Chase™", "美国专利 11,810,421 · 12,131,608 · 共同发明人 Charles Chang"], ["边注", "Flounder 4 · Nessie 9 · 888 Flop Bonus · Community Bonus"], ["上桌地点", "Venetian · Commerce · The Office · Silver Dollar SeaTac · Desert Bluffs"]] },
         { title: "Badugi Chase™ · “小彩虹”", text: ["先发三张，再进入 Chase：从三张公共牌中选一张，凑成四张 Badugi。花色与点数互不相同的最低牌获胜。"] },
         { items: [{ alt: "Badugi Chase 桌面布局", caption: "Badugi Chase 桌面布局。" }] },
-        { items: [{ label: "在 play2hh.com 在线试玩" }, { label: "查找实体牌桌" }, { label: "专利 11,117,045" }] },
+        { items: [{ label: "在 play2hh.com 在线试玩" }, { label: "查找实体牌桌" }, { label: "专利 11,117,045" }, { label: "2HH 地点地图" }] },
       ] },
     },
     library: {

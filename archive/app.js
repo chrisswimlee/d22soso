@@ -1,8 +1,8 @@
 /* D22: The Living Archive — modes, HUD, exhibits, tour, and fallbacks around the 3D world. */
-import { SECTORS as BASE_SECTORS, TOUR, CHRONO, ARTIFACTS as BASE_ARTIFACTS, EMAIL } from "./content.js?v=19";
+import { SECTORS as BASE_SECTORS, TOUR, CHRONO, ARTIFACTS as BASE_ARTIFACTS, EMAIL } from "./content.js?v=20";
 import { play, setSound, soundOn } from "./sound.js?v=1";
 import { mountDemo } from "./holdem.js?v=2";
-import { LOCALES, UI, detectLocale, persistLocale, makeT, localizeSectors, localizeArtifacts } from "./i18n.js?v=9";
+import { LOCALES, UI, detectLocale, persistLocale, makeT, localizeSectors, localizeArtifacts } from "./i18n.js?v=10";
 
 /* ---------- localisation (EN source, KO / ZH overlays from i18n.js) ---------- */
 let locale = detectLocale();

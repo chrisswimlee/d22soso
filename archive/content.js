@@ -212,7 +212,7 @@ export const SECTORS = [
             ["2 Hand Hold’em™", "U.S. Patents 11,117,045 · 11,731,032 · 12,005,342"],
             ["Badugi Chase™", "U.S. Patents 11,810,421 · 12,131,608 · co-inventor Charles Chang"],
             ["Side bets", "Flounder 4 · Nessie 9 · 888 Flop Bonus · Community Bonus"],
-            ["Live at", "Venetian · Commerce · The Office · Silver Dollar SeaTac"],
+            ["Live at", "Venetian · Commerce · The Office · Silver Dollar SeaTac · Desert Bluffs"],
           ],
         },
         {
@@ -227,6 +227,7 @@ export const SECTORS = [
             { label: "Play online at play2hh.com", href: "https://play2hh.com" },
             { label: "Find a live table", href: "../classic.html#locate" },
             { label: "Patent 11,117,045", href: "https://patents.google.com/patent/US11117045" },
+            { label: "Map of 2HH locations", href: "https://www.google.com/maps/d/viewer?mid=1jkuOr8dbWp_1eP_5JAC2VYsHcoKf-Uc" },
           ],
         },
       ],
