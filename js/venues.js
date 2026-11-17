@@ -1,12 +1,13 @@
 /* 2 Hand Hold’em venues — one source for every map and venue list on the site.
    Live source of truth: the published Google My Maps list (MAP_MID). VENUES below is the
-   offline fallback and what the static exhibit pages are built from; keep it in step with
-   the published map. Used by the classic page (js/locate-map.js), the 3D archive's Foundry
-   exhibit (archive/app.js) and tools/build-exhibits.mjs, so it must stay DOM-free at import. */
+   offline fallback for the classic page's pins; keep it in step with the published map.
+   Used by the classic page (js/locate-map.js), the 3D archive's Foundry exhibit
+   (archive/app.js) and tools/build-exhibits.mjs, so it must stay DOM-free at import. */
 
 export const MAP_MID = "1jkuOr8dbWp_1eP_5JAC2VYsHcoKf-Uc";
 export const KML_URL = "https://www.google.com/maps/d/kml?mid=" + MAP_MID + "&forcekml=1";
 export const VIEWER_URL = "https://www.google.com/maps/d/viewer?mid=" + MAP_MID;
+export const EMBED_URL = "https://www.google.com/maps/d/embed?mid=" + MAP_MID;
 
 /* West → east, matching the published My Maps folders. */
 export const VENUES = [
@@ -17,26 +18,11 @@ export const VENUES = [
   { name: "Rustlers Club", region: "Texas", lat: 29.467311, lon: -98.6156977 },
 ];
 
-/* Equirectangular CONUS bounds matching the hand-authored silhouette (viewBox 0 0 1000 620). */
+/* Equirectangular CONUS bounds matching the classic page's silhouette (viewBox 0 0 1000 620). */
 const LON_W = -125;
 const LON_E = -66.5;
 const LAT_N = 49.5;
 const LAT_S = 24.5;
-
-export const CONUS_PATH =
-  "M 4.3 38.2 L 34.5 23.8 L 258.6 23.8 L 517.2 23.8 L 620.7 47.7 L 706.9 83.5 L 793.1 155 L 844.8 131.2 L 931 119.2 L 1000 71.5 L 948.3 166.9 L 939.7 202.7 L 879.3 238.5 L 844.8 274.6 L 827.6 345.4 L 758.6 428.5 L 767.2 583.1 L 750 535.4 L 706.9 476.9 L 620.7 488.8 L 534.5 488.8 L 482.8 559.2 L 439.7 559.2 L 318.9 433.8 L 241.4 445.8 L 175.9 419.2 L 136.2 419.2 L 77.6 369.2 L 51.7 291.2 L 13.8 226.9 L 17.2 166.9 Z";
-
-/* Every 10° of longitude and 5° of latitude. */
-const GRID_X = [86.2, 258.6, 431, 603.4, 775.9, 948.3];
-const GRID_Y = [119.2, 238.5, 357.7, 476.9, 596.2];
-
-/* The outline as an SVG string, so the archive and the static pages draw the same country. */
-export function outlineSvg(cls = "venue-map-svg") {
-  const grid =
-    GRID_X.map((x) => `<line x1="${x}" y1="0" x2="${x}" y2="620"/>`).join("") +
-    GRID_Y.map((y) => `<line x1="0" y1="${y}" x2="1000" y2="${y}"/>`).join("");
-  return `<svg class="${cls}" viewBox="0 0 1000 620" aria-hidden="true" focusable="false"><g class="venue-map-grid">${grid}</g><path class="venue-map-land" d="${CONUS_PATH}"/></svg>`;
-}
 
 export function inConus(lon, lat) {
   return lon >= LON_W && lon <= LON_E && lat >= LAT_S && lat <= LAT_N;
@@ -95,21 +81,6 @@ export function placeVenues(list) {
     .sort((a, b) => a.lon - b.lon || b.lat - a.lat);
 }
 
-/* Venues too close to tell apart on a small map share one marker. `gap` is in percent of the
-   map width; y is scaled by the 620/1000 aspect so the distance is true on screen. */
-export function groupVenues(venues, gap = 3) {
-  const groups = [];
-  venues.forEach((v, i) => {
-    const near = groups.find((g) => Math.hypot(g.x - v.x, (g.y - v.y) * 0.62) < gap);
-    if (near) {
-      near.n.push(i + 1);
-      near.x = (near.x * (near.n.length - 1) + v.x) / near.n.length;
-      near.y = (near.y * (near.n.length - 1) + v.y) / near.n.length;
-    } else groups.push({ x: v.x, y: v.y, n: [i + 1] });
-  });
-  return groups;
-}
-
 /* Browser only (DOMParser). */
 export function parseKml(xmlText) {
   const doc = new DOMParser().parseFromString(xmlText, "text/xml");
@@ -153,31 +124,9 @@ export function loadVenues() {
   return pending;
 }
 
-const escHtml = (v) =>
-  String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
-
-/* Numbered map + matching list, as an HTML string. Shared by the 3D archive and the static
-   exhibit pages. `s` carries the localized strings:
-   { label, openIn: "{name} — open in Google Maps", fullMap, regions: { Texas: "…" } } */
-export function venueMapMarkup(venues, s) {
-  const region = (r) => escHtml(s.regions?.[r] || r);
-  const pins = groupVenues(venues)
-    .map(
-      (g) =>
-        `<span class="venue-pin${g.n.length > 1 ? " is-group" : ""}" data-n="${g.n.join(" ")}" style="left:${g.x.toFixed(2)}%;top:${g.y.toFixed(2)}%">${g.n.join("·")}</span>`
-    )
-    .join("");
-  const rows = venues
-    .map(
-      (v, i) =>
-        `<li data-n="${i + 1}"><span class="venue-n">${i + 1}</span><a href="${escHtml(mapsHref(v))}" target="_blank" rel="noopener noreferrer" aria-label="${escHtml(
-          s.openIn.replace("{name}", v.name)
-        )}">${escHtml(v.name)}</a><span class="venue-region">${region(v.region)}</span></li>`
-    )
-    .join("");
-  return (
-    `<div class="venue-map" role="img" aria-label="${escHtml(s.label)}">${outlineSvg()}${pins}</div>` +
-    `<ol class="venue-list">${rows}</ol>` +
-    `<p class="venue-more"><a href="${VIEWER_URL}" target="_blank" rel="noopener noreferrer">${escHtml(s.fullMap)} →</a></p>`
-  );
+/* The published My Maps map itself, small and lazy. Shared by the 3D archive and the static
+   exhibit pages. `label` names the frame for screen readers. */
+export function venueEmbedMarkup(label) {
+  const t = String(label || "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+  return `<div class="venue-map"><iframe src="${EMBED_URL}" title="${t}" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe></div>`;
 }

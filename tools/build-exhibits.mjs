@@ -5,7 +5,7 @@
 import { mkdir, writeFile, readFile } from "node:fs/promises";
 import { SECTORS, EMAIL } from "../archive/content.js";
 import { UI, LOCALES, localizeSectors } from "../archive/i18n.js";
-import { VENUES, placeVenues, venueMapMarkup } from "../js/venues.js";
+import { venueEmbedMarkup } from "../js/venues.js";
 
 const SITE = "https://d22soso.com";
 let ui = UI.en;
@@ -40,8 +40,7 @@ const BLOCKS = {
   demo: () => `<p class="note">${chrome.demo.replace("{href}", worldFor(loc, "foundry"))}</p>`,
   book: (b) => `<figure class="book"><img src="${esc(abs(b.cover))}" alt="${esc(ui.bookCoverAlt)}" loading="lazy" /><figcaption><strong>${esc(ui.bookQuote)}</strong> ${esc(ui.bookDesc)}</figcaption></figure>`,
   contact: () => `<section class="contact"><p class="eyebrow">${esc(ui.contactEyebrow)}</p><p><a href="mailto:${esc(EMAIL)}">${esc(EMAIL)}</a></p></section>`,
-  // Built from the bundled list in js/venues.js; the 3D archive and the classic page refresh from the live My Maps list.
-  venues: (b) => `<section class="venues">${b.title ? `<h2>${esc(b.title)}</h2>` : ""}${venueMapMarkup(placeVenues(VENUES), { label: ui.venueMapLabel, openIn: ui.venueOpenIn, fullMap: ui.venueFullMap, regions: ui.venueRegions })}</section>`,
+  venues: () => venueEmbedMarkup(ui.venueMapLabel),
   downloads: (b) => `<section><h2>${esc(b.title)}</h2><ul class="links">${b.items.map((d) => `<li><a href="${esc(abs(d.href))}" download>${esc(d.label)}</a></li>`).join("")}</ul></section>`,
 };
 
@@ -66,10 +65,7 @@ footer{font:500 13px var(--mono);color:var(--small);padding-bottom:40px}
 @media (max-width:560px){.head{grid-template-columns:1fr;gap:16px}.hero{max-width:200px;order:-1}.hero.wide{max-width:none}.facts div,.book{grid-template-columns:1fr}.timeline li{grid-template-columns:80px 1fr}body{font-size:16px}}`;
 
 // Only the Foundry carries the venue map, so only its pages carry these rules.
-const VENUE_CSS = `.venue-map{position:relative;aspect-ratio:1000/620;margin:0 0 8px;border-radius:6px;overflow:hidden;background:radial-gradient(120% 90% at 30% 20%,#11201d,#08090c)}.venue-map-svg{position:absolute;inset:0;width:100%;height:100%;display:block}.venue-map-grid line{stroke:rgba(236,232,220,.05);stroke-width:1;vector-effect:non-scaling-stroke}.venue-map-land{fill:rgba(45,212,191,.07);stroke:rgba(45,212,191,.5);stroke-width:1.2;stroke-linejoin:round;vector-effect:non-scaling-stroke}
-.venue-pin{position:absolute;transform:translate(-50%,-50%);min-width:24px;height:24px;padding:0 6px;display:grid;place-items:center;border-radius:12px;font:500 12px/1 var(--mono);color:var(--ink);background:#07080b;border:1px solid #2dd4bf}
-.venue-list{list-style:none;margin:0;padding:0}.venue-list li{display:grid;grid-template-columns:24px minmax(0,1fr) auto;gap:12px;align-items:baseline;padding:10px 0;border-bottom:1px solid var(--rule)}.venue-n{font:500 13px var(--mono);color:#7ee8d6}.venue-list a{color:var(--ink);text-decoration:none}.venue-list a:hover{color:var(--gold)}.venue-region{font:500 12px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--small);text-align:right}.venue-more{margin:12px 0 0;font:500 13px var(--mono)}
-@media (max-width:560px){.venue-pin{min-width:20px;height:20px;font-size:11px}}`;
+const VENUE_CSS = `.venue-map{width:100%;aspect-ratio:16/10;max-height:300px;margin:24px 0;border-radius:6px;overflow:hidden;background:#101116}.venue-map iframe{display:block;width:100%;height:100%;border:0}`;
 
 function page(s, i, SECTORS) {
   const ex = s.exhibit;

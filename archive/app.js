@@ -3,7 +3,7 @@ import { SECTORS as BASE_SECTORS, TOUR, CHRONO, ARTIFACTS as BASE_ARTIFACTS, EMA
 import { play, setSound, soundOn } from "./sound.js?v=1";
 import { mountDemo } from "./holdem.js?v=2";
 import { LOCALES, UI, detectLocale, persistLocale, makeT, localizeSectors, localizeArtifacts } from "./i18n.js?v=11";
-import { VENUES, placeVenues, loadVenues, venueMapMarkup } from "../js/venues.js?v=1";
+import { venueEmbedMarkup } from "../js/venues.js?v=2";
 
 /* ---------- localisation (EN source, KO / ZH overlays from i18n.js) ---------- */
 let locale = detectLocale();
@@ -132,27 +132,8 @@ const BLOCKS = {
       h("p", { class: "mono eyebrow", text: t("contactEyebrow") }),
       addr, h("p", { class: "contact-actions" }, h("a", { class: "btn-solid", href: `mailto:${EMAIL}`, text: t("emailWayne") }), copy, status));
   },
-  /* Live tables: numbered map + list. Draws the bundled list at once, then the published
-     My Maps list when it arrives. Pointing at a row lights its pin, and the other way round. */
-  venues: (b) => {
-    const body = h("div", { class: "venues-body" });
-    const strings = () => ({ label: t("venueMapLabel"), openIn: t("venueOpenIn"), fullMap: t("venueFullMap"), regions: (UI[locale] || UI.en).venueRegions });
-    const draw = (venues) => { body.innerHTML = venueMapMarkup(venues, strings()); };
-    draw(placeVenues(VENUES));
-    loadVenues().then(({ venues, source }) => { if (source === "kml") draw(venues); });
-    const light = (e) => {
-      body.querySelectorAll(".is-on").forEach((el) => el.classList.remove("is-on"));
-      const from = e?.target.closest?.("[data-n]");
-      if (!from) return;
-      const ns = from.dataset.n.split(" ");
-      body.querySelectorAll("[data-n]").forEach((el) => { if (el.dataset.n.split(" ").some((n) => ns.includes(n))) el.classList.add("is-on"); });
-    };
-    body.addEventListener("pointerover", light);
-    body.addEventListener("pointerleave", () => light(null));
-    body.addEventListener("focusin", light);
-    body.addEventListener("focusout", () => light(null));
-    return h("section", { class: "venues" }, b.title && h("h3", { class: "sec mono", text: b.title }), body);
-  },
+  /* Live tables: the published My Maps map, small, no heading. */
+  venues: () => { const el = h("section", { class: "venues" }); el.innerHTML = venueEmbedMarkup(t("venueMapLabel")); return el; },
   downloads: (b) => h("section", {}, h("h3", { class: "sec mono", text: b.title }),
     h("ul", { class: "downloads" }, b.items.map((d) => h("li", {}, h("a", { href: d.href, download: true, text: d.label }))))),
 };

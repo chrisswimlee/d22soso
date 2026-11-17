@@ -214,8 +214,8 @@ export const SECTORS = [
             ["Side bets", "Flounder 4 · Nessie 9 · 888 Flop Bonus · Community Bonus"],
           ],
         },
-        /* Map + list of live tables, drawn from js/venues.js and the published My Maps list. */
-        { type: "venues", title: "Where to play it live" },
+        /* Small embed of the published My Maps venue list (js/venues.js). */
+        { type: "venues" },
         {
           type: "story",
           title: "Badugi Chase™ · “The Baby Rainbow”",
