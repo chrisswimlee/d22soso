@@ -76,6 +76,12 @@ html[lang="ko"] body { word-break: keep-all; overflow-wrap: anywhere; }
 .btn-cta span { transition: transform 0.2s; }
 .btn-cta:hover span { transform: translateX(3px); }
 [data-mode="exhibit"] .btn-cta { opacity: 0; pointer-events: none; }
+/* Quick routes for visitors who came for business, not the tour. */
+.fast-lane { display: flex; flex-wrap: wrap; gap: 6px 16px; margin-top: 10px; font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9), 0 0 10px rgba(0, 0, 0, 0.75); transition: opacity 0.3s; }
+.fast-lane a { color: var(--small); text-decoration: none; padding: 4px 0; border-bottom: 1px solid var(--rule); }
+.fast-lane a:hover { color: var(--gold-text); border-color: var(--gold); }
+[data-mode="exhibit"] .fast-lane { opacity: 0; pointer-events: none; }
+.contact-licensing { margin: 12px 0 0; }
 /* The sheet owns the right side. Keep the name in the open column instead of under it. */
 @media (min-width: 761px) {
   [data-mode="exhibit"] .deck-top {
@@ -457,7 +463,8 @@ button.card.picked { transform: translateY(-6px); outline: 2px solid var(--gold-
   .deck-top .brand .portrait { grid-column: 1; grid-row: 1 / span 2; width: 40px; align-self: center; margin-right: 2px; }
   .deck-top .brand h1 { grid-column: 2 / -1; grid-row: 1; }
   .deck-top .brand .intro { grid-column: 2 / -1; grid-row: 2; }
-  .deck-top .brand .btn-cta { grid-column: 1 / -1; grid-row: 3; justify-self: start; margin-top: 6px; min-height: 36px; padding: 0 12px; font-size: 12px; }
+  .deck-top .brand .btn-cta { grid-column: 1 / -1; grid-row: 3; justify-self: start; margin-top: 6px; min-height: 36px; padding: 0 10px; font-size: 12px; }
+  .deck-top .brand .fast-lane { grid-column: 1 / -1; grid-row: 3; justify-self: end; align-self: center; margin-top: 6px; gap: 10px; font-size: 11px; letter-spacing: 0; flex-wrap: nowrap; }
   /* One dock: sectors on the left, the artifact count filling the rest. No minimap. */
   .instruments { display: none; align-items: stretch; left: 122px; right: 12px; width: auto; bottom: calc(10px + env(safe-area-inset-bottom, 0px)); pointer-events: none; }
   .has-finds .instruments { display: flex; }
@@ -511,4 +518,10 @@ button.card.picked { transform: translateY(-6px); outline: 2px solid var(--gold-
   .list-ex:has(> .emblem) { grid-template-columns: minmax(0, 1fr); }
   .list-ex:has(> .emblem) > :is(.kicker, h2, .lede) { grid-column: 1; }
   .list-ex:has(> .emblem) > .emblem { grid-row: auto; grid-column: 1; width: 92px; margin: 0 0 14px; }
+}
+
+/* Narrowest phones (≤370px): the tour button and the quick routes still share one row. */
+@media (max-width: 370px) {
+  .deck-top .brand .btn-cta { padding: 0 8px; }
+  .deck-top .brand .fast-lane { gap: 7px; }
 }

@@ -227,6 +227,7 @@ export const SECTORS = [
           items: [
             { label: "Play online at play2hh.com", href: "https://play2hh.com" },
             { label: "Patent 11,117,045", href: "https://patents.google.com/patent/US11117045" },
+            { label: "Licensing", href: "../licensing/" },
           ],
         },
       ],

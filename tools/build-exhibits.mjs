@@ -5,7 +5,8 @@
 import { mkdir, writeFile, readFile } from "node:fs/promises";
 import { SECTORS, EMAIL } from "../archive/content.js";
 import { UI, LOCALES, localizeSectors } from "../archive/i18n.js";
-import { venueEmbedMarkup } from "../js/venues.js";
+import { venueEmbedMarkup, VENUES, placeVenues, VIEWER_URL } from "../js/venues.js";
+import { LICENSING, LICENSING_EMAIL, PATENTS, SIDE_BETS, BADUGI_BONUS } from "../archive/licensing.js";
 
 const SITE = "https://d22soso.com";
 let ui = UI.en;
@@ -39,7 +40,7 @@ const BLOCKS = {
   steps: (b) => `<section><h2>${esc(b.title)}</h2><ol class="steps">${b.items.map(([k, v]) => `<li><strong>${esc(k)}</strong> ${esc(v)}</li>`).join("")}</ol></section>`,
   demo: () => `<p class="note">${chrome.demo.replace("{href}", worldFor(loc, "foundry"))}</p>`,
   book: (b) => `<figure class="book"><img src="${esc(abs(b.cover))}" alt="${esc(ui.bookCoverAlt)}" loading="lazy" /><figcaption><strong>${esc(ui.bookQuote)}</strong> ${esc(ui.bookDesc)}</figcaption></figure>`,
-  contact: () => `<section class="contact"><p class="eyebrow">${esc(ui.contactEyebrow)}</p><p><a href="mailto:${esc(EMAIL)}">${esc(EMAIL)}</a></p></section>`,
+  contact: () => `<section class="contact"><p class="eyebrow">${esc(ui.contactEyebrow)}</p><p><a href="mailto:${esc(EMAIL)}">${esc(EMAIL)}</a></p><p><a href="${pathFor(loc, "licensing")}">${esc(ui.licensingPage)}</a></p></section>`,
   venues: () => venueEmbedMarkup(ui.venueMapLabel),
   downloads: (b) => `<section><h2>${esc(b.title)}</h2><ul class="links">${b.items.map((d) => `<li><a href="${esc(abs(d.href))}" download>${esc(d.label)}</a></li>`).join("")}</ul></section>`,
 };
@@ -139,6 +140,89 @@ ${ex.blocks.map((b) => (BLOCKS[b.type] ? BLOCKS[b.type](b) : "")).join("\n")}
 `;
 }
 
+// /licensing/: one page for casino and card-room buyers. Copy lives in archive/licensing.js.
+const LICENSING_CSS = `.actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:24px 0 6px}.ghost{display:inline-block;border:1px solid var(--rule);color:var(--ink);font:600 13px var(--mono);letter-spacing:.06em;text-transform:uppercase;padding:9px 14px;border-radius:6px;text-decoration:none}.ghost:hover{border-color:var(--gold);color:var(--ink)}.terms{font-size:15px;color:var(--small);margin:6px 0 0}
+.venues-list{list-style:none;padding:0;margin:12px 0 0}.venues-list li{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid var(--rule)}.venues-list span{font:500 12px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--small)}
+.chips{list-style:none;padding:0;margin:8px 0 0;display:flex;flex-wrap:wrap;gap:8px}.chips li{font:500 13px var(--mono);padding:6px 10px;border:1px solid var(--rule);border-radius:3px}
+.sub{font:500 12px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--small);margin:22px 0 4px}
+.pay{border-collapse:collapse;margin:8px 0 0;min-width:240px}.pay td{padding:7px 18px 7px 0;border-bottom:1px solid var(--rule);font:500 14px var(--mono)}.pay td:last-child{color:var(--gold);text-align:right;padding-right:0}`;
+
+function licensingPage(L, sectors) {
+  const url = `${SITE}${pathFor(loc, "licensing")}`;
+  const venues = placeVenues(VENUES);
+  const lede = L.lede.replace("{n}", String(venues.length));
+  const title = `${L.title} · Wayne “D22-soso” Chiang`;
+  const foundry = sectors.find((x) => x.id === "foundry");
+  const steps = foundry.exhibit.blocks.find((b) => b.type === "steps");
+  const mail = `mailto:${LICENSING_EMAIL}?subject=${encodeURIComponent(L.askSubject)}`;
+  const patentLinks = (list) => list.map(([n, href]) => `<a href="${href}" target="_blank" rel="noopener noreferrer">${esc(n)}</a>`).join(" · ");
+  const alternates = LOCALES.map((l) => `<link rel="alternate" hreflang="${HTML_LANG[l.code]}" href="${SITE}${pathFor(l.code, "licensing")}" />`).join("\n") +
+    `\n<link rel="alternate" hreflang="x-default" href="${SITE}${pathFor("en", "licensing")}" />`;
+  const langs = `<nav class="langs" aria-label="${esc(chrome.language)}">${LOCALES.map((l) => `<a href="${pathFor(l.code, "licensing")}" hreflang="${HTML_LANG[l.code]}" lang="${HTML_LANG[l.code]}"${l.code === loc ? ' aria-current="page"' : ""}>${esc(l.label)}</a>`).join("")}</nav>`;
+  const inventor = { "@type": "Person", name: "Wayne Chiang", alternateName: "D22-soso", url: `${SITE}/` };
+  const org = { "@type": "Organization", "@id": `${SITE}/licensing/#2hh-llc`, name: "2 HH, LLC", email: LICENSING_EMAIL, url: `${SITE}/licensing/` };
+  const ld = { "@context": "https://schema.org", "@graph": [
+    { "@type": "WebPage", "@id": url, url, name: title, description: lede, inLanguage: HTML_LANG[loc], isPartOf: { "@type": "WebSite", name: "D22-soso", url: `${SITE}/` } },
+    org,
+    { "@type": "Game", name: "2 Hand Hold’em", description: L.twohhPitch, author: inventor, copyrightHolder: { "@id": org["@id"] }, url: "https://play2hh.com" },
+    { "@type": "Game", name: "Badugi Chase", description: L.badugiPitch, author: inventor, copyrightHolder: { "@id": org["@id"] } },
+  ] };
+  return `<!doctype html>
+<html lang="${HTML_LANG[loc]}">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>${esc(title)}</title>
+<meta name="description" content="${esc(lede)}" />
+<link rel="canonical" href="${url}" />
+${alternates}
+<meta property="og:type" content="website" />
+<meta property="og:url" content="${url}" />
+<meta property="og:site_name" content="D22-soso" />
+<meta property="og:title" content="${esc(L.title)}" />
+<meta property="og:description" content="${esc(lede)}" />
+<meta property="og:image" content="${SITE}/assets/img/twohh-logo-cut.webp" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="theme-color" content="#07080b" />
+<link rel="icon" href="/assets/img/apple-touch-icon.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" /><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans:wght@400&family=Space+Grotesk:wght@600;700&display=swap" />
+<style>${CSS}
+${VENUE_CSS}
+${LICENSING_CSS}</style>
+<script type="application/ld+json">${JSON.stringify(ld)}</script>
+</head>
+<body>
+<a class="skip" href="#content">${esc(chrome.skip)}</a>
+<header class="top"><div class="wrap"><a class="brand" href="${loc === "en" ? "/" : `/?lang=${loc}`}">Wayne “D22-soso” Chiang</a>${langs}<a class="cta" href="${mail}">${esc(L.ask)} →</a></div></header>
+<main id="content" class="wrap">
+<div class="head"><div>
+<p class="kicker">${esc(L.kicker)}</p>
+<h1>${esc(L.title)}</h1>
+<p class="lede">${esc(lede)}</p>
+</div><figure class="hero logo"><img src="/assets/img/twohh-logo-cut.webp" alt="2 Hand Hold’em logo" style="object-position:50% 30%" fetchpriority="high" /></figure></div>
+<div class="actions"><a class="cta" href="${mail}">${esc(L.ask)} →</a><a class="ghost" href="https://play2hh.com" target="_blank" rel="noopener noreferrer">${esc(L.demo)}</a></div>
+<p class="terms">${esc(L.terms)} <a href="${mail}">${esc(LICENSING_EMAIL)}</a></p>
+<dl class="facts">${L.facts.map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join("")}</dl>
+<section><h2>${esc(L.liveTitle)}</h2>${venueEmbedMarkup(L.mapLabel)}
+<ul class="venues-list">${venues.map((v) => `<li>${esc(v.name)}<span>${esc(L.regions[v.region] || v.region)}</span></li>`).join("")}</ul>
+<p class="venue-more"><a href="${VIEWER_URL}" target="_blank" rel="noopener noreferrer">${esc(L.fullMap)} →</a></p></section>
+<section id="2hh"><h2>${esc(L.twohhTitle)}</h2><p>${esc(L.twohhPitch)}</p>
+<ol class="steps">${steps.items.map(([k, v]) => `<li><strong>${esc(k)}</strong> ${esc(v)}</li>`).join("")}</ol>
+<p class="sub">${esc(L.sideBets)}</p><ul class="chips">${SIDE_BETS.map((b) => `<li>${esc(b)}</li>`).join("")}</ul>
+<p class="sub">${esc(L.patents)}</p><p>${patentLinks(PATENTS.twohh)}</p></section>
+<section id="badugi"><h2>${esc(L.badugiTitle)}</h2><p>${esc(L.badugiPitch)}</p>
+<p class="sub">${esc(L.bonusTitle)}</p><table class="pay"><tbody>${BADUGI_BONUS.map(([n, pay]) => `<tr><td>${esc(L.bonusHigh.replace("{n}", n))}</td><td>${esc(pay)}</td></tr>`).join("")}</tbody></table>
+<p class="sub">${esc(L.patents)}</p><p>${patentLinks(PATENTS.badugi)}</p>
+<p class="sub">${esc(L.pending)}</p><p>${patentLinks([PATENTS.pending])}</p></section>
+<section><h2>${esc(L.pressTitle)}</h2><ul class="links">${L.press.map(([label, href]) => `<li><a href="${href}"${href.startsWith("/assets/") ? " download" : ""}>${esc(label)}</a></li>`).join("")}</ul></section>
+</main>
+<footer class="wrap"><a href="${loc === "en" ? "/" : `/?lang=${loc}`}">${esc(chrome.archive)}</a> · <a href="/classic.html">${esc(ui.classicSite)}</a> · <a href="https://chrisswimlee.com" target="_blank" rel="noopener noreferrer">${esc(ui.designedBy || "Designed by chrisswimlee")}</a></footer>
+</body>
+</html>
+`;
+}
+
 for (const { code } of LOCALES) {
   loc = code; chrome = CHROME[code]; ui = { ...UI.en, ...UI[code] };
   const sectors = localizeSectors(SECTORS, code);
@@ -148,13 +232,17 @@ for (const { code } of LOCALES) {
     await writeFile(`${dir}index.html`, page(s, i, sectors));
     console.log(`wrote ${dir}index.html`);
   }
+  const ldir = pathFor(code, "licensing").slice(1);
+  await mkdir(ldir, { recursive: true });
+  await writeFile(`${ldir}index.html`, licensingPage(LICENSING[code], sectors));
+  console.log(`wrote ${ldir}index.html`);
 }
 
 // Keep the sitemap in step: one entry per exhibit page, dated today.
 const today = new Date().toISOString().slice(0, 10);
 let map = await readFile("sitemap.xml", "utf8");
-map = map.replace(/\s*<url>\s*<loc>https:\/\/d22soso\.com\/((ko|zh)\/)?(arena|garden|broadcast|foundry|library|command)\/<\/loc>[\s\S]*?<\/url>/g, "");
-const entries = LOCALES.flatMap(({ code }) => SECTORS.map((s) => `  <url>\n    <loc>${SITE}${pathFor(code, s.id)}</loc>\n    <lastmod>${today}</lastmod>\n    <changefreq>monthly</changefreq>\n    <priority>${code === "en" ? "0.8" : "0.7"}</priority>\n  </url>`)).join("\n");
+map = map.replace(/\s*<url>\s*<loc>https:\/\/d22soso\.com\/((ko|zh)\/)?(arena|garden|broadcast|foundry|library|command|licensing)\/<\/loc>[\s\S]*?<\/url>/g, "");
+const entries = LOCALES.flatMap(({ code }) => [...SECTORS.map((s) => s.id), "licensing"].map((id) => `  <url>\n    <loc>${SITE}${pathFor(code, id)}</loc>\n    <lastmod>${today}</lastmod>\n    <changefreq>monthly</changefreq>\n    <priority>${id === "licensing" ? (code === "en" ? "0.9" : "0.8") : code === "en" ? "0.8" : "0.7"}</priority>\n  </url>`)).join("\n");
 map = map.replace("</urlset>", `${entries}\n</urlset>`);
 await writeFile("sitemap.xml", map);
 console.log("updated sitemap.xml");

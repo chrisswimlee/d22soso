@@ -1,8 +1,8 @@
 /* D22: The Living Archive — modes, HUD, exhibits, tour, and fallbacks around the 3D world. */
-import { SECTORS as BASE_SECTORS, TOUR, CHRONO, ARTIFACTS as BASE_ARTIFACTS, EMAIL } from "./content.js?v=21";
+import { SECTORS as BASE_SECTORS, TOUR, CHRONO, ARTIFACTS as BASE_ARTIFACTS, EMAIL } from "./content.js?v=22";
 import { play, setSound, soundOn } from "./sound.js?v=1";
 import { mountDemo } from "./holdem.js?v=2";
-import { LOCALES, UI, detectLocale, persistLocale, makeT, localizeSectors, localizeArtifacts } from "./i18n.js?v=11";
+import { LOCALES, UI, detectLocale, persistLocale, makeT, localizeSectors, localizeArtifacts } from "./i18n.js?v=12";
 import { venueEmbedMarkup } from "../js/venues.js?v=2";
 
 /* ---------- localisation (EN source, KO / ZH overlays from i18n.js) ---------- */
@@ -82,6 +82,8 @@ function h(tag, attrs = {}, ...kids) {
   return el;
 }
 const ext = (href) => /^https?:/.test(href) ? { target: "_blank", rel: "noopener noreferrer" } : {};
+/* The static licensing page in the visitor's language. */
+const licensingHref = () => (locale === "en" ? "licensing/" : `${locale}/licensing/`);
 
 /* ---------- exhibit blocks ---------- */
 const BLOCKS = {
@@ -130,7 +132,8 @@ const BLOCKS = {
     const addr = h("strong", { class: "email", text: EMAIL });
     return h("section", { class: "contact" },
       h("p", { class: "mono eyebrow", text: t("contactEyebrow") }),
-      addr, h("p", { class: "contact-actions" }, h("a", { class: "btn-solid", href: `mailto:${EMAIL}`, text: t("emailWayne") }), copy, status));
+      addr, h("p", { class: "contact-actions" }, h("a", { class: "btn-solid", href: `mailto:${EMAIL}`, text: t("emailWayne") }), copy, status),
+      h("p", { class: "contact-licensing" }, h("a", { class: "btn-ghost", href: licensingHref(), text: t("licensingPage") })));
   },
   /* Live tables: the published My Maps map, small, no heading. */
   venues: () => { const el = h("section", { class: "venues" }); el.innerHTML = venueEmbedMarkup(t("venueMapLabel")); return el; },
@@ -839,6 +842,7 @@ $("zoom-out").addEventListener("click", () => world?.zoomBy(0.77));
 $("ex-close").addEventListener("click", closeExhibit);
 $("home-link").addEventListener("click", (e) => { e.preventDefault(); closeList(); if (mode !== "explore") closeExhibit(); deselect(); frameOverview({ home: true }); });
 $("media-btn").addEventListener("click", (e) => { e.preventDefault(); closeList(); go("command", { instant: true }); });
+$("fast-press").addEventListener("click", (e) => { e.preventDefault(); closeList(); go("command", { instant: true }); });
 
 /* ---------- language switching ---------- */
 function applyI18n() {
@@ -848,6 +852,7 @@ function applyI18n() {
   document.querySelectorAll("[data-i18n]").forEach((el) => { el.textContent = t(el.dataset.i18n); });
   document.querySelectorAll("[data-i18n-aria]").forEach((el) => el.setAttribute("aria-label", t(el.dataset.i18nAria)));
   document.querySelectorAll("[data-i18n-alt]").forEach((el) => el.setAttribute("alt", t(el.dataset.i18nAlt)));
+  $("fast-licensing")?.setAttribute("href", licensingHref());
   const switcher = $("lang-switch");
   if (switcher) {
     switcher.setAttribute("aria-label", t("language"));
