@@ -387,6 +387,24 @@ button.card.picked { transform: translateY(-6px); outline: 2px solid var(--gold-
 .list-ex .lede { margin: 0; }
 .no-webgl #list-close { display: none; }
 
+/* "Where to play": modal with the live My Maps embed and the venue rows */
+.play-dialog { width: min(640px, calc(100vw - 32px)); max-height: calc(100dvh - 32px); margin: auto; padding: 18px 20px 16px; box-sizing: border-box; overflow: auto; background: var(--panel-solid); color: var(--ink); border: 1px solid var(--rule-soft); border-top: 3px solid var(--gold); border-radius: var(--r); box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6); }
+.play-dialog::backdrop { background: rgba(0, 0, 0, 0.72); }
+.play-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 14px; }
+.play-head .eyebrow { color: var(--gold-text); }
+.play-head h2 { margin: 4px 0 0; font: 600 22px/1.2 var(--display); }
+.play-dialog .venue-map { max-height: none; aspect-ratio: 16 / 10; }
+.play-list { list-style: none; margin: 12px 0 0; padding: 0; }
+.play-list a { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--rule-soft); color: var(--ink); text-decoration: none; }
+.play-list a:hover .play-name { color: var(--gold-text); }
+.play-name { font-weight: 600; }
+.play-region { flex: none; font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--small); opacity: 0.8; }
+.play-more { margin: 12px 0 0; font-size: 14px; }
+@media (max-width: 760px) {
+  .play-dialog { padding: 14px 16px 12px; }
+  .play-head h2 { font-size: 19px; }
+  .play-dialog .venue-map { aspect-ratio: 4 / 3; }
+}
 .lightbox { position: fixed; inset: 0; z-index: 20; display: grid; place-items: center; align-content: center; gap: 10px; padding: 24px; background: rgba(0, 0, 0, 0.9); cursor: zoom-out; }
 .lightbox img { max-width: 100%; max-height: 82vh; object-fit: contain; border-radius: 4px; }
 .lightbox-close { position: absolute; top: calc(12px + env(safe-area-inset-top, 0px)); right: 12px; }
@@ -432,7 +450,7 @@ button.card.picked { transform: translateY(-6px); outline: 2px solid var(--gold-
 
 /* Phones */
 @media (max-width: 760px) {
-  .deck-actions { grid-column: 1 / -1; grid-row: 4; justify-self: start; margin-top: 6px; gap: 6px; }
+  .deck-actions { grid-column: 1 / -1; grid-row: 5; justify-self: start; margin-top: 10px; gap: 6px; }
   .sound-btn { min-height: 34px; padding: 0 9px; }
   .sound-btn span { display: none; }
   .lang-switch button { min-height: 28px; padding: 0 9px; font-size: 11px; }
@@ -464,7 +482,7 @@ button.card.picked { transform: translateY(-6px); outline: 2px solid var(--gold-
   .deck-top .brand h1 { grid-column: 2 / -1; grid-row: 1; }
   .deck-top .brand .intro { grid-column: 2 / -1; grid-row: 2; }
   .deck-top .brand .btn-cta { grid-column: 1 / -1; grid-row: 3; justify-self: start; margin-top: 6px; min-height: 36px; padding: 0 10px; font-size: 12px; }
-  .deck-top .brand .fast-lane { grid-column: 1 / -1; grid-row: 3; justify-self: end; align-self: center; margin-top: 6px; gap: 10px; font-size: 11px; letter-spacing: 0; flex-wrap: nowrap; }
+  .deck-top .brand .fast-lane { grid-column: 1 / -1; grid-row: 4; justify-self: start; margin-top: 8px; gap: 6px 14px; font-size: 11px; letter-spacing: 0.04em; }
   /* One dock: sectors on the left, the artifact count filling the rest. No minimap. */
   .instruments { display: none; align-items: stretch; left: 122px; right: 12px; width: auto; bottom: calc(10px + env(safe-area-inset-bottom, 0px)); pointer-events: none; }
   .has-finds .instruments { display: flex; }
@@ -523,5 +541,5 @@ button.card.picked { transform: translateY(-6px); outline: 2px solid var(--gold-
 /* Narrowest phones (≤370px): the tour button and the quick routes still share one row. */
 @media (max-width: 370px) {
   .deck-top .brand .btn-cta { padding: 0 8px; }
-  .deck-top .brand .fast-lane { gap: 7px; }
+  .deck-top .brand .fast-lane { gap: 6px 10px; }
 }

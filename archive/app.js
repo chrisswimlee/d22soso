@@ -1,9 +1,10 @@
 /* D22: The Living Archive — modes, HUD, exhibits, tour, and fallbacks around the 3D world. */
-import { SECTORS as BASE_SECTORS, TOUR, CHRONO, ARTIFACTS as BASE_ARTIFACTS, EMAIL } from "./content.js?v=22";
+import { SECTORS as BASE_SECTORS, TOUR, CHRONO, ARTIFACTS as BASE_ARTIFACTS, EMAIL } from "./content.js?v=23";
 import { play, setSound, soundOn } from "./sound.js?v=1";
 import { mountDemo } from "./holdem.js?v=2";
-import { LOCALES, UI, detectLocale, persistLocale, makeT, localizeSectors, localizeArtifacts } from "./i18n.js?v=12";
-import { venueEmbedMarkup } from "../js/venues.js?v=2";
+import { LOCALES, UI, detectLocale, persistLocale, makeT, localizeSectors, localizeArtifacts } from "./i18n.js?v=13";
+import { venueEmbedMarkup, loadVenues, mapsHref, VIEWER_URL } from "../js/venues.js?v=2";
+import { LICENSING } from "./licensing.js?v=1";
 
 /* ---------- localisation (EN source, KO / ZH overlays from i18n.js) ---------- */
 let locale = detectLocale();
@@ -811,6 +812,7 @@ $("toast").addEventListener("click", () => {
 /* ---------- keyboard ---------- */
 addEventListener("keydown", (e) => {
   if (e.target.closest?.("input,textarea")) return;
+  if (playDialog?.open) return; /* the dialog handles its own Escape */
   if (e.key === "Escape") {
     if (!$("lightbox").hidden) { closeLightbox(); return; }
     if (!$("list-view").hidden && world) { closeList(); return; }
@@ -844,6 +846,38 @@ $("home-link").addEventListener("click", (e) => { e.preventDefault(); closeList(
 $("media-btn").addEventListener("click", (e) => { e.preventDefault(); closeList(); go("command", { instant: true }); });
 $("fast-press").addEventListener("click", (e) => { e.preventDefault(); closeList(); go("command", { instant: true }); });
 
+/* ---------- "Where to play": the live My Maps embed plus a tappable venue list ---------- */
+const playDialog = $("play-dialog");
+async function fillPlayList() {
+  const list = $("play-list");
+  const { venues } = await loadVenues();
+  const regions = LICENSING[locale]?.regions || {};
+  list.replaceChildren(...venues.filter((v) => !v.future).map((v) =>
+    h("li", {}, h("a", { href: mapsHref(v), target: "_blank", rel: "noopener noreferrer", "aria-label": t("playDirections", { name: v.name }) },
+      h("span", { class: "play-name", text: v.name }), h("span", { class: "play-region mono", text: regions[v.region] || v.region })))));
+}
+function openPlay() {
+  closeList();
+  if (!$("sectors-panel").hidden) setDrawer(false);
+  const map = $("play-map");
+  if (!map.firstChild) map.innerHTML = venueEmbedMarkup(t("venueMapLabel")).replace(' loading="lazy"', "");
+  $("play-full").href = VIEWER_URL;
+  fillPlayList();
+  if (!playDialog.open) playDialog.showModal();
+  if (location.hash !== "#play") history.replaceState(null, "", "#play");
+}
+/* Runs on every way out (button, backdrop, Escape); safe to run twice. */
+function afterPlay() {
+  if (location.hash === "#play") history.replaceState(null, "", location.pathname + location.search);
+  if (document.activeElement === document.body || playDialog.contains(document.activeElement)) $("fast-play").focus();
+}
+function closePlay() { if (playDialog.open) playDialog.close(); afterPlay(); }
+playDialog.addEventListener("cancel", () => queueMicrotask(afterPlay));
+playDialog.addEventListener("close", afterPlay);
+playDialog.addEventListener("click", (e) => { if (e.target === playDialog) closePlay(); });
+$("play-close").addEventListener("click", closePlay);
+$("fast-play").addEventListener("click", (e) => { e.preventDefault(); openPlay(); });
+
 /* ---------- language switching ---------- */
 function applyI18n() {
   document.documentElement.lang = locale === "zh" ? "zh-Hans" : locale;
@@ -853,6 +887,7 @@ function applyI18n() {
   document.querySelectorAll("[data-i18n-aria]").forEach((el) => el.setAttribute("aria-label", t(el.dataset.i18nAria)));
   document.querySelectorAll("[data-i18n-alt]").forEach((el) => el.setAttribute("alt", t(el.dataset.i18nAlt)));
   $("fast-licensing")?.setAttribute("href", licensingHref());
+  if (playDialog?.open) { $("play-map").querySelector("iframe")?.setAttribute("title", t("venueMapLabel")); fillPlayList(); }
   const switcher = $("lang-switch");
   if (switcher) {
     switcher.setAttribute("aria-label", t("language"));
@@ -898,6 +933,7 @@ document.querySelectorAll("[data-lang]").forEach((b) => b.addEventListener("clic
 function route() {
   const id = location.hash.slice(1);
   if (id === "list") openList();
+  else if (id === "play") openPlay();
   else if (byId(id)) go(id, { instant: true });
 }
 
@@ -907,9 +943,10 @@ function fallback() {
   $("loading").remove();
   openList();
   if (byId(id)) { listJump(id); history.replaceState(null, "", `#${id}`); }
+  else if (id === "play") openPlay();
 }
 async function boot() {
-    const { createWorld, webglAvailable } = await import("./world.js?v=81").catch((err) => { console.error(err); return {}; });
+    const { createWorld, webglAvailable } = await import("./world.js?v=82").catch((err) => { console.error(err); return {}; });
   if (!createWorld || !webglAvailable()) {
     fallback();
     return;
@@ -982,6 +1019,7 @@ async function boot() {
 addEventListener("hashchange", () => {
   const id = location.hash.slice(1);
   if (id === "list") { openList(); return; }
+  if (id === "play") { openPlay(); return; }
   closeList();
   if (byId(id)) { if (id !== current || mode === "explore") go(id); }
   else if (mode !== "explore") closeExhibit();

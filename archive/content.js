@@ -83,17 +83,55 @@ export const SECTORS = [
     name: "The Strategy Garden",
     short: "Garden",
     era: "1995 – today",
-    tagline: "Magic · Cube Draft · Ladders",
-    angle: 30,
-    accent: "#e879f9",
+    tagline: "Magic · Pro Tours · Ladders",
+    angle: 39,
+    accent: "#60a5fa",
     ground: "#26331f",
     exhibit: {
       kicker: "Sector 02 · Tabletop strategy",
-      title: "Where the Cube began",
+      title: "Where competitive play began",
       lede:
-        "Before real-time strategy, there was Magic. Brian Weissman introduced him to competitive play at a Round Table Pizza in Palo Alto. His custom draft pool, “The Cube,” grew into Cube Draft, later a Magic Online staple.",
+        "Before real-time strategy, there was Magic. Brian Weissman introduced him to competitive play at a Round Table Pizza in Palo Alto, and he went on to qualify for three Pro Tours. He never stopped climbing ladders.",
       blocks: [
         { type: "gallery", items: [{ src: img("weissman-900"), alt: "Wayne Chiang with Brian Weissman", caption: "With Brian Weissman, who brought him into competitive Magic." }] },
+        {
+          type: "facts",
+          items: [
+            ["Pro Tour", "New York ’01 · Boston ’02 · qualified for three"],
+            ["Qualifiers", "Consistent PTQ Top 8s"],
+          ],
+        },
+        {
+          type: "timeline",
+          title: "Still climbing",
+          items: [
+            ["2004", "Warcraft III · US West FFA #1 · Arranged Teams #2"],
+            ["2015 →", "Hearthstone · Legend #35 Standard NA · #11 Wild NA"],
+            ["2018", "Hearthstone Wild Open Americas · Top 32"],
+            ["Recent", "Clash Royale Challenger · League of Legends Diamond 5 · Once Upon a Galaxy #1"],
+          ],
+        },
+        { type: "gallery", items: [{ src: img("hearthstone-35-720"), alt: "Hearthstone Legend rank 35 screenshot", caption: "Legend #35, Standard NA." }] },
+        { type: "links", items: [{ label: "Magic room", href: "../gaming.html#game-mtg" }, { label: "Hearthstone room", href: "../gaming.html#game-hearthstone" }] },
+      ],
+    },
+  },
+  {
+    id: "cube",
+    key: { hero: true, src: img("cube-draft-sign"), ratio: 1, alt: "Cube Draft emblem", fit: "contain", scale: 0.6 },
+    name: "The Cube Draft Hall",
+    short: "Cube",
+    era: "Late 1990s – today",
+    tagline: "Magic · Open format · “The Cube”",
+    angle: -13,
+    accent: "#e879f9",
+    ground: "#2a1f33",
+    exhibit: {
+      kicker: "Sector 03 · Format origin",
+      title: "Where the Cube began",
+      lede:
+        "While Magic was still a side game next to the RTS ladders, he kept a custom draft pool in a storage box he called “The Cube.” It grew into Cube Draft, later a Magic Online staple.",
+      blocks: [
         {
           type: "quote",
           text: "Public credit for the majority of the Cube Draft idea comes from Brian Weissman and Tom Martell.",
@@ -111,23 +149,13 @@ export const SECTORS = [
         {
           type: "facts",
           items: [
-            ["Pro Tour", "New York ’01 · Boston ’02 · qualified for three"],
-            ["Qualifiers", "Consistent PTQ Top 8s"],
-            ["Format", "Cube Draft · open format, no patent claim"],
+            ["Origin", "Custom draft pools he called “The Cube”"],
+            ["Credit", "Brian Weissman and Tom Martell, on the record"],
+            ["Today", "A Magic Online staple"],
+            ["Format", "Open format · no patent claim"],
           ],
         },
-        {
-          type: "timeline",
-          title: "Still climbing",
-          items: [
-            ["2004", "Warcraft III · US West FFA #1 · Arranged Teams #2"],
-            ["2015 →", "Hearthstone · Legend #35 Standard NA · #11 Wild NA"],
-            ["2018", "Hearthstone Wild Open Americas · Top 32"],
-            ["Recent", "Clash Royale Challenger · League of Legends Diamond 5 · Once Upon a Galaxy #1"],
-          ],
-        },
-        { type: "gallery", items: [{ src: img("hearthstone-35-720"), alt: "Hearthstone Legend rank 35 screenshot", caption: "Legend #35, Standard NA." }] },
-        { type: "links", items: [{ label: "Cube Draft room", href: "../gaming.html#game-cube" }, { label: "Magic room", href: "../gaming.html#game-mtg" }, { label: "Kraken Celebrity Cube Draft on X", href: "https://x.com/D22_soso/status/2051916533425975574" }] },
+        { type: "links", items: [{ label: "Cube Draft room", href: "../gaming.html#game-cube" }, { label: "Kraken Celebrity Cube Draft on X", href: "https://x.com/D22_soso/status/2051916533425975574" }] },
       ],
     },
   },
@@ -138,11 +166,11 @@ export const SECTORS = [
     short: "Broadcast",
     era: "2010s – today",
     tagline: "Live at the Bike · WSOP · Interviews",
-    angle: -30,
+    angle: -64,
     accent: "#22c55e",
     ground: "#1d2b2a",
     exhibit: {
-      kicker: "Sector 03 · Poker & media",
+      kicker: "Sector 04 · Poker & media",
       title: "From the felt to the control room",
       lede:
         "A decade-plus high-stakes poker professional who moved behind the camera. As co-owner and lead producer of Live at the Bike he grew peak viewers from 2,500 to 8,800. Today he is Talent Manager on the World Series of Poker Media Team.",
@@ -185,11 +213,11 @@ export const SECTORS = [
     short: "Foundry",
     era: "2015 – today",
     tagline: "Patented table games · Playable demo",
-    angle: -90,
+    angle: -116,
     accent: "#2dd4bf",
     ground: "#1a2b2f",
     exhibit: {
-      kicker: "Sector 04 · Patented table games",
+      kicker: "Sector 05 · Patented table games",
       title: "Two hands. One board.",
       lede:
         "2 Hand Hold’em™ gives the player four hole cards to split into two independent hands against a single dealer board. It’s certified by the Washington State Gambling Commission and dealt live in casinos.",
@@ -240,11 +268,11 @@ export const SECTORS = [
     short: "Library",
     era: "December 2025",
     tagline: "Betting on Yourself · Kendall Hunt",
-    angle: -150,
+    angle: -167,
     accent: "#f5d48a",
     ground: "#2e2a22",
     exhibit: {
-      kicker: "Sector 05 · Author",
+      kicker: "Sector 06 · Author",
       title: "Betting on Yourself",
       lede:
         "Winning in Business, Poker, and the Age of AI. Co-written with Fortune 500 executive and WSOP champion Joe Matton, published by Kendall Hunt in December 2025.",
@@ -276,11 +304,11 @@ export const SECTORS = [
     short: "Command",
     era: "Today",
     tagline: "Bio · Media kit · Licensing · Contact",
-    angle: 150,
+    angle: 141,
     accent: "#e8c44a",
     ground: "#2f2a1c",
     exhibit: {
-      kicker: "Sector 06 · Media & licensing",
+      kicker: "Sector 07 · Media & licensing",
       title: "Wayne “D22-soso” Chiang",
       lede:
         "First official StarCraft: Brood War Season 1 World Champion (Random, 1999), Cube Draft pioneer, patented casino game inventor, Talent Manager for the World Series of Poker, and co-author of Betting on Yourself.",
@@ -337,10 +365,10 @@ export const SECTORS = [
 ];
 
 /* Guided tour leads with the world title, then the rest of the career. */
-export const TOUR = ["arena", "garden", "broadcast", "foundry", "library", "command"];
-/* The sectors in the order they happened: Magic (1995), StarCraft (1996), broadcasting, inventions, the book, today.
+export const TOUR = ["arena", "garden", "cube", "broadcast", "foundry", "library", "command"];
+/* The sectors in the order they happened: Magic (1995), StarCraft (1996), the Cube, broadcasting, inventions, the book, today.
    The supply lines on the map follow this order. */
-export const CHRONO = ["garden", "arena", "broadcast", "foundry", "library", "command"];
+export const CHRONO = ["garden", "arena", "cube", "broadcast", "foundry", "library", "command"];
 
 /* Smaller stories between the sectors. Three more hang on the underside of the island. */
 export const ARTIFACTS = [
@@ -348,8 +376,8 @@ export const ARTIFACTS = [
   { id: "caster", sector: "broadcast", angle: 68, r: 24, title: "One day late", text: "He missed PGL Season 3 registration by a single day in October 1998, so he called the matches instead and became StarCraft’s first play-by-play caster." },
   { id: "ng", sector: "arena", angle: 128, r: 9, title: "$250 at Neutral Ground", text: "His first StarCraft tournament win came in April 1998 at Neutral Ground Mountain View, against Jay “Gadianton” Severson." },
   { id: "usa", sector: "arena", angle: 52, r: 10, title: "USA vs Canada", text: "MVP of the June 1999 USA vs Canada showcase, sweeping his matches 3–0." },
-  { id: "pizza", sector: "garden", angle: 8, r: 25, title: "Round Table Pizza", text: "Competitive Magic started at a Round Table Pizza in Palo Alto, with Brian Weissman across the table." },
-  { id: "count", sector: "foundry", angle: -58, r: 25, title: "Counted out", text: "A blackjack advantage player using Hi-Lo and Hi-Opt 1, he was banned from major Las Vegas and San Diego properties." },
+  { id: "pizza", sector: "garden", angle: 13, r: 25, title: "Round Table Pizza", text: "Competitive Magic started at a Round Table Pizza in Palo Alto, with Brian Weissman across the table." },
+  { id: "count", sector: "foundry", angle: -90, r: 25, title: "Counted out", text: "A blackjack advantage player using Hi-Lo and Hi-Opt 1, he was banned from major Las Vegas and San Diego properties." },
   { id: "bankroll", sector: "broadcast", under: true, angle: 15, title: "Bankroll Challenge", text: "Won the streamed Global Poker Bankroll Challenge, finishing +$11,464." },
   { id: "pimp", sector: "broadcast", under: true, angle: 135, title: "Pimpest Plays", text: "At Gamers.com he ran GX StarCraft with Thresh and Calbear: battle reports after matches and Pimpest Plays, an early blueprint for esports highlight reels." },
   { id: "script", sector: "library", under: true, angle: 255, title: "Screenwriter", text: "A feature screenplay of his was a finalist at the 2007 Screenwriting Expo." },

@@ -421,6 +421,52 @@ const BUILD = {
   },
 
   garden(accent) {
+    // Magic and the ladders: the Round Table Pizza table where it started, and a stepped rank ladder behind it.
+    const g = new THREE.Group();
+    const r = rng(11);
+    g.add(cyl(4.6, 4.8, 0.12, mat("#22402a"), 0, 0, 0, 20));
+    // Round table, two stools, two decks and a game in progress.
+    g.add(cyl(0.16, 0.22, 0.6, mat("#3a2a1c"), 0.2, 0.12, 1.3, 8));
+    g.add(cyl(1.05, 1.05, 0.08, mat("#7a3b26"), 0.2, 0.72, 1.3, 20));
+    g.add(cyl(1.0, 1.0, 0.02, mat("#c9a46a"), 0.2, 0.8, 1.3, 20));
+    for (const sx of [-1.15, 1.55]) g.add(cyl(0.28, 0.24, 0.45, mat("#2a2230"), sx, 0.12, 1.3, 8));
+    const cardTint = ["#f5f0e1", "#60a5fa", "#a78bfa", "#ef4444", "#22c55e"];
+    for (let i = 0; i < 6; i++) {
+      const c = box(0.26, 0.012, 0.36, mat(cardTint[i % 5]), -0.25 + (i % 3) * 0.32, 0.82, 1.08 + Math.floor(i / 3) * 0.46);
+      c.rotation.y = (r() - 0.5) * 0.4;
+      g.add(c);
+    }
+    for (const dx of [-0.55, 0.95]) g.add(box(0.26, 0.16, 0.36, mat("#2a1630"), dx, 0.82, 1.3));
+    // The ladder: five tiers from bronze to legend, with a crystal on top.
+    const tiers = ["#8a5a3b", "#9aa3ad", "#d4af37", "#7dd3fc", "#a78bfa"];
+    tiers.forEach((c, i) => {
+      const w = 2.9 - i * 0.48;
+      g.add(box(w, 0.42, w * 0.8, mat("#2b2f3a"), 0, 0.12 + i * 0.42, -1.7));
+      g.add(box(w + 0.04, 0.07, 0.06, glow(c, 0.9), 0, 0.12 + i * 0.42 + 0.3, -1.7 + (w * 0.8) / 2 + 0.01));
+    });
+    const crystal = mesh(new THREE.OctahedronGeometry(0.42, 0), mat(accent, { emissive: accent, ei: 0.7, rough: 0.3 }), 0, 2.95, -1.7, false);
+    g.add(crystal);
+    // Hedges around the back, trees at the corners, lanterns along the path.
+    for (let i = 0; i < 7; i++) {
+      const a = Math.PI + (i / 6) * Math.PI;
+      g.add(box(1.25, 0.6, 0.5, mat(i % 2 ? "#2e5b31" : "#356b38"), Math.cos(a) * 3.8, 0.12, Math.sin(a) * 3.3 - 0.3));
+    }
+    for (const x of [-3.6, 3.6]) {
+      g.add(cyl(0.08, 0.1, 0.6, mat("#4a3420"), x, 0.12, -2.6, 5));
+      const h = 1.5 + r() * 0.5;
+      g.add(mesh(new THREE.ConeGeometry(0.55, h, 6), mat("#3f7d3a"), x, 0.72 + h / 2, -2.6));
+    }
+    for (let i = 0; i < 10; i++) g.add(mesh(new THREE.SphereGeometry(0.08, 5, 4), glow(i % 2 ? accent : "#fde68a", 0.6), -2.6 + i * 0.58, 0.2, 2.9 + (i % 2) * 0.25, false));
+    return {
+      g,
+      anim(t) {
+        crystal.rotation.y = t * 0.8;
+        crystal.position.y = 2.95 + Math.sin(t * 1.4) * 0.12;
+      },
+    };
+  },
+
+  cube(accent) {
     // Cube Draft: a draft table inside a ring of standing giant cards, with the Cube itself hovering above.
     const g = new THREE.Group();
     const r = rng(7);

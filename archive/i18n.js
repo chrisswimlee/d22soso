@@ -49,6 +49,12 @@ export const UI = {
     classicSite: "Classic site",
     quickLinks: "Quick links",
     fastLicensing: "Licensing",
+    fastPlay: "Where to play",
+    playEyebrow: "2 Hand Hold’em · live tables",
+    playTitle: "Where to play 2 Hand Hold’em",
+    playClose: "Close the map",
+    playFullMap: "Open the full map",
+    playDirections: "Directions to {name}",
     fastPress: "Press kit",
     fastContact: "Contact",
     licensingPage: "Licensing: 2 Hand Hold’em & Badugi Chase →",
@@ -158,6 +164,12 @@ export const UI = {
     classicSite: "클래식 사이트",
     quickLinks: "바로가기",
     fastLicensing: "라이선스",
+    fastPlay: "플레이 장소",
+    playEyebrow: "2 Hand Hold’em · 라이브 테이블",
+    playTitle: "2 Hand Hold’em 플레이 장소",
+    playClose: "지도 닫기",
+    playFullMap: "전체 지도 열기",
+    playDirections: "{name} 길찾기",
     fastPress: "프레스 키트",
     fastContact: "연락처",
     licensingPage: "라이선스: 2 Hand Hold’em & Badugi Chase →",
@@ -267,6 +279,12 @@ export const UI = {
     classicSite: "经典站点",
     quickLinks: "快速入口",
     fastLicensing: "授权",
+    fastPlay: "去哪玩",
+    playEyebrow: "2 Hand Hold’em · 实地牌桌",
+    playTitle: "在哪里玩 2 Hand Hold’em",
+    playClose: "关闭地图",
+    playFullMap: "打开完整地图",
+    playDirections: "前往 {name} 的路线",
     fastPress: "媒体资料",
     fastContact: "联系",
     licensingPage: "授权：2 Hand Hold’em 与 Badugi Chase →",
@@ -382,20 +400,27 @@ const SECTOR_T = {
       ] },
     },
     garden: {
-      name: "전략의 정원", short: "정원", tagline: "Magic · 큐브 드래프트 · 래더", keyAlt: "Brian Weissman과 함께한 Wayne Chiang",
-      exhibit: { kicker: "섹터 02 · 테이블탑 전략", title: "큐브가 시작된 곳", lede: "실시간 전략 이전에 Magic이 있었습니다. Brian Weissman은 팔로알토의 Round Table Pizza에서 그를 경쟁 플레이로 이끌었습니다. 그의 커스텀 드래프트 풀 “더 큐브”는 큐브 드래프트로 성장했고, 이후 Magic Online의 대표 형식이 됐습니다.", blocks: [
+      name: "전략의 정원", short: "정원", tagline: "Magic · 프로 투어 · 래더", keyAlt: "Brian Weissman과 함께한 Wayne Chiang",
+      exhibit: { kicker: "섹터 02 · 테이블탑 전략", title: "경쟁 플레이가 시작된 곳", lede: "실시간 전략 이전에 Magic이 있었습니다. Brian Weissman은 팔로알토의 Round Table Pizza에서 그를 경쟁 플레이로 이끌었고, 그는 프로 투어에 세 번 출전 자격을 얻었습니다. 래더 도전은 지금도 계속됩니다.", blocks: [
         { items: [{ alt: "Brian Weissman과 함께한 Wayne Chiang", caption: "그를 경쟁 Magic으로 이끈 Brian Weissman과 함께." }] },
-        { text: "큐브 드래프트 아이디어의 대부분에 대한 공개적인 공로는 Brian Weissman과 Tom Martell에게 돌아갑니다.", cite: "큐브 드래프트의 기원" },
-        { title: "영상으로 보는 큐브 드래프트", items: [{ title: "Magic History: The Cube", source: "The Tranquil Domain · 형식의 구술사" }, { title: "큐브 드래프트는 누가 만들었나?", source: "Brian Weissman이 들려주는 기원 · Wayne Chiang 채널" }, { title: "Kraken MTG 셀러브리티 큐브 드래프트 토너먼트", source: "Kraken · 라이브 방송 1부" }] },
-        { items: [["프로 투어", "뉴욕 ’01 · 보스턴 ’02 · 총 3회 출전 자격"], ["예선", "PTQ 상위 8위 단골"], ["형식", "큐브 드래프트 · 오픈 형식, 특허 주장 없음"]] },
+        { items: [["프로 투어", "뉴욕 ’01 · 보스턴 ’02 · 총 3회 출전 자격"], ["예선", "PTQ 상위 8위 단골"]] },
         { title: "여전히 도전 중", items: [["2004", "워크래프트 III · US West FFA 1위 · 팀전 2위"], ["2015 →", "하스스톤 · 전설 35위(스탠다드 NA) · 11위(와일드 NA)"], ["2018", "하스스톤 와일드 오픈 아메리카 · 상위 32위"], ["최근", "클래시 로얄 챌린저 · 리그 오브 레전드 다이아몬드 5 · Once Upon a Galaxy 1위"]] },
         { items: [{ alt: "하스스톤 전설 35위 스크린샷", caption: "전설 35위, 스탠다드 NA." }] },
-        { items: [{ label: "큐브 드래프트 룸" }, { label: "Magic 룸" }, { label: "X의 Kraken 셀러브리티 큐브 드래프트" }] },
+        { items: [{ label: "Magic 룸" }, { label: "하스스톤 룸" }] },
+      ] },
+    },
+    cube: {
+      name: "큐브 드래프트 홀", short: "큐브", tagline: "Magic · 오픈 형식 · “더 큐브”", keyAlt: "큐브 드래프트 엠블럼",
+      exhibit: { kicker: "섹터 03 · 형식의 기원", title: "큐브가 시작된 곳", lede: "Magic이 아직 RTS 래더 옆의 부업 게임이던 시절, 그는 “더 큐브”라 부른 수납 상자에 커스텀 드래프트 풀을 모아 두었습니다. 이것이 큐브 드래프트로 성장했고, 이후 Magic Online의 대표 형식이 됐습니다.", blocks: [
+        { text: "큐브 드래프트 아이디어의 대부분에 대한 공개적인 공로는 Brian Weissman과 Tom Martell에게 돌아갑니다.", cite: "큐브 드래프트의 기원" },
+        { title: "영상으로 보는 큐브 드래프트", items: [{ title: "Magic History: The Cube", source: "The Tranquil Domain · 형식의 구술사" }, { title: "큐브 드래프트는 누가 만들었나?", source: "Brian Weissman이 들려주는 기원 · Wayne Chiang 채널" }, { title: "Kraken MTG 셀러브리티 큐브 드래프트 토너먼트", source: "Kraken · 라이브 방송 1부" }] },
+        { items: [["기원", "그가 “더 큐브”라 부른 커스텀 드래프트 풀"], ["공로", "Brian Weissman과 Tom Martell의 공개 증언"], ["현재", "Magic Online의 대표 형식"], ["형식", "오픈 형식 · 특허 주장 없음"]] },
+        { items: [{ label: "큐브 드래프트 룸" }, { label: "X의 Kraken 셀러브리티 큐브 드래프트" }] },
       ] },
     },
     broadcast: {
       name: "방송 스테이션", short: "방송", tagline: "Live at the Bike · WSOP · 인터뷰", keyAlt: "World Series of Poker 로고",
-      exhibit: { kicker: "섹터 03 · 포커 & 미디어", title: "펠트에서 컨트롤룸으로", lede: "10년 넘게 하이스테이크스 포커 프로로 뛰다가 카메라 뒤로 옮겼습니다. Live at the Bike의 공동 소유주이자 리드 프로듀서로서 최고 시청자를 2,500명에서 8,800명으로 키웠습니다. 현재는 World Series of Poker 미디어 팀의 탤런트 매니저입니다.", blocks: [
+      exhibit: { kicker: "섹터 04 · 포커 & 미디어", title: "펠트에서 컨트롤룸으로", lede: "10년 넘게 하이스테이크스 포커 프로로 뛰다가 카메라 뒤로 옮겼습니다. Live at the Bike의 공동 소유주이자 리드 프로듀서로서 최고 시청자를 2,500명에서 8,800명으로 키웠습니다. 현재는 World Series of Poker 미디어 팀의 탤런트 매니저입니다.", blocks: [
         { items: [{ alt: "2025 WSOP에서 SlayerS_BoxeR와 함께한 Wayne Chiang", caption: "WSOP 2025, SlayerS_BoxeR와 함께." }, { alt: "포커 프로 ElkY와 함께한 Wayne Chiang", caption: "ElkY와 함께." }] },
         { title: "시청하기", items: [{ title: "WSOP의 브이로거 붐", source: "PokerOrg Q&A" }, { title: "스타크래프트 챔피언, WSOP 탤런트 매니저", source: "The Flow Show · Jeff Gross" }, { title: "그는 포커로 수백만을 벌었다…", source: "Table 1 Podcast" }, { title: "Live at the Bike 전 소유주", source: "Chasing Poker Greatness" }, { title: "Wayne Chiang Poker", source: "YouTube 채널" }] },
         { items: [["WSOP", "탤런트 매니저, 미디어 팀 · 브이로거 프로그램"], ["Live at the Bike", "공동 소유주 & 리드 프로듀서 · 최고 시청자 2,500 → 8,800"], ["PokerCraft", "Hellmuth, Negreanu, Greenstein과 함께한 팟캐스트"], ["Global Poker", "뱅크롤 챌린지 · 1위"]] },
@@ -404,7 +429,7 @@ const SECTOR_T = {
     },
     foundry: {
       name: "발명 공방", short: "공방", tagline: "특허 테이블 게임 · 플레이 가능 데모", keyAlt: "2 Hand Hold’em 로고",
-      exhibit: { kicker: "섹터 04 · 특허 테이블 게임", title: "두 개의 핸드. 하나의 보드.", lede: "2 Hand Hold’em™은 플레이어에게 홀 카드 네 장을 주어 딜러의 단일 보드를 상대로 두 개의 독립 핸드로 나눌 수 있게 합니다. 워싱턴주 도박위원회의 인증을 받아 카지노에서 실제로 딜링되고 있습니다.", blocks: [
+      exhibit: { kicker: "섹터 05 · 특허 테이블 게임", title: "두 개의 핸드. 하나의 보드.", lede: "2 Hand Hold’em™은 플레이어에게 홀 카드 네 장을 주어 딜러의 단일 보드를 상대로 두 개의 독립 핸드로 나눌 수 있게 합니다. 워싱턴주 도박위원회의 인증을 받아 카지노에서 실제로 딜링되고 있습니다.", blocks: [
         {},
         { title: "2 Hand Hold’em 플레이 방법", items: [["앤티", "핸드마다 하나씩, 같은 금액의 베팅 두 개."], ["딜", "플레이어에게 홀 카드 네 장, 딜러에게 세 장, 그리고 플랍 세 장."], ["배열", "네 장을 두 장씩 두 핸드로 나눕니다."], ["체크 또는 레이즈", "각 핸드마다 독립적으로 체크하거나 앤티의 2배를 레이즈."], ["쇼다운", "턴과 리버가 열립니다. 각 핸드는 딜러와 따로 대결합니다."]] },
         { items: [["2 Hand Hold’em™", "미국 특허 11,117,045 · 11,731,032 · 12,005,342"], ["Badugi Chase™", "미국 특허 11,810,421 · 12,131,608 · 공동 발명가 Charles Chang"], ["사이드 베팅", "Flounder 4 · Nessie 9 · 888 Flop Bonus · Community Bonus"]] },
@@ -416,7 +441,7 @@ const SECTOR_T = {
     },
     library: {
       name: "도서관", short: "도서관", tagline: "Betting on Yourself · Kendall Hunt", keyAlt: "Betting on Yourself 책 표지",
-      exhibit: { kicker: "섹터 05 · 저자", title: "Betting on Yourself", lede: "비즈니스, 포커, 그리고 AI 시대에서 승리하기. 포춘 500 임원이자 WSOP 챔피언 Joe Matton과 공저했으며, 2025년 12월 Kendall Hunt에서 출간됐습니다.", blocks: [
+      exhibit: { kicker: "섹터 06 · 저자", title: "Betting on Yourself", lede: "비즈니스, 포커, 그리고 AI 시대에서 승리하기. 포춘 500 임원이자 WSOP 챔피언 Joe Matton과 공저했으며, 2025년 12월 Kendall Hunt에서 출간됐습니다.", blocks: [
         {},
         { items: [["저자", "Joe Matton & Wayne Chiang"], ["출판사", "Kendall Hunt · 2025년 12월"], ["ISBN", "9798319708007"], ["다루는 주제", "비즈니스 의사결정 · 포커 · AI 시대"]] },
         { items: [{ label: "Amazon에서 구매" }, { label: "Kendall Hunt" }] },
@@ -424,7 +449,7 @@ const SECTOR_T = {
     },
     command: {
       name: "커맨드 센터", short: "커맨드", tagline: "약력 · 미디어 키트 · 라이선싱 · 문의", keyAlt: "2025 World Series of Poker에서의 Wayne Chiang",
-      exhibit: { kicker: "섹터 06 · 미디어 & 라이선싱", title: "Wayne “D22-soso” Chiang", lede: "첫 공식 스타크래프트: 브루드 워 시즌 1 세계 챔피언(랜덤, 1999), 큐브 드래프트 선구자, 특허 카지노 게임 발명가, World Series of Poker 탤런트 매니저, 『Betting on Yourself』 공저자.", blocks: [
+      exhibit: { kicker: "섹터 07 · 미디어 & 라이선싱", title: "Wayne “D22-soso” Chiang", lede: "첫 공식 스타크래프트: 브루드 워 시즌 1 세계 챔피언(랜덤, 1999), 큐브 드래프트 선구자, 특허 카지노 게임 발명가, World Series of Poker 탤런트 매니저, 『Betting on Yourself』 공저자.", blocks: [
         {},
         { items: [{ alt: "1999년 세계 챔피언십 트로피를 든 Wayne Chiang의 언론용 헤드샷", caption: "언론용 헤드샷, 시즌 1 트로피와 함께." }, { alt: "1999년 트로피들을 든 Wayne Chiang의 언론용 헤드샷", caption: "언론용 헤드샷, 1999년 트로피들과 함께." }, { alt: "각인된 1999년 세계 챔피언 트로피 클로즈업", caption: "D22-soso가 각인된 트로피 명판." }] },
         { title: "언론 & 미디어 키트", items: [{ label: "전체 미디어 키트 (.zip)" }, { label: "짧은 약력" }, { label: "긴 약력" }, { label: "팩트 시트" }, { label: "헤드샷 · 트로피" }, { label: "헤드샷 · PGL 시대" }, { label: "헤드샷 · 클로즈업" }] },
@@ -445,20 +470,27 @@ const SECTOR_T = {
       ] },
     },
     garden: {
-      name: "策略花园", short: "花园", tagline: "万智牌 · Cube Draft · 天梯", keyAlt: "Wayne Chiang 与 Brian Weissman",
-      exhibit: { kicker: "区域 02 · 桌面策略", title: "Cube 的起源之地", lede: "在即时战略之前，先有万智牌。Brian Weissman 在帕洛阿尔托一家 Round Table Pizza 将他带入竞技对局。他自创的轮抽牌池“The Cube”后来发展为 Cube Draft，成为 Magic Online 的常驻玩法。", blocks: [
+      name: "策略花园", short: "花园", tagline: "万智牌 · 职业巡回赛 · 天梯", keyAlt: "Wayne Chiang 与 Brian Weissman",
+      exhibit: { kicker: "区域 02 · 桌面策略", title: "竞技之路的起点", lede: "在即时战略之前，先有万智牌。Brian Weissman 在帕洛阿尔托一家 Round Table Pizza 将他带入竞技对局，他此后三次获得职业巡回赛资格，天梯攀登也从未停下。", blocks: [
         { items: [{ alt: "Wayne Chiang 与 Brian Weissman", caption: "与带他走进竞技万智牌的 Brian Weissman。" }] },
-        { text: "Cube Draft 创意的绝大部分公开功劳属于 Brian Weissman 和 Tom Martell。", cite: "Cube Draft 的起源" },
-        { title: "影像中的 Cube Draft", items: [{ title: "Magic History: The Cube", source: "The Tranquil Domain · 这一赛制的口述历史" }, { title: "Cube Draft 是谁创造的？", source: "Brian Weissman 讲述起源 · Wayne Chiang 频道" }, { title: "Kraken 万智牌名人 Cube Draft 锦标赛", source: "Kraken · 直播第一部分" }] },
-        { items: [["职业巡回赛", "纽约 ’01 · 波士顿 ’02 · 三次获得资格"], ["资格赛", "多次 PTQ 八强"], ["赛制", "Cube Draft · 开放赛制，无专利主张"]] },
+        { items: [["职业巡回赛", "纽约 ’01 · 波士顿 ’02 · 三次获得资格"], ["资格赛", "多次 PTQ 八强"]] },
         { title: "仍在攀登", items: [["2004", "《魔兽争霸 III》· 美西 FFA 第一 · 组队第二"], ["2015 →", "《炉石传说》· 传说第 35 名（标准 NA）· 第 11 名（狂野 NA）"], ["2018", "炉石狂野公开赛美洲区 · 32 强"], ["近期", "《皇室战争》挑战者 · 《英雄联盟》钻石 5 · Once Upon a Galaxy 第一"]] },
         { items: [{ alt: "《炉石传说》传说第 35 名截图", caption: "传说第 35 名，标准模式 NA。" }] },
-        { items: [{ label: "Cube Draft 展室" }, { label: "万智牌展室" }, { label: "X 上的 Kraken 名人 Cube Draft" }] },
+        { items: [{ label: "万智牌展室" }, { label: "炉石传说展室" }] },
+      ] },
+    },
+    cube: {
+      name: "Cube Draft 大厅", short: "Cube", tagline: "万智牌 · 开放赛制 · “The Cube”", keyAlt: "Cube Draft 徽章",
+      exhibit: { kicker: "区域 03 · 赛制起源", title: "Cube 的起源之地", lede: "当万智牌还只是 RTS 天梯之外的副业时，他把自创的轮抽牌池放在一个他称为“The Cube”的收纳盒里。它后来发展为 Cube Draft，成为 Magic Online 的常驻玩法。", blocks: [
+        { text: "Cube Draft 创意的绝大部分公开功劳属于 Brian Weissman 和 Tom Martell。", cite: "Cube Draft 的起源" },
+        { title: "影像中的 Cube Draft", items: [{ title: "Magic History: The Cube", source: "The Tranquil Domain · 这一赛制的口述历史" }, { title: "Cube Draft 是谁创造的？", source: "Brian Weissman 讲述起源 · Wayne Chiang 频道" }, { title: "Kraken 万智牌名人 Cube Draft 锦标赛", source: "Kraken · 直播第一部分" }] },
+        { items: [["起源", "他称为“The Cube”的自创轮抽牌池"], ["功劳", "Brian Weissman 与 Tom Martell 公开认可"], ["现今", "Magic Online 的常驻玩法"], ["赛制", "开放赛制 · 无专利主张"]] },
+        { items: [{ label: "Cube Draft 展室" }, { label: "X 上的 Kraken 名人 Cube Draft" }] },
       ] },
     },
     broadcast: {
       name: "广播站", short: "广播", tagline: "Live at the Bike · WSOP · 访谈", keyAlt: "世界扑克系列赛标志",
-      exhibit: { kicker: "区域 03 · 扑克与媒体", title: "从牌桌到控制室", lede: "十余年的高额扑克职业选手，后来走到镜头之后。作为 Live at the Bike 的共同所有者兼首席制作人，他将峰值观众从 2,500 提升到 8,800。如今他是世界扑克系列赛媒体团队的人才经理。", blocks: [
+      exhibit: { kicker: "区域 04 · 扑克与媒体", title: "从牌桌到控制室", lede: "十余年的高额扑克职业选手，后来走到镜头之后。作为 Live at the Bike 的共同所有者兼首席制作人，他将峰值观众从 2,500 提升到 8,800。如今他是世界扑克系列赛媒体团队的人才经理。", blocks: [
         { items: [{ alt: "Wayne Chiang 与 SlayerS_BoxeR 在 2025 WSOP", caption: "WSOP 2025，与 SlayerS_BoxeR。" }, { alt: "Wayne Chiang 与扑克职业选手 ElkY", caption: "与 ElkY。" }] },
         { title: "收看收听", items: [{ title: "WSOP 的视频博主热潮", source: "PokerOrg 问答" }, { title: "星际冠军、WSOP 人才经理", source: "The Flow Show · Jeff Gross" }, { title: "他靠扑克赚了数百万……", source: "Table 1 Podcast" }, { title: "Live at the Bike 前所有者", source: "Chasing Poker Greatness" }, { title: "Wayne Chiang Poker", source: "YouTube 频道" }] },
         { items: [["WSOP", "人才经理，媒体团队 · 视频博主计划"], ["Live at the Bike", "共同所有者兼首席制作人 · 峰值观众 2,500 → 8,800"], ["PokerCraft", "与 Hellmuth、Negreanu、Greenstein 的播客"], ["Global Poker", "资金挑战赛 · 第一名"]] },
@@ -467,7 +499,7 @@ const SECTOR_T = {
     },
     foundry: {
       name: "发明工坊", short: "工坊", tagline: "专利桌面游戏 · 可试玩演示", keyAlt: "2 Hand Hold’em 标志",
-      exhibit: { kicker: "区域 04 · 专利桌面游戏", title: "两手牌。一张牌面。", lede: "2 Hand Hold’em™ 让玩家拿到四张底牌，拆成两手独立的牌，对阵庄家的同一组公共牌。它已通过华盛顿州博彩委员会认证，并在赌场实地发牌。", blocks: [
+      exhibit: { kicker: "区域 05 · 专利桌面游戏", title: "两手牌。一张牌面。", lede: "2 Hand Hold’em™ 让玩家拿到四张底牌，拆成两手独立的牌，对阵庄家的同一组公共牌。它已通过华盛顿州博彩委员会认证，并在赌场实地发牌。", blocks: [
         {},
         { title: "2 Hand Hold’em 玩法", items: [["前注", "每手一注，两注金额相等。"], ["发牌", "你拿四张底牌，庄家三张，外加三张翻牌。"], ["分牌", "将四张牌分成两手各两张。"], ["让牌或加注", "每手独立让牌，或加注前注的 2 倍。"], ["摊牌", "发出转牌与河牌，每手分别与庄家对决。"]] },
         { items: [["2 Hand Hold’em™", "美国专利 11,117,045 · 11,731,032 · 12,005,342"], ["Badugi Chase™", "美国专利 11,810,421 · 12,131,608 · 共同发明人 Charles Chang"], ["边注", "Flounder 4 · Nessie 9 · 888 Flop Bonus · Community Bonus"]] },
@@ -479,7 +511,7 @@ const SECTOR_T = {
     },
     library: {
       name: "图书馆", short: "图书馆", tagline: "Betting on Yourself · Kendall Hunt", keyAlt: "《Betting on Yourself》书封",
-      exhibit: { kicker: "区域 05 · 作者", title: "Betting on Yourself", lede: "在商业、扑克与 AI 时代制胜。与财富 500 强高管兼 WSOP 冠军 Joe Matton 合著，2025 年 12 月由 Kendall Hunt 出版。", blocks: [
+      exhibit: { kicker: "区域 06 · 作者", title: "Betting on Yourself", lede: "在商业、扑克与 AI 时代制胜。与财富 500 强高管兼 WSOP 冠军 Joe Matton 合著，2025 年 12 月由 Kendall Hunt 出版。", blocks: [
         {},
         { items: [["作者", "Joe Matton 与 Wayne Chiang"], ["出版社", "Kendall Hunt · 2025 年 12 月"], ["ISBN", "9798319708007"], ["涵盖", "商业决策 · 扑克 · AI 时代"]] },
         { items: [{ label: "在 Amazon 购买" }, { label: "Kendall Hunt" }] },
@@ -487,7 +519,7 @@ const SECTOR_T = {
     },
     command: {
       name: "指挥中心", short: "指挥", tagline: "简介 · 媒体包 · 授权 · 联系", keyAlt: "Wayne Chiang 在 2025 年世界扑克系列赛",
-      exhibit: { kicker: "区域 06 · 媒体与授权", title: "Wayne “D22-soso” Chiang", lede: "首个官方《星际争霸：母巢之战》第一赛季世界冠军（随机种族，1999）、Cube Draft 先驱、专利赌场游戏发明人、世界扑克系列赛人才经理，以及《Betting on Yourself》合著者。", blocks: [
+      exhibit: { kicker: "区域 07 · 媒体与授权", title: "Wayne “D22-soso” Chiang", lede: "首个官方《星际争霸：母巢之战》第一赛季世界冠军（随机种族，1999）、Cube Draft 先驱、专利赌场游戏发明人、世界扑克系列赛人才经理，以及《Betting on Yourself》合著者。", blocks: [
         {},
         { items: [{ alt: "Wayne Chiang 手持 1999 年世界冠军奖杯的新闻头像", caption: "新闻头像，与第一赛季奖杯。" }, { alt: "Wayne Chiang 与 1999 年奖杯的新闻头像", caption: "新闻头像，与 1999 年奖杯。" }, { alt: "刻有铭文的 1999 年世界冠军奖杯特写", caption: "奖杯铭牌，刻着 D22-soso。" }] },
         { title: "新闻与媒体包", items: [{ label: "完整媒体包（.zip）" }, { label: "简短简介" }, { label: "详细简介" }, { label: "事实清单" }, { label: "头像 · 奖杯" }, { label: "头像 · PGL 时代" }, { label: "头像 · 特写" }] },
@@ -543,8 +575,8 @@ function applyBlock(base, tr) {
 }
 
 const ERA_T = {
-  ko: { "1995 – today": "1995 – 현재", "2010s – today": "2010년대 – 현재", "2015 – today": "2015 – 현재", "December 2025": "2025년 12월", "Today": "현재" },
-  zh: { "1995 – today": "1995 至今", "2010s – today": "2010年代至今", "2015 – today": "2015 至今", "December 2025": "2025年12月", "Today": "现今" },
+  ko: { "1995 – today": "1995 – 현재", "Late 1990s – today": "1990년대 후반 – 현재", "2010s – today": "2010년대 – 현재", "2015 – today": "2015 – 현재", "December 2025": "2025년 12월", "Today": "현재" },
+  zh: { "1995 – today": "1995 至今", "Late 1990s – today": "1990年代末至今", "2010s – today": "2010年代至今", "2015 – today": "2015 至今", "December 2025": "2025年12月", "Today": "现今" },
 };
 
 export function localizeSectors(baseSectors, locale) {
